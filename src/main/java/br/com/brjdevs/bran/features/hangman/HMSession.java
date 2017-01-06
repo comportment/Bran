@@ -39,7 +39,7 @@ public class HMSession {
 	private final List<String> mistakes;
 	
 	@Getter
-	private final HMEventListener listener;
+	private final IHMEvent listener;
 
 	private long lastGuess;
 
@@ -50,7 +50,7 @@ public class HMSession {
 	
 	private int shard;
 	public HMSession(Profile profile, HMWord word, TextChannel channel) {
-		this.listener = new HangManListener(this);
+		this.listener = new HMEventListener(this);
 		this.guesses = new LinkedHashMap<>();
 		this.creator = profile;
 		this.mistakes = new ArrayList<>();
