@@ -11,7 +11,7 @@ import br.com.brjdevs.bran.core.utils.MathUtils;
 import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.utils.Util;
 import br.com.brjdevs.bran.features.hangman.HMSession;
-import br.com.brjdevs.bran.features.hangman.HMSession.Status;
+import br.com.brjdevs.bran.features.hangman.HMSession.EmbedInfo;
 import br.com.brjdevs.bran.features.hangman.HMWord;
 import net.dv8tion.jda.core.entities.User;
 
@@ -43,7 +43,7 @@ public class HangManCommand {
 								}
 							}
 							session = new HMSession(event.getMember().getProfile(), Bot.getInstance().getData().getHMWords().get(MathUtils.random(Bot.getInstance().getData().getHMWords().size())), event.getTextChannel());
-							event.sendMessage(session.createEmbed(Status.INFO, event.getJDA())).queue();
+							event.sendMessage(session.createEmbed(EmbedInfo.INFO)).queue();
 						})
 						.build())
 				.addCommand(new CommandBuilder(Category.FUN)
