@@ -1,11 +1,7 @@
 package br.com.brjdevs.bran.cmds.misc;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.RegisterCommand;
-import br.com.brjdevs.bran.core.command.Category;
-import br.com.brjdevs.bran.core.command.CommandBuilder;
-import br.com.brjdevs.bran.core.command.CommandManager;
-import br.com.brjdevs.bran.core.command.TreeCommandBuilder;
+import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.data.DataManager;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
@@ -22,7 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Collectors;
 
-import static br.com.brjdevs.bran.core.Permissions.*;
+import static br.com.brjdevs.bran.core.Permissions.BOT_ADMIN;
 
 @RegisterCommand
 public class BotCommand {

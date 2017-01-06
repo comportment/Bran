@@ -1,16 +1,12 @@
 package br.com.brjdevs.bran.cmds.fun;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.RegisterCommand;
+import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.bran.core.audio.TrackContext;
 import br.com.brjdevs.bran.core.audio.TrackScheduler;
 import br.com.brjdevs.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.bran.core.command.Category;
-import br.com.brjdevs.bran.core.command.CommandBuilder;
-import br.com.brjdevs.bran.core.command.CommandManager;
-import br.com.brjdevs.bran.core.command.TreeCommandBuilder;
-import br.com.brjdevs.bran.core.Permissions;
+import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
 import br.com.brjdevs.bran.core.utils.ListBuilder;
 import br.com.brjdevs.bran.core.utils.ListBuilder.Format;

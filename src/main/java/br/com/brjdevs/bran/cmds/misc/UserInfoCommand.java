@@ -1,10 +1,10 @@
 package br.com.brjdevs.bran.cmds.misc;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.RegisterCommand;
 import br.com.brjdevs.bran.core.command.Category;
 import br.com.brjdevs.bran.core.command.CommandBuilder;
 import br.com.brjdevs.bran.core.command.CommandManager;
+import br.com.brjdevs.bran.core.command.RegisterCommand;
 import br.com.brjdevs.bran.core.utils.MathUtils;
 import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.utils.Util;

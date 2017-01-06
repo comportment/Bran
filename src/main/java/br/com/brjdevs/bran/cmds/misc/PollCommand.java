@@ -1,11 +1,7 @@
 package br.com.brjdevs.bran.cmds.misc;
 
-import br.com.brjdevs.bran.core.RegisterCommand;
 import br.com.brjdevs.bran.core.Permissions;
-import br.com.brjdevs.bran.core.command.Category;
-import br.com.brjdevs.bran.core.command.CommandBuilder;
-import br.com.brjdevs.bran.core.command.CommandManager;
-import br.com.brjdevs.bran.core.command.TreeCommandBuilder;
+import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.poll.Option;
 import br.com.brjdevs.bran.core.poll.Poll;
 import br.com.brjdevs.bran.core.utils.Util;

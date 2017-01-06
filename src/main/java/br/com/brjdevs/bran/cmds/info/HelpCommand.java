@@ -1,10 +1,6 @@
 package br.com.brjdevs.bran.cmds.info;
 
-import br.com.brjdevs.bran.core.RegisterCommand;
-import br.com.brjdevs.bran.core.command.Category;
-import br.com.brjdevs.bran.core.command.CommandBuilder;
-import br.com.brjdevs.bran.core.command.CommandManager;
-import br.com.brjdevs.bran.core.command.ICommand;
+import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.utils.StringUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;

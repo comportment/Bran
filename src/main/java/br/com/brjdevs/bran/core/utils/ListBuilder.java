@@ -1,6 +1,6 @@
 package br.com.brjdevs.bran.core.utils;
 
-import com.sun.istack.internal.NotNull;
+import lombok.NonNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +32,7 @@ public class ListBuilder {
 		if (list.size() % itemsShown == 0) return list.size() / itemsShown;
 		return (list.size() / itemsShown) + 1;
 	}
-	public String format(@NotNull Format format, String... markdown) {
+	public String format(@NonNull Format format, String... markdown) {
 		int min = (page * itemsShown) - itemsShown;
 		int max = page * itemsShown;
 		switch (format) {

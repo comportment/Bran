@@ -1,12 +1,8 @@
 package br.com.brjdevs.bran.cmds.botAdmin;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.RegisterCommand;
 import br.com.brjdevs.bran.core.Permissions;
-import br.com.brjdevs.bran.core.command.Category;
-import br.com.brjdevs.bran.core.command.CommandBuilder;
-import br.com.brjdevs.bran.core.command.CommandManager;
-import br.com.brjdevs.bran.core.command.TreeCommandBuilder;
+import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.utils.ListBuilder;
 import br.com.brjdevs.bran.core.utils.ListBuilder.Format;
 import br.com.brjdevs.bran.core.utils.MathUtils;

@@ -1,11 +1,6 @@
 package br.com.brjdevs.bran.cmds.fun;
 
-import br.com.brjdevs.bran.core.RegisterCommand;
-import br.com.brjdevs.bran.core.command.Category;
-import br.com.brjdevs.bran.core.command.CommandBuilder;
-import br.com.brjdevs.bran.core.command.CommandManager;
-import br.com.brjdevs.bran.core.command.TreeCommandBuilder;
-import br.com.brjdevs.bran.core.command.Action;
+import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.data.guild.configs.GuildMember;
 import br.com.brjdevs.bran.core.data.guild.configs.profile.Profile;
 import br.com.brjdevs.bran.core.data.guild.configs.profile.Profile.Rank;

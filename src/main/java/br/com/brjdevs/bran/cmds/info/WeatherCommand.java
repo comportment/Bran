@@ -1,11 +1,11 @@
 package br.com.brjdevs.bran.cmds.info;
 
-import br.com.brjdevs.bran.core.RegisterCommand;
 import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.WeatherSearch;
 import br.com.brjdevs.bran.core.command.Category;
 import br.com.brjdevs.bran.core.command.CommandBuilder;
 import br.com.brjdevs.bran.core.command.CommandManager;
+import br.com.brjdevs.bran.core.command.RegisterCommand;
 import br.com.brjdevs.bran.core.utils.Util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

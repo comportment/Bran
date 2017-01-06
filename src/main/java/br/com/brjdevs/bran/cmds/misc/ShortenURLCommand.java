@@ -1,11 +1,13 @@
 package br.com.brjdevs.bran.cmds.misc;
 
-import br.com.brjdevs.bran.core.RegisterCommand;
 import br.com.brjdevs.bran.core.command.Category;
 import br.com.brjdevs.bran.core.command.CommandBuilder;
 import br.com.brjdevs.bran.core.command.CommandManager;
+import br.com.brjdevs.bran.core.command.RegisterCommand;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 

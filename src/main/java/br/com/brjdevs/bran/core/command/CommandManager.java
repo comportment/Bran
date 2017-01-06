@@ -1,16 +1,15 @@
 package br.com.brjdevs.bran.core.command;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.RegisterCommand;
+import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.PrefixManager;
-import br.com.brjdevs.bran.core.data.guild.configs.impl.GuildMemberImpl.FakeGuildMemberImpl;
-import br.com.brjdevs.bran.core.utils.DiscordLog;
-import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.bran.core.data.guild.configs.GuildMember;
-import br.com.brjdevs.bran.core.Permissions;
+import br.com.brjdevs.bran.core.data.guild.configs.impl.GuildMemberImpl.FakeGuildMemberImpl;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
+import br.com.brjdevs.bran.core.utils.DiscordLog;
+import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;

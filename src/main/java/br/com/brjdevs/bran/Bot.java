@@ -17,7 +17,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.dv8tion.jda.core.*;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.Event;
@@ -29,7 +29,10 @@ import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Bot implements EventListener {
     public static final int MAX_PREFIXES = 5;
@@ -45,7 +48,7 @@ public class Bot implements EventListener {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     public static SimpleLog LOG = SimpleLog.getLog("Application");
     public static TextChannel LOG_CHANNEL;
-    private final long START_TIME = System.currentTimeMillis();
+    private long START_TIME = System.currentTimeMillis();
     public static void main(String[] args) {
 	    try {
 		    File DIR = new File(getInstance().WORKING_DIR);

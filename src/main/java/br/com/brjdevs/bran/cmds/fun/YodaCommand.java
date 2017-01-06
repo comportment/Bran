@@ -1,9 +1,9 @@
 package br.com.brjdevs.bran.cmds.fun;
 
-import br.com.brjdevs.bran.core.RegisterCommand;
 import br.com.brjdevs.bran.core.command.Category;
 import br.com.brjdevs.bran.core.command.CommandBuilder;
 import br.com.brjdevs.bran.core.command.CommandManager;
+import br.com.brjdevs.bran.core.command.RegisterCommand;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 

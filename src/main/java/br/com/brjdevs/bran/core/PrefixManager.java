@@ -22,8 +22,7 @@ public class PrefixManager {
         List<String> prefixes = discordGuild != null ? discordGuild.getPrefixes() : Arrays.asList(Bot.getInstance().getDefaultPrefixes());
         return prefixes.stream()
                 .filter(prefix -> string.length() > prefix.length() && string.startsWith(prefix)
-                        && discordGuild
-                        .getCustomCommands().getCustomCommand(string.substring(prefix.length())) != null)
+                        && discordGuild.getCustomCommands().getCustomCommand(string.substring(prefix.length())) != null)
                 .findFirst().orElse(null);
     }
 }

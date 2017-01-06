@@ -1,6 +1,5 @@
 package br.com.brjdevs.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.bran.core.RegisterCommand;
 import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.RolePick;
 import br.com.brjdevs.bran.core.RolePick.RolePickAction;

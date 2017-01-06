@@ -1,9 +1,9 @@
 package br.com.brjdevs.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.bran.core.RegisterCommand;
 import br.com.brjdevs.bran.core.command.Category;
 import br.com.brjdevs.bran.core.command.CommandBuilder;
 import br.com.brjdevs.bran.core.command.CommandManager;
+import br.com.brjdevs.bran.core.command.RegisterCommand;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
