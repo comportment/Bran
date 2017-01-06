@@ -1,14 +1,8 @@
 package br.com.brjdevs.bran.jdaLoader.impl;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.audio.Choice.ChoiceListener;
-import br.com.brjdevs.bran.core.audio.utils.VoiceChannelListener;
-import br.com.brjdevs.bran.core.command.CommandManager;
 import br.com.brjdevs.bran.core.data.bot.Config;
-import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.bran.core.listeners.*;
 import br.com.brjdevs.bran.core.utils.Util;
-import br.com.brjdevs.bran.features.hangman.HMListener;
 import br.com.brjdevs.bran.jdaLoader.JDALoader;
 import br.com.brjdevs.bran.jdaLoader.LoaderType;
 import net.dv8tion.jda.core.AccountType;
@@ -21,9 +15,10 @@ import net.dv8tion.jda.core.hooks.EventListener;
 import org.reflections.Reflections;
 
 import javax.security.auth.login.LoginException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class JDALoaderImpl implements JDALoader {
 	private final LoaderType loaderType;
