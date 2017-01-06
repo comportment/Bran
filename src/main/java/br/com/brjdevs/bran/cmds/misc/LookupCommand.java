@@ -33,7 +33,7 @@ public class LookupCommand {
 						return;
 					}
 					String status = result.get("status").getAsString();
-					if (!status.equals("success")) {
+					if (!"success".equals(status)) {
 						event.sendMessage(result.get("message").getAsString()).queue();
 						return;
 					}

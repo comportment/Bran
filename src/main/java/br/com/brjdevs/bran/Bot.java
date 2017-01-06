@@ -56,6 +56,7 @@ public class Bot implements EventListener {
 			    LOG.warn("Couldn't create expected directory to save files, please create a folder named 'data' in the current directory to make sure it won't happen again.");
 			    System.exit(0);
 		    }
+		    getInstance().setConfig();
 		    getInstance().build();
 		    LOG_CHANNEL = shards.entrySet().stream().filter(entry -> entry.getValue().getTextChannelById("249971874430320660") != null).findFirst().get().getValue().getTextChannelById("249971874430320660");
 		    LOG.info("Logged in as " + Util.getUser(getInstance().getSelfUser(shards.get(0))));
@@ -183,39 +184,41 @@ public class Bot implements EventListener {
             return false;
         }
     }
+    private void setConfig() {
+	    try {
+		    if (!CONFIG_FILE.exists()) {
+			    LOG.warn("No config.json file was found, creating example config.json...");
+			    if (CONFIG_FILE.createNewFile()) {
+				    BufferedWriter writer = new BufferedWriter(new FileWriter(CONFIG_FILE));
+				    writer.write(GSON.toJson(CONFIG));
+				    writer.close();
+				    LOG.warn("Please, populate the config.json file with valid properties before running the jar again.");
+			    } else
+				    LOG.fatal("Failed to generate config.json.");
+			    System.exit(0);
+		    } else {
+			    LOG.info("Found config.json, loading properties...");
+			    BufferedReader reader = new BufferedReader(new FileReader(CONFIG_FILE));
+			    CONFIG = GSON.fromJson(reader, Config.class);
+			    reader.close();
+			    if (Util.isEmpty(CONFIG.getToken())) {
+				    LOG.fatal("The set Token is invalid, please insert a valid token!");
+				    System.exit(0);
+			    }
+			    if (Util.isEmpty(CONFIG.getOwnerId())) {
+				    LOG.fatal("The set Owner ID is invalid.");
+				    System.exit(0);
+			    }
+			    if (Util.isEmpty(CONFIG.getDiscordBotsToken())) {
+				    LOG.info("Discord Bots Token was not provided, disabled command bot.updateStats.");
+			    }
+			    LOG.info("Loaded config.json!");
+		    }
+	    } catch (IOException e) {
+		    e.printStackTrace();
+	    }
+    }
     private void build() throws LoginException, RateLimitedException, UnirestException, IOException {
-        try {
-            if (!CONFIG_FILE.exists()) {
-                LOG.warn("No config.json file was found, creating example config.json...");
-                if (CONFIG_FILE.createNewFile()) {
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(CONFIG_FILE));
-                    writer.write(GSON.toJson(CONFIG));
-                    writer.close();
-                    LOG.warn("Please, populate the config.json file with valid properties before running the jar again.");
-                } else
-                    LOG.fatal("Failed to generate config.json.");
-                System.exit(0);
-            } else {
-                LOG.info("Found config.json, loading properties...");
-                BufferedReader reader = new BufferedReader(new FileReader(CONFIG_FILE));
-                CONFIG = GSON.fromJson(reader, Config.class);
-                reader.close();
-                if (Util.isEmpty(CONFIG.getToken())) {
-                    LOG.fatal("The set Token is invalid, please insert a valid token!");
-                    System.exit(0);
-                }
-                if (Util.isEmpty(CONFIG.getOwnerId())) {
-                    LOG.fatal("The set Owner ID is invalid.");
-                    System.exit(0);
-                }
-                if (Util.isEmpty(CONFIG.getDiscordBotsToken())) {
-                    LOG.info("Discord Bots Token was not provided, disabled command bot.updateStats.");
-                }
-                LOG.info("Loaded config.json!");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         int requiredShards = getInstance().getRequiredShards();
         LOG.info(requiredShards < 2 ? "Discord does not ask for sharding yet." : "Discord recommends " + requiredShards + " shards.");
         JDALoader jdaLoader = new JDALoaderImpl(requiredShards < 2 ? LoaderType.SINGLE : LoaderType.SHARDED);

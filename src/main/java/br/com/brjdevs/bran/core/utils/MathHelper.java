@@ -6,8 +6,8 @@
 package br.com.brjdevs.bran.core.utils;
 
 public class MathHelper {
-    public static int roundToPowerOf2(int value) {
-        value--;
+    public static int roundToPowerOf2(int i) {
+        int value = i - 1;
         value |= value >> 1;
         value |= value >> 2;
         value |= value >> 4;
@@ -23,8 +23,8 @@ public class MathHelper {
         return value >> 1;
     }
 
-    public static long roundToPowerOf2(long value) {
-        value--;
+    public static long roundToPowerOf2(long l) {
+        long value = l - 1;
         value |= value >> 1;
         value |= value >> 2;
         value |= value >> 4;

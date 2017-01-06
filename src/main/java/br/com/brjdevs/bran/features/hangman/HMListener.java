@@ -26,7 +26,7 @@ public class HMListener implements EventListener {
 		if (session == null) return;
 		String msg = event.getMessage().getRawContent();
 		TextChannel channel = event.getChannel();
-		if (msg.equals("giveup")) {
+		if ("giveup".equals(msg)) {
 			if (session.getCreator() != profile) {
 				session.remove(profile);
 				profile.getHMStats().defeats++;
@@ -40,7 +40,7 @@ public class HMListener implements EventListener {
 			return;
 		}
 		if (session.getChannel() != event.getChannel()) return;
-		if (msg.equals("info")) {
+		if ("info".equals(msg)) {
 			channel.sendMessage(session.createEmbed(Status.INFO, event.getJDA())).queue();
 			return;
 		}

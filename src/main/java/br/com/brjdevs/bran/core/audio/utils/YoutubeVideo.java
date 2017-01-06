@@ -12,9 +12,9 @@ public class YoutubeVideo {
 	String id = null;
 	String name = null;
 	String duration = null;//Youtube has strange duration strings suchs as PT2H3M33S
-	String description = null;
-	String channelId = null;
-	String channelTitle = null;
+	private String description = null;
+	private String channelId = null;
+	private String channelTitle = null;
 	
 	public String getId() {
 		return id;

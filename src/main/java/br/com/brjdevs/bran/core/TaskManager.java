@@ -85,7 +85,7 @@ public class TaskManager {
                 for (int i = 0; i != Choice.getChoices().size() - 1; i++) {
                     if (Choice.getChoices().isEmpty()) break;
                     Choice c = Choice.getChoices().get(i);
-                    if (!(c.getCreationInMillis() < (System.currentTimeMillis() + 12000))) continue;
+                    if (c.getCreationInMillis() >= (System.currentTimeMillis() + 12000)) continue;
                     if (c.getMessage() != null)
                         c.getMessage().deleteMessage().queue();
                     c.getChannel().sendTyping().queue(success -> c.getChannel().sendMessage("You took to long to pick a song, query canceled!").queue());
