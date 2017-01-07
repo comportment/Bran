@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Session {
+	
+	private final Runtime instance = Runtime.getRuntime();
+	private final int mb = 1024 * 1024;
 	public double cpuUsage;
 	public long cmds;
 	public long msgsReceived;
@@ -25,18 +28,18 @@ public class Session {
 		this.msgsReceived = 0;
 		this.msgsSent = 0;
 	}
+
 	public void readMessage(boolean isSelf) {
 		if (isSelf) msgsSent++; else msgsReceived++;
 	}
-	private final Runtime instance = Runtime.getRuntime();
-	private final int mb = 1024 * 1024;
+
 	public MessageEmbed toEmbed (CommandEvent event) {
 		List<Guild> guilds = Bot.getInstance().getGuilds();
 		List<TextChannel> channels = Bot.getInstance().getTextChannels();
 		List<VoiceChannel> voiceChannels = Bot.getInstance().getVoiceChannels();
 		List<User> users = Bot.getInstance().getUsers();
 		int audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).collect(Collectors.toList()).size();
-		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).count();
+		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).map(entry -> entry.getValue().getTrackScheduler().getQueue().size()).count();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";
 		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null).count();
 		JDA jda = event.getJDA();
@@ -91,7 +94,7 @@ public class Session {
 		List<VoiceChannel> voiceChannels = Bot.getInstance().getVoiceChannels();
 		List<User> users = Bot.getInstance().getUsers();
 		int audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).collect(Collectors.toList()).size();
-		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).count();
+		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).map(entry -> entry.getValue().getTrackScheduler().getQueue().size()).count();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";
 		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null).count();
 		String out = "";

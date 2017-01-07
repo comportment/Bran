@@ -19,33 +19,21 @@ public class VoiceChannelListener implements EventListener {
 	
 	public static final JsonObject musicTimeout = new JsonObject();
 	
-	@Override
-	public void onEvent(Event e) {
-		if (!(e instanceof GenericGuildVoiceEvent)) return;
-		GenericGuildVoiceEvent event = (GenericGuildVoiceEvent) e;
-		if (event instanceof GuildVoiceMoveEvent) {
-			onLeave(event.getGuild(), ((GuildVoiceMoveEvent) event).getChannelLeft());
-			onJoin(event.getGuild(), ((GuildVoiceMoveEvent) event).getChannelJoined(), event.getMember());
-		} else if (event instanceof GuildVoiceJoinEvent)
-			onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
-		else if (event instanceof GuildVoiceLeaveEvent)
-			onLeave(event.getGuild(), ((GuildVoiceLeaveEvent) event).getChannelLeft());
-	}
 	private static void onJoin(Guild guild, VoiceChannel voiceChannel, Member member) {
-		if (!musicTimeout.has(guild.getId())) return;
+		if (member.equals(guild.getSelfMember()) || !musicTimeout.has(guild.getId())) return;
 		GuildMusicManager player = AudioUtils.getManager().getGuildMusicManager(guild);
 		TrackContext track = player.getTrackScheduler().getCurrentTrack();
 		if (track == null) return;
 		JsonObject info = musicTimeout.get(guild.getId()).getAsJsonObject();
 		VoiceChannel channel = guild.getJDA().getVoiceChannelById(info.get("channelId").getAsString());
-		if (channel == null) return;
-		if (channel != voiceChannel) return;
+		if (channel == null || channel != voiceChannel) return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect()) AudioUtils.connect(channel, track.getContext(channel.getJDA()));
 		player.getPlayer().setPaused(false);
 		if (track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
 			track.getContext(guild.getJDA()).sendMessage(Util.getUser(member.getUser()) + " joined the channel, resumed the player!").queue();
 		musicTimeout.remove(guild.getId());
 	}
+
 	private static void onLeave(Guild guild, VoiceChannel voiceChannel) {
 		if (!AudioUtils.isAlone(voiceChannel)) return;
 		GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(guild);
@@ -62,5 +50,18 @@ public class VoiceChannelListener implements EventListener {
 		info.addProperty("timeout", 120);
 		info.addProperty("shard", Bot.getInstance().getShardId(guild.getJDA()));
 		musicTimeout.add(guild.getId(), info);
+	}
+	
+	@Override
+	public void onEvent(Event e) {
+		if (!(e instanceof GenericGuildVoiceEvent)) return;
+		GenericGuildVoiceEvent event = (GenericGuildVoiceEvent) e;
+		if (event instanceof GuildVoiceMoveEvent) {
+			onLeave(event.getGuild(), ((GuildVoiceMoveEvent) event).getChannelLeft());
+			onJoin(event.getGuild(), ((GuildVoiceMoveEvent) event).getChannelJoined(), event.getMember());
+		} else if (event instanceof GuildVoiceJoinEvent)
+			onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
+		else if (event instanceof GuildVoiceLeaveEvent)
+			onLeave(event.getGuild(), ((GuildVoiceLeaveEvent) event).getChannelLeft());
 	}
 }

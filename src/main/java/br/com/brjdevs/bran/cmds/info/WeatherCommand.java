@@ -4,7 +4,6 @@ import br.com.brjdevs.bran.core.command.Category;
 import br.com.brjdevs.bran.core.command.CommandBuilder;
 import br.com.brjdevs.bran.core.command.CommandManager;
 import br.com.brjdevs.bran.core.command.RegisterCommand;
-import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.managers.WeatherSearch;
 import br.com.brjdevs.bran.core.utils.Util;
 import com.google.gson.JsonElement;
@@ -21,7 +20,6 @@ public class WeatherCommand {
 				.setName("Weather Command")
 				.setDescription("Gives you weather information on a place.")
 				.setArgs("<location>")
-				.setRequiredPermission(Permissions.BOT_ADMIN)
 				.setAction((event) -> {
 					String query = event.getArgs(2)[1];
 					JsonElement element;

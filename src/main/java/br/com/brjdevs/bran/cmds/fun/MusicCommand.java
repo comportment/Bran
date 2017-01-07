@@ -46,7 +46,7 @@ public class MusicCommand {
 								vchan = AudioUtils.connect(event.getOriginMember().getVoiceState().getChannel(), event.getTextChannel());
 								if (vchan == null) return;
 							} else if (vchan == null && !event.getOriginMember().getVoiceState().inVoiceChannel()) {
-								event.sendMessage(Quote.getQuote(Quote.FAIL) + "Before asking for songs join a Voice Channel ").queue();
+								event.sendMessage(Quote.getQuote(Quote.FAIL) + "Before asking for songs you should join a Voice Channel ").queue();
 								return;
 							}
 							if (vchan == null) {
@@ -62,7 +62,7 @@ public class MusicCommand {
 							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
 							if (trackUrl.isEmpty()) {
 								if (!musicManager.getPlayer().isPaused())
-									event.sendMessage("You have to tell me a Song Name o URL!").queue();
+									event.sendMessage("You have to tell me a song name or link!").queue();
 								else {
 									musicManager.getPlayer().setPaused(false);
 									event.sendMessage("Resumed the Player!").queue();
@@ -71,7 +71,8 @@ public class MusicCommand {
 							}
 							event.getMessage().deleteMessage().queue();
 							TrackScheduler scheduler = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild()).getTrackScheduler();
-							if (event.getGuild().getMusicSettings().getMaxSongsPerUser() > 0 && scheduler.getTracksBy(event.getAuthor()).size() > event.getGuild().getMusicSettings().getMaxSongsPerUser()) {
+							List<TrackContext> tracksByUser = scheduler.getTracksBy(event.getAuthor());
+							if (event.getGuild().getMusicSettings().getMaxSongsPerUser() > 0 && tracksByUser.size() >= event.getGuild().getMusicSettings().getMaxSongsPerUser()) {
 								event.sendMessage("You can only have " + event.getGuild().getMusicSettings().getMaxSongsPerUser() + " songs in the queue.").queue();
 								return;
 							}
@@ -162,7 +163,7 @@ public class MusicCommand {
 								builder.append("Author: `" + info.author + "`\n");
 								builder.append("Duration: `" + AudioUtils.format(musicManager.getPlayer().getPlayingTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "`\n");
 								builder.append("DJ: `" + Util.getUser(musicManager.getTrackScheduler().getCurrentTrack().getDJ(event.getJDA())) + "`\n");
-								builder.append("URL: `" + scheduler.getCurrentTrack().getURL() + "`");
+								builder.append("URL: `" + scheduler.getCurrentTrack().getURL() + "`\n");
 							}
 							builder.append("__Queue__ (" + scheduler.getQueue().size() + " entries) - Page " + page + "/" + (list.size() / 15 + 1) + "\n\n");
 							ListBuilder listBuilder = new ListBuilder(list, page, 15);
@@ -175,7 +176,6 @@ public class MusicCommand {
 						.setAliases("repeat")
 						.setName("Repeat Toggle Command")
 						.setDescription("Toggles the Repeat.")
-						
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
 							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
@@ -202,7 +202,6 @@ public class MusicCommand {
 						.setAliases("reset", "stop")
 						.setName("Music Stop Command")
 						.setDescription("Completely stops the Music Player.")
-						
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
 							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());

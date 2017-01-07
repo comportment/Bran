@@ -49,8 +49,8 @@ public class TaskManager {
         );
         startAsyncTask(() -> musicTimeout.entrySet().forEach(entry -> {
             try {
-                JDA jda = Bot.getInstance().getShards().get(musicTimeout.get("shard").getAsInt());
-                Guild guild = jda.getGuildById(entry.getKey());
+	            JDA jda = Bot.getInstance().getShard(entry.getValue().getAsJsonObject().get("shard").getAsInt());
+	            Guild guild = jda.getGuildById(entry.getKey());
                 if (guild == null) {
                     musicTimeout.remove(entry.getKey());
                     return;
