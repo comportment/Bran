@@ -1,4 +1,4 @@
-package br.com.brjdevs.bran.core;
+package br.com.brjdevs.bran.core.managers;
 
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
@@ -28,34 +28,42 @@ public class RolePick {
 		this.action = action;
 		rolesPick.add(this);
 	}
-	public String getUserId() {
-		return userId;
-	}
-	public List<String> getRolesId() {
-		return rolesId;
-	}
-	public Message getMessage() {
-		return message;
-	}
-	public String getChannelId() {
-		return channelId;
-	}
-	public int getAttempts() {
-		return attempts;
-	}
-	public void addAttempt() {
-		attempts++;
-	}
-	public void remove() {
-		rolesPick.remove(this);
-	}
-	public RolePickAction getAction() {
-		return action;
-	}
 	
 	public static RolePick getRolePick(User user) {
 		return rolesPick.stream().filter(pick -> pick.getUserId().equals(user.getId()))
 				.findFirst().orElse(null);
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public List<String> getRolesId() {
+		return rolesId;
+	}
+	
+	public Message getMessage() {
+		return message;
+	}
+	
+	public String getChannelId() {
+		return channelId;
+	}
+	
+	public int getAttempts() {
+		return attempts;
+	}
+	
+	public void addAttempt() {
+		attempts++;
+	}
+	
+	public void remove() {
+		rolesPick.remove(this);
+	}
+	
+	public RolePickAction getAction() {
+		return action;
 	}
 	
 	public enum RolePickAction {

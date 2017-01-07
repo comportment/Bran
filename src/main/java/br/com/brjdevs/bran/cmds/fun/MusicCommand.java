@@ -1,12 +1,12 @@
 package br.com.brjdevs.bran.cmds.fun;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.bran.core.audio.TrackContext;
 import br.com.brjdevs.bran.core.audio.TrackScheduler;
 import br.com.brjdevs.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.bran.core.command.*;
+import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
 import br.com.brjdevs.bran.core.utils.ListBuilder;
 import br.com.brjdevs.bran.core.utils.ListBuilder.Format;
@@ -20,7 +20,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static br.com.brjdevs.bran.core.Permissions.DJ;
+import static br.com.brjdevs.bran.core.managers.Permissions.DJ;
 
 @RegisterCommand
 public class MusicCommand {
@@ -91,7 +91,7 @@ public class MusicCommand {
 							AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
 							TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
 							EmbedBuilder embedBuilder = new EmbedBuilder();
-							embedBuilder.setAuthor((musicManager.getPlayer().isPaused() ? PAUSED : PLAYING) + " Now Playing", "https://www.youtube.com/watch?v=" + info.identifier, null);
+							embedBuilder.setAuthor((musicManager.getPlayer().isPaused() ? PAUSED : PLAYING) + " Now Playing", context.getURL(), null);
 							embedBuilder.addField("Title", info.title, false)
 									.addField("Duration", AudioUtils.format(context.getOrigin().getPosition()) + "/" + AudioUtils.format(info.length), true)
 									.addField("Author", info.author, true);
@@ -162,7 +162,7 @@ public class MusicCommand {
 								builder.append("Author: `" + info.author + "`\n");
 								builder.append("Duration: `" + AudioUtils.format(musicManager.getPlayer().getPlayingTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "`\n");
 								builder.append("DJ: `" + Util.getUser(musicManager.getTrackScheduler().getCurrentTrack().getDJ(event.getJDA())) + "`\n");
-								builder.append("URL: `https://www.youtube.com/watch?v=" + info.identifier + "`\n\n");
+								builder.append("URL: `" + scheduler.getCurrentTrack().getURL() + "`");
 							}
 							builder.append("__Queue__ (" + scheduler.getQueue().size() + " entries) - Page " + page + "/" + (list.size() / 15 + 1) + "\n\n");
 							ListBuilder listBuilder = new ListBuilder(list, page, 15);

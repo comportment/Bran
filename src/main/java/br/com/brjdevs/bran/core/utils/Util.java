@@ -7,6 +7,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.Random;
 
 public class Util {
@@ -63,4 +64,8 @@ public class Util {
         }
         return builder.toString();
     }
+	
+	public static boolean containsEqualsIgnoreCase(Collection<String> collection, String s) {
+		return collection.stream().anyMatch((item) -> item.equalsIgnoreCase(s));
+	}
 }

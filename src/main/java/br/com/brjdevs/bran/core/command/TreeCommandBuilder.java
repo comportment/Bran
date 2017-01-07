@@ -2,8 +2,8 @@ package br.com.brjdevs.bran.core.command;
 
 import br.com.brjdevs.bran.Bot;
 import br.com.brjdevs.bran.core.data.guild.configs.GuildMember;
-import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.data.guild.configs.impl.GuildMemberImpl.FakeGuildMemberImpl;
+import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
 import br.com.brjdevs.bran.core.utils.StringUtils;
@@ -23,10 +23,10 @@ public class TreeCommandBuilder {
     private String defaultcmd = null;
     private String example = null;
     private Category category = Category.UNKNOWN;
-    private Action onNotFound = Action.SHOW_ERROR;
-    private Action onMissingPermission = Action.SHOW_ERROR;
-    
-    public TreeCommandBuilder(Category category) {
+	private CommandAction onNotFound = CommandAction.SHOW_ERROR;
+	private CommandAction onMissingPermission = CommandAction.SHOW_ERROR;
+	
+	public TreeCommandBuilder(Category category) {
         this.category = category;
     }
     
@@ -62,12 +62,14 @@ public class TreeCommandBuilder {
         this.example = example;
         return this;
     }
-    public TreeCommandBuilder onNotFound(Action action) {
-        this.onNotFound = action;
+	
+	public TreeCommandBuilder onNotFound(CommandAction action) {
+		this.onNotFound = action;
         return this;
     }
-    public TreeCommandBuilder onMissingPermission(Action action) {
-        this.onMissingPermission = action;
+	
+	public TreeCommandBuilder onMissingPermission(CommandAction action) {
+		this.onMissingPermission = action;
         return this;
     }
     private boolean check() {
@@ -97,15 +99,13 @@ public class TreeCommandBuilder {
                 }
                 if (cmd == null) {
                     //if (splitArgs.length > 1) {
-                        if (onNotFound == Action.SHOW_ERROR) {
-                            event.sendMessage(Quote.getQuote(Quote.FAIL) + "`" + splitArgs[1] + "` is not a valid command for `" + event.getCommand().getName() + "`. Please use `" + event.getPrefix() + help + "` to get help.").queue();
+	                if (onNotFound == CommandAction.SHOW_ERROR) {
+		                event.sendMessage(Quote.getQuote(Quote.FAIL) + "`" + splitArgs[1] + "` is not a valid command for `" + event.getCommand().getName() + "`. Please use `" + event.getPrefix() + help + "` to get help.").queue();
                             return;
-                        }
-                        else if (onNotFound == Action.SHOW_HELP) {
+                        } else if (onNotFound == CommandAction.SHOW_HELP) {
                             event.sendMessage(CommandManager.getHelp(this, event.getMember(), event.getOriginGuild().getSelfMember())).queue();
                             return;
-                        }
-                        else if (onNotFound == Action.REDIRECT && defaultcmd != null) {
+                        } else if (onNotFound == CommandAction.REDIRECT && defaultcmd != null) {
                             cmd = getSubCommands().stream().filter(c -> c.getAliases().contains(defaultcmd))
                                     .findFirst().orElse(null);
                             isDefault = true;
@@ -127,16 +127,15 @@ public class TreeCommandBuilder {
                 }
                 GuildMember member = event.getGuild() != null ? event.getGuild().getMember(event.getAuthor()) : new FakeGuildMemberImpl(event.getAuthor().getId(), null);
                 if (!member.hasPermission(cmd.getRequiredPermission(), event.getJDA())) {
-                    if (onMissingPermission == Action.SHOW_ERROR) {
-                        builder.append(Quote.FAIL);
+	                if (onMissingPermission == CommandAction.SHOW_ERROR) {
+		                builder.append(Quote.FAIL);
                         builder.append("You don't have enough permissions to do this!\n" +
                                 "Missing Permission(s): *" +
                                 String.join(", ", Permissions
                                         .toCollection(cmd.getRequiredPermission())) + "*");
                         event.sendMessage(builder.build()).queue();
                         return;
-                    }
-                    else if (onMissingPermission == Action.REDIRECT) {
+                    } else if (onMissingPermission == CommandAction.REDIRECT) {
                         if (!isDefault && defaultcmd != null) {
                             ICommand cmd2 = getSubCommands().stream().filter(c -> c.getAliases().contains(defaultcmd))
                                     .findFirst().orElse(null);

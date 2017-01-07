@@ -43,21 +43,21 @@ public class JDALoaderImpl implements JDALoader {
 				.setToken(config.getToken()).setAudioEnabled(true)
 				.setAutoReconnect(true)
 				.addListener(new Reflections("br.com.brjdevs.bran")
-								.getSubTypesOf(EventListener.class).stream()
-								.map(clazz -> {
-									try {
-										return clazz.newInstance();
-									} catch (Exception e) {
-										Bot.LOG.log(e);
-									}
-									return null;
-								}).filter(Objects::nonNull).toArray());
+						.getSubTypesOf(EventListener.class).stream()
+						.map(clazz -> {
+							try {
+								return clazz.newInstance();
+							} catch (Exception e) {
+								Bot.LOG.log(e);
+							}
+							return null;
+						}).filter(Objects::nonNull).toArray());
 		if (loaderType == LoaderType.SHARDED) {
 			for (int i = 0; i < shards; i++) {
 				Bot.LOG.info("Building Shard " + i + "/" + (shards - 1));
 				jdaBuilder.useSharding(i, shards);
 				if (config.getGame() != null && !config.getGame().isEmpty())
-					jdaBuilder.setGame(config.isStream() ? Game.of("[" + i + "] " + config.getGame(), "https://twitch.tv/ ") : Game.of("[" + i + "]" + config.getGame()));
+					jdaBuilder.setGame(config.isGameStream() ? Game.of("[" + i + "] " + config.getGame(), "https://twitch.tv/ ") : Game.of("[" + i + "]" + config.getGame()));
 				JDA jda = jdaBuilder.buildAsync();
 				while (jda.getStatus() != Status.CONNECTED && isComplete)
 					Util.sleep(100);
@@ -72,7 +72,7 @@ public class JDALoaderImpl implements JDALoader {
 		} else {
 			Bot.LOG.info("Building single JDA instance...");
 			if (config.getGame() != null && !config.getGame().isEmpty())
-				jdaBuilder.setGame(config.isStream() ? Game.of(config.getGame(), "https://twitch.tv/ ") : Game.of(config.getGame()));
+				jdaBuilder.setGame(config.isGameStream() ? Game.of(config.getGame(), "https://twitch.tv/ ") : Game.of(config.getGame()));
 			JDA jda = jdaBuilder.buildAsync();
 			while (jda.getStatus() != Status.CONNECTED && isComplete)
 				Util.sleep(100);

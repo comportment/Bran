@@ -1,9 +1,9 @@
 package br.com.brjdevs.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.bran.core.Permissions;
-import br.com.brjdevs.bran.core.RolePick;
-import br.com.brjdevs.bran.core.RolePick.RolePickAction;
 import br.com.brjdevs.bran.core.command.*;
+import br.com.brjdevs.bran.core.managers.Permissions;
+import br.com.brjdevs.bran.core.managers.RolePick;
+import br.com.brjdevs.bran.core.managers.RolePick.RolePickAction;
 import br.com.brjdevs.bran.core.utils.ListBuilder;
 import br.com.brjdevs.bran.core.utils.ListBuilder.Format;
 import br.com.brjdevs.bran.core.utils.MathUtils;
@@ -20,8 +20,8 @@ public class GiveableRolesCommand {
 				.setName("Giveme Command")
 				.setHelp("giveme ?")
 				.setPrivateAvailable(false)
-				.onMissingPermission(Action.REDIRECT)
-				.onNotFound(Action.REDIRECT)
+				.onMissingPermission(CommandAction.REDIRECT)
+				.onNotFound(CommandAction.REDIRECT)
 				.setDefault("role")
 				.addCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("role")

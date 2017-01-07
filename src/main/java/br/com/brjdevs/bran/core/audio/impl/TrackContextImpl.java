@@ -22,20 +22,30 @@ public class TrackContextImpl implements TrackContext {
 	public String getSourceName() {
 		return track.getSourceManager().getSourceName();
 	}
+	
 	@Override
 	public String getURL() {
 		return url;
 	}
+	
 	@Override
 	public String getDJId() {
 		return djId;
 	}
+	
 	@Override
 	public String getContextId() {
 		return contextId;
 	}
+	
 	@Override
 	public AudioTrack getOrigin() {
 		return track;
+	}
+	
+	@Override
+	public TrackContext makeClone() {
+		this.track = track.makeClone();
+		return this;
 	}
 }

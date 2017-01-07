@@ -21,7 +21,7 @@ public class EmotesCommand {
 				.setName("Emote Command")
 				.setDefault("info")
 				.setHelp("emote ?")
-				.onNotFound(Action.REDIRECT)
+				.onNotFound(CommandAction.REDIRECT)
 				.setPrivateAvailable(false)
 				.addCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setDescription("Returns you info about a certain emote.")

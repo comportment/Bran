@@ -19,7 +19,7 @@ public class ProfileCommand {
 				.setAliases("profile")
 				.setDefault("view")
 				.setHelp("profile ?")
-				.onNotFound(Action.REDIRECT)
+				.onNotFound(CommandAction.REDIRECT)
 				.setPrivateAvailable(false)
 				.addCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("view")

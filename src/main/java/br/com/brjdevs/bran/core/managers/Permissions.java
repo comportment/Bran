@@ -1,4 +1,4 @@
-package br.com.brjdevs.bran.core;
+package br.com.brjdevs.bran.core.managers;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;

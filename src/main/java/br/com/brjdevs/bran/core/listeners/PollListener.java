@@ -1,9 +1,9 @@
 package br.com.brjdevs.bran.core.listeners;
 
-import br.com.brjdevs.bran.core.Permissions;
-import br.com.brjdevs.bran.core.audio.Choice;
+import br.com.brjdevs.bran.core.action.Action;
 import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.bran.core.data.guild.configs.GuildMember;
+import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.poll.Poll;
 import br.com.brjdevs.bran.core.utils.MathUtils;
 import net.dv8tion.jda.core.events.Event;
@@ -18,7 +18,8 @@ public class PollListener implements EventListener {
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
-		if (Choice.getChoice(event.getAuthor(), event.getChannel()) != null) return;
+		Action action = Action.getAction(event.getAuthor().getId());
+		if (action != null && !action.getChannelId().equals(event.getChannel().getId())) return;
 		String msg = event.getMessage().getRawContent();
 		if (!MathUtils.isInteger(msg)) return;
 		if (!OPTION_INDEX.matcher(msg).matches()) return;

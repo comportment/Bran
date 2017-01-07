@@ -2,55 +2,49 @@ package br.com.brjdevs.bran.features.hangman;
 
 import br.com.brjdevs.bran.Bot;
 import br.com.brjdevs.bran.core.data.guild.configs.profile.Profile;
-import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.utils.Util;
+import br.com.brjdevs.bran.features.hangman.listener.HangManEventListener;
+import br.com.brjdevs.bran.features.hangman.listener.HangManEvents;
 import lombok.Getter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.MessageEmbed.Field;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HMSession {
-	private static final String HM_URL = "https://i.imgur.com/GdjzHgp.jpg";
-	private static final List<HMSession> sessions;
+import static br.com.brjdevs.bran.core.utils.StringUtils.containsEqualsIgnoreCase;
+import static br.com.brjdevs.bran.core.utils.Util.containsEqualsIgnoreCase;
+
+public class HangManGame {
+	
+	private static final List<HangManGame> sessions;
 	
 	static {
 		sessions = new ArrayList<>();
 	}
 
 	private final LinkedHashMap<String, Boolean> guesses;
-
 	private final List<Profile> invitedUsers;
-
-	private final HMWord word;
-	
+	private final HangManWord word;
 	private final String channel;
-
 	private final List<String> mistakes;
-	
 	@Getter
-	private final IHMEvent listener;
-
+	private final HangManEvents listener;
 	private long lastGuess;
-
 	private Profile creator;
-	
 	@Getter
 	private String lastMessage;
-	
 	private int shard;
-	public HMSession(Profile profile, HMWord word, TextChannel channel) {
-		this.listener = new HMEventListener(this);
+	
+	public HangManGame(Profile profile, HangManWord word, TextChannel channel) {
+		this.listener = new HangManEventListener(this);
 		this.guesses = new LinkedHashMap<>();
 		this.creator = profile;
 		this.mistakes = new ArrayList<>();
@@ -59,14 +53,14 @@ public class HMSession {
 		this.lastGuess = System.currentTimeMillis();
 		this.channel = channel.getId();
 		this.shard = Bot.getInstance().getShardId(channel.getJDA());
-		Arrays.stream(word.getWord().split(""))
+		Arrays.stream(word.asString().split(""))
 				.forEach(split ->
 						guesses.put(guesses.containsKey(split) ? split + Util.randomName(3) : split, false));
-		if (word.getWord().contains(" ")) guess(" ");
+		if (word.asString().contains(" ")) guess(" ");
 		sessions.add(this);
 	}
 	
-	public static HMSession getSession(Profile profile) {
+	public static HangManGame getSession(Profile profile) {
 		return sessions.stream().filter(session -> session.getCreator().equals(profile) || session.getInvitedUsers().contains(profile)).findAny().orElse(null);
 	}
 
@@ -103,18 +97,18 @@ public class HMSession {
 		if (isInvalid(c)) {
 			mistakes.add(c);
 			if (mistakes.size() > getMaxErrors()) {
-				getListener().onLoose();
+				getListener().onLoose(false);
 				return;
 			}
 			getListener().onInvalidGuess(c);
 			return;
 		}
 		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == String.valueOf(c).toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
-		if (getGuessedLetters().equals(getWord().getWord())) {
+		if (getGuessedLetters().equals(getWord().asString())) {
 			getListener().onWin();
 			return;
 		}
-		getListener().onGuess();
+		getListener().onGuess(c);
 	}
 
 	public void pass(Profile profile) {
@@ -126,8 +120,8 @@ public class HMSession {
 	public String getGuessedLetters() {
 		return String.join("", guesses.entrySet().stream().map(entry -> (entry.getValue() ? entry.getKey().charAt(0) : "\\_") + "").collect(Collectors.toList()));
 	}
-
-	public HMWord getWord() {
+	
+	public HangManWord getWord() {
 		return word;
 	}
 
@@ -140,11 +134,11 @@ public class HMSession {
 	}
 	
 	public boolean isGuessed(String c) {
-		return getGuesses().contains(c) || getMistakes().contains(c);
+		return containsEqualsIgnoreCase(getGuesses(), c) || containsEqualsIgnoreCase(getMistakes(), c);
 	}
 	
 	public boolean isInvalid(String c) {
-		return !getWord().getWord().contains(c);
+		return !containsEqualsIgnoreCase(getWord().asString(), c);
 	}
 	
 	public Profile getCreator() {
@@ -159,54 +153,40 @@ public class HMSession {
 	}
 	
 	public Field getCurrentGuessesField(boolean inline) {
-		return new Field("Current Guesses", "**Guesses:** " + getGuessedLetters() + "\n**Mistakes:** " + String.join(", ", getMistakes().stream().map(ch -> ch + "").collect(Collectors.toList())) + "      *Errors: " + getMistakes().size() + "/" + getMaxErrors() + "*", inline);
+		return new Field("_ _", "**These are your current guesses:** " + getGuessedLetters() + "\n**These are your current mistakes:** " + String.join(", ", getMistakes().stream().map(String::valueOf).collect(Collectors.toList())) + "         *Total Mistakes: " + getMistakes().size() + "/" + getMaxErrors() + "*", inline);
 	}
 	
 	public Field getInvitedUsersField(boolean inline) {
-		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "This is not a MultiPlayer session, use `" + Bot.getInstance().getDefaultPrefixes()[0] + "hm invite [MENTION]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getJDA()).getName()).collect(Collectors.toList()))), inline);
+		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + Bot.getInstance().getDefaultPrefixes()[0] + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getJDA()).getName()).collect(Collectors.toList()))), inline);
 	}
 	
 	public void setLastMessage(Message message) {
+		if (message == null) {
+			this.lastMessage = null;
+			return;
+		}
 		this.lastMessage = message.getId();
 	}
 	
-	public MessageEmbed createEmbed(EmbedInfo embedInfo) {
+	public EmbedBuilder createEmbed() {
 		if (lastMessage != null) {
 			try {
-				getChannel().deleteMessageById(lastMessage).queue();
+				getChannel().deleteMessageById(lastMessage).queue(
+						success -> setLastMessage(null),
+						fail -> setLastMessage(null));
 			} catch (ErrorResponseException ignored) {
 			}
 		}
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setAuthor("HangMan Session", null, HM_URL);
+		builder.setTitle("Hang Man");
 		builder.setFooter("Session created by " + getCreator().getUser(getJDA()).getName(), Util.getAvatarUrl(getCreator().getUser(getJDA())));
-		if (embedInfo.equals(EmbedInfo.INFO)) {
-			builder.setDescription("Information about this session.");
-		} else if (embedInfo.equals(EmbedInfo.GUESS_R)) {
-			int matches = StringUtils.countMatches(getGuessedLetters(), '_');
-			builder.setDescription("Nice, just more " + matches + " " + (matches > 1 ? "guesses" : "guess") + " to go!");
-		} else if (embedInfo.equals(EmbedInfo.GUESS_W)) {
-			builder.setDescription("Uh-oh... This doesn't seem to be right...");
-		} else if (embedInfo.equals(EmbedInfo.WIN)) {
-			builder.setDescription("Congratulations, you won! The word was '" + getWord().getWord() + "'!");
-		} else if (embedInfo.equals(EmbedInfo.LOOSE)) {
-			builder.setDescription("Aww man... You lost. The word was '" + getWord().getWord() + "'");
-		} else if (embedInfo.equals(EmbedInfo.GUESSED)) {
-			builder.setDescription("You already guessed this letter.");
-		} else if (embedInfo.equals(EmbedInfo.GIVEUP)) {
-			builder.setDescription("Aww man, why did you leave this session?");
-		}
-		builder.setColor(new Color((int)(Math.random() * 0x1000000)));
+		builder.setColor(getCreator().getEffectiveColor());
 		builder.addField(getCurrentGuessesField(false));
 		builder.addField(getInvitedUsersField(false));
-		return builder.build();
+		return builder;
 	}
 	
 	public void end() {
 		sessions.remove(this);
-	}
-	
-	public enum EmbedInfo {
-		INFO, GUESS_R, GUESS_W, WIN, LOOSE, GUESSED, GIVEUP
 	}
 }

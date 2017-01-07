@@ -62,4 +62,8 @@ public class StringUtils {
         string = string.substring(1).toLowerCase();
         return firstChar + string;
     }
+	
+	public static boolean containsEqualsIgnoreCase(String toCheck, String s) {
+		return Util.containsEqualsIgnoreCase(Arrays.asList(toCheck.split("")), s);
+	}
 }

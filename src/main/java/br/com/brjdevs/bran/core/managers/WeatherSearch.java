@@ -1,4 +1,4 @@
-package br.com.brjdevs.bran.core;
+package br.com.brjdevs.bran.core.managers;
 
 import br.com.brjdevs.bran.core.utils.HttpUtils;
 import com.google.gson.JsonElement;

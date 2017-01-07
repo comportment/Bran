@@ -1,18 +1,17 @@
 package br.com.brjdevs.bran.cmds.fun;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.data.guild.configs.profile.Profile;
+import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
 import br.com.brjdevs.bran.core.utils.ListBuilder;
 import br.com.brjdevs.bran.core.utils.ListBuilder.Format;
 import br.com.brjdevs.bran.core.utils.MathUtils;
 import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.utils.Util;
-import br.com.brjdevs.bran.features.hangman.HMSession;
-import br.com.brjdevs.bran.features.hangman.HMSession.EmbedInfo;
-import br.com.brjdevs.bran.features.hangman.HMWord;
+import br.com.brjdevs.bran.features.hangman.HangManGame;
+import br.com.brjdevs.bran.features.hangman.HangManWord;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.List;
@@ -32,8 +31,8 @@ public class HangManCommand {
 						.setDescription("Starts a HangMan Session.")
 						.setName("HangMan Start Command")
 						.setAction((event, args) -> {
-							HMSession session = HMSession.getSession(event.getMember().getProfile());
-							if (HMSession.getSession(event.getMember().getProfile()) != null) {
+							HangManGame session = HangManGame.getSession(event.getMember().getProfile());
+							if (HangManGame.getSession(event.getMember().getProfile()) != null) {
 								if (!session.getChannel().canTalk(session.getChannel().getGuild().getMember(session.getCreator().getUser(event.getJDA())))) {
 									event.sendMessage("You had a Session running in another Channel, but you can't talk in there so I'm closing that session and starting another for you :)").queue();
 									session.end();
@@ -42,8 +41,8 @@ public class HangManCommand {
 									return;
 								}
 							}
-							session = new HMSession(event.getMember().getProfile(), Bot.getInstance().getData().getHMWords().get(MathUtils.random(Bot.getInstance().getData().getHMWords().size())), event.getTextChannel());
-							event.sendMessage(session.createEmbed(EmbedInfo.INFO)).queue();
+							session = new HangManGame(event.getMember().getProfile(), Bot.getInstance().getData().getHangManWords().get(MathUtils.random(Bot.getInstance().getData().getHangManWords().size())), event.getTextChannel());
+							event.sendMessage(session.createEmbed().setDescription("You started a Hang Man Game in " + event.getTextChannel().getAsMention() + ". Why don't you invite someone to play with you?").build()).queue();
 						})
 						.build())
 				.addCommand(new CommandBuilder(Category.FUN)
@@ -53,7 +52,7 @@ public class HangManCommand {
 						.setArgs("[MENTION]")
 						.setExample("hangman invite <@219186621008838669>")
 						.setAction((event, args) -> {
-							HMSession session = HMSession.getSession(event.getMember().getProfile());
+							HangManGame session = HangManGame.getSession(event.getMember().getProfile());
 							if (session == null) {
 								event.sendMessage(Quote.getQuote(Quote.FAIL) + "You don't have a Session Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to create one!").queue();
 								return;
@@ -90,7 +89,7 @@ public class HangManCommand {
 						.setArgs("[MENTION]")
 						.setExample("hangman pass <@219186621008838669>")
 						.setAction((event) -> {
-							HMSession session = HMSession.getSession(event.getMember().getProfile());
+							HangManGame session = HangManGame.getSession(event.getMember().getProfile());
 							if (session == null) {
 								event.sendMessage(Quote.getQuote(Quote.FAIL) + "You don't have a Session Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to create one!").queue();
 								return;
@@ -127,7 +126,7 @@ public class HangManCommand {
 								.setArgs("[word]")
 								.setAction((event, rawArgs) -> {
 									String word = StringUtils.splitArgs(rawArgs, 2)[1];
-									Bot.getInstance().getData().getHMWords().add(new HMWord(word));
+									Bot.getInstance().getData().getHangManWords().add(new HangManWord(word));
 									event.sendMessage(Quote.getQuote(Quote.SUCCESS) + "Added word to HangMan, you can add tips to it using `" + event.getPrefix() + "hangman words tip " + word + " | [tip]`.").queue();
 								})
 								.build())
@@ -139,12 +138,12 @@ public class HangManCommand {
 								.setAction((event, rawArgs) -> {
 									String[] args = StringUtils.splitArgs(rawArgs, 2);
 									String word = args[1].substring(0, args[1].indexOf("|")).trim();
-									HMWord hmWord =  HMWord.getHMWord(word);
-									if (hmWord == null) {
+									HangManWord hangManWord = HangManWord.getHMWord(word);
+									if (hangManWord == null) {
 										event.sendMessage("Could not find word `" + word + "`.").queue();
 										return;
 									}
-									boolean added = hmWord.addTip(args[1].substring(args[1].indexOf("|")).trim());
+									boolean added = hangManWord.addTip(args[1].substring(args[1].indexOf("|")).trim());
 									event.sendMessage(added ? ":white_check_mark:" : "You can't add duplicated tips.").queue();
 								})
 								.build())
@@ -158,7 +157,7 @@ public class HangManCommand {
 									int page = 1;
 									if (MathUtils.isInteger(args[1]))
 										page = Integer.parseInt(args[1]);
-									List<String> list = Bot.getInstance().getData().getHMWords().stream().map(w -> w.getWord() + " (" + w.getTips().size() + " tips)").collect(Collectors.toList());
+									List<String> list = Bot.getInstance().getData().getHangManWords().stream().map(w -> w.asString() + " (" + w.getTips().size() + " tips)").collect(Collectors.toList());
 									ListBuilder listBuilder = new ListBuilder(list, page, 10);
 									listBuilder.setName("HangMan Words").setFooter("Total Words: " + list.size());
 									event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();

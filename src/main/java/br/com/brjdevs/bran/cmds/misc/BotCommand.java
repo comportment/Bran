@@ -18,7 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Collectors;
 
-import static br.com.brjdevs.bran.core.Permissions.BOT_ADMIN;
+import static br.com.brjdevs.bran.core.managers.Permissions.BOT_ADMIN;
 
 @RegisterCommand
 public class BotCommand {

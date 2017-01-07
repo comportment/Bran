@@ -17,8 +17,6 @@ public interface TrackContext {
 		return jda.getTextChannelById(getContextId());
 	}
 	AudioTrack getOrigin();
-	default TrackContext makeClone() {
-		getOrigin().makeClone();
-		return this;
-	}
+	
+	TrackContext makeClone();
 }

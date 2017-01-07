@@ -1,7 +1,7 @@
 package br.com.brjdevs.bran.cmds.misc;
 
-import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.command.*;
+import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.poll.Option;
 import br.com.brjdevs.bran.core.poll.Poll;
 import br.com.brjdevs.bran.core.utils.Util;

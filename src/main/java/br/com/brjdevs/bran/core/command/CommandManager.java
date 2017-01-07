@@ -1,11 +1,11 @@
 package br.com.brjdevs.bran.core.command;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.Permissions;
-import br.com.brjdevs.bran.core.PrefixManager;
 import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.bran.core.data.guild.configs.GuildMember;
 import br.com.brjdevs.bran.core.data.guild.configs.impl.GuildMemberImpl.FakeGuildMemberImpl;
+import br.com.brjdevs.bran.core.managers.Permissions;
+import br.com.brjdevs.bran.core.managers.PrefixManager;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
 import br.com.brjdevs.bran.core.utils.DiscordLog;
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 public class CommandManager implements EventListener {
     private static final List<ICommand> commands = new ArrayList<>();
+	private static final SimpleLog LOG = SimpleLog.getLog("Command Manager");
 
     public static void addCommand (ICommand command) {
         if (command != null)
@@ -38,56 +39,10 @@ public class CommandManager implements EventListener {
         return commands;
     }
 
-    public void onEvent (Event ev) {
-        if (!(ev instanceof MessageReceivedEvent)) return;
-        MessageReceivedEvent event = (MessageReceivedEvent) ev;
-        if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
-        String msg = event.getMessage().getRawContent();
-        String[] args = StringUtils.splitSimple(msg);
-        DiscordGuild discordGuild = event.getGuild() != null ? DiscordGuild.getInstance(event.getGuild()) : null;
-        String prefix = PrefixManager.getPrefix(args[0], discordGuild);
-        if (prefix == null) return;
-        String baseCmd = args[0].substring(prefix.length());
-        ICommand cmd = getCommands().stream().filter(c -> c.getAliases().contains(baseCmd))
-                .findFirst().orElse(null);
-        if (cmd == null) return;
-        CommandEvent e = new CommandEvent(event, cmd, discordGuild, event.getMessage().getRawContent(), prefix);
-        if (TooFast.isEnabled() && !TooFast.checkCanExecute(e)) return;
-        AdvancedMessageBuilder builder = new AdvancedMessageBuilder();
-        if (!cmd.isPrivateAvailable() && Util.isPrivate(event)) {
-            builder.append(Quote.FAIL);
-            builder.append("This command is not available through PMs, " +
-                    "use it in a Text Channel please.");
-            e.sendMessage(builder.build()).queue();
-            return;
-        }
-        GuildMember member = discordGuild != null ? discordGuild.getMember(event.getAuthor()) : new FakeGuildMemberImpl(event.getAuthor().getId(), null);
-        if (!member.hasPermission(cmd.getRequiredPermission(), event.getJDA())) {
-            builder.append(Quote.FAIL);
-            builder.append("You don't have enough permissions to do this!\n" +
-                    "Missing Permission(s): *" +
-                    String.join(", ", Permissions
-                            .toCollection(cmd.getRequiredPermission())) + "*");
-            e.sendMessage(builder.build()).queue();
-            return;
-        }
-
-        Bot.getInstance().getSession().cmds++;
-        Util.async(cmd.getName() + ">" + Util.getUser(event.getAuthor()),
-                () -> {
-                    try {
-                        cmd.execute(e, event.getMessage().getRawContent());
-                    } catch (Exception ex) {
-                        Bot.LOG.log(ex);
-                        e.sendMessage(Quote.getQuote(Quote.FAIL) + "A `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.").queue();
-                        DiscordLog.log(ex);
-                    }
-                }).run();
-    }
     public static List<ICommand> getCommands(Category category) {
         return getCommands().stream().filter(cmd -> cmd.getCategory() == category).collect(Collectors.toList());
     }
-    private static final SimpleLog LOG = SimpleLog.getLog("Command Manager");
+
     public static void load() {
     	String url = "br.com.brjdevs.bran.cmds";
 	    Reflections reflections = new Reflections(url);
@@ -100,7 +55,8 @@ public class CommandManager implements EventListener {
 		    }
 	    });
     }
-    @Deprecated
+	
+	@Deprecated
     public static MessageEmbed getHelpEmbed(ICommand command) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setAuthor("Help for " + command.getName(),null,null);
@@ -115,7 +71,8 @@ public class CommandManager implements EventListener {
         builder.setColor(Color.decode("#ff8f50"));
         return builder.build();
     }
-    public static MessageEmbed getHelp(ICommand command, GuildMember member, Member m) {
+	
+	public static MessageEmbed getHelp(ICommand command, GuildMember member, Member m) {
         //StringBuilder builder = new StringBuilder();
         //builder.append("**" + command.getName() + "** - Required Permission(s): " + (String.join(", ", Permissions.toCollection(command.getRequiredPermission()))) + " - Aliases: " + (String.join(", ", command.getAliases())));
         //builder.append("Command: ").append(command.getName()).append('\n');
@@ -154,4 +111,51 @@ public class CommandManager implements EventListener {
         builder.setDescription(desc);
         return builder.build();
     }
+	
+	public void onEvent(Event ev) {
+		if (!(ev instanceof MessageReceivedEvent)) return;
+		MessageReceivedEvent event = (MessageReceivedEvent) ev;
+		if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
+		String msg = event.getMessage().getRawContent();
+		String[] args = StringUtils.splitSimple(msg);
+		DiscordGuild discordGuild = event.getGuild() != null ? DiscordGuild.getInstance(event.getGuild()) : null;
+		String prefix = PrefixManager.getPrefix(args[0], discordGuild);
+		if (prefix == null) return;
+		String baseCmd = args[0].substring(prefix.length());
+		ICommand cmd = getCommands().stream().filter(c -> c.getAliases().contains(baseCmd))
+				.findFirst().orElse(null);
+		if (cmd == null) return;
+		CommandEvent e = new CommandEvent(event, cmd, discordGuild, event.getMessage().getRawContent(), prefix);
+		if (TooFast.isEnabled() && !TooFast.checkCanExecute(e)) return;
+		AdvancedMessageBuilder builder = new AdvancedMessageBuilder();
+		if (!cmd.isPrivateAvailable() && Util.isPrivate(event)) {
+			builder.append(Quote.FAIL);
+			builder.append("This command is not available through PMs, " +
+					"use it in a Text Channel please.");
+			e.sendMessage(builder.build()).queue();
+			return;
+		}
+		GuildMember member = discordGuild != null ? discordGuild.getMember(event.getAuthor()) : new FakeGuildMemberImpl(event.getAuthor().getId(), null);
+		if (!member.hasPermission(cmd.getRequiredPermission(), event.getJDA())) {
+			builder.append(Quote.FAIL);
+			builder.append("You don't have enough permissions to do this!\n" +
+					"Missing Permission(s): *" +
+					String.join(", ", Permissions
+							.toCollection(cmd.getRequiredPermission())) + "*");
+			e.sendMessage(builder.build()).queue();
+			return;
+		}
+		
+		Bot.getInstance().getSession().cmds++;
+		Util.async(cmd.getName() + ">" + Util.getUser(event.getAuthor()),
+				() -> {
+					try {
+						cmd.execute(e, event.getMessage().getRawContent());
+					} catch (Exception ex) {
+						Bot.LOG.log(ex);
+						e.sendMessage(Quote.getQuote(Quote.FAIL) + "A `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.").queue();
+						DiscordLog.log(ex);
+					}
+				}).run();
+	}
 }

@@ -1,10 +1,9 @@
 package br.com.brjdevs.bran.core.command;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.TaskManager;
+import br.com.brjdevs.bran.core.managers.TaskManager;
 import br.com.brjdevs.bran.core.utils.Util;
 import com.google.gson.JsonObject;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.HashMap;
 import java.util.Map;

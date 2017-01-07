@@ -1,9 +1,9 @@
 package br.com.brjdevs.bran.core.listeners;
 
-import br.com.brjdevs.bran.core.Permissions;
-import br.com.brjdevs.bran.core.PrefixManager;
 import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.bran.core.data.guild.configs.customcommands.CustomCommand;
+import br.com.brjdevs.bran.core.managers.Permissions;
+import br.com.brjdevs.bran.core.managers.PrefixManager;
 import br.com.brjdevs.bran.core.utils.MathUtils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -17,25 +17,8 @@ import java.util.regex.Pattern;
 
 public class CustomCommandsListener implements EventListener {
 	
-	@Override
-	public void onEvent(Event e) {
-		if (!(e instanceof GuildMessageReceivedEvent)) return;
-		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild());
-		if (!discordGuild.getCustomCommands().check()) return;
-		String msg = event.getMessage().getRawContent().trim().toLowerCase();
-		String prefix = PrefixManager.getPrefix0(msg, discordGuild);
-		if (prefix == null) return;
-		if (!discordGuild.getMember(event.getAuthor()).hasPermission(Permissions.RUN_USRCMD, event.getJDA())) return;
-		String baseCmd = msg.substring(prefix.length()).split(" ")[0];
-		CustomCommand command = discordGuild.getCustomCommands().getCustomCommand(baseCmd);
-		if (command == null) return;
-		String args = msg.contains(" ") ? msg.substring(msg.indexOf(" ") + 1) : "";
-		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args, command);
-		event.getChannel().sendTyping().queue(success ->
-				event.getChannel().sendMessage(answer).queue());
-	}
 	private static Pattern RANDOM_PATTERN = Pattern.compile("(\\$random\\{.+?;+.+?})", Pattern.CASE_INSENSITIVE);
+
 	private static String parseTag
 			(String answer, Member member, TextChannel textChannel, Guild guild, String args, CustomCommand cmd) {
 		answer = answer.replaceAll("\\$user", member.getEffectiveName());
@@ -54,5 +37,24 @@ public class CustomCommandsListener implements EventListener {
 					options[random]);
 		}
 		return answer;
+	}
+	
+	@Override
+	public void onEvent(Event e) {
+		if (!(e instanceof GuildMessageReceivedEvent)) return;
+		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
+		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild());
+		if (!discordGuild.getCustomCommands().check()) return;
+		String msg = event.getMessage().getRawContent().trim().toLowerCase();
+		String prefix = PrefixManager.getPrefix0(msg, discordGuild);
+		if (prefix == null) return;
+		if (!discordGuild.getMember(event.getAuthor()).hasPermission(Permissions.RUN_USRCMD, event.getJDA())) return;
+		String baseCmd = msg.substring(prefix.length()).split(" ")[0];
+		CustomCommand command = discordGuild.getCustomCommands().getCustomCommand(baseCmd);
+		if (command == null) return;
+		String args = msg.contains(" ") ? msg.substring(msg.indexOf(" ") + 1) : "";
+		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args, command);
+		event.getChannel().sendTyping().queue(success ->
+				event.getChannel().sendMessage(answer).queue());
 	}
 }

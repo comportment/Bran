@@ -1,7 +1,6 @@
-package br.com.brjdevs.bran.core;
+package br.com.brjdevs.bran.core.managers;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.audio.Choice;
 import br.com.brjdevs.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.bran.core.audio.TrackContext;
 import br.com.brjdevs.bran.core.audio.utils.AudioUtils;
@@ -19,9 +18,10 @@ import java.util.concurrent.TimeUnit;
 import static br.com.brjdevs.bran.core.audio.utils.VoiceChannelListener.musicTimeout;
 
 public class TaskManager {
-    private static boolean bool = false;
     private static final ExecutorService pools =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 5);
+	private static boolean bool = false;
+
     public static ExecutorService getThreadPool() {
         return pools;
     }
@@ -80,7 +80,7 @@ public class TaskManager {
                 e.printStackTrace();
             }
         }), 1);
-        startAsyncTask(() -> {
+        /*startAsyncTask(() -> {
             try {
                 for (int i = 0; i != Choice.getChoices().size() - 1; i++) {
                     if (Choice.getChoices().isEmpty()) break;
@@ -94,7 +94,7 @@ public class TaskManager {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, 10);
+        }, 10);*/
         //startAsyncTask(() -> );
     }
 }

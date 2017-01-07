@@ -1,9 +1,9 @@
 package br.com.brjdevs.bran.cmds.fun;
 
-import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.data.guild.configs.customcommands.CustomCmdsSettings;
 import br.com.brjdevs.bran.core.data.guild.configs.customcommands.CustomCommand;
+import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
 import br.com.brjdevs.bran.core.utils.ListBuilder;
 import br.com.brjdevs.bran.core.utils.ListBuilder.Format;

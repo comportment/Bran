@@ -1,7 +1,7 @@
 package br.com.brjdevs.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.command.*;
+import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.utils.StringUtils;
 
 import java.util.Arrays;

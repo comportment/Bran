@@ -1,8 +1,8 @@
 package br.com.brjdevs.bran.core.listeners;
 
-import br.com.brjdevs.bran.core.RolePick;
-import br.com.brjdevs.bran.core.RolePick.RolePickAction;
 import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
+import br.com.brjdevs.bran.core.managers.RolePick;
+import br.com.brjdevs.bran.core.managers.RolePick.RolePickAction;
 import br.com.brjdevs.bran.core.utils.MathUtils;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.Event;

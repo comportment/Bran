@@ -1,16 +1,18 @@
 package br.com.brjdevs.bran.cmds.botAdmin;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.Permissions;
 import br.com.brjdevs.bran.core.command.Category;
 import br.com.brjdevs.bran.core.command.CommandBuilder;
 import br.com.brjdevs.bran.core.command.CommandManager;
 import br.com.brjdevs.bran.core.command.RegisterCommand;
+import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.utils.StringUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.rmi.UnexpectedException;
 import java.util.Scanner;
 import java.util.concurrent.FutureTask;
@@ -35,24 +37,19 @@ public class JavaEvalCommand {
                 .setExample("eval return \"This is Java!\";")
                 .setRequiredPermission(Permissions.EVAL)
                 .setAction((event) -> {
-                    try {
-                        // Create Java src file and class
-                        if (f.createNewFile()) f.deleteOnExit();
+	                Object x = null;
+	                try {
                         OutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
                         stream.write(getBodyWithLines(StringUtils.splitArgs(event.getArgs(), 2)[1]).getBytes());
                         stream.close();
                         try {
-                            FutureTask<?> task = new FutureTask<>(() ->
-                            {
-                                compile();
-                                return null;
-                            });
-                            task.run();
-                            task.get(15, TimeUnit.SECONDS);
+	                        FutureTask<?> task = new FutureTask<>(this::compile);
+	                        task.run();
+	                        x = task.get(15, TimeUnit.SECONDS);
                         } catch (TimeoutException e) {
                             event.sendMessage("Compiling timed out.").queue();
                             return;
-                        } catch (Exception e) {// Compilation failed with error
+                        } catch (Exception e) {
                             event.sendMessage(e.getMessage()).queue();
                             return;
                         }
@@ -81,31 +78,40 @@ public class JavaEvalCommand {
                         o = o.toString().replace(Bot.getInstance().getConfig().getToken(), "<BOT TOKEN>");
                         event.sendMessage(o.toString()).queue();
                     } catch (Exception e) {
-                        event.sendMessage("Something went wrong trying to eval your query.\n" + e).queue();
-                    }
+	                    if (x == null) x = e;
+	                    event.sendMessage("Something went wrong trying to eval your query.\n" + x).queue();
+	                }
+	                f.delete();
                 })
                 .build());
     }
-
-    private void compile() throws IOException, InterruptedException {
-        if (!f.exists())
-            throw new UnexpectedException("Unable to compile source file.");
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.command("javac", "-cp", System.getProperty("java.class.path"), folder + "/" + f.getName());
-        Process p = builder.start();
-
-        Scanner sc = new Scanner(p.getInputStream());
-        Scanner scErr = new Scanner(p.getErrorStream());
-
-        sc.close();
-        scErr.close();
-
-        p.waitFor();
-        p.destroyForcibly();
-    }
-
-    private String getBodyWithLines(String code) {
-        String body =
+	
+	private String compile() throws Exception {
+		if (!f.exists())
+			throw new UnexpectedException("Unable to compile source file.");
+		ProcessBuilder builder = new ProcessBuilder();
+		builder.command("javac", "-cp", System.getProperty("java.class.path"), folder + "/" + f.getName());
+		Process p = builder.start();
+		
+		Scanner sc = new Scanner(p.getInputStream());
+		
+		Scanner scErr = new Scanner(p.getErrorStream());
+		
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(p.getErrorStream(), writer, Charset.forName("UTF-8"));
+		String x = writer.toString().replace(new File(Bot.getInstance().getWorkingDirectory()).getPath(), "<ClassPath>").replace("\\classes", "");
+		
+		sc.close();
+		scErr.close();
+		
+		p.waitFor();
+		p.destroyForcibly();
+		
+		return x;
+	}
+	
+	private String getBodyWithLines(String code) {
+		String body =
                 "import java.util.*;\n" +
                         "import java.math.*;\n" +
                         "import java.net.*;\n" +
@@ -133,7 +139,8 @@ public class JavaEvalCommand {
                         "import br.com.brjdevs.bran.core.poll.*;\n" +
                         "import br.com.brjdevs.bran.core.*;\n" +
                         "import br.com.brjdevs.bran.core.command.*;\n" +
-                        "import com.google.gson.*;\n" +
+		                "import br.com.brjdevs.bran.core.action.*;\n" +
+		                "import com.google.gson.*;\n" +
                         "public class " + f.getName().replace(".java", "") + "\n{" +
                         "\n\tpublic Object run() throws Exception" +
                         "\n\t{\n\t\t";

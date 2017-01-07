@@ -17,7 +17,6 @@ import net.dv8tion.jda.core.entities.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -162,9 +161,9 @@ public class TrackScheduler implements AudioEventListener {
 		return player.startTrack(trackContext != null ? trackContext.getOrigin() : null, noInterrupt);
 	}
 	
-	public void queue(AudioPlaylist playlist, Map<AudioTrack, String> map, User dj, TextChannel context) {
+	public void queue(AudioPlaylist playlist, List<TrackContext> trackContexts, User dj, TextChannel context) {
 		context.sendMessage("Found playlist `" + playlist.getName() + "`, loading `" + playlist.getTracks().size() + "` tracks...").queue();
-		map.forEach((track, string) -> queue.offer(new TrackContextImpl(track, string, dj, context)));
+		trackContexts.forEach(queue::offer);
 		context.sendMessage("Done! Queued `" + playlist.getTracks().size() + "` tracks!").queue();
 		if (player.getPlayingTrack() == null)
 			play(provideNextTrack(false), true);
