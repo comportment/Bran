@@ -69,7 +69,12 @@ public class MusicCommand {
 								}
 								return;
 							}
-							event.getMessage().deleteMessage();
+							event.getMessage().deleteMessage().queue();
+							TrackScheduler scheduler = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild()).getTrackScheduler();
+							if (event.getGuild().getMusicSettings().getMaxSongsPerUser() > 0 && scheduler.getTracksBy(event.getAuthor()).size() > event.getGuild().getMusicSettings().getMaxSongsPerUser()) {
+								event.sendMessage("You can only have " + event.getGuild().getMusicSettings().getMaxSongsPerUser() + " songs in the queue.").queue();
+								return;
+							}
 							AudioUtils.getManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
 						})
 						.build())

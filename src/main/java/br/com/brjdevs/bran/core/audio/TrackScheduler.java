@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 public class TrackScheduler implements AudioEventListener {
 	
@@ -180,6 +181,11 @@ public class TrackScheduler implements AudioEventListener {
 	
 	public void queue(AudioTrack track, String url, User user, TextChannel channel) {
 		queue(new TrackContextImpl(track, url, user, channel));
+	}
+	
+	public List<TrackContext> getTracksBy(User user) {
+		return queue.stream()
+				.filter(track -> track.getDJId().equals(user.getId())).collect(Collectors.toList());
 	}
 	
 	public void stop() {

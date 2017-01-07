@@ -4,8 +4,6 @@ public class HMStats {
 	int victory;
 	int defeats;
 
-	public HMStats() {}
-
 	public int getVictories() {
 		return victory;
 	}

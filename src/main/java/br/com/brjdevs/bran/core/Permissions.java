@@ -40,19 +40,21 @@ public class Permissions {
             GUILD_MOD = BASE_USR | DJ | BAN_USER | KICK_USR | PERMSYS_GM | WORD_FILTER,
             GUILD_OWNER = GUILD_MOD | PERMSYS_GO | PREFIX | ANNOUNCE | PRUNE_CLEANUP | GUILD_MANAGE | ANNOY,
             BOT_OWNER = GUILD_OWNER | PERMSYS_BO | EVAL | STOP_RESET | LOAD_SAVE | BLACKLIST | BOT_ADMIN;
-
-
-    public static Map<String, Long> perms = new HashMap<String, Long>() {{
-        Arrays.stream(Permissions.class.getDeclaredFields()) //This Reflection is used to HashMap-fy all the Fields above.
-                .filter(field -> Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) //public static final fields only
-                .forEach(field -> {
-                    try {
-                        put(field.getName(), field.getLong(null));
-                    } catch (Exception ignored) {
-                    }
-                });
-    }};
-    public static boolean checkPerms(long senderPerm, long targetPerm) {
+	
+	public static Map<String, Long> perms = new HashMap<>();
+	
+	static {
+		Arrays.stream(Permissions.class.getDeclaredFields())
+				.filter(field -> Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) //public static final fields only
+				.forEach(field -> {
+					try {
+						perms.put(field.getName(), field.getLong(null));
+					} catch (Exception ignored) {
+					}
+				});
+	}
+	
+	public static boolean checkPerms(long senderPerm, long targetPerm) {
         long perms = bits(13, 14, 15);
         senderPerm &= perms;
         targetPerm &= perms; //Select bits 13, 14, 15
