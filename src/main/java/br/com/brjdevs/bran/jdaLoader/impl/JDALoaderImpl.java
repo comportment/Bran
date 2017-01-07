@@ -40,8 +40,9 @@ public class JDALoaderImpl implements JDALoader {
 		Config config = Bot.getInstance().getConfig();
 		Map<Integer, JDA> out = new HashMap<>();
 		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
-				.setToken(config.getToken()).addListener(
-						new Reflections("br.com.brjdevs.bran")
+				.setToken(config.getToken()).setAudioEnabled(true)
+				.setAutoReconnect(true)
+				.addListener(new Reflections("br.com.brjdevs.bran")
 								.getSubTypesOf(EventListener.class).stream()
 								.map(clazz -> {
 									try {

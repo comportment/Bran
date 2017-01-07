@@ -70,8 +70,16 @@ public class TrackScheduler implements AudioEventListener {
 		return isRepeat;
 	}
 	
+	public void setRepeat(boolean repeat) {
+		this.isRepeat = repeat;
+	}
+	
 	public boolean isShuffle() {
 		return isShuffle;
+	}
+	
+	public void setShuffle(boolean shuffle) {
+		this.isShuffle = shuffle;
 	}
 	
 	public TrackContext getCurrentTrack() {
@@ -139,20 +147,9 @@ public class TrackScheduler implements AudioEventListener {
 		return currentTrack == null && getQueue().isEmpty();
 	}
 	
-	public void setRepeat(boolean repeat) {
-		this.isRepeat = repeat;
-	}
-	
-	public void setShuffle(boolean shuffle) {
-		this.isShuffle = shuffle;
-	}
-	
 	public TrackContext restartSong() {
-		if (currentTrack != null) {
-			currentTrack.getOrigin().setPosition(0);
-		} else if (previousTrack != null) {
-			play(previousTrack.makeClone(), false);
-		}
+		currentTrack = currentTrack != null ? currentTrack.makeClone() : previousTrack.makeClone();
+		play(currentTrack, false);
 		return currentTrack;
 	}
 	
@@ -238,25 +235,12 @@ public class TrackScheduler implements AudioEventListener {
 		} else if (audioEvent instanceof TrackStartEvent) {
 			TrackStartEvent event = (TrackStartEvent) audioEvent;
 			if (currentTrack == null && getAudioPlayer().getPlayingTrack() != null) {
-				Bot.LOG.fatal("Got TrackStartEvent with null AudioTrackContext.");
-				if (!getQueue().isEmpty()) {
-					provideNextTrack(true);
-					if (currentTrack == null) {
-						if (previousTrack != null) {
-							if (previousTrack.getContext(getJDA()) != null && previousTrack.getContext(getJDA()).canTalk()) {
-								previousTrack.getContext(getJDA()).sendMessage("A fatal error has occurred, the current session has been terminated. I'm sorry for this, but a synchronization and irreversible error has \"nulled\" the TrackScheduler current track.");
-							} else {
-								if (getGuild(getJDA()).getPublicChannel().canTalk()) {
-									getGuild(getJDA()).getPublicChannel().sendMessage("A fatal error has occurred, the current session has been terminated. I'm sorry for this, but a synchronization and irreversible error has \"nulled\" the TrackScheduler current track.").queue();
-								}
-							}
-						}
-					}
-				}
+				Bot.LOG.fatal("Got TrackStartEvent with null AudioTrackContext in Guild " + guildId + ", finished session.");
+				AudioUtils.getManager().getMusicManagers().remove(guildId);
 				return;
 			}
 			if (currentTrack.getContext(getJDA()) != null && currentTrack.getDJ(getJDA()) != null && !isRepeat) {
-				currentTrack.getContext(getJDA()).sendMessage(String.format(announce, getVoiceChannel().getName(), currentTrack.getOrigin().getInfo().title, AudioUtils.format(currentTrack.getOrigin()), Util.getUser(currentTrack.getDJ(getJDA())))).queue();
+				currentTrack.getContext(getJDA()).sendMessage(String.format(announce, getVoiceChannel().getName(), currentTrack.getOrigin().getInfo().title, AudioUtils.format(currentTrack.getOrigin()), Util.getUser(currentTrack.getDJ(getJDA())))).queue(this::setLastAnnounce);
 			}
 		} else if (audioEvent instanceof TrackExceptionEvent) {
 			TrackExceptionEvent event = (TrackExceptionEvent) audioEvent;
