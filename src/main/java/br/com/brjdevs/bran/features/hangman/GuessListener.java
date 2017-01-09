@@ -3,6 +3,8 @@ package br.com.brjdevs.bran.features.hangman;
 import br.com.brjdevs.bran.Bot;
 import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.bran.core.data.guild.configs.profile.Profile;
+import br.com.brjdevs.bran.features.hangman.events.LeaveGameEvent;
+import br.com.brjdevs.bran.features.hangman.events.LooseEvent;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -21,11 +23,11 @@ public class GuessListener implements EventListener {
 		TextChannel channel = event.getChannel();
 		if ("giveup".equals(msg)) {
 			if (session.getCreator() != profile)
-				session.getListener().onLeaveGame(profile);
+				session.getListener().onEvent(new LeaveGameEvent(session, event.getJDA(), profile));
 			else if (session.getCreator() == profile && !session.getInvitedUsers().isEmpty())
-				channel.sendMessage("You can't give up this session because there are other players playing with you, you can just let them finish if you don't want to continue or use `" + Bot.getInstance().getDefaultPrefixes()[0] + "hm pass [MENTION]` to set a new owner to the session.").queue();
+				channel.sendMessage("You can't give up this session because there are other players playing with you, you can just let them finish if you don't want to continue or use `" + Bot.getInstance().getDefaultPrefixes()[0] + "hm setCreator [MENTION]` to set a new owner to the session.").queue();
 			else
-				session.getListener().onLoose(true);
+				session.getListener().onEvent(new LooseEvent(session, event.getJDA(), true));
 			return;
 		}
 		if (session.getChannel() != event.getChannel()) return;
@@ -34,6 +36,6 @@ public class GuessListener implements EventListener {
 			return;
 		}
 		if (!msg.matches("^([A-Za-z]{1})$")) return;
-		session.guess(msg);
+		session.guess(msg, profile);
 	}
 }

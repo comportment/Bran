@@ -39,7 +39,12 @@ public class TrackContextImpl implements TrackContext {
 	}
 	
 	@Override
-	public AudioTrack getOrigin() {
+	public void setPosition(long position) {
+		getTrack().setPosition(position);
+	}
+	
+	@Override
+	public AudioTrack getTrack() {
 		return track;
 	}
 	

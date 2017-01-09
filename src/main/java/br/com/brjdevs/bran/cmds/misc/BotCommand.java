@@ -1,6 +1,7 @@
 package br.com.brjdevs.bran.cmds.misc;
 
 import br.com.brjdevs.bran.Bot;
+import br.com.brjdevs.bran.BotManager;
 import br.com.brjdevs.bran.core.command.*;
 import br.com.brjdevs.bran.core.data.DataManager;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder;
@@ -10,9 +11,12 @@ import br.com.brjdevs.bran.core.utils.ListBuilder.Format;
 import br.com.brjdevs.bran.core.utils.RequirementsUtils;
 import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.utils.Util;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Icon;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,7 +32,7 @@ public class BotCommand {
 	}
 
 	private static void register () {
-		CommandManager.addCommand(new TreeCommandBuilder(Category.INFORMATIVE)
+		CommandManager.addCommand(new TreeCommandBuilder(Category.MISCELLANEOUS)
 				.setName("Bot Command")
 				.setAliases("bot")
 				.setHelp("bot ?")
@@ -41,6 +45,19 @@ public class BotCommand {
 							AdvancedMessageBuilder builder = new AdvancedMessageBuilder();
 							builder.append(Bot.getInstance().getInfo());
 							event.sendMessage(builder.build()).queue();
+						})
+						.build())
+				.addCommand(new CommandBuilder(Category.INFORMATIVE)
+						.setAliases("inviteme", "invite")
+						.setName("InviteMe Command")
+						.setDescription("Gives you my OAuth URL!")
+						.setAction((event) -> {
+							MessageEmbed embed = new EmbedBuilder()
+									.setAuthor("Bran's OAuth URL", null, Util.getAvatarUrl(event.getJDA().getSelfUser()))
+									.setDescription("You can invite me to your server by [clicking here](https://discordapp.com/oauth2/authorize?client_id=219186621008838669&scope=bot&permissions=0)")
+									.setColor(Color.decode("#2759DB"))
+									.build();
+							event.sendMessage(embed).queue();
 						})
 						.build())
 				.addCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -88,24 +105,9 @@ public class BotCommand {
 								.setName("Shutdown Command")
 								.setDescription("Saves Guild and Bot Data and stops the bot.")
 								.setAction((event, args) -> {
-									AdvancedMessageBuilder builder = new AdvancedMessageBuilder();
-									try {
-										DataManager.saveData();
-										builder.append(Quote.SUCCESS);
-										builder.append("Internally saved Bot and Guild data.");
-									} catch (Exception e) {
-										builder.append("Something went wrong while internally saving Bot and Guild data because of a fucking " + e.getClass().getSimpleName() + ", please check out the log and fix it ;-;");
-										e.printStackTrace();
-										return;
-									} finally {
-										event.sendMessage(builder.build()).queue();
-									}
+									BotManager.preShutdown();
 									event.sendMessage("\uD83D\uDC4B").complete();
-									Bot.getInstance().getShards().forEach((i, jda) -> {
-										jda.shutdown();
-										Bot.LOG.info("Shutdown on shard " + i);
-									});
-									System.exit(0);
+									BotManager.shutdown(false);
 								})
 								.build())
 						.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)

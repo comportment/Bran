@@ -28,7 +28,7 @@ public class StringUtils {
         return normalized;
     }
     public static String[] splitSimple(String args) {
-        return args.split(" ");
+	    return args.split("\\s+");
     }
 
     public static int countMatches(CharSequence seq, char c) {

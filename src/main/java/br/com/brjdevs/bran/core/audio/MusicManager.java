@@ -6,14 +6,14 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 
-public class GuildMusicManager {
+public class MusicManager {
 	
 	private final AudioPlayer player;
 	private final TrackScheduler scheduler;
-	private Long guildId;
 	private final int shard;
+	private Long guildId;
 	
-	public GuildMusicManager(AudioPlayerManager manager, Guild guild) {
+	public MusicManager(AudioPlayerManager manager, Guild guild) {
 		player = manager.createPlayer();
 		this.guildId = Long.parseLong(guild.getId());
 		this.shard = Bot.getInstance().getShardId(guild.getJDA());
@@ -24,7 +24,7 @@ public class GuildMusicManager {
 		return getJDA().getGuildById(String.valueOf(guildId));
 	}
 	public JDA getJDA() {
-		return Bot.getInstance().getShards().entrySet().stream().filter(entry -> entry.getKey() == shard).findFirst().orElse(null).getValue();
+		return Bot.getInstance().getShard(shard);
 	}
 	public TrackScheduler getTrackScheduler() {
 		return scheduler;

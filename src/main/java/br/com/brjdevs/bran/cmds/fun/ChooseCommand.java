@@ -8,6 +8,14 @@ import br.com.brjdevs.bran.core.utils.MathUtils;
 
 @RegisterCommand
 public class ChooseCommand {
+	
+	private static final String[] QUOTES = {
+			"I'd stay with",
+			"The best option is",
+			"For sure",
+			"I'd choose"
+	};
+	
 	public ChooseCommand() {
 		CommandManager.addCommand(new CommandBuilder(Category.FUN)
 				.setAliases("choose", "decide")
@@ -20,7 +28,7 @@ public class ChooseCommand {
 					if (rawOptions.contains(" or "))
 						options = rawOptions.split(" or ");
 					else
-						options = rawOptions.split(" ");
+						options = rawOptions.split("\\s+");
 					if (options.length == 1) {
 						event.sendMessage("You need to give me at least 2 options to choose between!").queue();
 						return;
@@ -31,12 +39,6 @@ public class ChooseCommand {
 				.build());
 	}
 	
-	private static final String[] QUOTES = {
-			"I'd stay with",
-			"The best option is",
-			"For sure",
-			"I'd choose"
-	};
 	private static String getRandomQuote() {
 		return QUOTES[MathUtils.random(QUOTES.length)];
 	}

@@ -5,6 +5,7 @@ import br.com.brjdevs.bran.core.data.guild.configs.customcommands.CustomCommand;
 import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.managers.PrefixManager;
 import br.com.brjdevs.bran.core.utils.MathUtils;
+import br.com.brjdevs.bran.core.utils.StringUtils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -21,12 +22,12 @@ public class CustomCommandsListener implements EventListener {
 
 	private static String parseTag
 			(String answer, Member member, TextChannel textChannel, Guild guild, String args, CustomCommand cmd) {
-		answer = answer.replaceAll("\\$user", member.getEffectiveName());
-		answer = answer.replaceAll("\\$mention", member.getAsMention());
-		answer = answer.replaceAll("\\$channel", textChannel.getAsMention());
-		answer = answer.replaceAll("\\$guild", guild.getName());
-		answer = answer.replaceAll("\\$cmdName", cmd.getName());
-		answer = answer.replaceAll("\\$input", args);
+		answer = answer.replaceAll("%user%", member.getEffectiveName());
+		answer = answer.replaceAll("%mention%", member.getAsMention());
+		answer = answer.replaceAll("%channel%", textChannel.getAsMention());
+		answer = answer.replaceAll("%guild%", guild.getName());
+		answer = answer.replaceAll("%cmdName%", cmd.getName());
+		answer = answer.replaceAll("%input%", args);
 		Matcher matcher = RANDOM_PATTERN.matcher(answer);
 		while (matcher.find()) {
 			String group = matcher.group(0);
@@ -49,10 +50,10 @@ public class CustomCommandsListener implements EventListener {
 		String prefix = PrefixManager.getPrefix0(msg, discordGuild);
 		if (prefix == null) return;
 		if (!discordGuild.getMember(event.getAuthor()).hasPermission(Permissions.RUN_USRCMD, event.getJDA())) return;
-		String baseCmd = msg.substring(prefix.length()).split(" ")[0];
+		String baseCmd = msg.substring(prefix.length()).split("\\s+")[0];
 		CustomCommand command = discordGuild.getCustomCommands().getCustomCommand(baseCmd);
 		if (command == null) return;
-		String args = msg.contains(" ") ? msg.substring(msg.indexOf(" ") + 1) : "";
+		String args = StringUtils.splitArgs(msg, 2)[1];
 		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args, command);
 		event.getChannel().sendTyping().queue(success ->
 				event.getChannel().sendMessage(answer).queue());

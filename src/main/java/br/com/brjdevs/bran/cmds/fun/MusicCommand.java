@@ -1,7 +1,7 @@
 package br.com.brjdevs.bran.cmds.fun;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.audio.GuildMusicManager;
+import br.com.brjdevs.bran.core.audio.MusicManager;
 import br.com.brjdevs.bran.core.audio.TrackContext;
 import br.com.brjdevs.bran.core.audio.TrackScheduler;
 import br.com.brjdevs.bran.core.audio.utils.AudioUtils;
@@ -59,7 +59,7 @@ public class MusicCommand {
 								return;
 							}
 							String trackUrl = StringUtils.splitArgs(args, 2)[1].trim();
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							if (trackUrl.isEmpty()) {
 								if (!musicManager.getPlayer().isPaused())
 									event.sendMessage("You have to tell me a song name or link!").queue();
@@ -70,7 +70,7 @@ public class MusicCommand {
 								return;
 							}
 							event.getMessage().deleteMessage().queue();
-							TrackScheduler scheduler = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild()).getTrackScheduler();
+							TrackScheduler scheduler = AudioUtils.getManager().get(event.getOriginGuild()).getTrackScheduler();
 							List<TrackContext> tracksByUser = scheduler.getTracksBy(event.getAuthor());
 							if (event.getGuild().getMusicSettings().getMaxSongsPerUser() > 0 && tracksByUser.size() >= event.getGuild().getMusicSettings().getMaxSongsPerUser()) {
 								event.sendMessage("You can only have " + event.getGuild().getMusicSettings().getMaxSongsPerUser() + " songs in the queue.").queue();
@@ -84,7 +84,7 @@ public class MusicCommand {
 						.setName("Music NowPlaying Command")
 						.setDescription("Gives you information about the current song.")
 						.setAction((event) -> {
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							if (musicManager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I'm not playing anything, use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
 								return;
@@ -94,12 +94,12 @@ public class MusicCommand {
 							EmbedBuilder embedBuilder = new EmbedBuilder();
 							embedBuilder.setAuthor((musicManager.getPlayer().isPaused() ? PAUSED : PLAYING) + " Now Playing", context.getURL(), null);
 							embedBuilder.addField("Title", info.title, false)
-									.addField("Duration", AudioUtils.format(context.getOrigin().getPosition()) + "/" + AudioUtils.format(info.length), true)
+									.addField("Duration", AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length), true)
 									.addField("Author", info.author, true);
 							embedBuilder.addField("DJ", Util.getUser(context.getDJ(event.getJDA())), true);
 							if (!musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().isContinuous()) {
 								context = musicManager.getTrackScheduler().getQueue().peek();
-								info = context.getOrigin().getInfo();
+								info = context.getTrack().getInfo();
 								embedBuilder.addField("Next Up", info.title, false)
 										.addField("Duration", AudioUtils.format(info.length), true)
 										.addField("Author", info.author, true);
@@ -117,7 +117,7 @@ public class MusicCommand {
 						.setArgs("<0-100>")
 						.setRequiredPermission(DJ)
 						.setAction((event, args) -> {
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							if (StringUtils.splitSimple(args).length == 1) {
 								event.sendMessage("\uD83D\uDD09 " + musicManager.getPlayer().getVolume()).queue();
 								return;
@@ -146,14 +146,14 @@ public class MusicCommand {
 							} catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
 							}
 							if (page == 0) page = 1;
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							StringBuilder builder = new StringBuilder();
 							if (musicManager.getTrackScheduler().getQueue().isEmpty()) {
 								event.sendMessage("The queue is empty, use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
 								return;
 							}
 							List<String> list = musicManager.getTrackScheduler().getQueue().stream().map(track -> {
-								AudioTrackInfo i = track.getOrigin().getInfo();
+								AudioTrackInfo i = track.getTrack().getInfo();
 								return "`[" + musicManager.getTrackScheduler().getPosition(track) + "]`" + i.title + " - " + Util.getUser(track.getDJ(event.getJDA())) + " *(" + AudioUtils.format(i.length) + ")*";
 							}).collect(Collectors.toList());
 							TrackScheduler scheduler = musicManager.getTrackScheduler();
@@ -178,7 +178,7 @@ public class MusicCommand {
 						.setDescription("Toggles the Repeat.")
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							musicManager.getTrackScheduler().setRepeat(!musicManager.getTrackScheduler().isRepeat());
 							event.sendMessage(musicManager.getTrackScheduler().isRepeat() ? "The player is now on repeat." : "The player is no longer on repeat.").queue();
 						})
@@ -189,7 +189,7 @@ public class MusicCommand {
 						.setDescription("Pauses/Resumes the player.")
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							if (musicManager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I can't pause if I'm not playing anything.").queue();
 								return;
@@ -204,7 +204,7 @@ public class MusicCommand {
 						.setDescription("Completely stops the Music Player.")
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							if (musicManager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I can't stop if I'm not playing anything.").queue();
 								return;
@@ -219,7 +219,7 @@ public class MusicCommand {
 						.setDescription("Set the Queue to Shuffle.")
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							musicManager.getTrackScheduler().setShuffle(!musicManager.getTrackScheduler().isShuffle());
 							event.sendMessage(musicManager.getTrackScheduler().isShuffle() ? "The player is now set to shuffle." : "The player is no longer set to shuffle.").queue();
 						})
@@ -247,7 +247,7 @@ public class MusicCommand {
 								event.sendMessage(Quote.getQuote(Quote.FAIL) + "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
-							GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager musicManager = AudioUtils.getManager().get(event.getOriginGuild());
 							TrackScheduler scheduler = musicManager.getTrackScheduler();
 							if (scheduler.getCurrentTrack() != null)
 								event.sendMessage("Restarting the current song...").queue();
@@ -265,7 +265,7 @@ public class MusicCommand {
 						.setName("Music Vote Skip Command")
 						.setDescription("Voting for skipping song.")
 						.setAction((event) -> {
-							GuildMusicManager manager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager manager = AudioUtils.getManager().get(event.getOriginGuild());
 							TrackScheduler scheduler = manager.getTrackScheduler();
 							VoiceChannel vchan = event.getOriginGuild().getSelfMember().getVoiceState().getChannel();
 							if (vchan == null) {
@@ -313,7 +313,7 @@ public class MusicCommand {
 								event.sendMessage(Quote.getQuote(Quote.FAIL) + "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
-							GuildMusicManager manager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager manager = AudioUtils.getManager().get(event.getOriginGuild());
 							TrackScheduler scheduler = manager.getTrackScheduler();
 							if (manager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I'm not playing anything, so I can't skip!").queue();
@@ -351,7 +351,7 @@ public class MusicCommand {
 								event.sendMessage(Quote.getQuote(Quote.FAIL) + "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
-							GuildMusicManager manager = AudioUtils.getManager().getGuildMusicManager(event.getOriginGuild());
+							MusicManager manager = AudioUtils.getManager().get(event.getOriginGuild());
 							TrackScheduler scheduler = manager.getTrackScheduler();
 							if (scheduler.getQueue().isEmpty()) {
 								event.sendMessage("The queue is empty, so you can't remove any songs.").queue();
@@ -362,7 +362,7 @@ public class MusicCommand {
 								event.sendMessage("Could not remove from the queue. Reason: `Index is bigger than queue size`").queue();
 								return;
 							}
-							event.sendMessage(Quote.getQuote(Quote.SUCCESS) + "Removed `" + removed.getOrigin().getInfo().title + "` from the queue.").queue();
+							event.sendMessage(Quote.getQuote(Quote.SUCCESS) + "Removed `" + removed.getTrack().getInfo().title + "` from the queue.").queue();
 						})
 						.build())
 				.build());

@@ -3,7 +3,7 @@ package br.com.brjdevs.bran.core.command;
 import br.com.brjdevs.bran.Bot;
 import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.bran.core.data.guild.configs.GuildMember;
-import br.com.brjdevs.bran.core.data.guild.configs.impl.GuildMemberImpl.FakeGuildMemberImpl;
+import br.com.brjdevs.bran.core.data.guild.configs.GuildMember.FakeGuildMember;
 import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.managers.PrefixManager;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder;
@@ -135,7 +135,7 @@ public class CommandManager implements EventListener {
 			e.sendMessage(builder.build()).queue();
 			return;
 		}
-		GuildMember member = discordGuild != null ? discordGuild.getMember(event.getAuthor()) : new FakeGuildMemberImpl(event.getAuthor().getId(), null);
+		GuildMember member = discordGuild != null ? discordGuild.getMember(event.getAuthor()) : new FakeGuildMember(event.getAuthor(), null);
 		if (!member.hasPermission(cmd.getRequiredPermission(), event.getJDA())) {
 			builder.append(Quote.FAIL);
 			builder.append("You don't have enough permissions to do this!\n" +

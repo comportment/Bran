@@ -2,15 +2,13 @@ package br.com.brjdevs.bran.core.command;
 
 import br.com.brjdevs.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.bran.core.data.guild.configs.GuildMember;
-import br.com.brjdevs.bran.core.data.guild.configs.impl.GuildMemberImpl.FakeGuildMemberImpl;
+import br.com.brjdevs.bran.core.data.guild.configs.GuildMember.FakeGuildMember;
 import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.utils.Util;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.requests.RestAction;
-
-import java.util.concurrent.Future;
 
 public class CommandEvent {
     private Guild guild;
@@ -37,7 +35,7 @@ public class CommandEvent {
             this.guildMember = discordGuild.getMember(author);
         }
         if (this.guildMember == null)
-            this.guildMember = new FakeGuildMemberImpl(author.getId(), null);
+	        this.guildMember = new FakeGuildMember(author, null);
     }
     public String getPrefix() {
         return prefix;

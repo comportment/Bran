@@ -1,7 +1,11 @@
 package br.com.brjdevs.bran.cmds.fun;
 
 import br.com.brjdevs.bran.Bot;
+import br.com.brjdevs.bran.core.action.Action;
+import br.com.brjdevs.bran.core.action.Action.onInvalidResponse;
+import br.com.brjdevs.bran.core.action.ActionType;
 import br.com.brjdevs.bran.core.command.*;
+import br.com.brjdevs.bran.core.data.bot.HangManWord;
 import br.com.brjdevs.bran.core.data.guild.configs.profile.Profile;
 import br.com.brjdevs.bran.core.managers.Permissions;
 import br.com.brjdevs.bran.core.messageBuilder.AdvancedMessageBuilder.Quote;
@@ -11,7 +15,7 @@ import br.com.brjdevs.bran.core.utils.MathUtils;
 import br.com.brjdevs.bran.core.utils.StringUtils;
 import br.com.brjdevs.bran.core.utils.Util;
 import br.com.brjdevs.bran.features.hangman.HangManGame;
-import br.com.brjdevs.bran.features.hangman.HangManWord;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.List;
@@ -19,6 +23,9 @@ import java.util.stream.Collectors;
 
 @RegisterCommand
 public class HangManCommand {
+	
+	private static final String ACCEPT = "\u2705", DENY = "\u274C";
+	
 	public HangManCommand() {
 		CommandManager.addCommand(new TreeCommandBuilder(Category.FUN)
 				.setAliases("hangman", "hm")
@@ -54,7 +61,7 @@ public class HangManCommand {
 						.setAction((event, args) -> {
 							HangManGame session = HangManGame.getSession(event.getMember().getProfile());
 							if (session == null) {
-								event.sendMessage(Quote.getQuote(Quote.FAIL) + "You don't have a Session Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to create one!").queue();
+								event.sendMessage(Quote.getQuote(Quote.FAIL) + "You don't have a Game Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to start one!").queue();
 								return;
 							}
 							if (session.getChannel() != event.getTextChannel()) {
@@ -79,15 +86,31 @@ public class HangManCommand {
 								event.sendMessage(Quote.getQuote(Quote.FAIL) + "**" + Util.getUser(user) + "** is already playing with you.").queue();
 								return;
 							}
-							session.invite(profile);
+							event.getChannel().sendMessage(Util.getUser(user) + ", react to this message with " + ACCEPT + " to join the game or with " + DENY + " to deny.")
+									.queue(msg -> {
+										msg.addReaction(ACCEPT).queue();
+										msg.addReaction(DENY).queue();
+										Action action = new Action(ActionType.REACTION, onInvalidResponse.IGNORE, msg,
+												response -> {
+													if (response.equals(ACCEPT)) {
+														msg.editMessage(Util.getUser(user) + ", you've joined the session!").queue();
+														session.invite(profile);
+													} else {
+														msg.editMessage(Util.getUser(user) + ", you've denied the invite.").queue();
+													}
+													if (event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE))
+														msg.clearReactions().queue();
+												}, ACCEPT, DENY);
+										action.addUser(user);
+									});
 						})
 						.build())
 				.addCommand(new CommandBuilder(Category.FUN)
-						.setAliases("pass")
+						.setAliases("setCreator")
 						.setName("HangMan Session Pass Command")
 						.setDescription("Changes the owner of the current session.")
 						.setArgs("[MENTION]")
-						.setExample("hangman pass <@219186621008838669>")
+						.setExample("hangman setCreator <@219186621008838669>")
 						.setAction((event) -> {
 							HangManGame session = HangManGame.getSession(event.getMember().getProfile());
 							if (session == null) {
@@ -108,7 +131,7 @@ public class HangManCommand {
 								event.sendMessage(Quote.getQuote(Quote.FAIL) + "You have to mention an invited user.").queue();
 								return;
 							}
-							session.pass(profile);
+							session.setCreator(profile);
 							event.sendMessage(Quote.getQuote(Quote.SUCCESS) + "Alright, now **" + Util.getUser(user) + "** is the new creator of the Session. " + event.getOriginMember().getEffectiveName() + ", I've put you as invited, so you can type `giveup` to leave the session.").queue();
 						})
 						.build())

@@ -1,15 +1,9 @@
 package br.com.brjdevs.bran;
 
-import br.com.brjdevs.bran.core.command.CommandManager;
-import br.com.brjdevs.bran.core.data.DataManager;
 import br.com.brjdevs.bran.core.data.bot.BotData;
 import br.com.brjdevs.bran.core.data.bot.Config;
-import br.com.brjdevs.bran.core.managers.TaskManager;
 import br.com.brjdevs.bran.core.utils.Session;
 import br.com.brjdevs.bran.core.utils.Util;
-import br.com.brjdevs.bran.jdaLoader.JDALoader;
-import br.com.brjdevs.bran.jdaLoader.LoaderType;
-import br.com.brjdevs.bran.jdaLoader.impl.JDALoaderImpl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
@@ -17,19 +11,18 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import lombok.SneakyThrows;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,15 +32,14 @@ public class Bot implements EventListener {
     public static final int MAX_PREFIXES = 5;
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 	private static final Bot instance = new Bot();
-	private static final File CONFIG_FILE = new File(getInstance().getWorkingDirectory() + "config.json");
 	private static final String abal = "https://bots.discord.pw/api/bots/{0}/stats";
 	public static SimpleLog LOG = SimpleLog.getLog("Application");
 	public static TextChannel LOG_CHANNEL;
-	private static Map<Integer, JDA> shards = new HashMap<>();
+	static Map<Integer, JDA> shards = new HashMap<>();
 	private final Session session = new Session();
-	private User OWNER = null;
-    private Config CONFIG = new Config();
-    private String WORKING_DIR = System.getProperty("user.dir") + "/data/";
+	User OWNER = null;
+	Config CONFIG = new Config();
+	private String WORKING_DIR = System.getProperty("user.dir") + "/data/";
     private BotData DATA = new BotData();
     private String[] PREFIXES = {"!!", "."};
     private long START_TIME = System.currentTimeMillis();
@@ -59,25 +51,15 @@ public class Bot implements EventListener {
 			    LOG.warn("Couldn't create expected directory to save files, please create a folder named 'data' in the current directory to make sure it won't happen again.");
 			    System.exit(0);
 		    }
-		    getInstance().setConfig();
-		    getInstance().build();
-		    LOG_CHANNEL = shards.entrySet().stream().filter(entry -> entry.getValue().getTextChannelById("249971874430320660") != null).findFirst().get().getValue().getTextChannelById("249971874430320660");
-		    LOG.info("Logged in as " + Util.getUser(getInstance().getSelfUser(shards.get(0))));
-		    getInstance().OWNER = shards.entrySet().stream().filter(entry -> entry.getValue().getUserById(getInstance().getConfig().getOwnerId()) != null).findFirst().get().getValue().getUserById(getInstance().getConfig().getOwnerId());
-		    if (getInstance().OWNER == null) {
-			    LOG.fatal("Could not find user with ID '" + getInstance().getConfig().getOwnerId() + "', please set a valid ID in config.json.");
-			    System.exit(0);
-		    }
-		    LOG.info("Recognized owner as " + Util.getUser(getInstance().OWNER));
-		    CommandManager.load();
-		    LOG.info("Registered Commands.");
-		    DataManager.loadData();
-		    LOG.info("Loaded Bot and Guild data.");
-		    TaskManager.startAsyncTasks();
-		    LOG.info("Started async tasks.");
-		    LOG.info("Finished loading. Time taken: " + getInstance().getSession().getUptime());
+		    BotManager.preInit();
+		    BotManager.init();
 	    } catch (LoginException e) {
-		    LOG.fatal("The set Token is invalid, please insert a valid token!");
+		    if (!e.getMessage().contains("Connection reset")) {
+			    LOG.fatal("The set Token is invalid, please insert a valid token!");
+		    } else {
+			    LOG.fatal("Could not connect with Discord.");
+		    }
+		    LOG.log(e);
 		    System.exit(0);
 	    } catch (Exception e) {
 		    LOG.log(e);
@@ -207,44 +189,5 @@ public class Bot implements EventListener {
             Bot.LOG.log(e);
             return false;
         }
-    }
-	
-	@SneakyThrows(Exception.class)
-	private void setConfig() {
-		if (!CONFIG_FILE.exists()) {
-			LOG.warn("No config.json file was found, creating example config.json...");
-			if (CONFIG_FILE.createNewFile()) {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(CONFIG_FILE));
-				writer.write(GSON.toJson(new Config()));
-				writer.close();
-				LOG.warn("Please, populate the config.json file with valid properties before running the jar again.");
-			} else
-				LOG.fatal("Failed to generate config.json.");
-			System.exit(0);
-		} else {
-			LOG.info("Found config.json, loading properties...");
-			BufferedReader reader = new BufferedReader(new FileReader(CONFIG_FILE));
-			CONFIG = GSON.fromJson(reader, Config.class);
-			reader.close();
-			if (Util.isEmpty(CONFIG.getToken())) {
-				LOG.fatal("The set Token is invalid, please insert a valid token!");
-				System.exit(0);
-			}
-			if (Util.isEmpty(CONFIG.getOwnerId())) {
-				LOG.fatal("The set Owner ID is invalid.");
-				System.exit(0);
-			}
-			if (Util.isEmpty(CONFIG.getDiscordBotsToken())) {
-				LOG.info("Discord Bots Token was not provided, disabled command bot.updateStats.");
-			}
-			LOG.info("Loaded config.json!");
-		}
-	}
-	
-	private void build() throws LoginException, RateLimitedException, UnirestException, IOException {
-        int requiredShards = getInstance().getRequiredShards();
-        LOG.info(requiredShards < 2 ? "Discord does not ask for sharding yet." : "Discord recommends " + requiredShards + " shards.");
-        JDALoader jdaLoader = new JDALoaderImpl(requiredShards < 2 ? LoaderType.SINGLE : LoaderType.SHARDED);
-        shards = jdaLoader.build(true, requiredShards);
     }
 }

@@ -73,7 +73,7 @@ public class PokemonCommand {
 						String name = stat.get("stat").getAsJsonObject().get("name").getAsString();
 						name = StringUtils.neat(name.replaceAll("-", " "));
 						int base = stat.get("base_stat").getAsInt();
-						stringBuilder.append("      **").append(name).append("**\n         ").append("**Base Stat: **").append(base).append("\n");
+						stringBuilder.append("      **").append(name).append("**: ").append(base).append("\n");
 					}
 					try {
 						embedBuilder.setThumbnail(form);

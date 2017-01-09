@@ -1,7 +1,7 @@
 package br.com.brjdevs.bran.core.audio.utils;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.audio.GuildMusicManager;
+import br.com.brjdevs.bran.core.audio.MusicManager;
 import br.com.brjdevs.bran.core.audio.TrackContext;
 import br.com.brjdevs.bran.core.utils.Util;
 import com.google.gson.JsonObject;
@@ -21,7 +21,7 @@ public class VoiceChannelListener implements EventListener {
 	
 	private static void onJoin(Guild guild, VoiceChannel voiceChannel, Member member) {
 		if (member.equals(guild.getSelfMember()) || !musicTimeout.has(guild.getId())) return;
-		GuildMusicManager player = AudioUtils.getManager().getGuildMusicManager(guild);
+		MusicManager player = AudioUtils.getManager().get(guild);
 		TrackContext track = player.getTrackScheduler().getCurrentTrack();
 		if (track == null) return;
 		JsonObject info = musicTimeout.get(guild.getId()).getAsJsonObject();
@@ -36,7 +36,7 @@ public class VoiceChannelListener implements EventListener {
 
 	private static void onLeave(Guild guild, VoiceChannel voiceChannel) {
 		if (!AudioUtils.isAlone(voiceChannel)) return;
-		GuildMusicManager musicManager = AudioUtils.getManager().getGuildMusicManager(guild);
+		MusicManager musicManager = AudioUtils.getManager().get(guild);
 		TrackContext track = musicManager.getTrackScheduler().getCurrentTrack();
 		if (musicManager.getTrackScheduler().isStopped()) {
 			guild.getAudioManager().closeAudioConnection();

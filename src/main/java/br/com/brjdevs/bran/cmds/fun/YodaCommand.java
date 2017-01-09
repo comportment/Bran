@@ -17,7 +17,7 @@ public class YodaCommand {
 				.setArgs("[sentence]")
 				.setAction((event) -> {
 					HttpResponse<String> response = null;
-					String string = event.getArgs(2)[1].replaceAll(" ", "+");
+					String string = event.getArgs(2)[1].replaceAll("\\s+", "+");
 					if (string.isEmpty()) {
 						event.sendMessage("Teach you to speak like me if you tell me a sentence I will.  Herh herh herh.").queue();
 						return;

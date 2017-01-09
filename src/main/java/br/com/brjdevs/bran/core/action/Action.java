@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.ArrayList;
@@ -31,8 +31,10 @@ public class Action {
 	@Getter
 	@Setter
 	private Object[] extras;
+	@Getter
+	private onInvalidResponse onInvalidResponse;
 	
-	public Action(ActionType actionType, Message message, IEvent listener, List<String> expectedInput) {
+	public Action(ActionType actionType, onInvalidResponse onInvalidResponse, Message message, IEvent listener, List<String> expectedInput) {
 		this.usersId = new ArrayList<>();
 		this.expectedInput = expectedInput;
 		this.listener = listener;
@@ -40,12 +42,25 @@ public class Action {
 		this.channelId = message.getChannel().getId();
 		this.actionType = actionType;
 		this.shardId = Bot.getInstance().getShardId(message.getJDA());
+		this.onInvalidResponse = onInvalidResponse;
 		
 		actions.add(this);
 	}
 	
-	public Action(ActionType actionType, Message message, IEvent listener, String... expectedInputs) {
-		this(actionType, message, listener, Arrays.asList(expectedInputs));
+	public Action(ActionType actionType, onInvalidResponse onInvalidResponse, TextChannel channel, IEvent listener, List<String> expectedInput) {
+		this.usersId = new ArrayList<>();
+		this.expectedInput = expectedInput;
+		this.listener = listener;
+		this.channelId = channel.getId();
+		this.actionType = actionType;
+		this.shardId = Bot.getInstance().getShardId(channel.getJDA());
+		this.onInvalidResponse = onInvalidResponse;
+		
+		actions.add(this);
+	}
+	
+	public Action(ActionType actionType, onInvalidResponse onInvalidResponse, Message message, IEvent listener, String... expectedInputs) {
+		this(actionType, onInvalidResponse, message, listener, Arrays.asList(expectedInputs));
 	}
 	
 	public static Action getAction(String userId) {
@@ -60,11 +75,15 @@ public class Action {
 		return Bot.getInstance().getShard(shardId);
 	}
 	
-	public MessageChannel getChannel() {
+	public TextChannel getChannel() {
 		return getJDA().getTextChannelById(channelId);
 	}
 	
 	public void addUser(User user) {
 		usersId.add(user.getId());
+	}
+	
+	public enum onInvalidResponse {
+		CONTINUE, CANCEL, IGNORE
 	}
 }

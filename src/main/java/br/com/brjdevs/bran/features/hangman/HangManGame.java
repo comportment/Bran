@@ -1,10 +1,10 @@
 package br.com.brjdevs.bran.features.hangman;
 
 import br.com.brjdevs.bran.Bot;
+import br.com.brjdevs.bran.core.data.bot.HangManWord;
 import br.com.brjdevs.bran.core.data.guild.configs.profile.Profile;
 import br.com.brjdevs.bran.core.utils.Util;
-import br.com.brjdevs.bran.features.hangman.listener.HangManEventListener;
-import br.com.brjdevs.bran.features.hangman.listener.HangManEvents;
+import br.com.brjdevs.bran.features.hangman.events.*;
 import lombok.Getter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
@@ -36,7 +36,7 @@ public class HangManGame {
 	private final String channel;
 	private final List<String> mistakes;
 	@Getter
-	private final HangManEvents listener;
+	private final IEventListener listener;
 	private long lastGuess;
 	private Profile creator;
 	@Getter
@@ -44,7 +44,7 @@ public class HangManGame {
 	private int shard;
 	
 	public HangManGame(Profile profile, HangManWord word, TextChannel channel) {
-		this.listener = new HangManEventListener(this);
+		this.listener = new EventListener();
 		this.guesses = new LinkedHashMap<>();
 		this.creator = profile;
 		this.mistakes = new ArrayList<>();
@@ -56,7 +56,9 @@ public class HangManGame {
 		Arrays.stream(word.asString().split(""))
 				.forEach(split ->
 						guesses.put(guesses.containsKey(split) ? split + Util.randomName(3) : split, false));
-		if (word.asString().contains(" ")) guess(" ");
+		if (word.asString().contains(" ")) {
+			guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == ' ').forEach(entry -> guesses.replace(entry.getKey(), true));
+		}
 		sessions.add(this);
 	}
 	
@@ -87,44 +89,38 @@ public class HangManGame {
 	public int getMaxErrors() {
 		return 5 + (getInvitedUsers().size() * 3);
 	}
-
-	public void guess(String c) {
+	
+	public void guess(String string, Profile profile) {
 		this.lastGuess = System.currentTimeMillis();
-		if (isGuessed(c)) {
-			getListener().onAlreadyGuessed(getMistakes().contains(c));
+		if (isGuessed(string)) {
+			getListener().onEvent(new AlreadyGuessedEvent(this, getJDA(), profile, containsEqualsIgnoreCase(getWord().asString(), string), string));
 			return;
 		}
-		if (isInvalid(c)) {
-			mistakes.add(c);
+		if (isInvalid(string)) {
+			mistakes.add(string);
 			if (mistakes.size() > getMaxErrors()) {
-				getListener().onLoose(false);
+				getListener().onEvent(new LooseEvent(this, getJDA(), false));
 				return;
 			}
-			getListener().onInvalidGuess(c);
+			getListener().onEvent(new GuessEvent(this, getJDA(), profile, false, string));
 			return;
 		}
-		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == String.valueOf(c).toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
+		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == String.valueOf(string).toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
 		if (getGuessedLetters().equals(getWord().asString())) {
-			getListener().onWin();
+			getListener().onEvent(new WinEvent(this, getJDA()));
 			return;
 		}
-		getListener().onGuess(c);
-	}
-
-	public void pass(Profile profile) {
-		getInvitedUsers().remove(profile);
-		getInvitedUsers().add(creator);
-		this.creator = profile;
+		getListener().onEvent(new GuessEvent(this, getJDA(), profile, true, string));
 	}
 
 	public String getGuessedLetters() {
 		return String.join("", guesses.entrySet().stream().map(entry -> (entry.getValue() ? entry.getKey().charAt(0) : "\\_") + "").collect(Collectors.toList()));
 	}
-	
+
 	public HangManWord getWord() {
 		return word;
 	}
-
+	
 	public List<String> getGuesses() {
 		return guesses.entrySet().stream().map(entry -> entry.getValue() ? entry.getKey() : "_").collect(Collectors.toList());
 	}
@@ -132,7 +128,7 @@ public class HangManGame {
 	public List<String> getMistakes() {
 		return mistakes;
 	}
-	
+
 	public boolean isGuessed(String c) {
 		return containsEqualsIgnoreCase(getGuesses(), c) || containsEqualsIgnoreCase(getMistakes(), c);
 	}
@@ -143,6 +139,12 @@ public class HangManGame {
 	
 	public Profile getCreator() {
 		return creator;
+	}
+	
+	public void setCreator(Profile profile) {
+		getInvitedUsers().remove(profile);
+		getInvitedUsers().add(creator);
+		this.creator = profile;
 	}
 	
 	public List<Profile> getProfiles() {
@@ -175,6 +177,7 @@ public class HangManGame {
 						success -> setLastMessage(null),
 						fail -> setLastMessage(null));
 			} catch (ErrorResponseException ignored) {
+				setLastMessage(null);
 			}
 		}
 		EmbedBuilder builder = new EmbedBuilder();

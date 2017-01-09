@@ -16,6 +16,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -53,9 +54,9 @@ public class TrackScheduler implements AudioEventListener {
 	
 	public String getQueueDuration() {
 		long duration = 0;
-		duration += currentTrack.getOrigin().getPosition();
+		duration += currentTrack.getTrack().getPosition();
 		for (TrackContext track : queue)
-			duration += track.getOrigin().getInfo().length;
+			duration += track.getTrack().getInfo().length;
 		return AudioUtils.format(duration);
 	}
 	public List<String> getVoteSkips() {
@@ -90,8 +91,8 @@ public class TrackScheduler implements AudioEventListener {
 		return previousTrack;
 	}
 	
-	public Guild getGuild(JDA jda) {
-		return jda.getGuildById(String.valueOf(guildId));
+	public Guild getGuild() {
+		return getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
 	public BlockingQueue<TrackContext> getQueue() {
@@ -100,6 +101,22 @@ public class TrackScheduler implements AudioEventListener {
 	
 	public int getPosition(TrackContext trackContext) {
 		return new ArrayList<>(queue).indexOf(trackContext);
+	}
+	
+	public boolean isPaused() {
+		return getAudioPlayer().isPaused();
+	}
+	
+	public void setPaused(boolean paused) {
+		getAudioPlayer().setPaused(paused);
+	}
+	
+	public int getVolume() {
+		return getAudioPlayer().getVolume();
+	}
+	
+	public void setVolume(int volume) {
+		getAudioPlayer().setVolume(volume);
 	}
 	
 	public TrackContext provideNextTrack(boolean isSkipped) {
@@ -158,7 +175,7 @@ public class TrackScheduler implements AudioEventListener {
 	}
 	
 	public boolean play(TrackContext trackContext, boolean noInterrupt) {
-		return player.startTrack(trackContext != null ? trackContext.getOrigin() : null, noInterrupt);
+		return player.startTrack(trackContext != null ? trackContext.getTrack() : null, noInterrupt);
 	}
 	
 	public void queue(AudioPlaylist playlist, List<TrackContext> trackContexts, User dj, TextChannel context) {
@@ -171,9 +188,15 @@ public class TrackScheduler implements AudioEventListener {
 	
 	public void queue(TrackContext context) {
 		queue.offer(context);
-		AudioTrackInfo info = context.getOrigin().getInfo();
+		AudioTrackInfo info = context.getTrack().getInfo();
 		if (context.getDJ(getJDA()) != null && context.getContext(getJDA()) != null)
 			context.getContext(getJDA()).sendMessage(context.getDJ(getJDA()).getAsMention() + " has added `" + info.title + "` to the queue. (`" + AudioUtils.format(info.length) + "`)").queue();
+		if (player.getPlayingTrack() == null)
+			play(provideNextTrack(false), true);
+	}
+	
+	public void silentQueue(TrackContext context) {
+		queue.offer(context);
 		if (player.getPlayingTrack() == null)
 			play(provideNextTrack(false), true);
 	}
@@ -188,7 +211,7 @@ public class TrackScheduler implements AudioEventListener {
 	}
 	
 	public void stop() {
-		getGuild(getJDA()).getAudioManager().closeAudioConnection();
+		getGuild().getAudioManager().closeAudioConnection();
 		queue.clear();
 		play(null, false);
 	}
@@ -217,8 +240,15 @@ public class TrackScheduler implements AudioEventListener {
 		return null;
 	}
 	
+	public LinkedList<TrackContext> getRemainingTracks() {
+		LinkedList<TrackContext> tracks = new LinkedList<>();
+		tracks.add(currentTrack);
+		tracks.addAll(queue);
+		return tracks;
+	}
+	
 	public VoiceChannel getVoiceChannel() {
-		return getGuild(getJDA()).getAudioManager().getConnectedChannel();
+		return getGuild().getAudioManager().getConnectedChannel();
 	}
 	
 	@Override
@@ -244,15 +274,15 @@ public class TrackScheduler implements AudioEventListener {
 				AudioUtils.getManager().getMusicManagers().remove(guildId);
 				return;
 			}
-			if (currentTrack.getContext(getJDA()) != null && currentTrack.getDJ(getJDA()) != null && !isRepeat) {
-				currentTrack.getContext(getJDA()).sendMessage(String.format(announce, getVoiceChannel().getName(), currentTrack.getOrigin().getInfo().title, AudioUtils.format(currentTrack.getOrigin()), Util.getUser(currentTrack.getDJ(getJDA())))).queue(this::setLastAnnounce);
+			if (currentTrack.getContext(getJDA()) != null && !isRepeat) {
+				currentTrack.getContext(getJDA()).sendMessage(String.format(announce, getVoiceChannel().getName(), currentTrack.getTrack().getInfo().title, AudioUtils.format(currentTrack.getTrack()), Util.getUser(currentTrack.getDJ(getJDA())))).queue(this::setLastAnnounce);
 			}
 		} else if (audioEvent instanceof TrackExceptionEvent) {
 			TrackExceptionEvent event = (TrackExceptionEvent) audioEvent;
 			if (currentTrack != null && currentTrack.getContext(getJDA()) != null
 					&& currentTrack.getContext(getJDA()).canTalk()) {
 				if (currentTrack.getContext(getJDA()) != null && currentTrack.getContext(getJDA()).canTalk()) {
-					String string = "\u274c Failed to Load `" + currentTrack.getOrigin().getInfo().title + "`!\n" +
+					String string = "\u274c Failed to Load `" + currentTrack.getTrack().getInfo().title + "`!\n" +
 							(event.exception.severity.equals(Severity.COMMON) ? StringUtils.neat(event.track.getSourceManager().getSourceName()) + " said: " : event.exception.severity.equals(Severity.SUSPICIOUS) ? "I don't know what exactly caused it, but I've got this: " : "This error might be caused by the library (Lavaplayer) or an external unidentified factor: ") + "`" + event.exception.getMessage() + "`";
 					currentTrack.getContext(getJDA()).getMessageById(lastAnnounce).queue(msg -> msg.editMessage(string).queue(), throwable -> currentTrack.getContext(getJDA()).sendMessage(string).queue());
 				}
@@ -272,6 +302,6 @@ public class TrackScheduler implements AudioEventListener {
 		}
 		if (getPreviousTrack() != null)
 			getPreviousTrack().getContext(getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + Bot.getInstance().getDefaultPrefixes()[0] + "music play [SONG]`.").queue();
-		getGuild(getJDA()).getAudioManager().closeAudioConnection();
+		getGuild().getAudioManager().closeAudioConnection();
 	}
 }

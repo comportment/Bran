@@ -133,13 +133,13 @@ public class JavaEvalCommand {
                         "import br.com.brjdevs.bran.core.data.guild.configs.profile.*;\n" +
                         "import br.com.brjdevs.bran.core.utils.*;\n" +
 		                "import br.com.brjdevs.bran.core.data.guild.configs.*;\n" +
-		                "import br.com.brjdevs.bran.core.data.guild.configs.impl.GuildMemberImpl.FakeGuildMemberImpl;\n" +
                         "import br.com.brjdevs.bran.core.audio.*;\n" +
                         "import br.com.brjdevs.bran.core.audio.utils.*;\n" +
                         "import br.com.brjdevs.bran.core.poll.*;\n" +
                         "import br.com.brjdevs.bran.core.*;\n" +
                         "import br.com.brjdevs.bran.core.command.*;\n" +
 		                "import br.com.brjdevs.bran.core.action.*;\n" +
+		                "import br.com.brjdevs.bran.features.clashofclans.structures.storages.*;\n" +
 		                "import com.google.gson.*;\n" +
                         "public class " + f.getName().replace(".java", "") + "\n{" +
                         "\n\tpublic Object run() throws Exception" +

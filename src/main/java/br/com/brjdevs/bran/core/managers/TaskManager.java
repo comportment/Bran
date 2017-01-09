@@ -1,7 +1,7 @@
 package br.com.brjdevs.bran.core.managers;
 
 import br.com.brjdevs.bran.Bot;
-import br.com.brjdevs.bran.core.audio.GuildMusicManager;
+import br.com.brjdevs.bran.core.audio.MusicManager;
 import br.com.brjdevs.bran.core.audio.TrackContext;
 import br.com.brjdevs.bran.core.audio.utils.AudioUtils;
 import com.google.gson.JsonObject;
@@ -61,8 +61,8 @@ public class TaskManager {
                 if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
                     return;
                 if (info.get("timeout").getAsInt() == 0) {
-                    GuildMusicManager player = AudioUtils.getManager().getGuildMusicManager(guild);
-                    VoiceChannel channel = guild.getVoiceChannelById(info.get("channelId").getAsString());
+	                MusicManager player = AudioUtils.getManager().get(guild);
+	                VoiceChannel channel = guild.getVoiceChannelById(info.get("channelId").getAsString());
                     if (channel == null || !AudioUtils.isAlone(channel)) return;
                     TrackContext track = player.getTrackScheduler().getCurrentTrack();
                     player.getTrackScheduler().getQueue().clear();
