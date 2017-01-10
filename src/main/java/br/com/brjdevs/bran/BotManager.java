@@ -5,6 +5,7 @@ import br.com.brjdevs.bran.core.command.CommandManager;
 import br.com.brjdevs.bran.core.data.DataManager;
 import br.com.brjdevs.bran.core.data.bot.Config;
 import br.com.brjdevs.bran.core.managers.TaskManager;
+import br.com.brjdevs.bran.core.poll.PollPersistence;
 import br.com.brjdevs.bran.core.utils.Util;
 import br.com.brjdevs.bran.jdaLoader.JDALoader;
 import br.com.brjdevs.bran.jdaLoader.LoaderType;
@@ -36,6 +37,7 @@ public class BotManager {
 		LOG.info("Initiating Pre Shutdown...");
 		DataManager.saveData();
 		if (!MusicPersistence.savePlaylists()) LOG.info("Could not complete MusicPersistence savePlaylists.");
+		if (!PollPersistence.savePolls()) LOG.info("Could not complete PollPersistence savePolls.");
 		canShutdown = true;
 		LOG.info("Ready for shutdown.");
 	}
@@ -111,9 +113,13 @@ public class BotManager {
 		TaskManager.startAsyncTasks();
 		LOG.info("Started async tasks.");
 		if (!MusicPersistence.reloadPlaylists())
-			LOG.info("Failed reload playlists from MusicPersistence.");
+			LOG.fatal("Executed MusicPersistence with errors.");
 		else
-			LOG.info("Reloaded playlists from MusicPersistence.");
+			LOG.info("Executed MusicPersistence without errors.");
+		if (!PollPersistence.reloadPolls())
+			LOG.fatal("Executed PollPersistence with errors.");
+		else
+			LOG.info("Executed PollPersistence without errors.");
 		
 		LOG.info("Finished loading. Time taken: " + Bot.getInstance().getSession().getUptime());
 	}

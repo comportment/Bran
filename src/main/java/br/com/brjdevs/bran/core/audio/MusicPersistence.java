@@ -34,13 +34,17 @@ public class MusicPersistence {
 	
 	@SneakyThrows(Exception.class)
 	public static boolean savePlaylists() {
+		if (!Bot.getInstance().getConfig().isMusicPersistenceEnabled()) {
+			LOG.info("Music Persistence is disabled in config.json.");
+			return true;
+		}
 		LOG.info("Initiating MusicPersistence pre shutdown.");
 		File dir = new File(System.getProperty("user.dir") + "/music_persistence");
 		if (!dir.exists()) {
 			try {
 				if (!dir.mkdirs()) throw new RuntimeException("Could not create dir.");
 			} catch (Exception e) {
-				LOG.fatal("Could not create directory '" + dir.getPath() + "'");
+				LOG.fatal("Could not create dir.");
 				LOG.log(e);
 				return false;
 			}
@@ -79,10 +83,15 @@ public class MusicPersistence {
 			
 			FileUtils.writeStringToFile(new File(dir, trackScheduler.getGuild().getId()), data.toString(), Charset.forName("UTF-8"));
 		}
+		LOG.info("Finished MusicPersistence pre shutdown.");
 		return true;
 	}
 	
 	public static boolean reloadPlaylists() {
+		if (!Bot.getInstance().getConfig().isMusicPersistenceEnabled()) {
+			LOG.info("Music Persistence is disabled in config.json.");
+			return true;
+		}
 		File dir = new File(System.getProperty("user.dir") + "/music_persistence");
 		if (!dir.exists()) return true;
 		
@@ -92,7 +101,7 @@ public class MusicPersistence {
 			return false;
 		}
 		if (files.length == 0) {
-			LOG.info("No files in '" + dir.getPath() + "'.");
+			LOG.info("No files in path.");
 			return true;
 		}
 		

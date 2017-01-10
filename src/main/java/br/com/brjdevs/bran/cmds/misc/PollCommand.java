@@ -63,6 +63,7 @@ public class PollCommand {
 							builder.setTitle(poll.getPollName());
 							builder.setFooter("This Poll was created by " + Util.getUser(event.getJDA().getUserById(poll.getCreatorId())), Util.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
 							StringBuilder stringBuilder = new StringBuilder();
+							stringBuilder.append("**Current Votes**\n");
 							poll.getOptions().forEach(option ->
 								stringBuilder.append("**" + (option.getIndex() + 1) + ".** " + option.getContent() + "    *(Votes: " + option.getVotes().size() + ")*\n"));
 							builder.setDescription(stringBuilder.toString());
@@ -74,7 +75,6 @@ public class PollCommand {
 						.setAliases("end")
 						.setName("Poll End Command")
 						.setDescription("Ends a Poll running in the current channel.")
-						
 						.setAction((event) -> {
 							Poll poll = Poll.getPoll(event.getTextChannel());
 							if (poll == null) {
@@ -82,7 +82,7 @@ public class PollCommand {
 								return;
 							}
 							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
-								event.sendMessage("You... can't do this... You're not the creator of this poll neither a Guild Moderator to end this poll!").queue();
+								event.sendMessage("You can't do this... You're not the creator of this poll nor a Guild Moderator to end this poll!").queue();
 								return;
 							}
 							boolean wasOwner = poll.getCreatorId().equals(event.getAuthor().getId());
@@ -90,14 +90,14 @@ public class PollCommand {
 							builder.setTitle(poll.getPollName());
 							builder.setFooter("This Poll was created by " + Util.getUser(event.getJDA().getUserById(poll.getCreatorId())), Util.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
 							StringBuilder stringBuilder = new StringBuilder();
-							if (!wasOwner) stringBuilder.append("This Poll was forcibly ended by a moderator.\n\n");
-							else
-								stringBuilder.append("This Poll was ended by its creator.\n\n");
+							if (!wasOwner) stringBuilder.append("**This Poll was forcibly ended by a moderator!**\n\n");
+							else stringBuilder.append("**The Poll creator has stopped it.**\n\n");
 							if (!poll.getLeadership().isEmpty()) {
+								stringBuilder.append("**Results**\n");
 								poll.getOptions().forEach(option ->
 										stringBuilder.append("**" + (option.getIndex() + 1) + ".** " + option.getContent() + "    *(Votes: " + option.getVotes().size() + ")*\n"));
 							} else {
-								stringBuilder.append("This Poll had no votes! Nothing won.");
+								stringBuilder.append("**That's kinda sad I guess, no one voted to the Poll!**");
 							}
 							builder.setDescription(stringBuilder.toString());
 							builder.setColor(Color.decode("#F89F3F"));

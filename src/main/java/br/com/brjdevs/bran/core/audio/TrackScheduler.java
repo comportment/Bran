@@ -14,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.utils.SimpleLog;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 public class TrackScheduler implements AudioEventListener {
 	
+	private static final SimpleLog LOG = SimpleLog.getLog("Track Scheduler");
 	private static final String announce = "\uD83D\uDD0A Now Playing in **%s**: `%s` (`%s`) added by %s.";
 	private static final Random rand = new Random();
 	
@@ -217,7 +219,7 @@ public class TrackScheduler implements AudioEventListener {
 	}
 	
 	public int getRequiredVotes(VoiceChannel voiceChannel) {
-		return (int) (voiceChannel.getMembers().size() - 1 / .65 + 1);
+		return (int) ((voiceChannel.getMembers().size() - 1) / .65) + 1;
 	}
 	
 	public void skip() {
@@ -257,20 +259,20 @@ public class TrackScheduler implements AudioEventListener {
 			voteSkips.clear();
 			TrackEndEvent event = (TrackEndEvent) audioEvent;
 			AudioTrackEndReason endReason = event.endReason;
-			if (!isRepeat && lastAnnounce != null) {
-				currentTrack.getContext(getJDA()).getMessageById(lastAnnounce).queue(msg -> {
-					if (msg.getEditedTime() == null) msg.deleteMessage().queue();
-					setLastAnnounce(null);
-				}, throwable -> setLastAnnounce(null));
-			}
 			if (endReason.mayStartNext) {
 				TrackContext nextTrack = provideNextTrack(false);
 				play(nextTrack, false);
 			}
+			if (!isRepeat && lastAnnounce != null) {
+				previousTrack.getContext(getJDA()).getMessageById(lastAnnounce).queue(msg -> {
+					if (msg.getEditedTime() == null) msg.deleteMessage().queue();
+					setLastAnnounce(null);
+				}, throwable -> setLastAnnounce(null));
+			}
 		} else if (audioEvent instanceof TrackStartEvent) {
 			TrackStartEvent event = (TrackStartEvent) audioEvent;
 			if (currentTrack == null && getAudioPlayer().getPlayingTrack() != null) {
-				Bot.LOG.fatal("Got TrackStartEvent with null AudioTrackContext in Guild " + guildId + ", finished session.");
+				LOG.fatal("Got TrackStartEvent with null AudioTrackContext in Guild " + guildId + ", finished session.");
 				AudioUtils.getManager().getMusicManagers().remove(guildId);
 				return;
 			}
@@ -297,7 +299,7 @@ public class TrackScheduler implements AudioEventListener {
 	
 	private void onSchedulerStop() {
 		if (getCurrentTrack() != null) {
-			Bot.LOG.fatal("Got onSchedulerStop with current AudioTrackContext not null.");
+			LOG.fatal("Got onSchedulerStop with current AudioTrackContext not null.");
 			return;
 		}
 		if (getPreviousTrack() != null)

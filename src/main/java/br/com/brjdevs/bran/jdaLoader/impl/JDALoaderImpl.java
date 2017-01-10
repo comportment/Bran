@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.EventListener;
+import net.dv8tion.jda.core.utils.SimpleLog;
 import org.reflections.Reflections;
 
 import javax.security.auth.login.LoginException;
@@ -21,6 +22,13 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class JDALoaderImpl implements JDALoader {
+	
+	private static final SimpleLog LOG;
+	
+	static {
+		LOG = SimpleLog.getLog("JDA Loader");
+	}
+	
 	private final LoaderType loaderType;
 	
 	public JDALoaderImpl (LoaderType loaderType) {
@@ -48,13 +56,13 @@ public class JDALoaderImpl implements JDALoader {
 							try {
 								return clazz.newInstance();
 							} catch (Exception e) {
-								Bot.LOG.log(e);
+								LOG.log(e);
 							}
 							return null;
 						}).filter(Objects::nonNull).toArray());
 		if (loaderType == LoaderType.SHARDED) {
 			for (int i = 0; i < shards; i++) {
-				Bot.LOG.info("Building Shard " + i + "/" + (shards - 1));
+				LOG.info("Building Shard " + i + "/" + (shards - 1));
 				jdaBuilder.useSharding(i, shards);
 				if (config.getGame() != null && !config.getGame().isEmpty())
 					jdaBuilder.setGame(config.isGameStream() ? Game.of("[" + i + "] " + config.getGame(), "https://twitch.tv/ ") : Game.of("[" + i + "]" + config.getGame()));
@@ -62,23 +70,23 @@ public class JDALoaderImpl implements JDALoader {
 				while (jda.getStatus() != Status.CONNECTED && isComplete)
 					Util.sleep(100);
 				out.put(i, jda);
-				Bot.LOG.info("Finished loading Shard " + i + "/" + (shards - 1));
+				LOG.info("Finished loading Shard " + i + "/" + (shards - 1));
 				if (i != shards - 1)
-					Bot.LOG.info("Waiting 5 seconds until next shard...");
+					LOG.info("Waiting 5 seconds until next shard...");
 				Util.sleep(TimeUnit.SECONDS.toMillis(5));
 			}
-			Bot.LOG.info("Finished loading all shards!");
-			Bot.LOG.info("Time taken: " + Bot.getInstance().getSession().getUptime());
+			LOG.info("Finished loading all shards!");
+			LOG.info("Time taken: " + Bot.getInstance().getSession().getUptime());
 		} else {
-			Bot.LOG.info("Building single JDA instance...");
+			LOG.info("Building single JDA instance...");
 			if (config.getGame() != null && !config.getGame().isEmpty())
 				jdaBuilder.setGame(config.isGameStream() ? Game.of(config.getGame(), "https://twitch.tv/ ") : Game.of(config.getGame()));
 			JDA jda = jdaBuilder.buildAsync();
 			while (jda.getStatus() != Status.CONNECTED && isComplete)
 				Util.sleep(100);
 			out.put(0, jda);
-			Bot.LOG.info("Finished loading JDA!");
-			Bot.LOG.info("Time taken: " + Bot.getInstance().getSession().getUptime());
+			LOG.info("Finished loading JDA!");
+			LOG.info("Time taken: " + Bot.getInstance().getSession().getUptime());
 		}
 		return out;
 	}
