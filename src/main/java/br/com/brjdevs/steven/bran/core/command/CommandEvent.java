@@ -10,6 +10,11 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.requests.RestAction;
+import net.dv8tion.jda.core.utils.SimpleLog;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommandEvent {
     private Guild guild;
@@ -22,14 +27,22 @@ public class CommandEvent {
     private DiscordGuild discordGuild;
     private GuildMember guildMember;
     private String prefix;
-    public CommandEvent(MessageReceivedEvent event, ICommand command, DiscordGuild discordGuild, String args, String prefix) {
+	private Map<String, Argument> argsMap;
+	private Argument[] arguments;
+	
+	public CommandEvent(MessageReceivedEvent event, ICommand command, DiscordGuild discordGuild, String args, String prefix) {
         this.event = event;
         this.command = command;
         this.message = event.getMessage();
         this.author = event.getAuthor();
         this.args = args;
         this.prefix = prefix;
-        if (!Util.isPrivate(event)) {
+	    this.argsMap = new HashMap<>();
+	    this.arguments = CommandUtils.copy(command);
+	    if (arguments != null) {
+		    Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
+	    }
+	    if (!Util.isPrivate(event)) {
             this.discordGuild = discordGuild;
             this.member = event.getMember();
             this.guild = event.getGuild();
@@ -91,11 +104,13 @@ public class CommandEvent {
     public Message getMessage() {
         return message;
     }
-    public DiscordGuild getGuild() {
-        return discordGuild;
+	
+	public DiscordGuild getDiscordGuild() {
+		return discordGuild;
     }
-    public Guild getOriginGuild() {
-        return guild;
+	
+	public Guild getGuild() {
+		return guild;
     }
     public MessageChannel getChannel() {
         return event.getChannel();
@@ -112,11 +127,21 @@ public class CommandEvent {
     public boolean isPrivate() {
         return event.isFromType(ChannelType.PRIVATE);
     }
-    public CommandEvent createChild(ICommand command, boolean b) {
+	
+	public Argument[] getArguments() {
+		return arguments;
+	}
+	
+	public Argument getArgument(String name) {
+		if (!argsMap.containsKey(name)) SimpleLog.getLog("Argument Getter").fatal("TYPO CARALHO");
+		return argsMap.get(name);
+	}
+	
+	public CommandEvent createChild(ICommand command, boolean b) {
         String newArgs = b ? args : args.replaceFirst(" ", "");
         CommandEvent event = new CommandEvent(this.event, command, discordGuild, newArgs, prefix);
         Thread.currentThread().setName(command.getName() + ">" + Util.getUser(event.getAuthor()));
-        command.execute(event, newArgs);
-        return event;
+	    command.execute(event);
+		return event;
     }
 }

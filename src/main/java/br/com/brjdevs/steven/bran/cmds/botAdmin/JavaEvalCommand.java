@@ -1,12 +1,8 @@
 package br.com.brjdevs.steven.bran.cmds.botAdmin;
 
 import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
-import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -50,14 +46,14 @@ public class JavaEvalCommand {
 	}
 	
 	@Command
-	public static ICommand javaEval() {
+	private static ICommand javaEval() {
 		folder.mkdirs();
         f = new File(folder + "/DontUse.java");
         out = new File(folder + "/DontUse.class");
 		return new CommandBuilder(Category.BOT_ADMINISTRATOR)
 				.setAliases("java", "javaeval")
-                .setArgs("[Java Code]")
-                .setName("Java Eval Command")
+				.setArgs(new Argument<>("java code", String.class))
+				.setName("Java Eval Command")
                 .setDescription("Evaluates in Java!")
                 .setExample("eval return \"This is Java!\";")
                 .setRequiredPermission(Permissions.EVAL)
@@ -65,8 +61,8 @@ public class JavaEvalCommand {
 	                Object x = null;
 	                try {
                         OutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
-                        stream.write(getBodyWithLines(StringUtils.splitArgs(event.getArgs(), 2)[1]).getBytes());
-                        stream.close();
+		                stream.write(getBodyWithLines((String) event.getArgument("java code").get()).getBytes());
+		                stream.close();
                         try {
 	                        FutureTask<?> task = new FutureTask<>(JavaEvalCommand::compile);
 	                        task.run();
@@ -108,6 +104,9 @@ public class JavaEvalCommand {
 	                }
 	                if (!f.delete()) {
 		                event.sendMessage("Could not delete DontUse.java").queue();
+	                }
+	                if (!out.delete()) {
+		                event.sendMessage("Could not delete DontUse.class").queue();
 	                }
                 })
 				.build();

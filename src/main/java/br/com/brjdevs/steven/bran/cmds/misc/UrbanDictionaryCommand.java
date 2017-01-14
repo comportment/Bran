@@ -1,11 +1,7 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
 import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
-import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -21,14 +17,14 @@ import java.util.Scanner;
 public class UrbanDictionaryCommand {
 	
 	@Command
-	public static ICommand urban() {
+	private static ICommand urban() {
 		return new CommandBuilder(Category.INFORMATIVE)
 				.setAliases("urban", "ud")
 				.setDescription("Searches definitions from Urban Dictionary.")
-				.setArgs("[term]")
+				.setArgs(new Argument<>("term", String.class))
 				.setName("Urban Command")
 				.setAction((event, args) -> {
-					String params = StringUtils.splitArgs(args, 2)[1];
+					String params = ((String) event.getArgument("term").get());
 					if (params.isEmpty()) {
 						event.sendMessage("You didn't tell me a definition to search! Use `" + event.getPrefix() + "urban [term]").queue();
 						return;
@@ -63,7 +59,7 @@ public class UrbanDictionaryCommand {
 										.addField("\u00ad\nExample: ", Util.isEmpty(example) ? "No example provided." : example.length() > EmbedBuilder.VALUE_MAX_LENGTH ? "Example is too big, click [here](https://www.urbandictionary.com/define.php?term=" + query +") to see it." : example, false)
 										.addField("\uD83D\uDC4D", String.valueOf(thumbsup), true)
 										.addField("\uD83D\uDC4E", String.valueOf(thumbsdown), true)
-										.setColor(event.getOriginGuild().getSelfMember().getColor() == null ? Color.decode("#002b79") : event.getOriginGuild().getSelfMember().getColor());
+								.setColor(event.getGuild().getSelfMember().getColor() == null ? Color.decode("#002b79") : event.getGuild().getSelfMember().getColor());
 						event.sendMessage(builder.build()).queue(null, throwable -> {
 							event.sendMessage("An unexpected error occurred.").queue();
 							throwable.printStackTrace();

@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
 import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.actions.CommandAction;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -16,17 +17,18 @@ import java.util.stream.Collectors;
 public class EmotesCommand {
 	
 	@Command
-	public static ICommand emotes() {
+	private static ICommand emotes() {
 		return new TreeCommandBuilder(Category.INFORMATIVE)
 				.setAliases("emote")
 				.setName("Emote Command")
 				.setDefault("info")
+				.setDescription("Get information on Emotes!")
 				.setHelp("emote ?")
 				.onNotFound(CommandAction.REDIRECT)
 				.setPrivateAvailable(false)
-				.addCommand(new CommandBuilder(Category.INFORMATIVE)
+				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setDescription("Returns you info about a certain emote.")
-						.setArgs("[EMOTE]")
+						.setArgs(new Argument<>("emote", String.class))
 						.setName("Emote Info Command")
 						.setAliases("info")
 						.setAction((event, args) -> {
@@ -50,12 +52,12 @@ public class EmotesCommand {
 							event.sendMessage(embed).queue();
 						})
 						.build())
-				.addCommand(new CommandBuilder(Category.INFORMATIVE)
+				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("list")
 						.setName("Emote List Command")
 						.setDescription("Lists all the available emotes.")
 						.setAction((event) -> {
-							List<String> emotes = event.getOriginGuild().getEmotes().stream()
+							List<String> emotes = event.getGuild().getEmotes().stream()
 									.map(Emote::getAsMention)
 									.collect(Collectors.toList());
 							emotes.sort(Comparator.naturalOrder());
@@ -63,7 +65,7 @@ public class EmotesCommand {
 								event.sendMessage("This guild doesn't have emotes!").queue();
 								return;
 							}
-							event.sendMessage("**__" + event.getOriginGuild().getName() + " emotes:__**\n" + String.join(" ", emotes)
+							event.sendMessage("**__" + event.getGuild().getName() + " emotes:__**\n" + String.join(" ", emotes)
 							).queue();
 						})
 						.build())

@@ -1,9 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.utils.HttpUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import com.google.gson.JsonArray;
@@ -17,19 +14,14 @@ import java.awt.*;
 public class PokemonCommand {
 	
 	@Command
-	public static ICommand pokedex() {
+	private static ICommand pokedex() {
 		return new CommandBuilder(Category.FUN)
 				.setAliases("pokedex")
 				.setName("Pokedex Command")
 				.setDescription("Gives you information on a Pokemon!")
-				.setArgs("[pokemon id/pokemon name]")
+				.setArgs(new Argument<>("id/name", String.class))
 				.setAction((event) -> {
-					String pokemon = event.getArgs(2)[1];
-					String content;
-					if (pokemon.isEmpty()) {
-						event.sendMessage("You have to tell me a Pokemon name or ID!").queue();
-						return;
-					}
+					String pokemon = (String) event.getArgument("id/name").get(), content;
 					pokemon = String.format("http://pokeapi.co/api/v2/pokemon/%s/", pokemon);
 					try {
 						content = HttpUtils.read(pokemon);
@@ -82,7 +74,7 @@ public class PokemonCommand {
 						stringBuilder.append("\nCould not find any Pokemon matching that criteria.");
 					}
 					embedBuilder.setDescription(stringBuilder.toString());
-					Color color = event.getOriginGuild().getSelfMember().getColor() == null ? Color.decode("#ECB811") : event.getOriginGuild().getSelfMember().getColor();
+					Color color = event.getGuild().getSelfMember().getColor() == null ? Color.decode("#ECB811") : event.getGuild().getSelfMember().getColor();
 					embedBuilder.setColor(color);
 					event.sendMessage(embedBuilder.build()).queue();
 				})

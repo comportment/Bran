@@ -14,26 +14,26 @@ import java.util.LinkedList;
 public class PollCommand {
 	
 	@Command
-	public static ICommand poll() {
+	private static ICommand poll() {
 		return new TreeCommandBuilder(Category.MISCELLANEOUS)
 				.setAliases("poll")
 				.setDefault("info")
 				.setName("Poll Command")
 				.setHelp("poll ?")
+				.setDescription("Nah, nothing to talk about this command.")
 				.setRequiredPermission(Permissions.POLL)
 				.setExample("poll create What should I play? ;Game 1;Game 2;Game 3;Game 4;")
 				.setPrivateAvailable(false)
-				.addCommand(new CommandBuilder(Category.MISCELLANEOUS)
+				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("create")
 						.setName("Poll Create Command")
 						.setDescription("Creates polls in the current channel!")
 						.setExample("poll create What should I play? ;Game 1;Game 2;Game 3;Game 4;")
-						.setArgs("[poll Name] [options]")
-						.setAction((event, rawArgs) -> {
-							rawArgs = rawArgs.substring(rawArgs.indexOf(" ") + 1);
-							String[] args = rawArgs.split(";");
-							String name = args[0];
-							LinkedList<String> list = new LinkedList<>(Arrays.asList(rawArgs.substring(rawArgs.indexOf(";") + 1).split(";")));
+						.setArgs(new Argument<>("name", String.class), new Argument<>("options", String.class))
+						.setAction((event) -> {
+							String name = ((String) event.getArgument("name").get());
+							String rawOptions = (String) event.getArgument("options").get();
+							LinkedList<String> list = new LinkedList<>(Arrays.asList(rawOptions.substring(rawOptions.indexOf(";") + 1).split(";")));
 							if (list.isEmpty()) {
 								event.sendMessage("I can't create a Poll without options!").queue();
 								return;
@@ -49,11 +49,10 @@ public class PollCommand {
 							event.sendMessage("Created a Poll! You can vote by typing the number of the option.").queue();
 						})
 						.build())
-				.addCommand(new CommandBuilder(Category.INFORMATIVE)
+				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("info", "view")
 						.setName("Poll Information Command")
 						.setDescription("Gives you information about a poll running in the current channel.")
-						
 						.setAction((event) -> {
 							Poll poll = Poll.getPoll(event.getTextChannel());
 							if (poll == null) {
@@ -72,7 +71,7 @@ public class PollCommand {
 							event.sendMessage(builder.build()).queue();
 						})
 						.build())
-				.addCommand(new CommandBuilder(Category.MISCELLANEOUS)
+				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("end")
 						.setName("Poll End Command")
 						.setDescription("Ends a Poll running in the current channel.")

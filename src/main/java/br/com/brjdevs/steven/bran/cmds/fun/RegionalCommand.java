@@ -1,10 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
-import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.core.command.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,27 +60,23 @@ public class RegionalCommand {
 	}
 	
 	@Command
-	public static ICommand regional() {
+	private static ICommand regional() {
 		return new CommandBuilder(Category.FUN)
 				.setAliases("reg", "regional")
 				.setName("Regional Character Command")
-				.setArgs("[phrase]")
+				.setArgs(new Argument<>("phrase", String.class))
 				.setDescription("Makes a phrase cool.")
 				.setExample("reg This phrase is cool")
 				.setAction((event, rawArgs) -> {
-					String toFormat = StringUtils.splitArgs(rawArgs, 2)[1].toLowerCase();
-					if (toFormat.isEmpty()) {
-						event.sendMessage("You didn't tell me a phrase! Use `" + event.getPrefix() + "regional [phrase]`").queue();
-						return;
-					}
-					String[] characters = toFormat.split("");
+					String phrase = (String) event.getArgument("pharse").get();
+					String[] characters = phrase.split("");
 					String formatted = String.join("", Stream.of(characters).map(RegionalCommand::toRegional).collect(Collectors.toList()));
 					event.sendMessage(formatted).queue();
 				})
 				.build();
 	}
 	
-	public static String toRegional(String str) {
+	private static String toRegional(String str) {
 		return (A_ZPattern.matcher(str).find() ? ":regional_indicator_" + str + ":" : regional.getOrDefault(str, str)) + " ";
 	}
 }

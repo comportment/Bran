@@ -1,11 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
-import br.com.brjdevs.steven.bran.core.utils.MathUtils;
-import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.core.command.*;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.EmbedBuilder;
 import org.jsoup.Jsoup;
@@ -14,17 +9,15 @@ import org.jsoup.nodes.Element;
 public class RandomComicGenerator {
 	
 	@Command
-	public static ICommand rcg() {
+	private static ICommand rcg() {
 		return new CommandBuilder(Category.FUN)
 				.setName("Random Comic Generator")
 				.setDescription("Shit-post")
-				.setArgs("<AMOUNT>")
+				.setArgs(new Argument<>("amount", Integer.class, true))
 				.setAliases("rcg", "randomcomicgenerator")
-				.setAction((event, args) -> {
-					String s = StringUtils.splitArgs(args, 2)[1];
-					int times = 1;
-					if (MathUtils.isInteger(s))
-						times = Integer.parseInt(s);
+				.setAction((event) -> {
+					Argument argument = event.getArgument("amount");
+					int times = argument.isPresent() && (int) argument.get() > 0 ? (int) argument.get() : 1;
 					try{
 						if(times <= 0) {
 							event.sendMessage("You want me to send a comic " + times + " times...?").queue();

@@ -10,8 +10,8 @@ import java.util.List;
 public class PrefixManager {
     public static String getPrefix(String string, DiscordGuild discordGuild) {
         List<String> prefixes = discordGuild != null ? discordGuild.getPrefixes() : Arrays.asList(Bot.getInstance().getDefaultPrefixes());
-        return prefixes.stream()
-                .filter(prefix -> string.length() > prefix.length() && string.startsWith(prefix)
+	    return prefixes.stream()
+			    .filter(prefix -> string.length() > prefix.length() && string.startsWith(prefix)
                         && CommandManager.getCommands().stream()
                         .filter(cmd ->
                                 cmd.getAliases().contains(string.substring(prefix.length())))

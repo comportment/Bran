@@ -1,11 +1,7 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.utils.HttpUtils;
-import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -18,14 +14,14 @@ public class LookupCommand {
 	private static final String MAP_URL = "https://www.google.com/maps/@%f,%f,15z";
 	
 	@Command
-	public static ICommand lookUp() {
+	private static ICommand lookUp() {
 		return new CommandBuilder(Category.MISCELLANEOUS)
 				.setAliases("lookup")
 				.setName("Lookup Command")
 				.setDescription("Gives you information on a website")
-				.setArgs("<site>")
+				.setArgs(new Argument<>("site", String.class))
 				.setAction((event, rawArgs) -> {
-					String url = String.format(LOOKUP_URL, StringUtils.splitArgs(rawArgs, 2)[1].replaceAll(" ", "%20"));
+					String url = String.format(LOOKUP_URL, ((String) event.getArgument("site").get()).replaceAll(" ", "%20"));
 					JsonObject result;
 					try {
 						result = new JsonParser().parse(HttpUtils.read(url)).getAsJsonObject();
@@ -53,8 +49,8 @@ public class LookupCommand {
 							"**ISP:** " + isp + "\n" +
 							"**Timezone:** " + timezone + "\n" +
 							"**Zip:** " + zip);
-					builder.setColor(event.getOriginGuild().getSelfMember().getColor() == null
-							? Color.decode("#D68A38") : event.getOriginGuild().getSelfMember().getColor());
+					builder.setColor(event.getGuild().getSelfMember().getColor() == null
+							? Color.decode("#D68A38") : event.getGuild().getSelfMember().getColor());
 					event.sendMessage(builder.build()).queue();
 					
 				})

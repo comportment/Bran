@@ -1,10 +1,7 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
 import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
@@ -22,16 +19,16 @@ import java.util.List;
 public class UserInfoCommand {
 	
 	@Command
-	public static ICommand userInfo() {
+	private static ICommand userInfo() {
 		return new CommandBuilder(Category.INFORMATIVE)
 				.setAliases("user", "userinfo", "uinfo")
 				.setName("User Info Command")
 				.setDescription("Gives you info on the mentioned user")
-				.setArgs("<user ID>")
+				.setArgs(new Argument<>("mention", String.class))
 				.setExample("user " + Bot.getInstance().getSelfUser(Bot.getInstance().getShard(0)).getId())
 				.setPrivateAvailable(false)
 				.setAction((event, args) -> {
-					Member member = event.getMessage().getMentionedUsers().isEmpty() ? event.getOriginMember() : event.getOriginGuild().getMember(event.getMessage().getMentionedUsers().get(0));
+					Member member = event.getMessage().getMentionedUsers().isEmpty() ? event.getOriginMember() : event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
 					OffsetDateTime date = member.getJoinDate();
 					String joinDate = StringUtils.neat(date.getDayOfWeek().toString().substring(0, 3)) + ", " + date.getDayOfMonth() + " " + StringUtils.neat(date.getMonth().toString().substring(0, 3)) + " " + date.getYear() + " " + MathUtils.toOctalInteger(date.getHour()) + ":" + MathUtils.toOctalInteger(date.getMinute()) + ":" + MathUtils.toOctalInteger(date.getSecond()) + " GMT";
 					OffsetDateTime creation = member.getUser().getCreationTime();
@@ -48,7 +45,7 @@ public class UserInfoCommand {
 					embed.addField("Shared Guilds", String.valueOf(event.getJDA().getGuilds().stream().filter(guild -> guild.isMember(user)).count()), true);
 					embed.addField("Roles", String.valueOf(member.getRoles().size()), true);
 					embed.addField("Status", member.getOnlineStatus().toString(), true);
-					List<Member> joins = new ArrayList<>(event.getOriginGuild().getMembers());
+					List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
 					joins.sort(Comparator.comparing(Member::getJoinDate));
 					int index = joins.indexOf(member);
 					index -= 3;

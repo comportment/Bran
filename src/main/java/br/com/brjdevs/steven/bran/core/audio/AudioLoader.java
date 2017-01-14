@@ -5,7 +5,6 @@ import br.com.brjdevs.steven.bran.core.action.Action.onInvalidResponse;
 import br.com.brjdevs.steven.bran.core.action.ActionType;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -61,7 +60,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 					for (int i = tracks.size(); i > 0; i--) {
 						inputs.add(String.valueOf(i));
 					}
-					Action action = new Action(ActionType.MESSAGE, onInvalidResponse.CONTINUE, msg, response -> {
+					Action action = new Action(ActionType.MESSAGE, onInvalidResponse.CANCEL, msg, response -> {
 						if (response.matches("^(c|cancel)$")) {
 							if (msg != null)
 								msg.editMessage("Query canceled!").queue();
@@ -75,14 +74,6 @@ public class AudioLoader implements AudioLoadResultHandler {
 							musicManager.getTrackScheduler().queue(trackContext);
 							if (msg != null)
 								msg.deleteMessage().queue();
-						} else {
-							String string = "You didn't type " + StringUtils.replaceLast((String.join(", ", inputs.stream().map(s -> "`" + s + "`").collect(Collectors.toList()))), ", ", " or ") + ", query canceled!";
-							if (msg != null)
-								msg.editMessage(string).queue();
-							else
-								channel.sendMessage(string).queue();
-							if (musicManager.getTrackScheduler().isStopped())
-								channel.getGuild().getAudioManager().closeAudioConnection();
 						}
 					}, inputs);
 					action.addUser(user);

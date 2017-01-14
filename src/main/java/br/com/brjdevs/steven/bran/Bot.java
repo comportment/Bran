@@ -42,8 +42,8 @@ public class Bot implements EventListener {
     private BotData DATA = new BotData();
     private String[] PREFIXES = {"!!", "."};
     private long START_TIME = System.currentTimeMillis();
-
-    public static void main(String[] args) {
+	
+	public static void main(String[] args) throws Throwable {
 	    try {
 		    BotManager.preInit();
 		    BotManager.init();

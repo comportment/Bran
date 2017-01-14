@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ICommand {
 	
-	void execute(CommandEvent event, String args);
+	void execute(CommandEvent event);
 	
 	List<String> getAliases();
 	
@@ -12,15 +12,15 @@ public interface ICommand {
 	
 	String getDescription();
 	
-	String getRequiredArgs();
+	Argument[] getArguments();
 	
 	Long getRequiredPermission();
 	
 	boolean isPrivateAvailable();
 	
-	List<ICommand> getSubCommands();
-	
 	String getExample();
 	
 	Category getCategory();
+	
+	String getHelp();
 }

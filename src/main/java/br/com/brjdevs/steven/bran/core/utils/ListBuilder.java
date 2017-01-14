@@ -48,7 +48,7 @@ public class ListBuilder {
 	public enum Format {
 		NONE("%s"),
 		SIMPLE("%s - Page %d/%dn\n%s"),
-		CODE_BLOCK("```%s\n# %s - Page %d/%d\n%s\n# %s\n```");
+		CODE_BLOCK("```%s\n[%s](Page %d/%d)\n%s\n# %s\n```");
 		private String str;
 		Format(String str) {
 			this.str = str;

@@ -1,9 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Emote;
@@ -21,17 +18,16 @@ import static br.com.brjdevs.steven.bran.core.utils.StringUtils.neat;
 public class GuildInfoCommand {
 	
 	@Command
-	public static ICommand guildInfo() {
+	private static ICommand guildInfo() {
 		return new CommandBuilder(Category.INFORMATIVE)
 				.setAliases("guildinfo", "guild", "serverinfo", "server")
 				.setName("Guild Info Command")
-				.setDescription("Gives you info about the given guild id")
-				.setArgs("<guild ID>")
+				.setDescription("Gives you info about the given guild id.")
+				.setArgs(new Argument<>("guildId", String.class, true))
 				.setPrivateAvailable(false)
-				.setExample("guild 219256419684188161")
 				.setAction((event) -> {
-					String guildId = event.getArgs(2)[1];
-					Guild guild = (guildId.isEmpty() ? event.getOriginGuild() : event.getJDA().getGuildById(guildId) == null ? event.getOriginGuild() : event.getJDA().getGuildById(guildId));
+					Argument argument = event.getArgument("guildId");
+					Guild guild = argument.isPresent() ? event.getJDA().getGuildById((String) argument.get()) : event.getGuild();
 					Member guildOnwer = guild.getOwner();
 					OffsetDateTime creation = guild.getCreationTime();
 					String creationDate = neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + creation.getHour() + ":" + creation.getMinute() + ":" + creation.getSecond() + " GMT";

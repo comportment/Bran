@@ -1,9 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,14 +13,14 @@ public class ShortenURLCommand {
 	private static String baseURL = "https://is.gd/create.php?format=simple&url=%s";
 	
 	@Command
-	public static ICommand shortenUrl() {
+	private static ICommand shortenUrl() {
 		return new CommandBuilder(Category.MISCELLANEOUS)
 				.setAliases("shorten")
 				.setName("Shorten URL Command")
 				.setDescription("Shortens URLs for you!")
-				.setArgs("[URL]")
+				.setArgs(new Argument<>("url", String.class))
 				.setAction((event) -> {
-					String url = event.getArgs(2)[1];
+					String url = ((String) event.getArgument("url").get());
 					if (url.isEmpty()) {
 						event.sendMessage("You have to tell me a URL to shorten!").queue();
 						return;
@@ -38,7 +35,7 @@ public class ShortenURLCommand {
 				.build();
 	}
 	
-	public static String shorten(String url) throws IOException {
+	private static String shorten(String url) throws IOException {
 		try {
 			URLConnection conn = new URL(String.format(baseURL, url)).openConnection();
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));

@@ -2,17 +2,11 @@ package br.com.brjdevs.steven.bran.core.command;
 
 import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.GuildMember;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.GuildMember.FakeGuildMember;
-import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.DiscordLog;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -25,12 +19,13 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
-import java.awt.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static br.com.brjdevs.steven.bran.core.utils.Util.isEmpty;
 
 public class CommandManager implements EventListener {
     private static final List<ICommand> commands = new ArrayList<>();
@@ -55,74 +50,43 @@ public class CommandManager implements EventListener {
 			    new TypeAnnotationsScanner(), new MethodAnnotationsScanner()).filterInputsBy(new FilterBuilder().includePackage(url)));
 	    Set<Method> commands = reflections.getMethodsAnnotatedWith(Command.class);
 	    commands.forEach(method -> {
+		    Class clazz = method.getDeclaringClass();
+		    method.setAccessible(true);
 		    if (!method.getReturnType().equals(ICommand.class)) {
-			    LOG.fatal("Command " + method.getName() + " return different Type.");
+			    LOG.fatal("Method annotated with Command.class returns " + method.getReturnType().getSimpleName() + " instead of ICommand.class.");
 			    return;
 		    }
 	    	try {
-			    CommandManager.addCommand((ICommand) method.invoke(null));
+			    ICommand command = (ICommand) method.invoke(null);
+			    if (command.getAliases().isEmpty()) {
+				    LOG.fatal("Attempted to register ICommand without aliases. (" + clazz.getSimpleName() + ")");
+				    return;
+			    }
+			    if (isEmpty(command.getDescription())) {
+				    LOG.fatal("Attempted to register ICommand without description. (" + clazz.getSimpleName() + ")");
+				    return;
+			    }
+			    if (isEmpty(command.getName())) {
+				    LOG.fatal("Attempted to register ICommand without name. (" + clazz.getSimpleName() + ")");
+				    return;
+			    }
+			    if (command instanceof ITreeCommand && ((ITreeCommand) command).getSubCommands() != null && ((ITreeCommand) command).getSubCommands().isEmpty()) {
+				    LOG.fatal("Attempted to register Tree ICommand without SubCommands. (" + clazz.getSimpleName() + ")");
+				    return;
+			    }
+			    if (command.getCategory() == Category.UNKNOWN) {
+				    LOG.fatal("Registered ICommand with UNKNOWN Category. (" + clazz.getSimpleName() + ")");
+			    }
+			    HelpContainer.generateHelp(command);
+			    addCommand(command);
 		    } catch (Exception e) {
 	    		LOG.log(e);
 		    }
+		    method.setAccessible(false);
 	    });
     }
 	
-	@Deprecated
-    public static MessageEmbed getHelpEmbed(ICommand command) {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setAuthor("Help for " + command.getName(),null,null);
-        if (command.getSubCommands() != null) {
-            builder.addField("Name", command.getName(), true).addField("Aliases", String.join(", ", command.getAliases()), true).addField("Required Permission(s)", String.join(", ", Permissions.toCollection(command.getRequiredPermission())), true);
-            command.getSubCommands().forEach(cmd -> builder.addField((String.join(", ", cmd.getAliases())) + ": " + (cmd.getDescription() == null ? "Type '" + cmd.getRequiredArgs() + "' to get help." : cmd.getDescription()), (cmd.getSubCommands() == null ? "Usage Instruction: " + cmd.getRequiredArgs() + "\n" : "") + "Required Permission(s): " + (String.join(", ", Permissions.toCollection(cmd.getRequiredPermission()))), false));
-        } else {
-            builder.addField("Name", command.getName(), false);
-            builder.addField("Description", command.getDescription(), true).addField("Aliases", String.join(", ", command.getAliases()), true).addField("Required Permission(s)", String.join(", ", Permissions.toCollection(command.getRequiredPermission())), true);
-            builder.addField("Usage Instruction", command.getRequiredArgs(), false);
-        }
-        builder.setColor(Color.decode("#ff8f50"));
-        return builder.build();
-    }
-	
-	public static MessageEmbed getHelp(ICommand command, GuildMember member, Member m) {
-        //StringBuilder builder = new StringBuilder();
-        //builder.append("**" + command.getName() + "** - Required Permission(s): " + (String.join(", ", Permissions.toCollection(command.getRequiredPermission()))) + " - Aliases: " + (String.join(", ", command.getAliases())));
-        //builder.append("Command: ").append(command.getName()).append('\n');
-        //builder.append("Parameters:");
-        //builder.append('\n');
-        //if (command.getSubCommands() != null)
-        //    command.getSubCommands().forEach(cmd -> builder.append("    **").append(cmd.getAliases().get(0)).append("** ").append(cmd.getRequiredArgs() != null ? cmd.getRequiredArgs() : "").append(" - ").append(cmd.getDescription()).append("  ").append(member.hasPermission(cmd.getRequiredPermission()) ? "" : "*(" + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + ")*").append('\n'));
-        //builder.append("\nExample:\n    *" + command.getExample() + "*");
-        //return builder.toString();
-        EmbedBuilder builder = new EmbedBuilder();
-        String desc = "";
-        //desc += command.getCategory().getEmoji() + " **| " + command.getCategory().getKey() + "**\n";
-        desc += "**" + command.getName() + "**\n";
-        if (command.getSubCommands() == null)
-            desc += "Description: " + command.getDescription() + "\n";
-        if (command.getRequiredArgs() != null) {
-            desc += "Required Arguments: " + command.getRequiredArgs() + "";
-            desc += "     *Please note: do **NOT** include <> or []*\n";
-        }
-        desc += "Required Permission(s): " + String.join(", ", Permissions.toCollection(command.getRequiredPermission())) + "\n";
-        if (command.getSubCommands() != null) {
-            desc += "Parameters:\n";
-            Set<Category> categories = command.getSubCommands().stream().map(ICommand::getCategory).collect(Collectors.toSet());
-            for (Category category : categories) {
-                List<ICommand> commands = command.getSubCommands().stream().filter(cmd -> cmd.getCategory() == category).collect(Collectors.toList());
-                if (commands.isEmpty()) continue;
-                desc += category.getEmoji() + " **| " + category.getKey() + "**\n";
-                for (ICommand cmd : commands)
-                    desc += "          **" + cmd.getAliases().get(0) + "** " + (cmd.getRequiredArgs() != null ? cmd.getRequiredArgs() : "") + " - " + cmd.getDescription() + (member.hasPermission(cmd.getRequiredPermission(), m.getJDA()) ? "" : String.join(", ", Permissions.toCollection(cmd.getRequiredPermission()))) + "\n";
-                desc += '\n';
-            }
-        }
-        if (command.getExample() != null)
-            desc += "Example:\n       *" + command.getExample() + "*";
-        builder.setColor(m != null && m.getColor() != null ? m.getColor() : Color.decode("#D68A38"));
-        builder.setDescription(desc);
-        return builder.build();
-    }
-	
+	@Override
 	public void onEvent(Event ev) {
 		if (!(ev instanceof MessageReceivedEvent)) return;
 		MessageReceivedEvent event = (MessageReceivedEvent) ev;
@@ -133,8 +97,7 @@ public class CommandManager implements EventListener {
 		String prefix = PrefixManager.getPrefix(args[0], discordGuild);
 		if (prefix == null) return;
 		String baseCmd = args[0].substring(prefix.length());
-		ICommand cmd = getCommands().stream().filter(c -> c.getAliases().contains(baseCmd))
-				.findFirst().orElse(null);
+		ICommand cmd = CommandUtils.getCommand(baseCmd);
 		if (cmd == null) return;
 		CommandEvent e = new CommandEvent(event, cmd, discordGuild, event.getMessage().getRawContent(), prefix);
 		if (TooFast.isEnabled() && !TooFast.checkCanExecute(e)) return;
@@ -143,20 +106,12 @@ public class CommandManager implements EventListener {
 					"use it in a Text Channel please.").queue();
 			return;
 		}
-		GuildMember member = discordGuild != null ? discordGuild.getMember(event.getAuthor()) : new FakeGuildMember(event.getAuthor(), null);
-		if (!member.hasPermission(cmd.getRequiredPermission(), event.getJDA())) {
-			e.sendMessage(Quotes.FAIL, "You don't have enough permissions to do this!\n" +
-					"Missing Permission(s): *" +
-					String.join(", ", Permissions
-							.toCollection(cmd.getRequiredPermission())) + "*").queue();
-			return;
-		}
 		
 		Bot.getInstance().getSession().cmds++;
 		Util.async(cmd.getName() + ">" + Util.getUser(event.getAuthor()),
 				() -> {
 					try {
-						cmd.execute(e, event.getMessage().getRawContent());
+						cmd.execute(e);
 					} catch (Exception ex) {
 						Bot.LOG.log(ex);
 						e.sendMessage(Quotes.FAIL, "A `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.").queue();

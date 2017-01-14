@@ -29,16 +29,13 @@ public class ActionListener implements EventListener {
 				Action.remove(action);
 				return;
 			}
+			Action.remove(action);
 			if (Util.containsEqualsIgnoreCase(action.getExpectedInput(), reaction)) {
 				action.getListener().onRespond(reaction);
-			} else if (action.getOnInvalidResponse() == onInvalidResponse.IGNORE)
-				return;
-			else if (action.getOnInvalidResponse() == onInvalidResponse.CANCEL) {
+			} else if (action.getOnInvalidResponse() == onInvalidResponse.CANCEL) {
 				action.getChannel().sendMessage("You didn't type " + StringUtils.replaceLast((String.join(", ", action.getExpectedInput().stream().map(s -> "`" + s + "`").collect(Collectors.toList()))), ", ", " or ") + ", query canceled!").queue();
-				Action.remove(action);
-				return;
-			}
-			Action.remove(action);
+			} else if (action.getOnInvalidResponse() == onInvalidResponse.CONTINUE)
+				action.getListener().onRespond(reaction);
 		} else if (e instanceof MessageReceivedEvent) {
 			MessageReceivedEvent event = (MessageReceivedEvent) e;
 			Action action = Action.getAction(event.getAuthor().getId());
@@ -52,16 +49,13 @@ public class ActionListener implements EventListener {
 				Action.remove(action);
 				return;
 			}
+			Action.remove(action);
 			if (Util.containsEqualsIgnoreCase(action.getExpectedInput(), message)) {
 				action.getListener().onRespond(message);
-			} else if (action.getOnInvalidResponse() == onInvalidResponse.IGNORE)
-				return;
-			else if (action.getOnInvalidResponse() == onInvalidResponse.CANCEL) {
+			} else if (action.getOnInvalidResponse() == onInvalidResponse.CANCEL) {
 				action.getChannel().sendMessage("You didn't type " + StringUtils.replaceLast((String.join(", ", action.getExpectedInput().stream().map(s -> "`" + s + "`").collect(Collectors.toList()))), ", ", " or ") + ", query canceled!").queue();
-				Action.remove(action);
-				return;
-			}
-			Action.remove(action);
+			} else if (action.getOnInvalidResponse() == onInvalidResponse.CONTINUE)
+				action.getListener().onRespond(message);
 		}
 	}
 }

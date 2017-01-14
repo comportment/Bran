@@ -5,7 +5,6 @@ import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
-import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
@@ -19,30 +18,29 @@ public class BlacklistCommand {
 	private static final Pattern USER_PATTERN = Pattern.compile("(<@!?[0-9]{17,18}>)");
 	
 	@Command
-	public static ICommand blacklist() {
+	private static ICommand blacklist() {
 		return new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
 				.setAliases("blacklist")
 				.setName("Blacklist Command")
+				.setDescription("Whoever is in this list doesn't exist for me.")
 				.setHelp("blacklist ?")
 				.setRequiredPermission(Permissions.BLACKLIST)
-				.addCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
+				.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
 						.setAliases("user")
 						.setName("Blacklist User Command")
 						.setHelp("blacklist user ?")
-						.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("list")
 								.setName("Blacklist List User Command")
 								.setDescription("Lists you all the blacklisted users.")
-								.setArgs("<page>")
+								.setArgs(new Argument<>("page", Integer.class, true))
 								.setAction((event) -> {
 									if (Bot.getInstance().getData().getBlacklist().getUserBlacklist().isEmpty()) {
 										event.sendMessage("There are no blacklisted users.").queue();
 										return;
 									}
 									event.sendMessage("Just give me a second to index all users...").queue(msg -> {
-										String arg = event.getArgs(2)[1];
-										int page = MathUtils.parseIntOrDefault(arg, 1);
-										if (page == 0) page = 1;
+										int page = event.getArgument("page").isPresent() && (int) event.getArgument("page").get() > 0 ? (int) event.getArgument("page").get() : 1;
 										List<String> list = Bot.getInstance()
 												.getData().getBlacklist().getUserBlacklist().stream()
 												.map(id -> {
@@ -61,14 +59,14 @@ public class BlacklistCommand {
 									});
 								})
 								.build())
-						.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("add")
 								.setName("Blacklist Add User Command")
 								.setDescription("Adds a User to the blacklist.")
-								.setArgs("[mention/id]")
+								.setArgs(new Argument<>("mention/id", String.class))
 								.setAction((event) -> {
 									if (event.getMessage().getMentionedUsers().isEmpty()) {
-										String arg = event.getArgs(2)[1];
+										String arg = (String) event.getArgument("mention/id").get();
 										if (USER_PATTERN.matcher(arg).find())
 											arg = arg.replaceAll("(<@!?|>)", "");
 										boolean added = Bot.getInstance().getData().getBlacklist().addUserById(arg);

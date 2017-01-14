@@ -1,9 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 
 public class ChooseCommand {
@@ -16,14 +13,14 @@ public class ChooseCommand {
 	};
 	
 	@Command
-	public static ICommand choose() {
+	private static ICommand choose() {
 		return new CommandBuilder(Category.FUN)
 				.setAliases("choose", "decide")
 				.setName("Choose Command")
 				.setDescription("Chooses between options!")
-				.setArgs("[options]")
+				.setArgs(new Argument<>("options", String.class))
 				.setAction((event, rawArgs) -> {
-					String rawOptions = event.getArgs(2)[1];
+					String rawOptions = (String) event.getArgument("options").get();
 					String[] options;
 					if (rawOptions.contains(" or "))
 						options = rawOptions.split(" or ");

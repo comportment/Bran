@@ -7,18 +7,19 @@ import java.util.Base64;
 public class Base64Command {
 	
 	@Command
-	public static ICommand base64() {
+	private static ICommand base64() {
 		return new TreeCommandBuilder(Category.MISCELLANEOUS)
 				.setName("Base64 Command")
 				.setHelp("base64 ?")
 				.setAliases("base64")
-				.addCommand(new CommandBuilder(Category.MISCELLANEOUS)
+				.setDescription("Let's speak in Base64!")
+				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("encode")
 						.setName("Base64 Encode Command")
 						.setDescription("Encodes a String to Base64.")
-						.setArgs("[string]")
+						.setArgs(new Argument<>("string", String.class))
 						.setAction((event) -> {
-							String string = event.getArgs(2)[1];
+							String string = (String) event.getArgument("string").get();
 							String out;
 							try {
 								out = new String(Base64.getEncoder().encode(string.getBytes()));
@@ -33,13 +34,13 @@ public class Base64Command {
 							event.sendMessage("**To Base64:**\n" + out).queue();
 						})
 						.build())
-				.addCommand(new CommandBuilder(Category.MISCELLANEOUS)
+				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("decode")
 						.setName("Base64 Decode Command")
 						.setDescription("Decodes a Base64 to String!")
-						.setArgs("[string]")
+						.setArgs(new Argument<>("base64", String.class))
 						.setAction((event) -> {
-							String string = event.getArgs(2)[1];
+							String string = (String) event.getArgument("base64").get();
 							String out;
 							try {
 								out = new String(Base64.getDecoder().decode(string.getBytes()));

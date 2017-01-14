@@ -5,8 +5,11 @@ import br.com.brjdevs.steven.bran.BotManager;
 import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.data.DataManager;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.*;
+import br.com.brjdevs.steven.bran.core.utils.Hastebin;
+import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
+import br.com.brjdevs.steven.bran.core.utils.RequirementsUtils;
+import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Icon;
@@ -23,19 +26,20 @@ import static br.com.brjdevs.steven.bran.core.managers.Permissions.BOT_ADMIN;
 public class BotCommand {
 	
 	@Command
-	public static ICommand bot() {
+	private static ICommand bot() {
 		return new TreeCommandBuilder(Category.MISCELLANEOUS)
 				.setName("Bot Command")
 				.setAliases("bot")
 				.setHelp("bot ?")
 				.setExample("bot stats")
-				.addCommand(new CommandBuilder(Category.INFORMATIVE)
+				.setDescription("Multiple options and informations on me!")
+				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("info")
 						.setName("Info Command")
 						.setDescription("Gives you information about me!")
 						.setAction((event) -> event.sendMessage(Bot.getInstance().getInfo()).queue())
 						.build())
-				.addCommand(new CommandBuilder(Category.INFORMATIVE)
+				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("inviteme", "invite")
 						.setName("InviteMe Command")
 						.setDescription("Gives you my OAuth URL!")
@@ -48,13 +52,13 @@ public class BotCommand {
 							event.sendMessage(embed).queue();
 						})
 						.build())
-				.addCommand(new CommandBuilder(Category.INFORMATIVE)
+				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("stats", "status")
 						.setName("Stats Command")
 						.setDescription("Gives you my current statistics!")
 						.setAction((event) -> event.sendMessage(Bot.getInstance().getSession().toString(event.getJDA())).queue())
 						.build())
-				.addCommand(new CommandBuilder(Category.INFORMATIVE)
+				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("ping")
 						.setName("Ping Command")
 						.setDescription("Gives you my ping!")
@@ -66,12 +70,12 @@ public class BotCommand {
 							});
 						})
 						.build())
-				.addCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
+				.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
 						.setAliases("admin")
 						.setName("Bot Admin Command")
 						.setHelp("bot admin ?")
 						.setRequiredPermission(BOT_ADMIN)
-						.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("save")
 								.setName("Save Command")
 								.setDescription("Saves Guild and Bot Data.")
@@ -84,7 +88,7 @@ public class BotCommand {
 									}
 								})
 								.build())
-						.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("stop", "shutdown")
 								.setName("Shutdown Command")
 								.setDescription("Saves Guild and Bot Data and stops the bot.")
@@ -94,7 +98,7 @@ public class BotCommand {
 									BotManager.shutdown(false);
 								})
 								.build())
-						.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("updatestats")
 								.setName("Update Stats Command")
 								.setDescription("Updates the current guild amount in DiscordBots.")
@@ -103,26 +107,21 @@ public class BotCommand {
 									event.sendMessage(Quotes.getQuote(Quotes.SUCCESS)).queue();
 								})
 								.build())
-						.addCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
+						.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("account", "acc")
 								.setName("Bot Account Command")
 								.setHelp("bot admin account ?")
-								.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+								.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 										.setAliases("avatar")
 										.setName("Account Avatar Command")
 										.setDescription("Updates my Avatar.")
-										.setArgs("[avatar URL]")
+										.setArgs(new Argument<>("avatar", String.class))
 										.setAction((event, args) -> {
-											String[] splitArgs = StringUtils.splitArgs(args, 2);
-											if (Util.isEmpty(splitArgs[1])) {
-												event.sendMessage(Quotes.FAIL, "Insufficient arguments, please use `" + event.getPrefix() + "bot admin acc avatar [URL]` to update my avatar.").queue();
-												return;
-											}
 											URL url;
 											try {
-												url = new URL(splitArgs[1]);
+												url = new URL((String) event.getArgument("avatar").get());
 											} catch (MalformedURLException e) {
-												event.sendMessage(Quotes.FAIL, "`" + splitArgs[1] + "` is not a valid URL.").queue();
+												event.sendMessage(Quotes.FAIL, "`" + event.getArgument("avatar").get() + "` is not a valid URL.").queue();
 												return;
 											}
 											try {
@@ -137,78 +136,63 @@ public class BotCommand {
 											}
 										})
 										.build())
-								.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+								.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 										.setAliases("name")
 										.setName("Account Name Command")
 										.setDescription("Updates my name.")
-										.setArgs("[new Name]")
+										.setArgs(new Argument<>("name", String.class))
 										.setAction((event, args) -> {
-											String[] splitArgs = StringUtils.splitArgs(args, 2);
-											if (Util.isEmpty(splitArgs[1])) {
-												event.sendMessage(Quotes.FAIL, "Insufficient arguments, please use `" + event.getPrefix() + "bot admin acc avatar [URL]` to update my avatar.").queue();
-												return;
-											}
-											String name = splitArgs[1];
-											event.getJDA().getSelfUser().getManager().setName(name).queue();
+											String name = (String) event.getArgument("name").get();
+											Bot.getInstance().getShards().forEach((i, shard) -> shard.getSelfUser().getManager().setName(name).queue());
 											event.sendMessage("Updated my name! Yay, I've got a new name, cool! :smile:").queue();
 										})
 										.build())
 								.build())
-						.addCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
+						.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("guilds")
 								.setHelp("bot admin guilds ?")
 								.setName("Guilds Command")
 								.setDefault("list")
-								.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+								.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 										.setAliases("botc", "botcollections")
 										.setName("Bot Collection Guilds Command")
 										.setDescription("Lists you the Bot Collection Guilds.")
-										.setArgs("<page>")
+										.setArgs(new Argument<>("page", Integer.class, true))
 										.setAction((event, args) -> {
 											if (RequirementsUtils.getBotCollections().isEmpty()) {
 												event.sendMessage("Oh yeah, I'm not in any Bot Collection Guilds!").queue();
 												return;
 											}
-											int page = 1;
-											try {
-												page = Integer.parseInt(StringUtils.splitSimple(args)[1]);
-											} catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
-											}
+											Argument pageArg = event.getArgument("amount");
+											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
 											ListBuilder listBuilder = new ListBuilder(RequirementsUtils.getBotCollections().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getInstance().getShardId(g.getJDA()) +"]) Bots: " + Util.DECIMAL_FORMAT.format(RequirementsUtils.getBotsPercentage(g))).collect(Collectors.toList()), page, 15);
 											listBuilder.setName("Bot Collection Guilds").setFooter("Total Guilds: " + RequirementsUtils.getBotCollections().size());
 											event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();
 										})
 										.build())
-								.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+								.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 										.setAliases("list")
 										.setName("Guilds List Command")
 										.setDescription("Lists you all my guilds.")
-										.setArgs("<page>")
+										.setArgs(new Argument<>("page", Integer.class, true))
 										.setAction((event, args) -> {
-											int page = 1;
-											try {
-												page = Integer.parseInt(StringUtils.splitSimple(args)[1]);
-											} catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
-											}
+											Argument pageArg = event.getArgument("page");
+											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
 											ListBuilder listBuilder = new ListBuilder(Bot.getInstance().getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getInstance().getShardId(g.getJDA()) + "]) | Owner: " + Util.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
 											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + Bot.getInstance().getGuilds().size());
 											event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();
 										})
 										.build())
-								.addCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+								.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 										.setAliases("leave")
 										.setName("Leave Guild Command")
 										.setDescription("Leaves a Guild.")
-										.setArgs("<guild ID>")
+										.setArgs(new Argument<>("guildId", String.class))
 										.setAction((event, args) -> {
-											String[] splitArgs = StringUtils.splitSimple(args);
-											if (splitArgs.length < 2) {
-												event.sendMessage("You have to tell me a Guild ID to me to leave, you can see the guilds I'd like to leave by using `" + event.getPrefix() + "bot admin guilds botc`.").queue();
-												return;
-											}
-											Guild guild = event.getJDA().getGuildById(splitArgs[1]);
+											String guildId = (String) event.getArgument("guildId").get();
+											Guild guild = event.getJDA().getGuildById(guildId);
 											if (guild == null) {
-												event.sendMessage("`" + splitArgs[1] + "` is not a valid Guild ID or it's unknown for me...").queue();
+												event.sendMessage("`" + guildId + "` is not a valid Guild ID or it's unknown for me...").queue();
 												return;
 											}
 											guild.leave().queue();

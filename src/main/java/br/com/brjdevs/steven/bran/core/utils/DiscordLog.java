@@ -25,9 +25,9 @@ public class DiscordLog {
         EmbedBuilder builder = new EmbedBuilder();
         String args = StringUtils.splitArgs(event.getArgs(), 2)[1];
         builder.setTitle(CMD_EMOTE.getAsMention() + " Command Log");
-        String footer = "#" + event.getChannel().getName() + (event.getOriginGuild() == null ? " through Private Message." : " on " + event.getOriginGuild().getName() + ".");
-        builder.setFooter(footer, event.getOriginGuild() == null ? Util.getAvatarUrl(event.getAuthor()) : event.getOriginGuild().getIconUrl());
-        builder.setDescription("**Author** " + Util.getUser(event.getAuthor()) + " (" + event.getAuthor().getId() + ")\n" +
+	    String footer = "#" + event.getChannel().getName() + (event.getGuild() == null ? " through Private Message." : " on " + event.getGuild().getName() + ".");
+	    builder.setFooter(footer, event.getGuild() == null ? Util.getAvatarUrl(event.getAuthor()) : event.getGuild().getIconUrl());
+	    builder.setDescription("**Author** " + Util.getUser(event.getAuthor()) + " (" + event.getAuthor().getId() + ")\n" +
                 "**Command** " + event.getCommand().getName() + "\n" +
                 "**Arguments** " + (args.isEmpty() ? "No arguments were given." : args));
         builder.setColor(COLOR);

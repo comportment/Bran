@@ -66,7 +66,7 @@ public class Session {
 		embedBuilder.addField("Queue Size", String.valueOf(queueSize), true);
 		embedBuilder.addField("Now Playing", String.valueOf(nowPlaying), true);
 		
-		Color color = event.getOriginGuild().getSelfMember().getColor();
+		Color color = event.getGuild().getSelfMember().getColor();
 		embedBuilder.setColor(color == null ? Color.decode("#F1AC1A") : color);
 		
 		return embedBuilder.build();

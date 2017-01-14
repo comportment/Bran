@@ -1,9 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.info;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
-import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.*;
 import br.com.brjdevs.steven.bran.core.managers.WeatherSearch;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.google.gson.JsonElement;
@@ -15,14 +12,14 @@ import java.awt.*;
 public class WeatherCommand {
 	
 	@Command
-	public static ICommand weather() {
+	private static ICommand weather() {
 		return new CommandBuilder(Category.INFORMATIVE)
 				.setAliases("weather")
 				.setName("Weather Command")
 				.setDescription("Gives you weather information on a place.")
-				.setArgs("<location>")
+				.setArgs(new Argument<>("query", String.class))
 				.setAction((event) -> {
-					String query = event.getArgs(2)[1];
+					String query = (String) event.getArgument("query").get();
 					JsonElement element;
 					try {
 						element = WeatherSearch.search(query);

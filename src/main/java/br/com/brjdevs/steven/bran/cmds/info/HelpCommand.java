@@ -11,7 +11,7 @@ import java.util.Comparator;
 public class HelpCommand {
 	
 	@Command
-	public static ICommand help() {
+	private static ICommand help() {
 		return new CommandBuilder(Category.INFORMATIVE)
 				.setAliases("help")
 				.setDescription("Gives you information on all the available commands")
@@ -29,7 +29,7 @@ public class HelpCommand {
 						builder = new StringBuilder(StringUtils.replaceLast(builder.toString(), ", ", ""));
 						builder.append('\n');
 					}
-					Color color = event.getOriginGuild().getSelfMember().getColor();
+					Color color = event.getGuild().getSelfMember().getColor();
 					builder.append("\n")
 							.append("**To get help on a command use `" + event.getPrefix() + "[cmd] help`.**");
 					MessageEmbed embed = new EmbedBuilder()
