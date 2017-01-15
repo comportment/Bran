@@ -5,7 +5,6 @@ import br.com.brjdevs.steven.bran.core.data.bot.Config;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.jdaLoader.JDALoader;
 import br.com.brjdevs.steven.bran.jdaLoader.LoaderType;
-import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDA.Status;
@@ -51,7 +50,6 @@ public class JDALoaderImpl implements JDALoader {
 		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
 				.setToken(config.getToken()).setAudioEnabled(true)
 				.setAutoReconnect(true)
-				.setAudioSendFactory(new NativeAudioSendFactory())
 				.addListener(new Reflections("br.com.brjdevs.steven.bran")
 						.getSubTypesOf(EventListener.class).stream()
 						.map(clazz -> {
