@@ -5,6 +5,8 @@ import br.com.brjdevs.steven.bran.core.command.*;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
+import java.net.URLEncoder;
+
 public class YodaCommand {
 	
 	@Command
@@ -21,8 +23,8 @@ public class YodaCommand {
 						event.sendMessage("Teach you to speak like me if you tell me a sentence I will.  Herh herh herh.").queue();
 						return;
 					}
-					String string = (String) argument.get();
 					try {
+						String string = URLEncoder.encode((String) argument.get(), "UTF-8");
 						response = Unirest.get("https://yoda.p.mashape.com/yoda?sentence=" + string)
 								.header("X-Mashape-Key", Bot.getInstance().getConfig().getMashapeKey())
 								.header("Accept", "text/plain")

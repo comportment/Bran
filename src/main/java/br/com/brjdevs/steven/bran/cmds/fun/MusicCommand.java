@@ -132,7 +132,7 @@ public class MusicCommand {
 							builder.append("**__Music Player__**\n");
 							builder.append("Repeat: `").append(scheduler.isRepeat()).append("`\n");
 							builder.append("Shuffle: `").append(scheduler.isShuffle()).append("`\n");
-							builder.append("Paused: `").append(scheduler.isPaused()).append("`\n");
+							builder.append("Paused: `").append(scheduler.isPaused()).append("`\n\n");
 							if (musicManager.getPlayer().getPlayingTrack() != null) {
 								AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
 								builder.append("**__Now Playing__**\n").append("Title: `" + info.title + "`\n");

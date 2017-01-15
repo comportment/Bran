@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Scanner;
 
 public class UrbanDictionaryCommand {
@@ -30,7 +31,7 @@ public class UrbanDictionaryCommand {
 						return;
 					}
 					try {
-						String query = params.replaceAll("\\s+", "%20");
+						String query = URLEncoder.encode(params, "UTF-8");
 						URL url = new URL("http://api.urbandictionary.com/v0/define?term=" + query);
 						InputStream in = url.openStream();
 						Scanner scan = new Scanner(in);

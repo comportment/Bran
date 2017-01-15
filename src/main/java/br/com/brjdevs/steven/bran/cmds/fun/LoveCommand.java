@@ -8,6 +8,9 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class LoveCommand {
 	
 	@Command
@@ -18,27 +21,31 @@ public class LoveCommand {
 				.setDescription("Gives you the love percentage between to names!")
 				.setArgs(new Argument<>("firstName", String.class), new Argument<>("secondName", String.class))
 				.setAction((event) -> {
-					HttpResponse<JsonNode> response = null;
-					String firstName = (String) event.getArgument("firstName").get();
-					String secondName = (String) event.getArgument("secondName").get();
-					if (firstName.isEmpty() || secondName.isEmpty()) {
-						event.sendMessage("You have to provide me at least two names!").queue();
-						return;
-					}
 					try {
-						response = Unirest.get("https://love-calculator.p.mashape.com/getPercentage?fname=" + firstName + "&sname=" + secondName)
-								.header("X-Mashape-Key", Bot.getInstance().getConfig().getMashapeKey())
-								.header("Accept", "application/json")
-								.asJson();
-					} catch (Exception e) {
-						event.sendMessage(Quotes.FAIL, "Could not calculate love, try someone else!").queue();
-						return;
+						HttpResponse<JsonNode> response = null;
+						String firstName = URLEncoder.encode((String) event.getArgument("firstName").get(), "UTF-8");
+						String secondName = URLEncoder.encode((String) event.getArgument("secondName").get(), "UTF-8");
+						if (firstName.isEmpty() || secondName.isEmpty()) {
+							event.sendMessage("You have to provide me at least two names!").queue();
+							return;
+						}
+						try {
+							response = Unirest.get("https://love-calculator.p.mashape.com/getPercentage?fname=" + firstName + "&sname=" + secondName)
+									.header("X-Mashape-Key", Bot.getInstance().getConfig().getMashapeKey())
+									.header("Accept", "application/json")
+									.asJson();
+						} catch (Exception e) {
+							event.sendMessage(Quotes.FAIL, "Could not calculate love, try someone else!").queue();
+							return;
+						}
+						JSONObject object = new JSONObject(response.getBody().toString());
+						String percentage = object.getString("percentage");
+						String result = object.getString("result");
+						event.sendMessage("**" + percentage + "%** of love between " + firstName + " and " + secondName + "!\n" + result).queue();
+						
+					} catch (UnsupportedEncodingException e) {
+						event.sendMessage(e.getMessage()).queue();
 					}
-					JSONObject object = new JSONObject(response.getBody().toString());
-					String percentage = object.getString("percentage");
-					String result = object.getString("result");
-					event.sendMessage("**" + percentage + "%** of love between " + firstName + " and " + secondName + "!\n" + result).queue();
-					
 				})
 				.build();
 	}

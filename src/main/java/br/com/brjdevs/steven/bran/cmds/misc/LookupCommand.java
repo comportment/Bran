@@ -8,6 +8,8 @@ import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class LookupCommand {
 	private static final String LOOKUP_URL = "http://ip-api.com/json/%s";
@@ -21,38 +23,42 @@ public class LookupCommand {
 				.setDescription("Gives you information on a website")
 				.setArgs(new Argument<>("site", String.class))
 				.setAction((event, rawArgs) -> {
-					String url = String.format(LOOKUP_URL, ((String) event.getArgument("site").get()).replaceAll(" ", "%20"));
-					JsonObject result;
 					try {
-						result = new JsonParser().parse(HttpUtils.read(url)).getAsJsonObject();
-					} catch (IOException e) {
-						event.sendMessage("Could not connect, please try again later.").queue();
-						return;
+						String url = String.format(LOOKUP_URL, URLEncoder.encode((String) event.getArgument("site").get(), "UTF-8"));
+						JsonObject result;
+						try {
+							result = new JsonParser().parse(HttpUtils.read(url)).getAsJsonObject();
+						} catch (IOException e) {
+							e.printStackTrace();
+							event.sendMessage("Could not connect, please try again later.").queue();
+							return;
+						}
+						String status = result.get("status").getAsString();
+						if (!"success".equals(status)) {
+							event.sendMessage(result.get("message").getAsString()).queue();
+							return;
+						}
+						String mapUrl = String.format(MAP_URL, result.get("lat").getAsFloat(), result.get("lon").getAsFloat());
+						String city = result.get("city").getAsString();
+						String country = result.get("country").getAsString();
+						String region = result.get("regionName").getAsString();
+						String isp = result.get("isp").getAsString();
+						String timezone = result.get("timezone").getAsString();
+						String zip = result.get("zip").getAsString();
+						EmbedBuilder builder = new EmbedBuilder();
+						builder.setDescription("**Map:** [Click Here](" + mapUrl + ")\n" +
+								"**City:** " + city + "\n" +
+								"**Country:** " + country + "\n" +
+								"**Region:** " + region + "\n" +
+								"**ISP:** " + isp + "\n" +
+								"**Timezone:** " + timezone + "\n" +
+								"**Zip:** " + zip);
+						builder.setColor(event.getGuild().getSelfMember().getColor() == null
+								? Color.decode("#D68A38") : event.getGuild().getSelfMember().getColor());
+						event.sendMessage(builder.build()).queue();
+					} catch (UnsupportedEncodingException e) {
+						event.sendMessage(e.getMessage()).queue();
 					}
-					String status = result.get("status").getAsString();
-					if (!"success".equals(status)) {
-						event.sendMessage(result.get("message").getAsString()).queue();
-						return;
-					}
-					String mapUrl = String.format(MAP_URL, result.get("lat").getAsFloat(), result.get("lon").getAsFloat());
-					String city = result.get("city").getAsString();
-					String country = result.get("country").getAsString();
-					String region = result.get("regionName").getAsString();
-					String isp = result.get("isp").getAsString();
-					String timezone = result.get("timezone").getAsString();
-					String zip = result.get("zip").getAsString();
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setDescription("**Map:** [Click Here](" + mapUrl + ")\n" +
-							"**City:** " + city + "\n" +
-							"**Country:** " + country + "\n" +
-							"**Region:** " + region + "\n" +
-							"**ISP:** " + isp + "\n" +
-							"**Timezone:** " + timezone + "\n" +
-							"**Zip:** " + zip);
-					builder.setColor(event.getGuild().getSelfMember().getColor() == null
-							? Color.decode("#D68A38") : event.getGuild().getSelfMember().getColor());
-					event.sendMessage(builder.build()).queue();
-					
 				})
 				.build();
 	}
