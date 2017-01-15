@@ -1,4 +1,4 @@
-package br.com.brjdevs.steven.bran.core.command;
+package br.com.brjdevs.steven.bran.core.command.enums;
 
 public enum Category {
 	MISCELLANEOUS("Miscellaneous", "\uD83D\uDD2E"),

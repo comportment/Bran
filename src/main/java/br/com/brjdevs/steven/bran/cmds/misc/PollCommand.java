@@ -1,6 +1,11 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Option;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
@@ -45,7 +50,7 @@ public class PollCommand {
 							LinkedList<Option> options = new LinkedList<>();
 							for (String string : list)
 								options.add(new Option(list.indexOf(string), string));
-							new Poll(name, event.getOriginMember(), options, event.getTextChannel());
+							new Poll(name, event.getMember(), options, event.getTextChannel());
 							event.sendMessage("Created a Poll! You can vote by typing the number of the option.").queue();
 						})
 						.build())
@@ -81,7 +86,7 @@ public class PollCommand {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
 							}
-							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
+							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
 								event.sendMessage("You can't do this... You're not the creator of this poll nor a Guild Moderator to end this poll!").queue();
 								return;
 							}

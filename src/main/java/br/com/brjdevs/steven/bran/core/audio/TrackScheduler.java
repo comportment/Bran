@@ -171,9 +171,9 @@ public class TrackScheduler implements AudioEventListener {
 	}
 	
 	public void queue(AudioPlaylist playlist, List<TrackContext> trackContexts, User dj, TextChannel context) {
-		context.sendMessage("Found playlist `" + playlist.getName() + "`, loading `" + playlist.getTracks().size() + "` tracks...").queue();
+		Message msg = context.sendMessage("Found playlist `" + playlist.getName() + "` with `" + playlist.getTracks().size() + "` tracks, give me a second to queue them...").complete();
 		trackContexts.forEach(queue::offer);
-		context.sendMessage("Done! Queued `" + playlist.getTracks().size() + "` tracks!").queue();
+		msg.editMessage(dj.getAsMention() + " has added the Playlist `" + playlist.getName() + "` (`" + AudioUtils.format(AudioUtils.getLength(playlist)) + "`)").queue();
 		if (player.getPlayingTrack() == null)
 			play(provideNextTrack(false), true);
 	}

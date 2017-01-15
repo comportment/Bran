@@ -1,5 +1,11 @@
-package br.com.brjdevs.steven.bran.core.command;
+package br.com.brjdevs.steven.bran.core.command.builders;
 
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.ArgumentParsingException;
+import br.com.brjdevs.steven.bran.core.command.CommandEvent;
+import br.com.brjdevs.steven.bran.core.command.HelpContainer;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 
@@ -16,7 +22,7 @@ public class CommandBuilder {
 	protected List<String> aliases = new ArrayList<>();
 	protected String name = null;
 	protected String desc = null;
-	protected Argument[] args = null;
+	protected Argument[] args = {};
 	protected boolean isPrivate = true;
 	protected String example = null;
 	protected Long perm = Permissions.RUN_BASECMD;
@@ -86,33 +92,25 @@ public class CommandBuilder {
 					event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
 					return;
 				}
-				if (!event.getMember().hasPermission(perm, event.getJDA())) {
+				if (!event.getGuildMember().hasPermission(perm, event.getJDA())) {
 					event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
 					return;
 				}
 				if (event.getArgs(3)[1].matches("^(\\?|help)$")) {
-					event.sendMessage(HelpContainer.getHelp(this, event.getOriginMember())).queue();
+					event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
 					return;
 				}
+				String[] s = args.length > 1 ? Arrays.stream(Argument.split(event.getArgs(2)[1], args.length)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {event.getArgs(2)[1]};
+				Argument[] args = event.getArguments();
 				if (args != null) {
-					String[] s = args.length > 1 ? Arrays.stream(Argument.split(event.getArgs(2)[1], args.length)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {event.getArgs(2)[1]};
-					Argument[] args = event.getArguments();
 					for (int i = 0; i < args.length; i++) {
 						try {
 							args[i].parse(s[i]);
-						} catch (ArgumentParsingException ex) {
+							if (!args[i].isPresent() && !args[i].isOptional())
+								throw new ArgumentParsingException();
+						} catch (ArgumentParsingException | ArrayIndexOutOfBoundsException ex) {
 							if (!args[i].isOptional()) {
 								event.sendMessage("**Bad Arguments:** " + ex.getMessage() + ".\nExpected arguments: " + (String.join(" ", Arrays.stream(getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new)))).queue();
-								return;
-							}
-							try {
-								args[i].parse(null);
-							} catch (ArgumentParsingException ignored) {
-							}
-						} catch (ArrayIndexOutOfBoundsException e) {
-							if (!args[i].isOptional()) {
-								event.sendMessage("**Bad Arguments:** You gave me insufficient arguments!\n" +
-										"Correct command usage: `" + getAliases().get(0) + " " + (String.join(" ", Arrays.stream(args).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) + "`").queue();
 								return;
 							}
 						}

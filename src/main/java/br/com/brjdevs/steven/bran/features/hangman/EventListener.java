@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
-import br.com.brjdevs.steven.bran.core.data.guild.configs.profile.Profile.ProfileAction;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile.ProfileAction;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
 import net.dv8tion.jda.core.EmbedBuilder;

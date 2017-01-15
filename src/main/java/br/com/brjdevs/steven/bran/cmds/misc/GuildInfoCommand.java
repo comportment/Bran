@@ -1,8 +1,14 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -28,6 +34,7 @@ public class GuildInfoCommand {
 				.setAction((event) -> {
 					Argument argument = event.getArgument("guildId");
 					Guild guild = argument.isPresent() ? event.getJDA().getGuildById((String) argument.get()) : event.getGuild();
+					if (guild == null) guild = event.getGuild();
 					Member guildOnwer = guild.getOwner();
 					OffsetDateTime creation = guild.getCreationTime();
 					String creationDate = neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + creation.getHour() + ":" + creation.getMinute() + ":" + creation.getSecond() + " GMT";
@@ -42,7 +49,8 @@ public class GuildInfoCommand {
 					embedBuilder.addField("Owner", Util.getUser(guildOnwer.getUser()) + "\n(ID: " + guildOnwer.getUser().getId() + ")", true);
 					embedBuilder.addField("Region", guild.getRegion().toString(), true);
 					embedBuilder.addField("Created at", creationDate, true);
-					embedBuilder.addField("Members", String.valueOf(guild.getMembers().size()), true);
+					List<Member> online = guild.getMembers().stream().filter(m -> m.getOnlineStatus() == OnlineStatus.ONLINE).collect(Collectors.toList());
+					embedBuilder.addField("Members", String.valueOf(guild.getMembers().size()) + " (Online: " + online.size() + "/Offline: " + (guild.getMembers().size() - online.size()) + ")", true);
 					embedBuilder.addField("Text Channels", String.valueOf(guild.getTextChannels().size()), true);
 					embedBuilder.addField("Voice Channels", String.valueOf(guild.getVoiceChannels().size()), true);
 					embedBuilder.addField("Verification Level", guild.getVerificationLevel().toString(), true);
@@ -50,32 +58,30 @@ public class GuildInfoCommand {
 					embedBuilder.addField("Role Count", String.valueOf(guild.getRoles().size()), true);
 					List<Role> roles = guild.getRoles().stream()
 							.filter(role -> !role.getName().equals("@everyone")).collect(Collectors.toList());
-					String string = "";
+					String strRoles = "";
 					int i = roles.size();
 					for (Role role : roles) {
-						if (string.length() > 900) break;
-						string += role.getName();
+						if (strRoles.length() > EmbedBuilder.VALUE_MAX_LENGTH - 100) break;
+						strRoles += role.getName();
 						i--;
-						if (string.length() < 900 && roles.indexOf(role) != roles.size() - 1)
-							string += ", ";
 					}
+					strRoles = StringUtils.replaceLast(strRoles, ", ", "");
 					if (i != 0)
-						string += " *(+" + i + " roles)*";
-					embedBuilder.addField("Roles", string, false);
+						strRoles += " *(+" + i + " roles)*";
+					embedBuilder.addField("Roles", strRoles, false);
 					if (hasEmotes) {
 						List<Emote> emotes = guild.getEmotes();
-						String str = "";
+						String strEmotes = "";
 						int emotesSize = emotes.size();
 						for (Emote emote : emotes) {
-							if (str.length() > 900) break;
-							str += emote.getAsMention();
+							if (strEmotes.length() > EmbedBuilder.VALUE_MAX_LENGTH - 100) break;
+							strEmotes += emote.getAsMention();
 							emotesSize--;
-							if (str.length() < 900 && emotes.indexOf(emote) != emotes.size() - 1)
-								str += " ";
 						}
+						strEmotes = StringUtils.replaceLast(strEmotes, ", ", "");
 						if (emotesSize != 0)
-							str += " *(+" + emotesSize + " emote)*";
-						embedBuilder.addField("Emotes", str, true);
+							strEmotes += " *(+" + emotesSize + " emote)*";
+						embedBuilder.addField("Emotes", strEmotes, true);
 					}
 					event.sendMessage(embedBuilder.build()).queue();
 				})

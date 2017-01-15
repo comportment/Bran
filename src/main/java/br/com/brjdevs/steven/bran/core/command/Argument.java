@@ -1,7 +1,5 @@
 package br.com.brjdevs.steven.bran.core.command;
 
-import br.com.brjdevs.steven.bran.core.utils.Util;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -72,8 +70,8 @@ public class Argument<T> {
 		return type;
 	}
 	
-	void parse(String input) throws ArgumentParsingException {
-		if (Util.isEmpty(input)) {
+	public void parse(String input) throws ArgumentParsingException {
+		if (input == null || input.isEmpty()) {
 			result = null;
 			return;
 		}

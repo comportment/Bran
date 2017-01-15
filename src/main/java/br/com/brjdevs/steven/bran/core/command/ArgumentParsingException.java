@@ -9,4 +9,8 @@ public class ArgumentParsingException extends Throwable {
 	public ArgumentParsingException(Class<?> invalid) {
 		super("Expected invalid argument type \"" + invalid.getSimpleName() + "\"");
 	}
+	
+	public ArgumentParsingException() {
+		super();
+	}
 }

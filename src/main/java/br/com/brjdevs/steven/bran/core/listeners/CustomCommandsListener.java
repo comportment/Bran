@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.customcommands.CustomCommand;
+import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
@@ -21,12 +21,11 @@ public class CustomCommandsListener implements EventListener {
 	private static Pattern RANDOM_PATTERN = Pattern.compile("(\\$random\\{.+?;+.+?})", Pattern.CASE_INSENSITIVE);
 
 	private static String parseTag
-			(String answer, Member member, TextChannel textChannel, Guild guild, String args, CustomCommand cmd) {
+			(String answer, Member member, TextChannel textChannel, Guild guild, String args) {
 		answer = answer.replaceAll("%user%", member.getEffectiveName());
 		answer = answer.replaceAll("%mention%", member.getAsMention());
 		answer = answer.replaceAll("%channel%", textChannel.getAsMention());
 		answer = answer.replaceAll("%guild%", guild.getName());
-		answer = answer.replaceAll("%cmdName%", cmd.getName());
 		answer = answer.replaceAll("%input%", args);
 		Matcher matcher = RANDOM_PATTERN.matcher(answer);
 		while (matcher.find()) {
@@ -54,7 +53,7 @@ public class CustomCommandsListener implements EventListener {
 		CustomCommand command = discordGuild.getCustomCommands().getCustomCommand(baseCmd);
 		if (command == null) return;
 		String args = StringUtils.splitArgs(event.getMessage().getRawContent(), 2)[1];
-		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args, command);
+		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args);
 		event.getChannel().sendTyping().queue(success ->
 				event.getChannel().sendMessage(answer).queue());
 	}

@@ -1,6 +1,10 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
-import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +72,7 @@ public class RegionalCommand {
 				.setDescription("Makes a phrase cool.")
 				.setExample("reg This phrase is cool")
 				.setAction((event, rawArgs) -> {
-					String phrase = (String) event.getArgument("pharse").get();
+					String phrase = (String) event.getArgument("phrase").get();
 					String[] characters = phrase.split("");
 					String formatted = String.join("", Stream.of(characters).map(RegionalCommand::toRegional).collect(Collectors.toList()));
 					event.sendMessage(formatted).queue();

@@ -1,6 +1,6 @@
-package br.com.brjdevs.steven.bran.core.command;
+package br.com.brjdevs.steven.bran.core.command.interfaces;
 
-import br.com.brjdevs.steven.bran.core.command.actions.CommandAction;
+import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 
 import java.util.List;
 

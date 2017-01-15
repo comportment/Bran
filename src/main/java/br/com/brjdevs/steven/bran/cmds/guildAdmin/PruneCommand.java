@@ -1,7 +1,12 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.steven.bran.core.command.*;
-import br.com.brjdevs.steven.bran.core.command.actions.CommandAction;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;

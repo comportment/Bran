@@ -2,7 +2,7 @@ package br.com.brjdevs.steven.bran.core.listeners;
 
 import br.com.brjdevs.steven.bran.core.action.Action;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.GuildMember;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;

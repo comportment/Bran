@@ -1,6 +1,11 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 
 import java.util.Arrays;
@@ -43,7 +48,7 @@ public class WordFilterCommand {
 						.setDescription("Lists the filtered words in the current guild.")
 						.setAction((event) -> {
 							if (!event.getDiscordGuild().getWordFilter().isEnabled()) {
-								event.sendMessage("The WordFilter is disabled in this guild." + (event.getMember().hasPermission(Permissions.GUILD_MANAGE, event.getJDA()) ? " Use `" + event.getPrefix() + "wf toggle` to enable it." : "")).queue();
+								event.sendMessage("The WordFilter is disabled in this guild." + (event.getGuildMember().hasPermission(Permissions.GUILD_MANAGE, event.getJDA()) ? " Use `" + event.getPrefix() + "wf toggle` to enable it." : "")).queue();
 								return;
 							}
 							event.sendPrivate("These are the filtered words in " + event.getGuild().getName()

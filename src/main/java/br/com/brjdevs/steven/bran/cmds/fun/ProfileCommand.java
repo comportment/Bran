@@ -1,10 +1,15 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
-import br.com.brjdevs.steven.bran.core.command.*;
-import br.com.brjdevs.steven.bran.core.command.actions.CommandAction;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.GuildMember;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.profile.Profile;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.profile.Profile.Rank;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile.Rank;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
@@ -44,7 +49,7 @@ public class ProfileCommand {
 								.setArgs(new Argument<>("hex", String.class, true))
 								.setDescription("Set or update your custom color!")
 								.setAction((event, rawArgs) -> {
-									Profile profile = event.getMember().getProfile();
+									Profile profile = event.getGuildMember().getProfile();
 									Argument argument = event.getArgument("hex");
 									if (!argument.isPresent()) {
 										if (profile.getCustomHex() != null) {

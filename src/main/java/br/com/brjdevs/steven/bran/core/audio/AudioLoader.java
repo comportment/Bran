@@ -91,13 +91,9 @@ public class AudioLoader implements AudioLoadResultHandler {
 	
 	@Override
 	public void noMatches() {
-		if (!trackUrl.startsWith("ytsearch:")) {
-			AudioUtils.getManager().loadAndPlay(user, channel, "ytsearch:" + trackUrl);
-		} else {
-			channel.sendMessage("Nothing found by `" + trackUrl.substring(9).trim() + "`").queue();
-			if (musicManager.getTrackScheduler().isStopped() && channel.getGuild().getAudioManager().isConnected())
-				channel.getGuild().getAudioManager().closeAudioConnection();
-		}
+		channel.sendMessage("Nothing found by `" + (trackUrl.startsWith("ytsearch:") ? trackUrl.substring(9).trim() : trackUrl) + "`").queue();
+		if (musicManager.getTrackScheduler().isStopped() && channel.getGuild().getAudioManager().isConnected())
+			channel.getGuild().getAudioManager().closeAudioConnection();
 	}
 	
 	@Override

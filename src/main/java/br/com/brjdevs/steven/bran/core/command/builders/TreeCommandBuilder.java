@@ -1,6 +1,13 @@
-package br.com.brjdevs.steven.bran.core.command;
+package br.com.brjdevs.steven.bran.core.command.builders;
 
-import br.com.brjdevs.steven.bran.core.command.actions.CommandAction;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.CommandEvent;
+import br.com.brjdevs.steven.bran.core.command.CommandUtils;
+import br.com.brjdevs.steven.bran.core.command.HelpContainer;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 
 import java.util.ArrayList;
@@ -110,7 +117,7 @@ public class TreeCommandBuilder {
 					return;
 				}
 				if (event.getArgs(3)[1].matches("^(\\?|help)$")) {
-					event.sendMessage(HelpContainer.getHelp(this, event.getOriginMember())).queue();
+					event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
 					return;
 				}
 				String alias = event.getArgs(3)[1];
@@ -120,7 +127,7 @@ public class TreeCommandBuilder {
 					isDefault = true;
 				}
 				ICommand subCommand = CommandUtils.getCommand(this, alias);
-				if (!event.getMember().hasPermission(perm, event.getJDA())) {
+				if (!event.getGuildMember().hasPermission(perm, event.getJDA())) {
 					switch (onMissingPermission) {
 						case SHOW_ERROR:
 							event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
@@ -168,7 +175,7 @@ public class TreeCommandBuilder {
 			
 			@Override
 			public Argument[] getArguments() {
-				return null;
+				return new Argument[0];
 			}
 			
 			@Override

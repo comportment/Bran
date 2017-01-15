@@ -1,9 +1,10 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.steven.bran.core.command.Category;
 import br.com.brjdevs.steven.bran.core.command.Command;
-import br.com.brjdevs.steven.bran.core.command.CommandBuilder;
-import br.com.brjdevs.steven.bran.core.command.ICommand;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.RestActionSleep;
 import net.dv8tion.jda.core.Permission;
@@ -22,6 +23,7 @@ public class FlushCommand {
 				.setName("Flush Command")
 				.setDescription("Deletes all my messages in the latest 100 messages.")
 				.setPrivateAvailable(false)
+				.setRequiredPermission(Permissions.PRUNE_CLEANUP)
 				.setAction((event) -> {
 					if (!event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_HISTORY)) {
 						event.sendMessage("I can't get the latest messages due to a lack of permission. Missing Permission: MESSAGE_HISTORY.").queue();

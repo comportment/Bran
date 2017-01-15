@@ -1,7 +1,11 @@
 package br.com.brjdevs.steven.bran.cmds.botAdmin;
 
 import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
@@ -102,10 +106,10 @@ public class JavaEvalCommand {
 	                    if (x == null) x = e;
 	                    event.sendMessage("Something went wrong trying to eval your query.\n" + x).queue();
 	                }
-	                if (!f.delete()) {
+	                if (f.exists() && !f.delete()) {
 		                event.sendMessage("Could not delete DontUse.java").queue();
 	                }
-	                if (!out.delete()) {
+	                if (out.exists() && !out.delete()) {
 		                event.sendMessage("Could not delete DontUse.class").queue();
 	                }
                 })

@@ -1,7 +1,11 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
 import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
@@ -24,11 +28,11 @@ public class UserInfoCommand {
 				.setAliases("user", "userinfo", "uinfo")
 				.setName("User Info Command")
 				.setDescription("Gives you info on the mentioned user")
-				.setArgs(new Argument<>("mention", String.class))
+				.setArgs(new Argument<>("mention", String.class, true))
 				.setExample("user " + Bot.getInstance().getSelfUser(Bot.getInstance().getShard(0)).getId())
 				.setPrivateAvailable(false)
 				.setAction((event, args) -> {
-					Member member = event.getMessage().getMentionedUsers().isEmpty() ? event.getOriginMember() : event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
+					Member member = event.getMessage().getMentionedUsers().isEmpty() ? event.getMember() : event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
 					OffsetDateTime date = member.getJoinDate();
 					String joinDate = StringUtils.neat(date.getDayOfWeek().toString().substring(0, 3)) + ", " + date.getDayOfMonth() + " " + StringUtils.neat(date.getMonth().toString().substring(0, 3)) + " " + date.getYear() + " " + MathUtils.toOctalInteger(date.getHour()) + ":" + MathUtils.toOctalInteger(date.getMinute()) + ":" + MathUtils.toOctalInteger(date.getSecond()) + " GMT";
 					OffsetDateTime creation = member.getUser().getCreationTime();
@@ -60,9 +64,9 @@ public class UserInfoCommand {
 					{
 						if(i >= joins.size())
 							break;
-						Member u = joins.get(i);
-						String name = u.getUser().getName();
-						if(u.equals(member))
+						Member m = joins.get(i);
+						String name = m.getUser().getName();
+						if (m.equals(member))
 							name = "**" + name + "**";
 						str += " > "+ name;
 					}

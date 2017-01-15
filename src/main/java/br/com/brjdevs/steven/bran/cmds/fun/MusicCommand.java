@@ -5,7 +5,12 @@ import br.com.brjdevs.steven.bran.core.audio.MusicManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
 import br.com.brjdevs.steven.bran.core.audio.TrackScheduler;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
@@ -16,6 +21,8 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
 import java.awt.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,19 +50,19 @@ public class MusicCommand {
 						.setArgs(new Argument<>("title/url", String.class, true))
 						.setAction((event, args) -> {
 							VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
-							if (vchan == null && event.getOriginMember().getVoiceState().inVoiceChannel()) {
-								vchan = AudioUtils.connect(event.getOriginMember().getVoiceState().getChannel(), event.getTextChannel());
+							if (vchan == null && event.getMember().getVoiceState().inVoiceChannel()) {
+								vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel());
 								if (vchan == null) return;
-							} else if (vchan == null && !event.getOriginMember().getVoiceState().inVoiceChannel()) {
+							} else if (vchan == null && !event.getMember().getVoiceState().inVoiceChannel()) {
 								event.sendMessage(Quotes.FAIL, "Before asking for songs you should join a Voice Channel ").queue();
 								return;
 							}
 							if (vchan == null) {
 								event.sendMessage("Something went wrong...").queue();
-								Bot.LOG.warn("Null Voice Channel in " + event.getGuild().getName() + " from " + event.getOriginMember().getUser().getName());
+								Bot.LOG.warn("Null Voice Channel in " + event.getGuild().getName() + " from " + event.getMember().getUser().getName());
 								return;
 							}
-							if (!vchan.getMembers().contains(event.getOriginMember())) {
+							if (!vchan.getMembers().contains(event.getMember())) {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
@@ -76,6 +83,11 @@ public class MusicCommand {
 							if (event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser() > 0 && tracksByUser.size() >= event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser()) {
 								event.sendMessage("You can only have " + event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser() + " songs in the queue.").queue();
 								return;
+							}
+							try {
+								new URL(trackUrl);
+							} catch (MalformedURLException ignored) {
+								trackUrl = "ytsearch:" + trackUrl;
 							}
 							AudioUtils.getManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
 						})
@@ -111,7 +123,7 @@ public class MusicCommand {
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
-						.setAliases("queue", "q")
+						.setAliases("queue", "q", "list")
 						.setName("Music Queue Command")
 						.setDescription("Lists you the current queue.")
 						.setArgs(new Argument<>("page", Integer.class, true))
@@ -207,19 +219,19 @@ public class MusicCommand {
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
 							VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
-							if (vchan == null && event.getOriginMember().getVoiceState().inVoiceChannel()) {
-								vchan = AudioUtils.connect(event.getOriginMember().getVoiceState().getChannel(), event.getTextChannel());
+							if (vchan == null && event.getMember().getVoiceState().inVoiceChannel()) {
+								vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel());
 								if (vchan == null) return;
-							} else if (vchan == null && !event.getOriginMember().getVoiceState().inVoiceChannel()) {
+							} else if (vchan == null && !event.getMember().getVoiceState().inVoiceChannel()) {
 								event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to track you. Are you even in a voice channel?").queue();
 								return;
 							}
 							if (vchan == null) {
 								event.sendMessage("Something went wrong...").queue();
-								Bot.LOG.warn("Null Voice Channel in " + event.getGuild().getName() + " from " + event.getOriginMember().getUser().getName());
+								Bot.LOG.warn("Null Voice Channel in " + event.getGuild().getName() + " from " + event.getMember().getUser().getName());
 								return;
 							}
-							if (!vchan.getMembers().contains(event.getOriginMember())) {
+							if (!vchan.getMembers().contains(event.getMember())) {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
@@ -248,7 +260,7 @@ public class MusicCommand {
 								event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to locate you. Are you even in a voice channel?").queue();
 								return;
 							}
-							if (!vchan.getMembers().contains(event.getOriginMember())) {
+							if (!vchan.getMembers().contains(event.getMember())) {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
@@ -285,7 +297,7 @@ public class MusicCommand {
 								event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to locate you. Are you even in a voice channel?").queue();
 								return;
 							}
-							if (!vchan.getMembers().contains(event.getOriginMember())) {
+							if (!vchan.getMembers().contains(event.getMember())) {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
@@ -308,8 +320,8 @@ public class MusicCommand {
 						.setAction((event) -> {
 							Argument argument = event.getArgument("trackPos");
 							int index = (int) argument.get() - 1;
-							if (index <= 0) {
-								event.sendMessage("The Track Position has to be bigger than 0.").queue();
+							if (index < 0) {
+								event.sendMessage("The Track position has to be bigger than 0. You can see all tracks and positions by using `" + event.getPrefix() + "music queue`.").queue();
 								return;
 							}
 							VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
@@ -317,7 +329,7 @@ public class MusicCommand {
 								event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to locate you. Are you even in a voice channel?").queue();
 								return;
 							}
-							if (!vchan.getMembers().contains(event.getOriginMember())) {
+							if (!vchan.getMembers().contains(event.getMember())) {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}

@@ -1,7 +1,12 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.core.command.*;
-import br.com.brjdevs.steven.bran.core.command.actions.CommandAction;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -46,7 +51,7 @@ public class EmotesCommand {
 									.addField("ID: ", emote.getId(), true)
 									.addField("Creation: ", createdAt + "\n\u00ad", true)
 									.addField("Emote: ", emote.getAsMention(), true)
-									.setColor(event.getOriginMember().getColor() == null ? Color.decode("#f1c40f") : event.getOriginMember().getColor())
+									.setColor(event.getMember().getColor() == null ? Color.decode("#f1c40f") : event.getMember().getColor())
 									.setThumbnail(emote.getImageUrl())
 									.build();
 							event.sendMessage(embed).queue();

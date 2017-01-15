@@ -2,7 +2,7 @@ package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.profile.Profile;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
 import br.com.brjdevs.steven.bran.features.hangman.events.LeaveGameEvent;
 import br.com.brjdevs.steven.bran.features.hangman.events.LooseEvent;
 import net.dv8tion.jda.core.Permission;

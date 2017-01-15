@@ -1,8 +1,13 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
-import br.com.brjdevs.steven.bran.core.command.*;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.customcommands.CustomCmdsSettings;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.customcommands.CustomCommand;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.CustomCmdsSettings;
+import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
@@ -42,8 +47,8 @@ public class CustomCmdsCommand {
 								return;
 							}
 							String answer = (String) event.getArgument("answer").get();
-							CustomCommand command = new CustomCommand(cmdName, answer, event.getAuthor());
-							event.getDiscordGuild().getCustomCommands().asList().add(command);
+							CustomCommand command = new CustomCommand(answer, event.getAuthor());
+							event.getDiscordGuild().getCustomCommands().asMap().put(cmdName, command);
 							event.sendMessage("Created Custom Command **" + cmdName + "**!").queue();
 						})
 						.build())
@@ -66,7 +71,7 @@ public class CustomCmdsCommand {
 							}
 							CustomCommand command = event.getDiscordGuild().getCustomCommands().getCustomCommand(cmdName);
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
 								event.sendMessage("You can't add responses to this command because you're not its creator or has GUILD_MOD permission.").queue();
 								return;
 							}
@@ -97,7 +102,7 @@ public class CustomCmdsCommand {
 								return;
 							}
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
 								event.sendMessage("You can't delete responses from this command because you're not its owner or has GUILD_MOD permission!").queue();
 								return;
 							}
@@ -131,11 +136,11 @@ public class CustomCmdsCommand {
 								return;
 							}
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
 								event.sendMessage("You can't delete this command because you're not its owner or has GUILD_MOD permission!").queue();
 								return;
 							}
-							event.getDiscordGuild().getCustomCommands().asList().remove(command);
+							event.getDiscordGuild().getCustomCommands().asMap().remove(cmdName);
 							event.sendMessage(Quotes.SUCCESS, "Deleted Custom Command `" + cmdName + "`.").queue();
 						})
 						.build())
@@ -177,13 +182,13 @@ public class CustomCmdsCommand {
 								return;
 							}
 							CustomCmdsSettings settings = event.getDiscordGuild().getCustomCommands();
-							if (settings.asList().isEmpty()) {
-								event.sendMessage("This guild has no Custom Commands!").queue();
+							if (settings.asMap().isEmpty()) {
+								event.sendMessage("No Custom Commands in this Guild.").queue();
 								return;
 							}
 							int page = event.getArgument("page").isPresent() && (int) event.getArgument("page").get() > 0 ? (int) event.getArgument("page").get() : 1;
-							List<String> cmds = settings.asList().stream()
-									.map(cmd -> cmd.getName() + " - Created by " + (cmd.getCreator(event.getJDA()) != null ? Util.getUser(cmd.getCreator(event.getJDA())) : "Unknown (ID:" + cmd.getCreatorId() + ")"))
+							List<String> cmds = settings.asMap().entrySet().stream()
+									.map(entry -> entry.getKey() + " - Created by " + (entry.getValue().getCreator(event.getJDA()) != null ? Util.getUser(entry.getValue().getCreator(event.getJDA())) : "Unknown (ID:" + entry.getValue().getCreatorId() + ")"))
 									.collect(Collectors.toList());
 							ListBuilder listBuilder = new ListBuilder(cmds, page, 15);
 							listBuilder.setName("Custom Commands For " + event.getGuild().getName())
@@ -208,7 +213,11 @@ public class CustomCmdsCommand {
 								event.sendMessage("The new name cannot contain spaces.").queue();
 								return;
 							}
-							command.rename(newName);
+							if (event.getDiscordGuild().getCustomCommands().hasCustomCommand(newName)) {
+								event.sendMessage("This guild already has a Command named `" + newName + "`.").queue();
+								return;
+							}
+							event.getDiscordGuild().getCustomCommands().rename(oldName, newName);
 							event.sendMessage(String.format(":ok_hand: Renamed `%s` to `%s`", oldName, newName)).queue();
 							
 						}).build())

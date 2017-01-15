@@ -1,7 +1,12 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.steven.bran.core.command.*;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.Announces;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.AnnouncesSettings;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Util;
@@ -47,7 +52,7 @@ public class AnnounceCommands {
 									String message = (String) event.getArgument("joinmsg").get();
 									event.getDiscordGuild().getAnnounces().setJoinAnnounce(message);
 									event.sendMessage(Quotes.SUCCESS, "Successfully set the Join Announce Message. " +
-											"When someone joins this guild, it'll look like this:\n\n" + Announces.parse(message, event.getOriginMember())).queue();
+											"When someone joins this guild, it'll look like this:\n\n" + AnnouncesSettings.parse(message, event.getMember())).queue();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -61,7 +66,7 @@ public class AnnounceCommands {
 									String message = (String) event.getArgument("joindmmsg").get();
 									event.getDiscordGuild().getAnnounces().setJoinDMAnnounce(message);
 									event.sendMessage(Quotes.SUCCESS, "Successfully set the Join DM Announce Message. " +
-											"When someone joins this guild, it'll receive this message:\n\n" + Announces.parse(message, event.getOriginMember())).queue();
+											"When someone joins this guild, it'll receive this message:\n\n" + AnnouncesSettings.parse(message, event.getMember())).queue();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -75,7 +80,7 @@ public class AnnounceCommands {
 									String message = (String) event.getArgument("leavemsg").get();
 									event.getDiscordGuild().getAnnounces().setLeaveAnnounce(message);
 									event.sendMessage(Quotes.SUCCESS, "Successfully set the Leave Announce Message. " +
-											"When someone leaves this guild, it'll look like this:\n\n" + Announces.parse(message, event.getOriginMember())).queue();
+											"When someone leaves this guild, it'll look like this:\n\n" + AnnouncesSettings.parse(message, event.getMember())).queue();
 								})
 								.build())
 						.build())
@@ -106,7 +111,7 @@ public class AnnounceCommands {
 										return;
 									}
 									String s = "The Join Announce Message will look like this when an user joins here:";
-									s += "\n\n" + Announces.parse(event.getDiscordGuild().getAnnounces().getJoinAnnounce(), event.getOriginMember());
+									s += "\n\n" + AnnouncesSettings.parse(event.getDiscordGuild().getAnnounces().getJoinAnnounce(), event.getMember());
 									event.sendMessage(s).queue();
 								})
 								.build())
@@ -121,7 +126,7 @@ public class AnnounceCommands {
 										return;
 									}
 									String s = "The Leave Announce Message will look like this when an user joins here:";
-									s += "\n\n" + Announces.parse(event.getDiscordGuild().getAnnounces().getLeaveAnnounce(), event.getOriginMember());
+									s += "\n\n" + AnnouncesSettings.parse(event.getDiscordGuild().getAnnounces().getLeaveAnnounce(), event.getMember());
 									event.sendMessage(s).queue();
 								})
 								.build())
@@ -136,7 +141,7 @@ public class AnnounceCommands {
 										return;
 									}
 									String s = "The Join DM Announce Message will look like this when an user joins here:";
-									s += "\n\n" + Announces.parse(event.getDiscordGuild().getAnnounces().getJoinDMAnnounce(), event.getOriginMember());
+									s += "\n\n" + AnnouncesSettings.parse(event.getDiscordGuild().getAnnounces().getJoinDMAnnounce(), event.getMember());
 									event.sendMessage(s).queue();
 								})
 								.build())

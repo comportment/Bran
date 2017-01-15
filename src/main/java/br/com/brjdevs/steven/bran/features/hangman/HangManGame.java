@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.data.bot.HangManWord;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.profile.Profile;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.HangManWord;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;

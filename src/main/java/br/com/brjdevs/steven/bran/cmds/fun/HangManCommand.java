@@ -4,9 +4,14 @@ import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.action.Action;
 import br.com.brjdevs.steven.bran.core.action.Action.onInvalidResponse;
 import br.com.brjdevs.steven.bran.core.action.ActionType;
-import br.com.brjdevs.steven.bran.core.command.*;
-import br.com.brjdevs.steven.bran.core.data.bot.HangManWord;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.profile.Profile;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.HangManWord;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
@@ -38,8 +43,8 @@ public class HangManCommand {
 						.setDescription("Starts a HangMan Session.")
 						.setName("HangMan Start Command")
 						.setAction((event, args) -> {
-							HangManGame session = HangManGame.getSession(event.getMember().getProfile());
-							if (HangManGame.getSession(event.getMember().getProfile()) != null) {
+							HangManGame session = HangManGame.getSession(event.getGuildMember().getProfile());
+							if (HangManGame.getSession(event.getGuildMember().getProfile()) != null) {
 								if (!session.getChannel().canTalk(session.getChannel().getGuild().getMember(session.getCreator().getUser(event.getJDA())))) {
 									event.sendMessage("You had a Session running in another Channel, but you can't talk in there so I'm closing that session and starting another for you :)").queue();
 									session.end();
@@ -48,7 +53,7 @@ public class HangManCommand {
 									return;
 								}
 							}
-							session = new HangManGame(event.getMember().getProfile(), Bot.getInstance().getData().getHangManWords().get(MathUtils.random(Bot.getInstance().getData().getHangManWords().size())), event.getTextChannel());
+							session = new HangManGame(event.getGuildMember().getProfile(), Bot.getInstance().getData().getHangManWords().get(MathUtils.random(Bot.getInstance().getData().getHangManWords().size())), event.getTextChannel());
 							event.sendMessage(session.createEmbed().setDescription("You started a Hang Man Game in " + event.getTextChannel().getAsMention() + ". Why don't you invite someone to play with you?").build()).queue();
 						})
 						.build())
@@ -59,7 +64,7 @@ public class HangManCommand {
 						.setArgs(new Argument<>("mention", String.class))
 						.setExample("hangman invite <@219186621008838669>")
 						.setAction((event, args) -> {
-							HangManGame session = HangManGame.getSession(event.getMember().getProfile());
+							HangManGame session = HangManGame.getSession(event.getGuildMember().getProfile());
 							if (session == null) {
 								event.sendMessage(Quotes.FAIL, "You don't have a Game Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to start one!").queue();
 								return;
@@ -112,7 +117,7 @@ public class HangManCommand {
 						.setArgs(new Argument<>("mention", String.class))
 						.setExample("hangman pass <@219186621008838669>")
 						.setAction((event) -> {
-							HangManGame session = HangManGame.getSession(event.getMember().getProfile());
+							HangManGame session = HangManGame.getSession(event.getGuildMember().getProfile());
 							if (session == null) {
 								event.sendMessage(Quotes.FAIL, "You don't have a Session Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to create one!").queue();
 								return;
@@ -132,7 +137,7 @@ public class HangManCommand {
 								return;
 							}
 							session.setCreator(profile);
-							event.sendMessage(Quotes.SUCCESS, "Alright, now **" + Util.getUser(user) + "** is the new creator of the Session. " + event.getOriginMember().getEffectiveName() + ", I've put you as invited, so you can type `giveup` to leave the session.").queue();
+							event.sendMessage(Quotes.SUCCESS, "Alright, now **" + Util.getUser(user) + "** is the new creator of the Session. " + event.getMember().getEffectiveName() + ", I've put you as invited, so you can type `giveup` to leave the session.").queue();
 						})
 						.build())
 				.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)

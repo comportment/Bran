@@ -1,5 +1,8 @@
 package br.com.brjdevs.steven.bran.core.command;
 
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
+
 public class CommandUtils {
 	
 	public static ICommand getCommand(ITreeCommand tree, String alias) {
@@ -11,7 +14,6 @@ public class CommandUtils {
 	}
 	
 	public static Argument[] copy(ICommand cmd) {
-		if (cmd.getArguments() == null) return null;
 		Argument[] copy = new Argument[cmd.getArguments().length];
 		for (int i = 0; i < copy.length; i++) {
 			copy[i] = cmd.getArguments()[i].copy();

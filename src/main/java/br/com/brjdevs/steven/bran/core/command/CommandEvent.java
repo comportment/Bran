@@ -1,8 +1,9 @@
 package br.com.brjdevs.steven.bran.core.command;
 
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.GuildMember;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.GuildMember.FakeGuildMember;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember.FakeGuildMember;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
@@ -39,10 +40,8 @@ public class CommandEvent {
         this.prefix = prefix;
 	    this.argsMap = new HashMap<>();
 	    this.arguments = CommandUtils.copy(command);
-	    if (arguments != null) {
-		    Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
-	    }
-	    if (!Util.isPrivate(event)) {
+		Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
+		if (!Util.isPrivate(event)) {
             this.discordGuild = discordGuild;
             this.member = event.getMember();
             this.guild = event.getGuild();
@@ -86,11 +85,13 @@ public class CommandEvent {
     public JDA getJDA() {
         return event.getJDA();
     }
-    public Member getOriginMember () {
-        return member;
+	
+	public Member getMember() {
+		return member;
     }
-    public GuildMember getMember() {
-        return guildMember;
+	
+	public GuildMember getGuildMember() {
+		return guildMember;
     }
     public ICommand getCommand() {
         return command;

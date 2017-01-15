@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.configs.WordFilter;
+import br.com.brjdevs.steven.bran.core.data.guild.settings.WordFilterSettings;
 import br.com.brjdevs.steven.bran.core.utils.RestActionSleep;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.Permission;
@@ -26,7 +26,7 @@ public class WordFilterListener implements EventListener {
 		if (event.getMessage() == null) return;
 		if (!canManageMessages(event.getChannel())) return;
 		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild());
-		WordFilter wordFilter = discordGuild.getWordFilter();
+		WordFilterSettings wordFilter = discordGuild.getWordFilter();
 		if (!wordFilter.isEnabled()) return;
 		boolean bool = false;
 		for (String word : wordFilter.asList()) {

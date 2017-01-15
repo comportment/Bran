@@ -1,4 +1,8 @@
-package br.com.brjdevs.steven.bran.core.command;
+package br.com.brjdevs.steven.bran.core.command.interfaces;
+
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.CommandEvent;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
 
 import java.util.List;
 

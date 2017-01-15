@@ -1,6 +1,10 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.core.command.*;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.utils.HttpUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -57,7 +61,7 @@ public class LookupCommand {
 								? Color.decode("#D68A38") : event.getGuild().getSelfMember().getColor());
 						event.sendMessage(builder.build()).queue();
 					} catch (UnsupportedEncodingException e) {
-						event.sendMessage(e.getMessage()).queue();
+						event.sendMessage("Failed to encode URL.").queue();
 					}
 				})
 				.build();

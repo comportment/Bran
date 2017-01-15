@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran;
 
-import br.com.brjdevs.steven.bran.core.data.bot.BotData;
 import br.com.brjdevs.steven.bran.core.data.bot.Config;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.BotData;
 import br.com.brjdevs.steven.bran.core.utils.Session;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.google.gson.Gson;
