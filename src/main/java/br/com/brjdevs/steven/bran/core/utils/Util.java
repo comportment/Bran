@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -69,6 +70,10 @@ public class Util {
 	
 	public static <T, K> Entry<T, K> getEntryByIndex(Map<T, K> map, int index) {
 		return (Entry<T, K>) map.entrySet().toArray()[index];
+	}
+	
+	public static <E> E random(List<E> list) {
+		return list.get(MathUtils.random(list.size()));
 	}
 	public static boolean containsEqualsIgnoreCase(Collection<String> collection, String s) {
 		return collection.stream().anyMatch((item) -> item.equalsIgnoreCase(s));

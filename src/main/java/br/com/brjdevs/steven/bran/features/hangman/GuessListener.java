@@ -9,7 +9,6 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 import net.dv8tion.jda.core.hooks.EventListener;
 
 public class GuessListener implements EventListener {
@@ -41,12 +40,5 @@ public class GuessListener implements EventListener {
 		game.guess(msg, profile);
 		if (event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
 			event.getMessage().deleteMessage().queue();
-		try {
-			game.getChannel().deleteMessageById(game.getLastMessage())
-					.queue(success -> game.setLastMessage(null),
-							throwable -> game.setLastMessage(null));
-		} catch (ErrorResponseException ignored) {
-			game.setLastMessage(null);
-		}
 	}
 }

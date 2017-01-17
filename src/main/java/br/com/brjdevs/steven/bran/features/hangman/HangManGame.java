@@ -2,16 +2,14 @@ package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
-import lombok.Getter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed.Field;
 import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,12 +30,9 @@ public class HangManGame {
 	private final String word;
 	private final String channel;
 	private final List<String> mistakes;
-	@Getter
 	private final IEventListener listener;
 	private long lastGuess;
 	private Profile creator;
-	@Getter
-	private String lastMessage;
 	private int shard;
 	
 	public HangManGame(Profile profile, String word, TextChannel channel) {
@@ -57,12 +52,21 @@ public class HangManGame {
 			guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == ' ').forEach(entry -> guesses.replace(entry.getKey(), true));
 		}
 		sessions.add(this);
+		profile.registerListener(new HangManProfileListener(this));
 	}
 	
 	public static HangManGame getSession(Profile profile) {
 		return sessions.stream().filter(session -> session.getCreator().equals(profile) || session.getInvitedUsers().contains(profile)).findAny().orElse(null);
 	}
-
+	
+	public IEventListener getListener() {
+		return listener;
+	}
+	
+	public long getLastGuess() {
+		return lastGuess;
+	}
+	
 	public TextChannel getChannel() {
 		return getJDA().getTextChannelById(channel);
 	}
@@ -76,6 +80,7 @@ public class HangManGame {
 	}
 
 	public void invite(Profile profile) {
+		profile.registerListener(new HangManProfileListener(this));
 		this.invitedUsers.add(profile);
 	}
 
@@ -159,24 +164,7 @@ public class HangManGame {
 		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + Bot.getDefaultPrefixes()[0] + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getJDA()).getName()).collect(Collectors.toList()))), inline);
 	}
 	
-	public void setLastMessage(Message message) {
-		if (message == null) {
-			this.lastMessage = null;
-			return;
-		}
-		this.lastMessage = message.getId();
-	}
-	
 	public EmbedBuilder createEmbed() {
-		if (lastMessage != null) {
-			try {
-				getChannel().deleteMessageById(lastMessage).queue(
-						success -> setLastMessage(null),
-						fail -> setLastMessage(null));
-			} catch (ErrorResponseException ignored) {
-				setLastMessage(null);
-			}
-		}
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Hang Man");
 		builder.setFooter("Session created by " + getCreator().getUser(getJDA()).getName(), Util.getAvatarUrl(getCreator().getUser(getJDA())));
@@ -184,6 +172,18 @@ public class HangManGame {
 		builder.addField(getCurrentGuessesField(false));
 		builder.addField(getInvitedUsersField(false));
 		return builder;
+	}
+	
+	private String getRandomLetter() {
+		String guesses = getGuessedLetters(); //avoid doing streams constantly
+		int r = MathUtils.random(word.length());
+		char choice = guesses.charAt(r);
+		while (choice != '_') {
+			if (r == 0) r += 1;
+			else r -= 1;
+		}
+		choice = word.charAt(r);
+		return String.valueOf(choice);
 	}
 	
 	public void end() {

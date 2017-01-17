@@ -138,7 +138,7 @@ public class HangManCommand {
 								return;
 							}
 							session.setCreator(profile);
-							event.sendMessage(Quotes.SUCCESS, "Alright, now **" + Util.getUser(user) + "** is the new creator of the Session. " + event.getMember().getEffectiveName() + ", I've put you as invited, so you can type `giveup` to leave the session.").queue();
+							event.sendMessage(Quotes.SUCCESS, "Alright, now **" + Util.getUser(user) + "** is the new creator of the Session. " + event.getMember().getEffectiveName() + ", I've put you as an invited user, so you can type `giveup` to leave the session.").queue();
 						})
 						.build())
 				.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -156,7 +156,7 @@ public class HangManCommand {
 								.setAction((event, rawArgs) -> {
 									String word = (String) event.getArgument("word").get();
 									Bot.getData().getHangManWords().put(word, new ArrayList<>());
-									event.sendMessage(Quotes.SUCCESS, "Added word to HangMan, you can add tips to it using `" + event.getPrefix() + "hangman words tip " + word + " | [tip]`.").queue();
+									event.sendMessage(Quotes.SUCCESS, "Added word to HangMan, you can add tips to it using `" + event.getPrefix() + "hangman words tip " + word + " [tip]`.").queue();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -180,6 +180,7 @@ public class HangManCommand {
 										event.sendMessage("The Tip can't be the word!").queue();
 										return;
 									}
+									data.getHangManWords().get(word).add(tip);
 									event.sendMessage(Quotes.SUCCESS, "Added new tip to this word! *(Total tips: " + data.getHangManWords().get(word).size() + ")*").queue();
 								})
 								.build())

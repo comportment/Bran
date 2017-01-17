@@ -122,7 +122,7 @@ public class TreeCommandBuilder {
 				}
 				String alias = event.getArgs(3)[1];
 				boolean isDefault = false;
-				if (alias.isEmpty()) {
+				if (alias.isEmpty() && defaultCmd != null) {
 					alias = defaultCmd;
 					isDefault = true;
 				}
