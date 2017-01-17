@@ -2,7 +2,6 @@ package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
-import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
@@ -179,19 +178,6 @@ public class HangManGame {
 		builder.addField(getInvitedUsersField(false));
 		return builder;
 	}
-	
-	private String getRandomLetter() {
-		String guesses = getGuessedLetters(); //avoid doing streams constantly
-		int r = MathUtils.random(word.length());
-		char choice = guesses.charAt(r);
-		while (choice != '_') {
-			if (r == 0) r += 1;
-			else r -= 1;
-		}
-		choice = word.charAt(r);
-		return String.valueOf(choice);
-	}
-	
 	public void end() {
 		getProfiles().forEach(p -> p.unregisterListener(new HMProfileListener(this)));
 		sessions.remove(this);
