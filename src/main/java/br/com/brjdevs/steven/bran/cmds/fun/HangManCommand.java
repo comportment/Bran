@@ -195,7 +195,7 @@ public class HangManCommand {
 									List<String> list = Bot.getData().getHangManWords().entrySet().stream().map(entry -> entry.getKey() + " (" + entry.getValue().size() + " tips)").collect(Collectors.toList());
 									ListBuilder listBuilder = new ListBuilder(list, page, 10);
 									listBuilder.setName("HangMan Words").setFooter("Total Words: " + list.size());
-									event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();
+									event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 								})
 								.build())
 						.build())

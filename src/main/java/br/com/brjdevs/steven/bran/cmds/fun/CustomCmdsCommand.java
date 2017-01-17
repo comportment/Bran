@@ -193,7 +193,7 @@ public class CustomCmdsCommand {
 							ListBuilder listBuilder = new ListBuilder(cmds, page, 15);
 							listBuilder.setName("Custom Commands For " + event.getGuild().getName())
 									.setFooter("Total Custom Commands: " + cmds.size());
-							event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();
+							event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)

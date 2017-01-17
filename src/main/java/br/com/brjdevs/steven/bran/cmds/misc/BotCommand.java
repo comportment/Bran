@@ -172,7 +172,7 @@ public class BotCommand {
 											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
 											ListBuilder listBuilder = new ListBuilder(RequirementsUtils.getBotCollections().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getShardId(g.getJDA()) + "]) Bots: " + Util.DECIMAL_FORMAT.format(RequirementsUtils.getBotsPercentage(g))).collect(Collectors.toList()), page, 15);
 											listBuilder.setName("Bot Collection Guilds").setFooter("Total Guilds: " + RequirementsUtils.getBotCollections().size());
-											event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();
+											event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 										})
 										.build())
 								.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -185,7 +185,7 @@ public class BotCommand {
 											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
 											ListBuilder listBuilder = new ListBuilder(Bot.getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getShardId(g.getJDA()) + "]) | Owner: " + Util.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
 											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + Bot.getGuilds().size());
-											event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();
+											event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 										})
 										.build())
 								.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)

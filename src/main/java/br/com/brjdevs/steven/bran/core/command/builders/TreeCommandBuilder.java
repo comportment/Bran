@@ -127,10 +127,10 @@ public class TreeCommandBuilder {
 					isDefault = true;
 				}
 				ICommand subCommand = CommandUtils.getCommand(this, alias);
-				if (!event.getGuildMember().hasPermission(perm, event.getJDA())) {
-					switch (onMissingPermission) {
+				if (subCommand == null) {
+					switch (onNotFound) {
 						case SHOW_ERROR:
-							event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
+							event.sendMessage("No such SubCommand `" + alias + "` in " + getName() + ".").queue();
 							break;
 						case REDIRECT:
 							event.createChild(CommandUtils.getCommand(this, defaultCmd), true);
@@ -141,10 +141,10 @@ public class TreeCommandBuilder {
 					}
 					return;
 				}
-				if (subCommand == null) {
-					switch (onNotFound) {
+				if (!event.getGuildMember().hasPermission(perm, event.getJDA())) {
+					switch (onMissingPermission) {
 						case SHOW_ERROR:
-							event.sendMessage("No such SubCommand `" + alias + "` in " + getName() + ".").queue();
+							event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
 							break;
 						case REDIRECT:
 							event.createChild(CommandUtils.getCommand(this, defaultCmd), true);

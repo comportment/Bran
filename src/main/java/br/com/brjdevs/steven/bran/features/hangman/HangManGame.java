@@ -34,6 +34,7 @@ public class HangManGame {
 	private long lastGuess;
 	private Profile creator;
 	private int shard;
+	private int usedItems;
 	
 	public HangManGame(Profile profile, String word, TextChannel channel) {
 		this.listener = new EventListener();
@@ -45,6 +46,7 @@ public class HangManGame {
 		this.lastGuess = System.currentTimeMillis();
 		this.channel = channel.getId();
 		this.shard = Bot.getShardId(channel.getJDA());
+		this.usedItems = 0;
 		Arrays.stream(word.split(""))
 				.forEach(split ->
 						guesses.put(guesses.containsKey(split) ? split + Util.randomName(3) : split, false));
@@ -52,7 +54,7 @@ public class HangManGame {
 			guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == ' ').forEach(entry -> guesses.replace(entry.getKey(), true));
 		}
 		sessions.add(this);
-		profile.registerListener(new HangManProfileListener(this));
+		profile.registerListener(new HMProfileListener(this));
 	}
 	
 	public static HangManGame getSession(Profile profile) {
@@ -74,13 +76,17 @@ public class HangManGame {
 	public JDA getJDA() {
 		return Bot.getShard(shard);
 	}
+	
+	public boolean isMultiplayer() {
+		return !getInvitedUsers().isEmpty();
+	}
 
 	public void remove(Profile profile) {
 		invitedUsers.remove(profile);
 	}
 
 	public void invite(Profile profile) {
-		profile.registerListener(new HangManProfileListener(this));
+		profile.registerListener(new HMProfileListener(this));
 		this.invitedUsers.add(profile);
 	}
 
@@ -187,6 +193,7 @@ public class HangManGame {
 	}
 	
 	public void end() {
+		getProfiles().forEach(p -> p.unregisterListener(new HMProfileListener(this)));
 		sessions.remove(this);
 	}
 }

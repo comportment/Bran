@@ -32,14 +32,15 @@ public class ListBuilder {
 		if (list.size() % itemsShown == 0) return list.size() / itemsShown;
 		return (list.size() / itemsShown) + 1;
 	}
-	public String format(@NonNull Format format, String... markdown) {
+	
+	public String format(@NonNull Format format) {
 		int min = (page * itemsShown) - itemsShown;
 		int max = page * itemsShown;
 		switch (format) {
 			case SIMPLE:
 				return String.format(format.toString(), listName, page, getMaxPages(), String.join("\n", list.stream().filter(item -> list.indexOf(item) < max && list.indexOf(item) >= min).map(item -> (list.indexOf(item) + 1) + ". " + item).collect(Collectors.toList())), footer);
 			case CODE_BLOCK:
-				return String.format(format.toString(), markdown[0], listName, page, getMaxPages(), String.join("\n", list.stream().filter(item -> list.indexOf(item) < max && list.indexOf(item) >= min).map(item -> (list.indexOf(item) + 1) + ". " + item).collect(Collectors.toList())), footer);
+				return String.format(format.toString(), listName, page, getMaxPages(), String.join("\n", list.stream().filter(item -> list.indexOf(item) < max && list.indexOf(item) >= min).map(item -> (list.indexOf(item) + 1) + ". " + item).collect(Collectors.toList())), footer);
 			default:
 				return String.format(Format.NONE.toString(), String.join("\n", String.join("\n", list.stream().filter(item -> list.indexOf(item) < max && list.indexOf(item) >= min).collect(Collectors.toList()))));
 		}
@@ -48,7 +49,7 @@ public class ListBuilder {
 	public enum Format {
 		NONE("%s"),
 		SIMPLE("%s - Page %d/%dn\n%s"),
-		CODE_BLOCK("```%s\n[%s](Page %d/%d)\n%s\n# %s\n```");
+		CODE_BLOCK("```md\n[%s](Page %d/%d)\n%s\n# %s\n```");
 		private String str;
 		Format(String str) {
 			this.str = str;
