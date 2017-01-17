@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class TooFast {
 	private static final Map<String, JsonObject> userTimeout = new HashMap<>();
-	private static boolean enabled = Bot.getInstance().getConfig().isTooFastEnabled();
+	private static boolean enabled = Bot.getConfig().isTooFastEnabled();
 	static {
 			TaskManager.startAsyncTask(() -> {
 				synchronized (userTimeout) {

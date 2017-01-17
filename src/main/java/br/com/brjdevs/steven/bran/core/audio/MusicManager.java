@@ -16,7 +16,7 @@ public class MusicManager {
 	public MusicManager(AudioPlayerManager manager, Guild guild) {
 		player = manager.createPlayer();
 		this.guildId = Long.parseLong(guild.getId());
-		this.shard = Bot.getInstance().getShardId(guild.getJDA());
+		this.shard = Bot.getShardId(guild.getJDA());
 		scheduler = new TrackScheduler(player, guildId, shard);
 		player.addListener(scheduler);
 	}
@@ -24,7 +24,7 @@ public class MusicManager {
 		return getJDA().getGuildById(String.valueOf(guildId));
 	}
 	public JDA getJDA() {
-		return Bot.getInstance().getShard(shard);
+		return Bot.getShard(shard);
 	}
 	public TrackScheduler getTrackScheduler() {
 		return scheduler;

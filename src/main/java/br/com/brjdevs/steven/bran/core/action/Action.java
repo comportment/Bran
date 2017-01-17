@@ -41,7 +41,7 @@ public class Action {
 		this.messageId = message.getId();
 		this.channelId = message.getChannel().getId();
 		this.actionType = actionType;
-		this.shardId = Bot.getInstance().getShardId(message.getJDA());
+		this.shardId = Bot.getShardId(message.getJDA());
 		this.onInvalidResponse = onInvalidResponse;
 		
 		actions.add(this);
@@ -60,7 +60,7 @@ public class Action {
 	}
 	
 	public JDA getJDA() {
-		return Bot.getInstance().getShard(shardId);
+		return Bot.getShard(shardId);
 	}
 	
 	public TextChannel getChannel() {

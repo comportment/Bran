@@ -64,7 +64,7 @@ public class AudioUtils {
 	}
 	public static boolean isAlone(VoiceChannel channel) {
 		return channel.getMembers().size() == 1
-				&& channel.getMembers().get(0).getUser().equals(Bot.getInstance().getSelfUser(channel.getJDA()));
+				&& channel.getMembers().get(0).getUser().equals(Bot.getSelfUser(channel.getJDA()));
 	}
 	public static boolean isAllowed(User user, TrackContext context) {
 		return context.getDJ(user.getJDA()) != null && context.getDJId().equals(user.getId());

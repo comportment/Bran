@@ -34,10 +34,10 @@ public class Session {
 	}
 
 	public MessageEmbed toEmbed (CommandEvent event) {
-		List<Guild> guilds = Bot.getInstance().getGuilds();
-		List<TextChannel> channels = Bot.getInstance().getTextChannels();
-		List<VoiceChannel> voiceChannels = Bot.getInstance().getVoiceChannels();
-		List<User> users = Bot.getInstance().getUsers();
+		List<Guild> guilds = Bot.getGuilds();
+		List<TextChannel> channels = Bot.getTextChannels();
+		List<VoiceChannel> voiceChannels = Bot.getVoiceChannels();
+		List<User> users = Bot.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
 		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).map(entry -> entry.getValue().getTrackScheduler().getQueue().size()).collect(Collectors.toList()).size();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";
@@ -52,7 +52,7 @@ public class Session {
 		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", true);
 		embedBuilder.addField("JDA Version", JDAInfo.VERSION, true);
 		embedBuilder.addField("API Responses", jda.getResponseTotal() + "\n\n**General**", true);
-		embedBuilder.addField("Shards (ONLINE/TOTAL)", Bot.getInstance().getShards().size() + "/" + Bot.getInstance().getOnlineShards(), true);
+		embedBuilder.addField("Shards (ONLINE/TOTAL)", Bot.getShards().size() + "/" + Bot.getOnlineShards(), true);
 		//General Stats
 		embedBuilder.addField("Guilds", String.valueOf(guilds.size()), true);
 		embedBuilder.addField("Users", String.valueOf(users.size()), true);
@@ -89,10 +89,10 @@ public class Session {
 	}
 	
 	public String toString(JDA jda) {
-		List<Guild> guilds = Bot.getInstance().getGuilds();
-		List<TextChannel> channels = Bot.getInstance().getTextChannels();
-		List<VoiceChannel> voiceChannels = Bot.getInstance().getVoiceChannels();
-		List<User> users = Bot.getInstance().getUsers();
+		List<Guild> guilds = Bot.getGuilds();
+		List<TextChannel> channels = Bot.getTextChannels();
+		List<VoiceChannel> voiceChannels = Bot.getVoiceChannels();
+		List<User> users = Bot.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
 		long queueSize = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).collect(Collectors.toList()).size();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";

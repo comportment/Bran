@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.managers.profile;
 
-import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 
 public class ProfileListener implements ProfileEvents {
 	

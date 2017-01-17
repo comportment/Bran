@@ -35,7 +35,7 @@ public class LoveCommand {
 						}
 						try {
 							response = Unirest.get("https://love-calculator.p.mashape.com/getPercentage?fname=" + firstName + "&sname=" + secondName)
-									.header("X-Mashape-Key", Bot.getInstance().getConfig().getMashapeKey())
+									.header("X-Mashape-Key", Bot.getConfig().getMashapeKey())
 									.header("Accept", "application/json")
 									.asJson();
 						} catch (Exception e) {

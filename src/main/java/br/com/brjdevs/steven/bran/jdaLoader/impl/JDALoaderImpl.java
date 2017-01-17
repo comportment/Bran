@@ -45,7 +45,7 @@ public class JDALoaderImpl implements JDALoader {
 		if (shards > 1 && loaderType == LoaderType.SINGLE) {
 			throw new RuntimeException("Got LoaderType.SINGLE and more then one shard... What the fuck did you do?");
 		}
-		Config config = Bot.getInstance().getConfig();
+		Config config = Bot.getConfig();
 		Map<Integer, JDA> out = new HashMap<>();
 		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
 				.setToken(config.getToken()).setAudioEnabled(true)
@@ -76,7 +76,7 @@ public class JDALoaderImpl implements JDALoader {
 				Util.sleep(TimeUnit.SECONDS.toMillis(5));
 			}
 			LOG.info("Finished loading all shards!");
-			LOG.info("Time taken: " + Bot.getInstance().getSession().getUptime());
+			LOG.info("Time taken: " + Bot.getSession().getUptime());
 		} else {
 			LOG.info("Building single JDA instance...");
 			if (config.getGame() != null && !config.getGame().isEmpty())
@@ -86,7 +86,7 @@ public class JDALoaderImpl implements JDALoader {
 				Util.sleep(100);
 			out.put(0, jda);
 			LOG.info("Finished loading JDA!");
-			LOG.info("Time taken: " + Bot.getInstance().getSession().getUptime());
+			LOG.info("Time taken: " + Bot.getSession().getUptime());
 		}
 		return out;
 	}

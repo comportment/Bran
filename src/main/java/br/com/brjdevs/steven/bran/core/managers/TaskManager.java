@@ -34,22 +34,22 @@ public class TaskManager {
                 ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
         startAsyncTask(
                 () -> {
-                    Bot.getInstance().getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100);
-                    if (Bot.getInstance().getSession().cpuUsage > 20 && !bool) {
-                        //TODO Update this to support sharding
-                        //Bot.getInstance().getJDA().getPresence().setStatus(OnlineStatus.IDLE);
-                        bool = true;
-                    } else if (bool) {
+	                Bot.getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100);
+	                if (Bot.getSession().cpuUsage > 20 && !bool) {
+		                //TODO Update this to support sharding
+		                //Bot.getJDA().getPresence().setStatus(OnlineStatus.IDLE);
+		                bool = true;
+	                } else if (bool) {
                         //TODO This one too
-                        //Bot.getInstance().getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                        bool = false;
-                    }
+		                //Bot.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+		                bool = false;
+	                }
                 }
                 , 2
         );
         startAsyncTask(() -> musicTimeout.entrySet().forEach(entry -> {
             try {
-	            JDA jda = Bot.getInstance().getShard(entry.getValue().getAsJsonObject().get("shard").getAsInt());
+	            JDA jda = Bot.getShard(entry.getValue().getAsJsonObject().get("shard").getAsInt());
 	            Guild guild = jda.getGuildById(entry.getKey());
                 if (guild == null) {
                     musicTimeout.remove(entry.getKey());

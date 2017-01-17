@@ -29,7 +29,7 @@ public class UserInfoCommand {
 				.setName("User Info Command")
 				.setDescription("Gives you info on the mentioned user")
 				.setArgs(new Argument<>("mention", String.class, true))
-				.setExample("user " + Bot.getInstance().getSelfUser(Bot.getInstance().getShard(0)).getId())
+				.setExample("user " + Bot.getSelfUser(Bot.getShard(0)).getId())
 				.setPrivateAvailable(false)
 				.setAction((event, args) -> {
 					Member member = event.getMessage().getMentionedUsers().isEmpty() ? event.getMember() : event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));

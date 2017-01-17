@@ -1,8 +1,7 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.data.bot.settings.HangManWord;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
@@ -30,7 +29,7 @@ public class HangManGame {
 
 	private final LinkedHashMap<String, Boolean> guesses;
 	private final List<Profile> invitedUsers;
-	private final HangManWord word;
+	private final String word;
 	private final String channel;
 	private final List<String> mistakes;
 	@Getter
@@ -41,7 +40,7 @@ public class HangManGame {
 	private String lastMessage;
 	private int shard;
 	
-	public HangManGame(Profile profile, HangManWord word, TextChannel channel) {
+	public HangManGame(Profile profile, String word, TextChannel channel) {
 		this.listener = new EventListener();
 		this.guesses = new LinkedHashMap<>();
 		this.creator = profile;
@@ -50,11 +49,11 @@ public class HangManGame {
 		this.invitedUsers = new ArrayList<>();
 		this.lastGuess = System.currentTimeMillis();
 		this.channel = channel.getId();
-		this.shard = Bot.getInstance().getShardId(channel.getJDA());
-		Arrays.stream(word.asString().split(""))
+		this.shard = Bot.getShardId(channel.getJDA());
+		Arrays.stream(word.split(""))
 				.forEach(split ->
 						guesses.put(guesses.containsKey(split) ? split + Util.randomName(3) : split, false));
-		if (word.asString().contains(" ")) {
+		if (word.contains(" ")) {
 			guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == ' ').forEach(entry -> guesses.replace(entry.getKey(), true));
 		}
 		sessions.add(this);
@@ -69,7 +68,7 @@ public class HangManGame {
 	}
 	
 	public JDA getJDA() {
-		return Bot.getInstance().getShard(shard);
+		return Bot.getShard(shard);
 	}
 
 	public void remove(Profile profile) {
@@ -91,7 +90,7 @@ public class HangManGame {
 	public void guess(String string, Profile profile) {
 		this.lastGuess = System.currentTimeMillis();
 		if (isGuessed(string)) {
-			getListener().onEvent(new AlreadyGuessedEvent(this, getJDA(), profile, StringUtils.containsEqualsIgnoreCase(getWord().asString(), string), string));
+			getListener().onEvent(new AlreadyGuessedEvent(this, getJDA(), profile, StringUtils.containsEqualsIgnoreCase(getWord(), string), string));
 			return;
 		}
 		if (isInvalid(string)) {
@@ -104,7 +103,7 @@ public class HangManGame {
 			return;
 		}
 		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == String.valueOf(string).toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
-		if (getGuessedLetters().equals(getWord().asString())) {
+		if (getGuessedLetters().equals(getWord())) {
 			getListener().onEvent(new WinEvent(this, getJDA()));
 			return;
 		}
@@ -114,8 +113,8 @@ public class HangManGame {
 	public String getGuessedLetters() {
 		return String.join("", guesses.entrySet().stream().map(entry -> (entry.getValue() ? entry.getKey().charAt(0) : "\\_") + "").collect(Collectors.toList()));
 	}
-
-	public HangManWord getWord() {
+	
+	public String getWord() {
 		return word;
 	}
 	
@@ -132,7 +131,7 @@ public class HangManGame {
 	}
 	
 	public boolean isInvalid(String c) {
-		return !StringUtils.containsEqualsIgnoreCase(getWord().asString(), c);
+		return !StringUtils.containsEqualsIgnoreCase(getWord(), c);
 	}
 	
 	public Profile getCreator() {
@@ -157,7 +156,7 @@ public class HangManGame {
 	}
 	
 	public Field getInvitedUsersField(boolean inline) {
-		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + Bot.getInstance().getDefaultPrefixes()[0] + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getJDA()).getName()).collect(Collectors.toList()))), inline);
+		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + Bot.getDefaultPrefixes()[0] + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getJDA()).getName()).collect(Collectors.toList()))), inline);
 	}
 	
 	public void setLastMessage(Message message) {

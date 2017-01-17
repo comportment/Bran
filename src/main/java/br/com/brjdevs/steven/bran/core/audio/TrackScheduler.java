@@ -147,7 +147,7 @@ public class TrackScheduler implements AudioEventListener {
 	}
 	
 	public JDA getJDA() {
-		return Bot.getInstance().getShard(shard);
+		return Bot.getShard(shard);
 	}
 	
 	public boolean isStopped() {
@@ -294,7 +294,7 @@ public class TrackScheduler implements AudioEventListener {
 			return;
 		}
 		if (getPreviousTrack() != null)
-			getPreviousTrack().getContext(getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + Bot.getInstance().getDefaultPrefixes()[0] + "music play [SONG]`.").queue();
+			getPreviousTrack().getContext(getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + Bot.getDefaultPrefixes()[0] + "music play [SONG]`.").queue();
 		getGuild().getAudioManager().closeAudioConnection();
 	}
 }

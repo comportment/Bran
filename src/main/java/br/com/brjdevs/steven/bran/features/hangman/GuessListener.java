@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
 import br.com.brjdevs.steven.bran.features.hangman.events.LeaveGameEvent;
 import br.com.brjdevs.steven.bran.features.hangman.events.LooseEvent;
 import net.dv8tion.jda.core.Permission;
@@ -27,7 +27,7 @@ public class GuessListener implements EventListener {
 			if (game.getCreator() != profile)
 				game.getListener().onEvent(new LeaveGameEvent(game, event.getJDA(), profile));
 			else if (game.getCreator() == profile && !game.getInvitedUsers().isEmpty())
-				channel.sendMessage("You can't give up this session because there are other players playing with you, you can just let them finish if you don't want to continue or use `" + Bot.getInstance().getDefaultPrefixes()[0] + "hm setCreator [MENTION]` to set a new owner to the session.").queue();
+				channel.sendMessage("You can't give up this session because there are other players playing with you, you can just let them finish if you don't want to continue or use `" + Bot.getDefaultPrefixes()[0] + "hm setCreator [MENTION]` to set a new owner to the session.").queue();
 			else
 				game.getListener().onEvent(new LooseEvent(game, event.getJDA(), true));
 			return;

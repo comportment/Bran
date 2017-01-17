@@ -48,7 +48,7 @@ public class VoiceChannelListener implements EventListener {
 		JsonObject info = new JsonObject();
 		info.addProperty("channelId", voiceChannel.getId());
 		info.addProperty("timeout", 120);
-		info.addProperty("shard", Bot.getInstance().getShardId(guild.getJDA()));
+		info.addProperty("shard", Bot.getShardId(guild.getJDA()));
 		musicTimeout.add(guild.getId(), info);
 	}
 	

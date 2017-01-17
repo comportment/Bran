@@ -13,9 +13,9 @@ public class RequirementsUtils {
     public static final float MAX_BOTS = 75f;
 
     public static List<Guild> getBotCollections() {
-        return Bot.getInstance().getGuilds().stream()
-                .filter(g ->
-                        (100f / (float) g.getMembers().size())
+	    return Bot.getGuilds().stream()
+			    .filter(g ->
+					    (100f / (float) g.getMembers().size())
                                 * (float) getBots(g).size() > MAX_BOTS)
                 .collect(Collectors.toList());
     }

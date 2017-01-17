@@ -24,7 +24,7 @@ public class ConnectionListener implements EventListener {
 		} else if (event instanceof DisconnectEvent) {
 			DiscordLog.log((DisconnectEvent) event);
 		} else if (event instanceof ShutdownEvent) {
-			LOG.info("ShutdownEvent on Shard " + Bot.getInstance().getShardId(event.getJDA()));
+			LOG.info("ShutdownEvent on Shard " + Bot.getShardId(event.getJDA()));
 		}
 	}
 }

@@ -34,7 +34,7 @@ public class MusicPersistence {
 	
 	@SneakyThrows(Exception.class)
 	public static boolean savePlaylists() {
-		if (!Bot.getInstance().getConfig().isMusicPersistenceEnabled()) {
+		if (!Bot.getConfig().isMusicPersistenceEnabled()) {
 			LOG.info("Music Persistence is disabled in config.json.");
 			return true;
 		}
@@ -88,7 +88,7 @@ public class MusicPersistence {
 	}
 	
 	public static boolean reloadPlaylists() {
-		if (!Bot.getInstance().getConfig().isMusicPersistenceEnabled()) {
+		if (!Bot.getConfig().isMusicPersistenceEnabled()) {
 			LOG.info("Music Persistence is disabled in config.json.");
 			return true;
 		}
@@ -115,8 +115,8 @@ public class MusicPersistence {
 				JSONObject data = new JSONObject(scanner.useDelimiter("\\A").next());
 				scanner.close();
 				
-				int shardId = (int) (Long.parseLong(guildId) >> 22) % Bot.getInstance().getShards().size();
-				JDA jda = Bot.getInstance().getShard(shardId);
+				int shardId = (int) (Long.parseLong(guildId) >> 22) % Bot.getShards().size();
+				JDA jda = Bot.getShard(shardId);
 				Guild guild = jda.getGuildById(guildId);
 				if (guild == null) continue;
 				JSONArray sources = data.getJSONArray("sources");

@@ -27,7 +27,7 @@ public class BotManager {
 	private static boolean canInit;
 	
 	static {
-		CONFIG_FILE = new File(Bot.getInstance().getWorkingDirectory() + "config.json");
+		CONFIG_FILE = new File(Bot.getWorkingDirectory() + "config.json");
 		LOG = SimpleLog.getLog("Bot Manager");
 		canShutdown = false;
 		canInit = false;
@@ -48,14 +48,14 @@ public class BotManager {
 			return;
 		}
 		LOG.info("Shutting system down...");
-		Bot.getInstance().getShards().forEach((i, shard) -> shard.shutdown());
+		Bot.getShards().forEach((i, shard) -> shard.shutdown());
 		System.exit(0);
 	}
 	
 	@SneakyThrows(Exception.class)
 	public static void preInit() {
 		LOG.info("Pre initiating system...");
-		File DIR = new File(Bot.getInstance().getWorkingDirectory());
+		File DIR = new File(Bot.getWorkingDirectory());
 		if (!DIR.exists() && !DIR.mkdirs()) {
 			LOG.warn("Couldn't create expected directory to save files, please create a folder named 'data' in the current directory to make sure it won't happen again.");
 			System.exit(0);
@@ -73,17 +73,17 @@ public class BotManager {
 		} else {
 			LOG.info("Found config.json, loading properties...");
 			BufferedReader reader = new BufferedReader(new FileReader(CONFIG_FILE));
-			Bot.getInstance().CONFIG = Bot.GSON.fromJson(reader, Config.class);
+			Bot.CONFIG = Bot.GSON.fromJson(reader, Config.class);
 			reader.close();
-			if (Util.isEmpty(Bot.getInstance().getConfig().getToken())) {
+			if (Util.isEmpty(Bot.getConfig().getToken())) {
 				LOG.fatal("The set Token is invalid, please insert a valid token!");
 				System.exit(0);
 			}
-			if (Util.isEmpty(Bot.getInstance().getConfig().getOwnerId())) {
+			if (Util.isEmpty(Bot.getConfig().getOwnerId())) {
 				LOG.fatal("The set Owner ID is invalid.");
 				System.exit(0);
 			}
-			if (Util.isEmpty(Bot.getInstance().getConfig().getDiscordBotsToken())) {
+			if (Util.isEmpty(Bot.getConfig().getDiscordBotsToken())) {
 				LOG.info("Discord Bots Token was not provided, disabled command bot.updateStats.");
 			}
 			LOG.info("Loaded config.json!");
@@ -98,19 +98,19 @@ public class BotManager {
 			return;
 		}
 		LOG.info("Initiating...");
-		int requiredShards = Bot.getInstance().getRequiredShards();
+		int requiredShards = Bot.getRequiredShards();
 		LOG.info(requiredShards < 2 ? "Discord does not ask for sharding yet." : "Discord recommends " + requiredShards + " shards.");
 		JDALoader jdaLoader = new JDALoaderImpl(requiredShards < 2 ? LoaderType.SINGLE : LoaderType.SHARDED);
 		
-		Bot.getInstance().shards = jdaLoader.build(true, requiredShards);
-		Bot.LOG_CHANNEL = Bot.getInstance().shards.entrySet().stream().map(entry -> entry.getValue().getTextChannelById("249971874430320660")).filter(Objects::nonNull).findFirst().orElse(null);
-		LOG.info("Logged in as " + Util.getUser(Bot.getInstance().getSelfUser(Bot.getInstance().shards.get(0))));
-		Bot.getInstance().OWNER = Bot.getInstance().shards.entrySet().stream().map(entry -> entry.getValue().getUserById(Bot.getInstance().getConfig().getOwnerId())).filter(Objects::nonNull).findFirst().orElse(null);
-		if (Bot.getInstance().OWNER == null) {
-			LOG.fatal("Could not find user with ID '" + Bot.getInstance().getConfig().getOwnerId() + "', please set a valid ID in config.json.");
+		Bot.shards = jdaLoader.build(true, requiredShards);
+		Bot.LOG_CHANNEL = Bot.shards.entrySet().stream().map(entry -> entry.getValue().getTextChannelById("249971874430320660")).filter(Objects::nonNull).findFirst().orElse(null);
+		LOG.info("Logged in as " + Util.getUser(Bot.getSelfUser(Bot.shards.get(0))));
+		Bot.OWNER = Bot.shards.entrySet().stream().map(entry -> entry.getValue().getUserById(Bot.getConfig().getOwnerId())).filter(Objects::nonNull).findFirst().orElse(null);
+		if (Bot.OWNER == null) {
+			LOG.fatal("Could not find user with ID '" + Bot.getConfig().getOwnerId() + "', please set a valid ID in config.json.");
 			System.exit(0);
 		}
-		LOG.info("Recognized owner as " + Util.getUser(Bot.getInstance().OWNER));
+		LOG.info("Recognized owner as " + Util.getUser(Bot.OWNER));
 		CommandManager.load();
 		LOG.info("Registered Commands.");
 		DataManager.loadData();
@@ -126,6 +126,6 @@ public class BotManager {
 		else
 			LOG.info("Executed PollPersistence without errors.");
 		
-		LOG.info("Finished loading. Time taken: " + Bot.getInstance().getSession().getUptime());
+		LOG.info("Finished loading. Time taken: " + Bot.getSession().getUptime());
 	}
 }

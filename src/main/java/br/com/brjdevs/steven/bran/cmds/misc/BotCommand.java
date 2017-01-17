@@ -42,7 +42,7 @@ public class BotCommand {
 						.setAliases("info")
 						.setName("Info Command")
 						.setDescription("Gives you information about me!")
-						.setAction((event) -> event.sendMessage(Bot.getInstance().getInfo()).queue())
+						.setAction((event) -> event.sendMessage(Bot.getInfo()).queue())
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("inviteme", "invite")
@@ -61,7 +61,7 @@ public class BotCommand {
 						.setAliases("stats", "status")
 						.setName("Stats Command")
 						.setDescription("Gives you my current statistics!")
-						.setAction((event) -> event.sendMessage(Bot.getInstance().getSession().toString(event.getJDA())).queue())
+						.setAction((event) -> event.sendMessage(Bot.getSession().toString(event.getJDA())).queue())
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("ping")
@@ -108,7 +108,7 @@ public class BotCommand {
 								.setName("Update Stats Command")
 								.setDescription("Updates the current guild amount in DiscordBots.")
 								.setAction((event) -> {
-									Bot.getInstance().updateStats();
+									Bot.updateStats();
 									event.sendMessage(Quotes.getQuote(Quotes.SUCCESS)).queue();
 								})
 								.build())
@@ -148,7 +148,7 @@ public class BotCommand {
 										.setArgs(new Argument<>("name", String.class))
 										.setAction((event, args) -> {
 											String name = (String) event.getArgument("name").get();
-											Bot.getInstance().getShards().forEach((i, shard) -> shard.getSelfUser().getManager().setName(name).queue());
+											Bot.getShards().forEach((i, shard) -> shard.getSelfUser().getManager().setName(name).queue());
 											event.sendMessage("Updated my name! Yay, I've got a new name, cool! :smile:").queue();
 										})
 										.build())
@@ -170,7 +170,7 @@ public class BotCommand {
 											}
 											Argument pageArg = event.getArgument("amount");
 											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
-											ListBuilder listBuilder = new ListBuilder(RequirementsUtils.getBotCollections().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getInstance().getShardId(g.getJDA()) +"]) Bots: " + Util.DECIMAL_FORMAT.format(RequirementsUtils.getBotsPercentage(g))).collect(Collectors.toList()), page, 15);
+											ListBuilder listBuilder = new ListBuilder(RequirementsUtils.getBotCollections().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getShardId(g.getJDA()) + "]) Bots: " + Util.DECIMAL_FORMAT.format(RequirementsUtils.getBotsPercentage(g))).collect(Collectors.toList()), page, 15);
 											listBuilder.setName("Bot Collection Guilds").setFooter("Total Guilds: " + RequirementsUtils.getBotCollections().size());
 											event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();
 										})
@@ -183,8 +183,8 @@ public class BotCommand {
 										.setAction((event, args) -> {
 											Argument pageArg = event.getArgument("page");
 											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
-											ListBuilder listBuilder = new ListBuilder(Bot.getInstance().getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getInstance().getShardId(g.getJDA()) + "]) | Owner: " + Util.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
-											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + Bot.getInstance().getGuilds().size());
+											ListBuilder listBuilder = new ListBuilder(Bot.getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getShardId(g.getJDA()) + "]) | Owner: " + Util.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
+											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + Bot.getGuilds().size());
 											event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();
 										})
 										.build())

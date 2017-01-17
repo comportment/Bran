@@ -69,17 +69,17 @@ public class DiscordLog {
     public static void log(DisconnectEvent event) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setAuthor("\uD83C\uDF10 Connection Log", null, null);
-        embedBuilder.setDescription("Got Disconnect Event on Shard " + Bot.getInstance().getShardId(event.getJDA()));
-        embedBuilder.setTimestamp(Instant.now().atOffset(ZoneOffset.UTC));
-        embedBuilder.setColor(COLOR);
+	    embedBuilder.setDescription("Got Disconnect Event on Shard " + Bot.getShardId(event.getJDA()));
+	    embedBuilder.setTimestamp(Instant.now().atOffset(ZoneOffset.UTC));
+	    embedBuilder.setColor(COLOR);
         LOG_CHAN.sendMessage(embedBuilder.build()).queue();
     }
     public static void log(ReconnectedEvent event) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setAuthor("\uD83C\uDF10 Connection Log", null, null);
-        embedBuilder.setDescription("Got Reconnect Event on Shard " + Bot.getInstance().getShardId(event.getJDA()));
-        embedBuilder.setTimestamp(Instant.now().atOffset(ZoneOffset.UTC));
-        embedBuilder.setColor(COLOR);
+	    embedBuilder.setDescription("Got Reconnect Event on Shard " + Bot.getShardId(event.getJDA()));
+	    embedBuilder.setTimestamp(Instant.now().atOffset(ZoneOffset.UTC));
+	    embedBuilder.setColor(COLOR);
         LOG_CHAN.sendMessage(embedBuilder.build()).queue();
     }
 }

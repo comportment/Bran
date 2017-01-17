@@ -7,9 +7,9 @@ import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile.Rank;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile.Rank;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;

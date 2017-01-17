@@ -10,8 +10,8 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.bot.settings.HangManWord;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.bot.BotData;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
@@ -22,6 +22,7 @@ import br.com.brjdevs.steven.bran.features.hangman.HangManGame;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,7 @@ public class HangManCommand {
 									return;
 								}
 							}
-							session = new HangManGame(event.getGuildMember().getProfile(), Bot.getInstance().getData().getHangManWords().get(MathUtils.random(Bot.getInstance().getData().getHangManWords().size())), event.getTextChannel());
+							session = new HangManGame(event.getGuildMember().getProfile(), Util.getEntryByIndex(Bot.getData().getHangManWords(), MathUtils.random(Bot.getData().getHangManWords().size())).getKey(), event.getTextChannel());
 							event.sendMessage(session.createEmbed().setDescription("You started a Hang Man Game in " + event.getTextChannel().getAsMention() + ". Why don't you invite someone to play with you?").build()).queue();
 						})
 						.build())
@@ -154,7 +155,7 @@ public class HangManCommand {
 								.setArgs(new Argument<>("word", String.class))
 								.setAction((event, rawArgs) -> {
 									String word = (String) event.getArgument("word").get();
-									Bot.getInstance().getData().getHangManWords().add(new HangManWord(word));
+									Bot.getData().getHangManWords().put(word, new ArrayList<>());
 									event.sendMessage(Quotes.SUCCESS, "Added word to HangMan, you can add tips to it using `" + event.getPrefix() + "hangman words tip " + word + " | [tip]`.").queue();
 								})
 								.build())
@@ -165,14 +166,21 @@ public class HangManCommand {
 								.setArgs(new Argument<>("word", String.class), new Argument<>("tip", String.class))
 								.setAction((event) -> {
 									String word = (String) event.getArgument("word").get();
-									HangManWord hangManWord = HangManWord.getHMWord(word);
-									if (hangManWord == null) {
+									BotData data = Bot.getData();
+									if (!data.getHangManWords().containsKey(word)) {
 										event.sendMessage("Could not find word `" + word + "`.").queue();
 										return;
 									}
 									String tip = (String) event.getArgument("tip").get();
-									boolean added = hangManWord.addTip(tip.trim());
-									event.sendMessage(added ? ":white_check_mark:" : "You can't add duplicated tips.").queue();
+									if (data.getHangManWords().get(word).contains(tip)) {
+										event.sendMessage("This word already has this Tip!").queue();
+										return;
+									}
+									if (tip.equals(word)) {
+										event.sendMessage("The Tip can't be the word!").queue();
+										return;
+									}
+									event.sendMessage(Quotes.SUCCESS, "Added new tip to this word! *(Total tips: " + data.getHangManWords().get(word).size() + ")*").queue();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -183,7 +191,7 @@ public class HangManCommand {
 								.setAction((event, rawArgs) -> {
 									Argument argument = event.getArgument("page");
 									int page = argument.isPresent() && (int) argument.get() > 0 ? (int) argument.get() : 1;
-									List<String> list = Bot.getInstance().getData().getHangManWords().stream().map(w -> w.asString() + " (" + w.getTips().size() + " tips)").collect(Collectors.toList());
+									List<String> list = Bot.getData().getHangManWords().entrySet().stream().map(entry -> entry.getKey() + " (" + entry.getValue().size() + " tips)").collect(Collectors.toList());
 									ListBuilder listBuilder = new ListBuilder(list, page, 10);
 									listBuilder.setName("HangMan Words").setFooter("Total Words: " + list.size());
 									event.sendMessage(listBuilder.format(Format.CODE_BLOCK, "md")).queue();

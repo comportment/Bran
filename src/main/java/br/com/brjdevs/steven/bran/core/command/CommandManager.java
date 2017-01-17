@@ -110,7 +110,7 @@ public class CommandManager implements EventListener {
 			return;
 		}
 		
-		Bot.getInstance().getSession().cmds++;
+		Bot.getSession().cmds++;
 		Util.async(cmd.getName() + ">" + Util.getUser(event.getAuthor()),
 				() -> {
 					try {

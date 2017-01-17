@@ -29,7 +29,7 @@ public class PollPersistence {
 	
 	@SneakyThrows(Exception.class)
 	public static boolean savePolls() {
-		if (!Bot.getInstance().getConfig().isPollPersistenceEnabled()) {
+		if (!Bot.getConfig().isPollPersistenceEnabled()) {
 			LOG.info("Poll Persistence is disabled in config.json.");
 			return true;
 		}
@@ -53,7 +53,7 @@ public class PollPersistence {
 	
 	@SneakyThrows(Exception.class)
 	public static boolean reloadPolls() {
-		if (!Bot.getInstance().getConfig().isPollPersistenceEnabled()) {
+		if (!Bot.getConfig().isPollPersistenceEnabled()) {
 			LOG.info("Poll Persistence is disabled in config.json.");
 			return true;
 		}
@@ -70,7 +70,7 @@ public class PollPersistence {
 		}
 		for (File file : files) {
 			String guildId = file.getName();
-			int shardId = (int) (Long.parseLong(guildId) >> 22) % Bot.getInstance().getShards().size();
+			int shardId = (int) (Long.parseLong(guildId) >> 22) % Bot.getShards().size();
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			Poll poll = GSON.fromJson(reader, Poll.class);
 			poll.setShardId(shardId);

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PrefixManager {
     public static String getPrefix(String string, DiscordGuild discordGuild) {
-        List<String> prefixes = discordGuild != null ? discordGuild.getPrefixes() : Arrays.asList(Bot.getInstance().getDefaultPrefixes());
+	    List<String> prefixes = discordGuild != null ? discordGuild.getPrefixes() : Arrays.asList(Bot.getDefaultPrefixes());
 	    return prefixes.stream()
 			    .filter(prefix -> string.length() > prefix.length() && string.startsWith(prefix)
                         && CommandManager.getCommands().stream()

@@ -31,7 +31,7 @@ public class Poll {
 		this.options = options;
 		this.channelId = channel.getId();
 		this.guildId = channel.getGuild().getId();
-		setShardId(Bot.getInstance().getShardId(channel.getJDA()));
+		setShardId(Bot.getShardId(channel.getJDA()));
 		polls.add(this);
 	}
 	
@@ -44,7 +44,7 @@ public class Poll {
 	}
 	
 	public JDA getJDA() {
-		return Bot.getInstance().getShard(shardId);
+		return Bot.getShard(shardId);
 	}
 	
 	public String getGuildId() {

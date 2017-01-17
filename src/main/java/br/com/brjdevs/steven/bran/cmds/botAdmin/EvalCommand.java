@@ -16,10 +16,9 @@ public class EvalCommand {
 	
 	static {
 		eval = new ScriptEngineManager().getEngineByName("nashorn");
-        eval.put("cfg", Bot.getInstance().getConfig());
-        eval.put("owner", Bot.getInstance().getOwner());
-        eval.put("instance", Bot.getInstance());
-    }
+		eval.put("cfg", Bot.getConfig());
+		eval.put("owner", Bot.getOwner());
+	}
 	
 	@Command
 	private static ICommand eval() {
@@ -35,8 +34,8 @@ public class EvalCommand {
                     eval.put("event", event);
                     eval.put("args", args);
                     eval.put("author", event.getAuthor());
-                    eval.put("self", Bot.getInstance().getSelfUser(event.getJDA()));
-	                String toEval = (String) event.getArgument("js code").get();
+					eval.put("self", event.getJDA().getSelfUser());
+					String toEval = (String) event.getArgument("js code").get();
 					Object out;
                     try {
                         eval.eval("imports = new JavaImporter(java.util, java.io, java.net)\n");

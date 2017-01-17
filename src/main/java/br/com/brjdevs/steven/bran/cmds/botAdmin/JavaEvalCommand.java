@@ -100,9 +100,9 @@ public class JavaEvalCommand {
                         }
                         if (o == null || o.toString().isEmpty())
                             o = "Executed without error and no objects returned!";
-                        o = o.toString().replace(Bot.getInstance().getConfig().getToken(), "<BOT TOKEN>");
-                        event.sendMessage(o.toString()).queue();
-                    } catch (Exception e) {
+		                o = o.toString().replace(Bot.getConfig().getToken(), "<BOT TOKEN>");
+		                event.sendMessage(o.toString()).queue();
+	                } catch (Exception e) {
 	                    if (x == null) x = e;
 	                    event.sendMessage("Something went wrong trying to eval your query.\n" + x).queue();
 	                }
@@ -129,7 +129,7 @@ public class JavaEvalCommand {
 		
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(p.getErrorStream(), writer, Charset.forName("UTF-8"));
-		String x = writer.toString().replace(new File(Bot.getInstance().getWorkingDirectory()).getPath(), "<ClassPath>").replace("\\classes", "");
+		String x = writer.toString().replace(new File(Bot.getWorkingDirectory()).getPath(), "<ClassPath>").replace("\\classes", "");
 		
 		sc.close();
 		scErr.close();

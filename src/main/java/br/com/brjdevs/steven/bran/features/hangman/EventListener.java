@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
-import br.com.brjdevs.steven.bran.core.data.guild.settings.Profile.ProfileAction;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile.ProfileAction;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -30,7 +30,7 @@ public class EventListener implements IEventListener {
 			event.getGame().getChannel().sendMessage(event.getGame().createEmbed().setDescription(String.format(s, Util.getUser(event.getProfile().getUser(event.getJDA())))).build()).queue(event.getGame()::setLastMessage);
 		} else if (hangManEvent instanceof LooseEvent) {
 			LooseEvent event = (LooseEvent) hangManEvent;
-			event.getGame().getChannel().sendMessage(!event.isGiveup() ? event.getGame().createEmbed().setDescription("Well, I think you did great but it wasn't this time. The word was '" + event.getGame().getWord().asString() + "'.").build() : event.getGame().createEmbed().setDescription("Aww man... I know you could've done it! The word was '" + event.getGame().getWord().asString() + "'").build()).queue(event.getGame()::setLastMessage);
+			event.getGame().getChannel().sendMessage(!event.isGiveup() ? event.getGame().createEmbed().setDescription("Well, I think you did great but it wasn't this time. The word was '" + event.getGame().getWord() + "'.").build() : event.getGame().createEmbed().setDescription("Aww man... I know you could've done it! The word was '" + event.getGame().getWord() + "'").build()).queue(event.getGame()::setLastMessage);
 			event.getGame().end();
 			event.getGame().getProfiles().forEach(p -> {
 				p.addCoins(-2);
@@ -41,7 +41,7 @@ public class EventListener implements IEventListener {
 			});
 		} else if (hangManEvent instanceof WinEvent) {
 			WinEvent event = (WinEvent) hangManEvent;
-			event.getGame().getChannel().sendMessage(event.getGame().createEmbed().setDescription("\uD83C\uDF89 You did it! You win!! The word is '" + event.getGame().getWord().asString() + "'! \uD83C\uDF89").build()).queue();
+			event.getGame().getChannel().sendMessage(event.getGame().createEmbed().setDescription("\uD83C\uDF89 You did it! You win!! The word is '" + event.getGame().getWord() + "'! \uD83C\uDF89").build()).queue();
 			event.getGame().end();
 			event.getGame().getProfiles().forEach(p -> {
 				p.addCoins(2);
