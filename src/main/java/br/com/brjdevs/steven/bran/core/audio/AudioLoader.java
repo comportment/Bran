@@ -98,7 +98,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 	
 	@Override
 	public void loadFailed(FriendlyException exception) {
-		channel.sendMessage("Could not play the requested song. `" + exception.getMessage() + "`").queue();
+		channel.sendMessage("Could not play the requested song. `" + exception.getMessage() + " (" + exception.severity + ")`").queue();
 		if (musicManager.getTrackScheduler().isStopped())
 			channel.getGuild().getAudioManager().closeAudioConnection();
 	}

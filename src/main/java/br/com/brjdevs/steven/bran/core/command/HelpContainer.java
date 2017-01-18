@@ -23,7 +23,7 @@ public class HelpContainer {
 		desc += command.getCategory().getEmoji() + " **| " + command.getCategory().getKey() + "**\n**Command:** " + command.getName() + "\n";
 		desc += "**Description:** " + command.getDescription() + "\n";
 		if (command.getArguments() != null) {
-			desc += "**Arguments:** " + (command.getArguments() != null ? (String.join(" ", Arrays.stream(command.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "No arguments required.") + '\n';
+			desc += "**Arguments:** " + (command.getArguments().length != 0 ? (String.join(" ", Arrays.stream(command.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "No arguments required.") + '\n';
 			desc += "            *Please note: do **NOT** include <> or []*\n";
 		}
 		desc += "**Required Permission(s):** " + String.join(", ", Permissions.toCollection(command.getRequiredPermission())) + "\n";
@@ -35,7 +35,7 @@ public class HelpContainer {
 				if (commands.isEmpty()) continue;
 				desc += category.getEmoji() + " **| " + category.getKey() + "**\n";
 				for (ICommand cmd : commands)
-					desc += "          **" + cmd.getAliases().get(0) + "** " + (cmd.getArguments() != null ? (String.join(" ", Arrays.stream(cmd.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "") + " - " + cmd.getDescription() + "\n";
+					desc += "          **" + cmd.getAliases().get(0) + "** " + (cmd.getArguments() != null ? (String.join(" ", Arrays.stream(cmd.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "") + " - " + (cmd instanceof ITreeCommand ? "Use `" + cmd.getHelp() + "` to get help on this command!" : cmd.getDescription()) + "\n";
 				desc += '\n';
 			}
 		}

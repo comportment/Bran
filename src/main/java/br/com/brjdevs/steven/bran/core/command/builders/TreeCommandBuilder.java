@@ -120,11 +120,16 @@ public class TreeCommandBuilder {
 					event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
 					return;
 				}
-				String alias = event.getArgs(3)[1];
+				String alias = event.getArgs(3)[1].trim();
 				boolean isDefault = false;
-				if (alias.isEmpty() && defaultCmd != null) {
-					alias = defaultCmd;
-					isDefault = true;
+				if (alias.isEmpty()) {
+					if (defaultCmd != null) {
+						alias = defaultCmd;
+						isDefault = true;
+					} else {
+						event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+						return;
+					}
 				}
 				ICommand subCommand = CommandUtils.getCommand(this, alias);
 				if (subCommand == null) {

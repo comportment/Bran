@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed.Field;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class HangManGame {
@@ -30,22 +32,24 @@ public class HangManGame {
 	private final String channel;
 	private final List<String> mistakes;
 	private final IEventListener listener;
+	public HMProfileListener profileListener;
+	private AtomicReference<Message> lastMessage;
 	private long lastGuess;
 	private Profile creator;
 	private int shard;
-	private int usedItems;
 	
 	public HangManGame(Profile profile, String word, TextChannel channel) {
 		this.listener = new EventListener();
 		this.guesses = new LinkedHashMap<>();
 		this.creator = profile;
 		this.mistakes = new ArrayList<>();
+		this.lastMessage = new AtomicReference<>();
 		this.word = word;
 		this.invitedUsers = new ArrayList<>();
 		this.lastGuess = System.currentTimeMillis();
 		this.channel = channel.getId();
 		this.shard = Bot.getShardId(channel.getJDA());
-		this.usedItems = 0;
+		this.profileListener = new HMProfileListener(this);
 		Arrays.stream(word.split(""))
 				.forEach(split ->
 						guesses.put(guesses.containsKey(split) ? split + Util.randomName(3) : split, false));
@@ -53,7 +57,7 @@ public class HangManGame {
 			guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == ' ').forEach(entry -> guesses.replace(entry.getKey(), true));
 		}
 		sessions.add(this);
-		profile.registerListener(new HMProfileListener(this));
+		profile.registerListener(profileListener);
 	}
 	
 	public static HangManGame getSession(Profile profile) {
@@ -79,16 +83,24 @@ public class HangManGame {
 	public boolean isMultiplayer() {
 		return !getInvitedUsers().isEmpty();
 	}
-
+	
 	public void remove(Profile profile) {
 		invitedUsers.remove(profile);
 	}
 
 	public void invite(Profile profile) {
-		profile.registerListener(new HMProfileListener(this));
+		profile.registerListener(profileListener);
 		this.invitedUsers.add(profile);
 	}
-
+	
+	public AtomicReference<Message> getLastMessage() {
+		return lastMessage;
+	}
+	
+	public void setLastMessage(Message message) {
+		this.lastMessage.set(message);
+	}
+	
 	public List<Profile> getInvitedUsers() {
 		return invitedUsers;
 	}
@@ -179,7 +191,7 @@ public class HangManGame {
 		return builder;
 	}
 	public void end() {
-		getProfiles().forEach(p -> p.unregisterListener(new HMProfileListener(this)));
+		getProfiles().forEach(p -> p.unregisterListener(profileListener));
 		sessions.remove(this);
 	}
 }
