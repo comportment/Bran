@@ -205,6 +205,7 @@ public class TrackScheduler implements AudioEventListener {
 	public void stop() {
 		queue.clear();
 		play(null, false);
+		onSchedulerStop();
 	}
 	
 	public int getRequiredVotes(VoiceChannel voiceChannel) {

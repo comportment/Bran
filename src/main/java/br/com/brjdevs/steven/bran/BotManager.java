@@ -4,6 +4,7 @@ import br.com.brjdevs.steven.bran.core.audio.MusicPersistence;
 import br.com.brjdevs.steven.bran.core.command.CommandManager;
 import br.com.brjdevs.steven.bran.core.data.DataManager;
 import br.com.brjdevs.steven.bran.core.data.bot.Config;
+import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.poll.PollPersistence;
 import br.com.brjdevs.steven.bran.core.utils.Util;
@@ -125,6 +126,7 @@ public class BotManager {
 			LOG.fatal("Executed PollPersistence with errors.");
 		else
 			LOG.info("Executed PollPersistence without errors.");
+		ItemContainer.loadItems();
 		
 		LOG.info("Finished loading. Time taken: " + Bot.getSession().getUptime());
 	}

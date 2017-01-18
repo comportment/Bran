@@ -2,6 +2,7 @@ package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
@@ -37,6 +38,7 @@ public class HangManGame {
 	private long lastGuess;
 	private Profile creator;
 	private int shard;
+	private int usedItems;
 	
 	public HangManGame(Profile profile, String word, TextChannel channel) {
 		this.listener = new EventListener();
@@ -50,6 +52,7 @@ public class HangManGame {
 		this.channel = channel.getId();
 		this.shard = Bot.getShardId(channel.getJDA());
 		this.profileListener = new HMProfileListener(this);
+		this.usedItems = 0;
 		Arrays.stream(word.split(""))
 				.forEach(split ->
 						guesses.put(guesses.containsKey(split) ? split + Util.randomName(3) : split, false));
@@ -179,6 +182,29 @@ public class HangManGame {
 	
 	public Field getInvitedUsersField(boolean inline) {
 		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + Bot.getDefaultPrefixes()[0] + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getJDA()).getName()).collect(Collectors.toList()))), inline);
+	}
+	
+	public int getUsedItems() {
+		return usedItems;
+	}
+	
+	public void addUseItem() {
+		this.usedItems++;
+	}
+	
+	public String getRandomLetter() {
+		int random = MathUtils.random(word.length());
+		char c = getGuessedLetters().charAt(random);
+		while (c != '_') {
+			if (random <= 0) random++;
+			else random--;
+			c = getGuessedLetters().charAt(random);
+		}
+		return String.valueOf(getWord().charAt(random));
+	}
+	
+	public void guess(String string) {
+		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == string.toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
 	}
 	
 	public EmbedBuilder createEmbed() {

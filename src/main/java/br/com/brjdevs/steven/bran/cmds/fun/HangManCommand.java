@@ -12,14 +12,20 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.bot.BotData;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.itemManager.Item;
+import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
+import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
+import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.HangManGame;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.ArrayList;
@@ -139,6 +145,66 @@ public class HangManCommand {
 							}
 							session.setCreator(profile);
 							event.sendMessage(Quotes.SUCCESS, "Alright, now **" + Util.getUser(user) + "** is the new creator of the Session. " + event.getMember().getEffectiveName() + ", I've put you as an invited user, so you can type `giveup` to leave the session.").queue();
+						})
+						.build())
+				.addSubCommand(new CommandBuilder(Category.FUN)
+						.setAliases("use")
+						.setName("Use Item Command")
+						.setDescription("Uses a item in HangMan!")
+						.setArgs(new Argument<>("item name", String.class))
+						.setAction((event) -> {
+							HangManGame session = HangManGame.getSession(event.getGuildMember().getProfile());
+							if (session == null) {
+								event.sendMessage(Quotes.FAIL, "You don't have a Session Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to create one!").queue();
+								return;
+							}
+							if (session.getChannel() != event.getTextChannel()) {
+								event.sendMessage(Quotes.FAIL, "You can only do this in " + session.getChannel().getAsMention() + " because that's where the Game is running...").queue();
+								return;
+							}
+							if (session.isMultiplayer()) {
+								event.sendMessage("You can't use items in a MultiPlayer session!").queue();
+								return;
+							}
+							int matches = StringUtils.countMatches(session.getGuessedLetters(), '_');
+							if (matches <= 1) {
+								event.sendMessage("You can't use items now because you only have one guess left!").queue();
+								return;
+							}
+							String itemName = (String) event.getArgument("item name").get();
+							Item item = ItemContainer.getItemById("HangMan_" + StringUtils.neat(itemName));
+							if (item == null) {
+								event.sendMessage("No such Item named \"" + itemName + "\" usable in HangMan!").queue();
+								return;
+							}
+							Inventory inventory = event.getGuildMember().getProfile().getInventory();
+							if (inventory.getAmountOf(item) == 0) {
+								event.sendMessage("You don't have any " + item.getName() + " in your inventory!").queue();
+								return;
+							}
+							if (session.getUsedItems() > 2) {
+								event.sendMessage("You can only use 2 items per session!").queue();
+								return;
+							}
+							session.addUseItem();
+							inventory.remove(item);
+							if (item.getName().equals("Tip")) {
+								List<String> tips = Bot.getData().getHangManWords().get(session.getWord());
+								if (tips.isEmpty()) {
+									event.sendMessage("This word doesn't have tips! Sorry!").queue();
+									inventory.put(item);
+									return;
+								}
+								event.sendMessage("**Here's a small tip:** " + Util.random(Bot.getData().getHangManWords().get(session.getWord()))).queue();
+								return;
+							} else if (item.getName().equals("Guesser")) {
+								String r = session.getRandomLetter();
+								session.guess(r);
+								Message message = new MessageBuilder()
+										.append("**Here you go, I guessed a letter for you!**\n")
+										.setEmbed(session.createEmbed().build()).build();
+								event.sendMessage(message).queue();
+							}
 						})
 						.build())
 				.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)

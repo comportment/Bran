@@ -10,10 +10,17 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile.Rank;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
+import br.com.brjdevs.steven.bran.core.itemManager.Item;
+import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
+import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
+import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
+import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ProfileCommand {
 	private static final Pattern pattern = Pattern.compile("^(reset|default|null|none)$");
@@ -37,6 +44,29 @@ public class ProfileCommand {
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getAuthor() : event.getMessage().getMentionedUsers().get(0);
 							GuildMember member = event.getDiscordGuild().getMember(user);
 							event.sendMessage(member.getProfile().createEmbed(event.getJDA())).queue();
+						})
+						.build())
+				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
+						.setAliases("inventory")
+						.setDescription("Shows you your inventory.")
+						.setArgs(new Argument<>("page", Integer.class, true))
+						.setAction((event) -> {
+							Inventory inventory = event.getGuildMember().getProfile().getInventory();
+							if (inventory.isEmpty()) {
+								event.sendMessage("Your inventory is empty!").queue();
+								return;
+							}
+							Argument arg = event.getArgument("page");
+							int page = arg.isPresent() && (int) arg.get() > 0 ? (int) arg.get() : 1;
+							List<String> items = inventory.getItems().entrySet()
+									.stream().map(entry -> {
+										Item item = ItemContainer.getItemById(entry.getKey());
+										return item.getName() + "  x" + entry.getValue();
+									}).collect(Collectors.toList());
+							ListBuilder listBuilder = new ListBuilder(items, page, 15);
+							listBuilder.setName("Your inventory");
+							listBuilder.setFooter("Total Items (UNIQUE/TOTAL): " + inventory.size(true) + "/" + inventory.size(false));
+							event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 						})
 						.build())
 				.addSubCommand(new TreeCommandBuilder(Category.MISCELLANEOUS)
