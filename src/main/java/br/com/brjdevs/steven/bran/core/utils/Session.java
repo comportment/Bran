@@ -12,7 +12,6 @@ import net.dv8tion.jda.core.entities.*;
 import java.awt.*;
 import java.lang.management.ManagementFactory;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Session {
 	
@@ -39,7 +38,7 @@ public class Session {
 		List<VoiceChannel> voiceChannels = Bot.getVoiceChannels();
 		List<User> users = Bot.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
-		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).map(entry -> entry.getValue().getTrackScheduler().getQueue().size()).collect(Collectors.toList()).size();
+		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).map(entry -> entry.getValue().getTrackScheduler().getQueue().size()).count();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";
 		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null).count();
 		JDA jda = event.getJDA();
@@ -94,9 +93,10 @@ public class Session {
 		List<VoiceChannel> voiceChannels = Bot.getVoiceChannels();
 		List<User> users = Bot.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
-		long queueSize = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).collect(Collectors.toList()).size();
+		long queueSize = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";
-		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null).count();
+		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getPlayer().isPaused()).count();
+		long paused = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().isPaused()).count();
 		String out = "";
 		out += "```prolog\n";
 		out += "--Bot Stats--\n";
@@ -119,7 +119,8 @@ public class Session {
 		out += "--Music--\n";
 		out += "Connections: " + audioConnections + "\n";
 		out += "Queue Size: " + queueSize + "\n";
-		out += "Now Playing: " + nowPlaying;
+		out += "Now Playing: " + nowPlaying + "\n";
+		out += "Paused: " + paused;
 		out += "```";
 		return out;
 	}

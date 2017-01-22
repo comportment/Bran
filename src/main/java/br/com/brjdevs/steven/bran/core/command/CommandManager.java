@@ -109,7 +109,6 @@ public class CommandManager implements EventListener {
 					"use it in a Text Channel please.").queue();
 			return;
 		}
-		
 		Bot.getSession().cmds++;
 		Util.async(cmd.getName() + ">" + Util.getUser(event.getAuthor()),
 				() -> {

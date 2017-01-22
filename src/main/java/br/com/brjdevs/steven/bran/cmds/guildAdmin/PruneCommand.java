@@ -59,7 +59,11 @@ public class PruneCommand {
 								if (filteredMessages.size() < 2) {
 									filteredMessages.get(0).deleteMessage().queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
 								} else {
-									event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+									try {
+										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+									} catch (IllegalArgumentException ex) {
+										event.sendMessage(ex.getMessage()).queue();
+									}
 								}
 							});
 						})
@@ -103,7 +107,11 @@ public class PruneCommand {
 								if (filteredMessages.size() < 2) {
 									filteredMessages.get(0).deleteMessage().queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
 								} else {
-									event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+									try {
+										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+									} catch (IllegalArgumentException ex) {
+										event.sendMessage(ex.getMessage()).queue();
+									}
 								}
 							});
 						})
@@ -136,7 +144,11 @@ public class PruneCommand {
 								if (filteredMessages.size() < 2) {
 									filteredMessages.get(0).deleteMessage().queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
 								} else {
-									event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+									try {
+										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+									} catch (IllegalArgumentException ex) {
+										event.sendMessage(ex.getMessage()).queue();
+									}
 								}
 							});
 						})
@@ -157,8 +169,13 @@ public class PruneCommand {
 								event.sendMessage("I can prune at least 2 or at most 100 messages.").queue();
 								return;
 							}
-							event.getTextChannel().getHistory().retrievePast(amount).queue(messages ->
-									event.getTextChannel().deleteMessages(messages).queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + messages.size() + " messages.").queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue))));
+							event.getTextChannel().getHistory().retrievePast(amount).queue(messages -> {
+								try {
+									event.getTextChannel().deleteMessages(messages).queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + messages.size() + " messages.").queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+								} catch (IllegalArgumentException ex) {
+									event.sendMessage(ex.getMessage()).queue();
+								}
+							});
 						})
 						.build())
 				.build();

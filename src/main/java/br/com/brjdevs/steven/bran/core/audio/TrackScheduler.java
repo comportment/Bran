@@ -172,7 +172,13 @@ public class TrackScheduler implements AudioEventListener {
 	
 	public void queue(AudioPlaylist playlist, List<TrackContext> trackContexts, User dj, TextChannel context) {
 		Message msg = context.sendMessage("Found playlist `" + playlist.getName() + "` with `" + playlist.getTracks().size() + "` tracks, give me a second to queue them...").complete();
-		trackContexts.forEach(queue::offer);
+		for (TrackContext trackContext : trackContexts) {
+			if (getQueue().size() > 600) {
+				context.sendMessage("Queue has reached its limit! (" + 600 + ")").queue();
+				return;
+			}
+			queue.offer(trackContext);
+		}
 		msg.editMessage(dj.getAsMention() + " has added the Playlist `" + playlist.getName() + "` (`" + AudioUtils.format(AudioUtils.getLength(playlist)) + "`)").queue();
 		if (player.getPlayingTrack() == null)
 			play(provideNextTrack(false), true);
@@ -204,8 +210,8 @@ public class TrackScheduler implements AudioEventListener {
 	
 	public void stop() {
 		queue.clear();
-		play(null, false);
-		onSchedulerStop();
+		play(provideNextTrack(true), false);
+		getGuild().getAudioManager().closeAudioConnection();
 	}
 	
 	public int getRequiredVotes(VoiceChannel voiceChannel) {
@@ -291,11 +297,12 @@ public class TrackScheduler implements AudioEventListener {
 	
 	private void onSchedulerStop() {
 		if (getCurrentTrack() != null) {
-			LOG.fatal("Got onSchedulerStop with current AudioTrackContext not null.");
+			LOG.fatal("Got onSchedulerStop with currentTrack not null.");
 			return;
 		}
-		if (getPreviousTrack() != null)
+		if (getPreviousTrack() != null && getPreviousTrack().getContext(getJDA()) != null && getPreviousTrack().getContext(getJDA()).canTalk())
 			getPreviousTrack().getContext(getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + Bot.getDefaultPrefixes()[0] + "music play [SONG]`.").queue();
 		getGuild().getAudioManager().closeAudioConnection();
+		AudioUtils.getManager().unregister(guildId);
 	}
 }

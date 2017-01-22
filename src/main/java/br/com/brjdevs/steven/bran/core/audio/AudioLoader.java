@@ -22,6 +22,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 	
 	private static final long MAX_SONG_LENGTH = 10800000;
 	private static final long MAX_PLAYLIST_LENGTH = 108000000;
+	private static final int MAX_QUEUE_SIZE = 600;
+	
 	private TextChannel channel;
 	private User user;
 	private String trackUrl;
@@ -40,6 +42,10 @@ public class AudioLoader implements AudioLoadResultHandler {
 			channel.sendMessage("This song is too long! The maximum supported length is 3 hours. *" + AudioUtils.format(track) + "/" + AudioUtils.format(MAX_SONG_LENGTH) + "*").queue();
 			return;
 		}
+		if (musicManager.getTrackScheduler().getQueue().size() > MAX_QUEUE_SIZE) {
+			channel.sendMessage("Queue has reached its limit! (" + MAX_QUEUE_SIZE + ")").queue();
+			return;
+		}
 		String url = !track.getSourceManager().getSourceName().equalsIgnoreCase("youtube") ? trackUrl : "https://www.youtube.com/watch?v=" + track.getInfo().identifier;
 		musicManager.getTrackScheduler().queue(track, url, user, channel);
 	}
@@ -47,6 +53,10 @@ public class AudioLoader implements AudioLoadResultHandler {
 	@Override
 	public void playlistLoaded(AudioPlaylist playlist) {
 		playlist = new BasicAudioPlaylist(playlist.getName(), playlist.getTracks().stream().filter(track -> track.getInfo().length < MAX_SONG_LENGTH).collect(Collectors.toList()), playlist.getSelectedTrack(), playlist.isSearchResult());
+		if (musicManager.getTrackScheduler().getQueue().size() > MAX_QUEUE_SIZE) {
+			channel.sendMessage("Queue has reached its limit! (" + MAX_QUEUE_SIZE + ")").queue();
+			return;
+		}
 		if (playlist.getSelectedTrack() != null) {
 			trackLoaded(playlist.getSelectedTrack());
 		} else {

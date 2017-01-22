@@ -45,7 +45,11 @@ public class FlushCommand {
 						if (messages.size() < 2) {
 							messages.get(0).deleteMessage().queue(success -> restAction.queue(message -> new RestActionSleep(message.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
 						} else {
-							event.getTextChannel().deleteMessages(messages).queue(success -> restAction.queue(message -> new RestActionSleep(message.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+							try {
+								event.getTextChannel().deleteMessages(messages).queue(success -> restAction.queue(message -> new RestActionSleep(message.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+							} catch (IllegalArgumentException e) {
+								event.sendMessage(e.getMessage()).queue();
+							}
 						}
 					});
 				})

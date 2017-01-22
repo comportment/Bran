@@ -53,15 +53,16 @@ public class TaskManager {
 	            musicTimeout.remove(guild.getId());
                 if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
                     return;
-                if (info.get("timeout").getAsInt() == 0) {
-	                MusicManager player = AudioUtils.getManager().get(guild);
-	                VoiceChannel channel = guild.getVoiceChannelById(info.get("channelId").getAsString());
-                    if (channel == null || !AudioUtils.isAlone(channel)) return;
-	                TrackScheduler scheduler = player.getTrackScheduler();
+	            VoiceChannel channel = guild.getVoiceChannelById(info.get("channelId").getAsString());
+	            if (channel == null || !AudioUtils.isAlone(channel)) return;
+	            if (info.get("timeout").getAsInt() == 0) {
+		            MusicManager player = AudioUtils.getManager().get(guild);
+		            TrackScheduler scheduler = player.getTrackScheduler();
 	                TrackContext track = scheduler.getCurrentTrack();
-	                scheduler.getQueue().clear();
-	                scheduler.play(player.getTrackScheduler().provideNextTrack(false), false);
-	                if (track.getContext(jda) != null && track.getContext(jda).canTalk())
+		            if (track == null) track = scheduler.getPreviousTrack();
+		            scheduler.getQueue().clear();
+		            scheduler.play(player.getTrackScheduler().provideNextTrack(true), false);
+		            if (track.getContext(jda) != null && track.getContext(jda).canTalk())
                         track.getContext(jda).sendMessage("Nobody rejoined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
                     player.getPlayer().setPaused(false);
                     if (guild.getAudioManager().isConnected())
@@ -73,21 +74,5 @@ public class TaskManager {
                 e.printStackTrace();
             }
         }), 10);
-        /*startAsyncTask(() -> {
-            try {
-                for (int i = 0; i != Choice.getChoices().size() - 1; i++) {
-                    if (Choice.getChoices().isEmpty()) break;
-                    Choice c = Choice.getChoices().get(i);
-                    if (c.getCreationInMillis() >= (System.currentTimeMillis() + 12000)) continue;
-                    if (c.getMessage() != null)
-                        c.getMessage().deleteMessage().queue();
-                    c.getChannel().sendTyping().queue(success -> c.getChannel().sendMessage("You took to long to pick a song, query canceled!").queue());
-                    c.remove();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, 10);*/
-        //startAsyncTask(() -> );
     }
 }

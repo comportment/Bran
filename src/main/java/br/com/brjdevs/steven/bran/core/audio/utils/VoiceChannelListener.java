@@ -23,13 +23,13 @@ public class VoiceChannelListener implements EventListener {
 		if (member.equals(guild.getSelfMember()) || !musicTimeout.has(guild.getId())) return;
 		MusicManager player = AudioUtils.getManager().get(guild);
 		TrackContext track = player.getTrackScheduler().getCurrentTrack();
-		if (track == null) return;
+		if (track == null) track = player.getTrackScheduler().getPreviousTrack();
 		JsonObject info = musicTimeout.get(guild.getId()).getAsJsonObject();
 		VoiceChannel channel = guild.getJDA().getVoiceChannelById(info.get("channelId").getAsString());
 		if (channel == null || channel != voiceChannel) return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect()) AudioUtils.connect(channel, track.getContext(channel.getJDA()));
 		player.getPlayer().setPaused(false);
-		if (track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
+		if (track != null && track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
 			track.getContext(guild.getJDA()).sendMessage(Util.getUser(member.getUser()) + " joined the channel, resumed the player!").queue();
 		musicTimeout.remove(guild.getId());
 	}
@@ -43,7 +43,8 @@ public class VoiceChannelListener implements EventListener {
 			return;
 		}
 		musicManager.getPlayer().setPaused(true);
-		if (track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
+		if (track == null) track = musicManager.getTrackScheduler().getPreviousTrack();
+		if (track != null && track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
 			track.getContext(guild.getJDA()).sendMessage("I was left alone in `" + voiceChannel.getName() + "`, so I paused the player. If nobody reenter in this channel I'll stop que player, clean the queue and leave the channel.").queue();
 		JsonObject info = new JsonObject();
 		info.addProperty("channelId", voiceChannel.getId());

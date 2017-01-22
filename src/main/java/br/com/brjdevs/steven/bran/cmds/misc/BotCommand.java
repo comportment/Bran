@@ -16,6 +16,7 @@ import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
 import br.com.brjdevs.steven.bran.core.utils.RequirementsUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Icon;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -49,9 +50,14 @@ public class BotCommand {
 						.setName("InviteMe Command")
 						.setDescription("Gives you my OAuth URL!")
 						.setAction((event) -> {
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+								event.sendMessage("You can invite me to your server using this link: https://discordapp.com/oauth2/authorize?client_id=219186621008838669&scope=bot&permissions=0").queue();
+								return;
+							}
 							MessageEmbed embed = new EmbedBuilder()
 									.setAuthor("Bran's OAuth URL", null, Util.getAvatarUrl(event.getJDA().getSelfUser()))
-									.setDescription("You can invite me to your server by [clicking here](https://discordapp.com/oauth2/authorize?client_id=219186621008838669&scope=bot&permissions=0)")
+									.setDescription("You can invite me to your server by [clicking here](https://discordapp.com/oauth2/authorize?client_id=219186621008838669&scope=bot&permissions=0)\n" +
+											"If you need any support join [this guild](https://discord.gg/8vXwwEQ) and ask your question in #support!")
 									.setColor(Color.decode("#2759DB"))
 									.build();
 							event.sendMessage(embed).queue();
@@ -100,7 +106,17 @@ public class BotCommand {
 								.setAction((event, args) -> {
 									BotManager.preShutdown();
 									event.sendMessage("\uD83D\uDC4B").complete();
-									BotManager.shutdown(false);
+									BotManager.shutdown(false, 0);
+								})
+								.build())
+						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+								.setAliases("restart")
+								.setName("Restart Command")
+								.setDescription("Restarts the Bot")
+								.setAction((event) -> {
+									BotManager.preShutdown();
+									event.sendMessage(":wave:").queue();
+									BotManager.shutdown(false, 15);
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)

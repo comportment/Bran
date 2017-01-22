@@ -15,6 +15,7 @@ import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
@@ -41,6 +42,10 @@ public class ProfileCommand {
 						.setArgs(new Argument<>("mention", String.class, true))
 						.setName("Profile View Command")
 						.setAction((event) -> {
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+								event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
+								return;
+							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getAuthor() : event.getMessage().getMentionedUsers().get(0);
 							GuildMember member = event.getDiscordGuild().getMember(user);
 							event.sendMessage(member.getProfile().createEmbed(event.getJDA())).queue();

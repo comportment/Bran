@@ -18,6 +18,7 @@ import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
 import java.awt.*;
@@ -68,16 +69,21 @@ public class MusicCommand {
 							}
 							String trackUrl = event.getArgument("title/url").isPresent() ? ((String) event.getArgument("title/url").get()) : "";
 							MusicManager musicManager = AudioUtils.getManager().get(event.getGuild());
+							
 							if (trackUrl.isEmpty()) {
-								if (!musicManager.getPlayer().isPaused())
-									event.sendMessage("You have to tell me a song name or link!").queue();
-								else {
+								if (musicManager.getPlayer().isPaused()) {
 									musicManager.getPlayer().setPaused(false);
 									event.sendMessage("Resumed the Player!").queue();
-								}
+								} else
+									event.sendMessage("You have to tell me a song name or link!").queue();
 								return;
 							}
-							event.getMessage().deleteMessage().queue();
+							if (musicManager.getPlayer().isPaused()) {
+								musicManager.getPlayer().setPaused(false);
+								event.sendMessage("Resumed the Player!").queue();
+							}
+							if (event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE))
+								event.getMessage().deleteMessage().queue();
 							TrackScheduler scheduler = AudioUtils.getManager().get(event.getGuild()).getTrackScheduler();
 							List<TrackContext> tracksByUser = scheduler.getTracksBy(event.getAuthor());
 							if (event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser() > 0 && tracksByUser.size() >= event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser()) {

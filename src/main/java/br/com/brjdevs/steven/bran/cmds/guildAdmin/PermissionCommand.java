@@ -13,6 +13,7 @@ import br.com.brjdevs.steven.bran.core.operations.ResultType.OperationResult;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
@@ -31,7 +32,8 @@ public class PermissionCommand {
                 .setHelp("perms ?")
 				.setDescription("Get & Set Permissions in your guild.")
 				.setExample("perms set -MUSIC <@219186621008838669>")
-                .setPrivateAvailable(false)
+				.setDefault("list")
+				.setPrivateAvailable(false)
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 						.setAliases("set")
                         .setName("Permission Set Command")
@@ -65,6 +67,9 @@ public class PermissionCommand {
 			                        if (Permissions.perms.containsKey(p)) {
 				                        toBeUnset |= Permissions.perms.get(p);
 			                        }
+		                        } else {
+			                        event.sendMessage("You have to include `+` or `-` before the permission name!").queue();
+			                        return;
 		                        }
 	                        }
 	                        Holder<Integer> holder = new Holder<>(0);
@@ -103,6 +108,10 @@ public class PermissionCommand {
 						.setArgs(new Argument<>("user", String.class, true))
 						.setExample("perms get <@219186621008838669>")
                         .setAction((event, a) -> {
+	                        if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+		                        event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
+		                        return;
+	                        }
 	                        User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getJDA().getUserById((String) event.getArgument("user").get()) : event.getMessage().getMentionedUsers().get(0);
 	                        if (user == null) user = event.getAuthor();
 	                        GuildMember member = event.getDiscordGuild().getMember(user);
@@ -116,6 +125,18 @@ public class PermissionCommand {
 
                         })
                         .build())
+				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
+						.setAliases("list")
+						.setName("Permission List Command")
+						.setDescription("Lists you all the available permissions to be assigned")
+						.setAction((event) -> {
+							EmbedBuilder embedBuilder = new EmbedBuilder();
+							embedBuilder.setTitle("All of my permissions");
+							embedBuilder.setDescription(Permissions.toCollection(Permissions.BOT_OWNER).stream().collect(Collectors.joining(", ")));
+							embedBuilder.setFooter("Requested by " + Util.getUser(event.getAuthor()), Util.getAvatarUrl(event.getAuthor()));
+							embedBuilder.setColor(Color.decode("#9318E6"));
+						})
+						.build())
 				.build();
 	}
 }

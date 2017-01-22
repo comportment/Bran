@@ -10,6 +10,7 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
@@ -39,6 +40,10 @@ public class EmotesCommand {
 						.setAction((event, args) -> {
 							if (event.getMessage().getEmotes().isEmpty()) {
 								event.sendMessage("I can't give you info about emotes if you don't tell me one!").queue();
+								return;
+							}
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+								event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
 								return;
 							}
 							Emote emote = event.getMessage().getEmotes().get(0);

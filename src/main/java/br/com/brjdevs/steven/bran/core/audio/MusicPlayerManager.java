@@ -24,13 +24,18 @@ public class MusicPlayerManager {
 		return musicManagers;
 	}
 	
+	public void unregister(Long guildId) {
+		musicManagers.remove(guildId).getGuild().getAudioManager().setSendingHandler(null);
+	}
+	
 	public AudioPlayerManager getAudioPlayerManager() {
 		return playerManager;
 	}
 	
 	public synchronized MusicManager get(Guild guild) {
 		long guildId = Long.parseLong(guild.getId());
-		MusicManager musicManager = musicManagers.computeIfAbsent(guildId, k -> new MusicManager(playerManager, guild));
+		MusicManager musicManager = musicManagers
+				.computeIfAbsent(guildId, k -> new MusicManager(playerManager, guild));
 		
 		if (guild.getAudioManager().getSendingHandler() == null)
 			guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());

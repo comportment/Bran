@@ -89,12 +89,18 @@ public class Poll {
 	 * @throws NullPointerException if the index is invalid.
 	 */
 	public boolean vote(String userId, int optionIndex) {
+		
 		Option option = getOption(optionIndex);
 		if (option.getVotes().contains(userId)) {
 			option.getVotes().remove(userId);
 			return false;
 		}
-		return option.getVotes().add(userId);
+		Option option1 = getOption(userId);
+		if (option1 != null) {
+			option1.getVotes().remove(userId);
+		}
+		option.getVotes().add(userId);
+		return true;
 	}
 	
 	public List<Option> getLeadership() {
@@ -103,5 +109,9 @@ public class Poll {
 	
 	public void remove() {
 		polls.remove(this);
+	}
+	
+	public Option getOption(String userId) {
+		return getOptions().stream().filter(op -> op.getVotes().contains(userId)).findFirst().orElse(null);
 	}
 }

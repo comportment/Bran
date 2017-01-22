@@ -9,6 +9,7 @@ import br.com.brjdevs.steven.bran.core.utils.HttpUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 
 import java.awt.*;
 import java.io.IOException;
@@ -27,6 +28,10 @@ public class LookupCommand {
 				.setDescription("Gives you information on a website")
 				.setArgs(new Argument<>("site", String.class))
 				.setAction((event, rawArgs) -> {
+					if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
+						return;
+					}
 					try {
 						String url = String.format(LOOKUP_URL, URLEncoder.encode((String) event.getArgument("site").get(), "UTF-8"));
 						JsonObject result;

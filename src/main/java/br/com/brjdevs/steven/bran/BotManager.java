@@ -43,14 +43,14 @@ public class BotManager {
 		LOG.info("Ready for shutdown.");
 	}
 	
-	public static void shutdown(boolean force) {
+	public static void shutdown(boolean force, int code) {
 		if (!canShutdown && !force) {
 			LOG.fatal("Attempted to init Shutdown without calling savePlaylists()");
 			return;
 		}
 		LOG.info("Shutting system down...");
 		Bot.getShards().forEach((i, shard) -> shard.shutdown());
-		System.exit(0);
+		System.exit(code);
 	}
 	
 	@SneakyThrows(Exception.class)

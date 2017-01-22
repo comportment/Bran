@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
@@ -20,6 +21,10 @@ public class RandomComicGenerator {
 				.setArgs(new Argument<>("amount", Integer.class, true))
 				.setAliases("rcg", "randomcomicgenerator")
 				.setAction((event) -> {
+					if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
+						return;
+					}
 					Argument argument = event.getArgument("amount");
 					int times = argument.isPresent() && (int) argument.get() > 0 ? (int) argument.get() : 1;
 					try{

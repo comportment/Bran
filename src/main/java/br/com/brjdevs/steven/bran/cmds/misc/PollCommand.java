@@ -15,6 +15,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 public class PollCommand {
 	
@@ -34,11 +35,13 @@ public class PollCommand {
 						.setName("Poll Create Command")
 						.setDescription("Creates polls in the current channel!")
 						.setExample("poll create What should I play? ;Game 1;Game 2;Game 3;Game 4;")
-						.setArgs(new Argument<>("name", String.class), new Argument<>("options", String.class))
+						.setArgs(new Argument<>("argument", String.class))
 						.setAction((event) -> {
-							String name = ((String) event.getArgument("name").get());
-							String rawOptions = (String) event.getArgument("options").get();
-							LinkedList<String> list = new LinkedList<>(Arrays.asList(rawOptions.substring(rawOptions.indexOf(";") + 1).split(";")));
+							String name = ((String) event.getArgument("argument").get());
+							name = name.substring(0, name.indexOf(";"));
+							String rawOptions = ((String) event.getArgument("argument").get()).substring(name.length() + 1).trim();
+							name = name.trim();
+							LinkedList<String> list = new LinkedList<>(Arrays.stream(rawOptions.split("(?<=[^\\\\]);")).filter(string -> !string.isEmpty()).map(String::trim).collect(Collectors.toList()));
 							if (list.isEmpty()) {
 								event.sendMessage("I can't create a Poll without options!").queue();
 								return;
@@ -51,7 +54,7 @@ public class PollCommand {
 							for (String string : list)
 								options.add(new Option(list.indexOf(string), string));
 							new Poll(name, event.getMember(), options, event.getTextChannel());
-							event.sendMessage("Created a Poll! You can vote by typing the number of the option.").queue();
+							event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll add reactions to the message as the votes get added/removed.").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)

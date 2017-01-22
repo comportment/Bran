@@ -50,6 +50,10 @@ public class HangManCommand {
 						.setDescription("Starts a HangMan Session.")
 						.setName("HangMan Start Command")
 						.setAction((event, args) -> {
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+								event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
+								return;
+							}
 							HangManGame session = HangManGame.getSession(event.getGuildMember().getProfile());
 							if (HangManGame.getSession(event.getGuildMember().getProfile()) != null) {
 								if (!session.getChannel().canTalk(session.getChannel().getGuild().getMember(session.getCreator().getUser(event.getJDA())))) {
@@ -71,6 +75,10 @@ public class HangManCommand {
 						.setArgs(new Argument<>("mention", String.class))
 						.setExample("hangman invite <@219186621008838669>")
 						.setAction((event, args) -> {
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_ADD_REACTION)) {
+								event.sendMessage("I need to have MESSAGE_ADD_REACTION permission to run this command!").queue();
+								return;
+							}
 							HangManGame session = HangManGame.getSession(event.getGuildMember().getProfile());
 							if (session == null) {
 								event.sendMessage(Quotes.FAIL, "You don't have a Game Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to start one!").queue();

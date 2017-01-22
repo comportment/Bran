@@ -3,6 +3,7 @@ package br.com.brjdevs.steven.bran.core.audio;
 import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
+import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
 import com.sedmelluq.discord.lavaplayer.tools.io.MessageInput;
 import com.sedmelluq.discord.lavaplayer.tools.io.MessageOutput;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -51,9 +52,16 @@ public class MusicPersistence {
 		}
 		String msg = "I'm going to restart, I'll be back in a minute and the current playlist will be reloaded!";
 		for (MusicManager musicManager : AudioUtils.getManager().getMusicManagers().values()) {
+			if (musicManager == null || musicManager.getGuild() == null) continue;
 			TrackScheduler trackScheduler = musicManager.getTrackScheduler();
+			if (trackScheduler == null) continue;
+			if (VoiceChannelListener.musicTimeout.has(musicManager.getGuild().getId())) {
+				VoiceChannelListener.musicTimeout.remove(musicManager.getGuild().getId());
+				musicManager.getTrackScheduler().setPaused(false);
+			}
 			if (trackScheduler.isStopped())
 				continue;
+			if (trackScheduler.getVoiceChannel() == null) continue;
 			if (trackScheduler.getCurrentTrack() != null && trackScheduler.getCurrentTrack().getContext(trackScheduler.getJDA()) != null)
 				trackScheduler.getCurrentTrack().getContext(trackScheduler.getJDA()).sendMessage(msg).queue();
 			JSONObject data = new JSONObject();
@@ -117,12 +125,15 @@ public class MusicPersistence {
 				
 				int shardId = (int) (Long.parseLong(guildId) >> 22) % Bot.getShards().size();
 				JDA jda = Bot.getShard(shardId);
+				if (jda == null) continue;
 				Guild guild = jda.getGuildById(guildId);
 				if (guild == null) continue;
 				JSONArray sources = data.getJSONArray("sources");
 				VoiceChannel vc = jda.getVoiceChannelById(data.getString("vc"));
-				if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
+				if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect()) {
+					guild.getAudioManager().setSelfDeafened(true);
 					guild.getAudioManager().openAudioConnection(vc);
+				}
 				boolean isPaused = data.getBoolean("paused");
 				boolean shuffle = data.getBoolean("shuffle");
 				boolean repeat = data.getBoolean("repeat");

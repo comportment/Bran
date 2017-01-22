@@ -6,6 +6,7 @@ import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -31,8 +32,16 @@ public class PollListener implements EventListener {
 		int i = Integer.parseInt(msg) - 1;
 		try {
 			boolean added = poll.vote(event.getAuthor().getId(), i);
+			if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
+				event.getChannel().sendMessage(added ? "\u2705" : "\u2796").queue();
+				return;
+			}
 			event.getMessage().addReaction(added ? "\u2705" : "\u2796").queue();
 		} catch (NullPointerException ex) {
+			if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
+				event.getChannel().sendMessage("\u274c").queue();
+				return;
+			}
 			event.getMessage().addReaction("\u274c").queue();
 		}
 	}

@@ -107,7 +107,7 @@ public class CommandBuilder {
 						try {
 							args[i].parse(s[i]);
 							if (!args[i].isPresent() && !args[i].isOptional())
-								throw new ArgumentParsingException();
+								throw new ArgumentParsingException(args[i].getType().getSimpleName(), s[i]);
 						} catch (ArgumentParsingException | ArrayIndexOutOfBoundsException ex) {
 							if (!args[i].isOptional()) {
 								event.sendMessage("**Bad Arguments:** " + ex.getMessage() + ".\nExpected arguments: " + (String.join(" ", Arrays.stream(getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new)))).queue();

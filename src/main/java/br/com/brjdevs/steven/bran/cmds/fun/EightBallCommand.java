@@ -25,7 +25,7 @@ public class EightBallCommand {
 						event.sendMessage("\uD83C\uDFB1 *`Ask the 8Ball a question!`*").queue();
 						return;
 					}
-					String question = (String) event.getArgument("qustion").get();
+					String question = (String) event.getArgument("question").get();
 					if (!QUESTION.matcher(question).matches()) {
 						event.sendMessage("\uD83C\uDFB1 *`This doesn't sound like a question...`*").queue();
 						return;
