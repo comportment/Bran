@@ -322,7 +322,6 @@ public class MusicCommand {
 						.setName("Music Queue Remove Command")
 						.setDescription("Removes a track from the queue.")
 						.setArgs(new Argument<>("trackPos", Integer.class))
-						.setRequiredPermission(DJ)
 						.setAction((event) -> {
 							Argument argument = event.getArgument("trackPos");
 							int index = (int) argument.get() - 1;
@@ -345,12 +344,17 @@ public class MusicCommand {
 								event.sendMessage("The queue is empty, so you can't remove any songs.").queue();
 								return;
 							}
-							TrackContext removed = scheduler.removeAt(index);
-							if (removed == null) {
+							TrackContext toRemove = scheduler.getByPosition(index);
+							if (toRemove == null) {
 								event.sendMessage("Could not remove from the queue. Reason: `Index is bigger than queue size`").queue();
 								return;
 							}
-							event.sendMessage(Quotes.SUCCESS, "Removed `" + removed.getTrack().getInfo().title + "` from the queue.").queue();
+							if (!toRemove.getDJId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.DJ, event.getJDA())) {
+								event.sendMessage("You can't do this because you're not this song's DJ!").queue();
+								return;
+							}
+							scheduler.getQueue().remove(toRemove);
+							event.sendMessage(Quotes.SUCCESS, "Removed `" + toRemove.getTrack().getInfo().title + "` from the queue.").queue();
 						})
 						.build())
 				.build();

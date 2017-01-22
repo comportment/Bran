@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.Region;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.AudioManager;
 
@@ -41,6 +42,8 @@ public class AudioUtils {
 		return selfMember.hasPermission(channel, Permission.VOICE_SPEAK);
 	}
 	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan) {
+		String warning = "Please note, this guild is located in Brazil so you might notice some slutter or can't hear the song consider changing the server region. (Recommended Region: US South)";
+		boolean shouldWarn = vchan.getGuild().getRegion() == Region.BRAZIL;
 		if (!vchan.getGuild().getSelfMember().hasPermission(vchan, Permission.VOICE_CONNECT)) {
 			tchan.sendMessage("I can't connect to `" + vchan.getName() + "` due to a lack of permission!").queue();
 			return null;
@@ -51,16 +54,21 @@ public class AudioUtils {
 		}
 		AudioManager audioManager = vchan.getGuild().getAudioManager();
 		if (audioManager.isAttemptingToConnect()) {
-			Message message = tchan.sendMessage("Attempting to Connect to " + audioManager.getQueuedAudioConnection().getName() + "...").complete();
+			Message message = tchan.sendMessage("Attempting to Connect to " + audioManager.getQueuedAudioConnection().getName() + "..." + (shouldWarn ? "\n" + warning : "")).complete();
 			while (audioManager.isAttemptingToConnect())
 				Util.sleep(100);
-			message.editMessage("Connected to **" + audioManager.getConnectedChannel().getName() + "**!").queue();
+			message.editMessage("Connected to **" + audioManager.getConnectedChannel().getName() + "**!" + (shouldWarn ? "\n" + warning : "")).queue();
 			return audioManager.getConnectedChannel();
 		}
 		if (audioManager.isConnected()) return audioManager.getConnectedChannel();
-		audioManager.setSelfDeafened(true);
-		audioManager.openAudioConnection(vchan);
-		return connect(vchan, tchan);
+		try {
+			audioManager.setSelfDeafened(true);
+			audioManager.openAudioConnection(vchan);
+		} catch (Exception e) {
+			tchan.sendMessage("I couldn't connect to the voice channel! " + (shouldWarn ? "\n" + warning : "I'm not sure why... `" + e.getMessage())).queue();
+			return null;
+		}
+		return audioManager.getQueuedAudioConnection();
 	}
 	public static boolean isAlone(VoiceChannel channel) {
 		return channel.getMembers().size() == 1

@@ -150,6 +150,7 @@ public class CustomCmdsCommand {
 						.setExample("cmds enabled toggle")
 						.setHelp("cmds enabled ?")
 						.setDefault("check")
+						.setDescription("Checks if the Custom Commands are enabled and toggle them.")
 						.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 								.setAliases("toggle")
 								.setName("Custom Command Enable/Disable")

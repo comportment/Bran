@@ -76,6 +76,7 @@ public class WordFilterCommand {
 						.setAliases("remove")
 						.setName("WordFilter Remove Command")
 						.setDescription("Removes a word from the WordFilter.")
+						.setArgs(new Argument<>("word", String.class))
 						.setAction((event, rawArgs) -> {
 							if (!event.getDiscordGuild().getWordFilter().isEnabled()) {
 								event.sendMessage("The WordFilter is disabled in this Guild.").queue();

@@ -106,6 +106,12 @@ public class TrackScheduler implements AudioEventListener {
 		return new ArrayList<>(queue).indexOf(trackContext);
 	}
 	
+	public TrackContext getByPosition(int index) {
+		LinkedList<TrackContext> list = new LinkedList<>(queue);
+		if (index >= list.size()) return null;
+		return list.get(index);
+	}
+	
 	public boolean isPaused() {
 		return getAudioPlayer().isPaused();
 	}

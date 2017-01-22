@@ -96,18 +96,21 @@ public class CommandBuilder {
 					event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
 					return;
 				}
-				if (event.getArgs(3)[1].matches("^(\\?|help)$")) {
+				String[] split = event.getArgs(2);
+				if (split[1].matches("^(\\?|help)$")) {
 					event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
 					return;
 				}
-				String[] s = args.length > 1 ? Arrays.stream(Argument.split(event.getArgs(2)[1], args.length)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {event.getArgs(2)[1]};
+				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\')
+					split[1] = split[1].substring(1);
+				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
 				Argument[] args = event.getArguments();
 				if (args != null) {
 					for (int i = 0; i < args.length; i++) {
 						try {
 							args[i].parse(s[i]);
 							if (!args[i].isPresent() && !args[i].isOptional())
-								throw new ArgumentParsingException(args[i].getType().getSimpleName(), s[i]);
+								throw new ArgumentParsingException("No arguments were given.");
 						} catch (ArgumentParsingException | ArrayIndexOutOfBoundsException ex) {
 							if (!args[i].isOptional()) {
 								event.sendMessage("**Bad Arguments:** " + ex.getMessage() + ".\nExpected arguments: " + (String.join(" ", Arrays.stream(getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new)))).queue();

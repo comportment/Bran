@@ -130,6 +130,7 @@ public class MusicPersistence {
 				if (guild == null) continue;
 				JSONArray sources = data.getJSONArray("sources");
 				VoiceChannel vc = jda.getVoiceChannelById(data.getString("vc"));
+				if (vc == null || vc.getMembers().isEmpty()) continue;
 				if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect()) {
 					guild.getAudioManager().setSelfDeafened(true);
 					guild.getAudioManager().openAudioConnection(vc);
