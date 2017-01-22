@@ -122,7 +122,9 @@ public class MusicPersistence {
 				Scanner scanner = new Scanner(inputStream);
 				JSONObject data = new JSONObject(scanner.useDelimiter("\\A").next());
 				scanner.close();
-				
+				if (!file.delete()) {
+					LOG.warn("Could not delete File named '" + guildId + "'");
+				}
 				int shardId = (int) (Long.parseLong(guildId) >> 22) % Bot.getShards().size();
 				JDA jda = Bot.getShard(shardId);
 				if (jda == null) continue;
@@ -180,9 +182,6 @@ public class MusicPersistence {
 						channel.sendMessage("Reloading playlist, found `" + sources.length() + "` tracks...").queue();
 					}
 				});
-				if (!file.delete()) {
-					LOG.warn("Could not delete File named '" + guildId + "'");
-				}
 			} catch (Exception e) {
 				LOG.fatal("Error while loading persistence file.");
 				LOG.log(e);
