@@ -284,12 +284,12 @@ public class MusicCommand {
 								scheduler.getVoteSkips().remove(event.getAuthor().getId());
 							else
 								scheduler.getVoteSkips().add(event.getAuthor().getId());
-							if (scheduler.getVoteSkips().size() >= scheduler.getRequiredVotes(vchan)) {
+							if (scheduler.getVoteSkips().size() >= scheduler.getRequiredVotes()) {
 								event.sendMessage("Reached the required amount of votes, skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`...").queue();
 								scheduler.skip();
 								return;
 							}
-							event.sendMessage(scheduler.getVoteSkips().size() + " users voted for skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`. More `" + (scheduler.getRequiredVotes(vchan) - scheduler.getVoteSkips().size()) + "` votes are required.").queue();
+							event.sendMessage(scheduler.getVoteSkips().size() + " users voted for skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`. More `" + (scheduler.getRequiredVotes() - scheduler.getVoteSkips().size()) + "` votes are required.").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)

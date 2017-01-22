@@ -220,8 +220,10 @@ public class TrackScheduler implements AudioEventListener {
 		getGuild().getAudioManager().closeAudioConnection();
 	}
 	
-	public int getRequiredVotes(VoiceChannel voiceChannel) {
-		return (int) ((voiceChannel.getMembers().size() - 1) / .65) + 1;
+	public int getRequiredVotes() {
+		int listeners = (int) getVoiceChannel().getMembers().stream()
+				.filter(m -> !m.getUser().isBot() && !m.getVoiceState().isDeafened()).count();
+		return (int) Math.ceil(listeners * .55);
 	}
 	
 	public void skip() {

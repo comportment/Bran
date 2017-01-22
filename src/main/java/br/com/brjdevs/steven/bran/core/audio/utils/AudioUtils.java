@@ -42,7 +42,7 @@ public class AudioUtils {
 		return selfMember.hasPermission(channel, Permission.VOICE_SPEAK);
 	}
 	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan) {
-		String warning = "Please note, this guild is located in Brazil so you might notice some slutter or can't hear the song consider changing the server region. (Recommended Region: US South)";
+		String warning = "Please note, this guild is located in Brazil so if you notice some slutter or can't hear the song consider changing the server region. (Recommended Region: US South)";
 		boolean shouldWarn = vchan.getGuild().getRegion() == Region.BRAZIL;
 		if (!vchan.getGuild().getSelfMember().hasPermission(vchan, Permission.VOICE_CONNECT)) {
 			tchan.sendMessage("I can't connect to `" + vchan.getName() + "` due to a lack of permission!").queue();
@@ -68,7 +68,7 @@ public class AudioUtils {
 			tchan.sendMessage("I couldn't connect to the voice channel! " + (shouldWarn ? "\n" + warning : "I'm not sure why... `" + e.getMessage())).queue();
 			return null;
 		}
-		return audioManager.getQueuedAudioConnection();
+		return connect(vchan, tchan);
 	}
 	public static boolean isAlone(VoiceChannel channel) {
 		return channel.getMembers().size() == 1
