@@ -22,6 +22,9 @@ public class AudioUtils {
 				+ (minutes == 0 ? "00" : decimal(minutes)) + ":" + (seconds == 0 ? "00" : decimal(seconds));
 	}
 	
+	public static boolean canConnect() {
+		return Bot.getSession().cpuUsage < 40;
+	}
 	public static long getLength(AudioPlaylist audioPlaylist) {
 		long[] total = {0};
 		audioPlaylist.getTracks().forEach(track -> total[0] += track.getInfo().length);
@@ -42,6 +45,10 @@ public class AudioUtils {
 		return selfMember.hasPermission(channel, Permission.VOICE_SPEAK);
 	}
 	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan) {
+		if (!canConnect()) {
+			tchan.sendMessage("I'm sorry about this but I'm a bit overloaded right now so can you ask me to join the channel later? I can't push myself too hard, I'm still in testing phase \uD83D\uDE26").queue();
+			return null;
+		}
 		String warning = "Please note, this guild is located in Brazil so if you notice some slutter or can't hear the song consider changing the server region. (Recommended Region: US South)";
 		boolean shouldWarn = vchan.getGuild().getRegion() == Region.BRAZIL;
 		if (!vchan.getGuild().getSelfMember().hasPermission(vchan, Permission.VOICE_CONNECT)) {
