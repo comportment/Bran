@@ -24,7 +24,7 @@ public class UrbanDictionaryCommand {
 	@Command
 	private static ICommand urban() {
 		return new CommandBuilder(Category.INFORMATIVE)
-				.setAliases("urban", "ud")
+				.setAliases("urban", "ud", "define")
 				.setDescription("Searches definitions from Urban Dictionary.")
 				.setArgs(new Argument<>("term", String.class))
 				.setName("Urban Command")

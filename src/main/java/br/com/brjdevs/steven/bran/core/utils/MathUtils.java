@@ -32,4 +32,8 @@ public class MathUtils {
 			return d;
 		}
 	}
+	
+	public static int random(int min, int max) {
+		return random.nextInt(max - min) + min;
+	}
 }

@@ -125,7 +125,7 @@ public class BotCommand {
 								.setDescription("Updates the current guild amount in DiscordBots.")
 								.setAction((event) -> {
 									Bot.updateStats();
-									event.sendMessage(Quotes.getQuote(Quotes.SUCCESS)).queue();
+									event.sendMessage(Quotes.SUCCESS, "Updated status at Discord Bots!\nhttps://bots.discord.pw/bots/219186621008838669").queue();
 								})
 								.build())
 						.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)

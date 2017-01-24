@@ -40,7 +40,7 @@ public class TaskManager {
             try {
 	            JDA jda = Bot.getShard(entry.getValue().getAsJsonObject().get("shard").getAsInt());
 	            if (jda == null) {
-		            Bot.LOG.fatal("Got JDA null in TaskManager.java. Shard: " + entry.getValue().getAsJsonObject().get("shard").getAsInt());
+		            musicTimeout.remove(entry.getKey());
 		            return;
 	            }
 	            Guild guild = jda.getGuildById(entry.getKey());
