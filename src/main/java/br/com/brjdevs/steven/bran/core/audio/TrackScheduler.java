@@ -161,7 +161,9 @@ public class TrackScheduler implements AudioEventListener {
 	}
 	
 	public TrackContext restartSong() {
-		currentTrack = currentTrack != null ? currentTrack.makeClone() : previousTrack.makeClone();
+		TrackContext context = currentTrack != null ? currentTrack.makeClone() : previousTrack.makeClone();
+		if (context == null) return null;
+		currentTrack = context;
 		play(currentTrack, false);
 		return currentTrack;
 	}
@@ -264,8 +266,7 @@ public class TrackScheduler implements AudioEventListener {
 			TrackEndEvent event = (TrackEndEvent) audioEvent;
 			AudioTrackEndReason endReason = event.endReason;
 			if (endReason.mayStartNext) {
-				TrackContext nextTrack = provideNextTrack(false);
-				play(nextTrack, false);
+				play(provideNextTrack(false), false);
 			}
 		} else if (audioEvent instanceof TrackStartEvent) {
 			TrackStartEvent event = (TrackStartEvent) audioEvent;
@@ -311,6 +312,6 @@ public class TrackScheduler implements AudioEventListener {
 		if (getPreviousTrack() != null && getPreviousTrack().getContext(getJDA()) != null && getPreviousTrack().getContext(getJDA()).canTalk())
 			getPreviousTrack().getContext(getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + Bot.getDefaultPrefixes()[0] + "music play [SONG]`.").queue();
 		getGuild().getAudioManager().closeAudioConnection();
-		AudioUtils.getManager().unregister(guildId);
+		//AudioUtils.getManager().unregister(guildId);
 	}
 }

@@ -249,6 +249,7 @@ public class MusicCommand {
 								event.sendMessage("Restarting the previous song...").queue();
 							else {
 								event.sendMessage("The player has never played a song, so it cannot restart a song.").queue();
+								event.getGuild().getAudioManager().closeAudioConnection();
 								return;
 							}
 							musicManager.getTrackScheduler().restartSong();
