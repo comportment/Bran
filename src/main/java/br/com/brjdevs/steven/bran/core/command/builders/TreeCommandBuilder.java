@@ -9,6 +9,7 @@ import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
+import net.dv8tion.jda.core.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +128,11 @@ public class TreeCommandBuilder {
 						alias = defaultCmd;
 						isDefault = true;
 					} else {
-						event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+						if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+							event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
+						} else {
+							event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+						}
 						return;
 					}
 				}
@@ -141,7 +146,11 @@ public class TreeCommandBuilder {
 							event.createChild(CommandUtils.getCommand(this, defaultCmd), true);
 							break;
 						case SHOW_HELP:
-							event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+								event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
+							} else {
+								event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+							}
 							break;
 					}
 					return;
@@ -155,7 +164,11 @@ public class TreeCommandBuilder {
 							event.createChild(CommandUtils.getCommand(this, defaultCmd), true);
 							break;
 						case SHOW_HELP:
-							event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+								event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
+							} else {
+								event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+							}
 							break;
 					}
 					return;

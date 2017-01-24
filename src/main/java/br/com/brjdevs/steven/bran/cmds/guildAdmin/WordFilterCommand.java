@@ -8,7 +8,6 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class WordFilterCommand {
@@ -32,14 +31,9 @@ public class WordFilterCommand {
 								event.sendMessage("Before adding words to the WordFilter you have to enable it! Use `" + event.getPrefix() + "wordfilter toggle` to enable.").queue();
 								return;
 							}
-							String[] words = Arrays.stream(Argument.split((String) event.getArgument("word").get())).filter(w -> !event.getDiscordGuild().getWordFilter().asList().contains(w)).toArray(String[]::new);
-							if (words.length == 0) {
-								event.sendMessage("No words to filter found.").queue();
-								return;
-							}
-							Arrays.stream(words)
-									.forEach(word -> event.getDiscordGuild().getWordFilter().asList().add(word));
-							event.sendMessage("\uD83D\uDC4C Added " + words.length + " word(s) to the filter! *(Total: " + event.getDiscordGuild().getWordFilter().asList().size() + ")*").queue();
+							String word = ((String) event.getArgument("word").get());
+							event.getDiscordGuild().getWordFilter().asList().add(word);
+							event.sendMessage("\uD83D\uDC4C Added word to the filter! *(Total: " + event.getDiscordGuild().getWordFilter().asList().size() + ")*").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -82,14 +76,9 @@ public class WordFilterCommand {
 								event.sendMessage("The WordFilter is disabled in this Guild.").queue();
 								return;
 							}
-							String[] words = Arrays.stream(Argument.split((String) event.getArgument("word").get())).filter(w -> !event.getDiscordGuild().getWordFilter().asList().contains(w)).toArray(String[]::new);
-							if (words.length == 0) {
-								event.sendMessage("No words to remove from the filter found.").queue();
-								return;
-							}
-							Arrays.stream(words)
-									.forEach(word -> event.getDiscordGuild().getWordFilter().asList().add(word));
-							event.sendMessage("\uD83D\uDC4C Removed " + words.length + " word(s) to the filter! *(Total: " + event.getDiscordGuild().getWordFilter().asList().size() + ")*").queue();
+							String word = ((String) event.getArgument("word").get());
+							event.getDiscordGuild().getWordFilter().asList().remove(word);
+							event.sendMessage("\uD83D\uDC4C Removed word from the filter! *(Total: " + event.getDiscordGuild().getWordFilter().asList().size() + ")*").queue();
 						})
 						.build())
 				.build();

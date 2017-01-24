@@ -108,7 +108,7 @@ public class CommandBuilder {
 				if (args != null) {
 					for (int i = 0; i < args.length; i++) {
 						try {
-							args[i].parse(s[i]);
+							args[i].parse(s[i].trim());
 							if (!args[i].isPresent() && !args[i].isOptional())
 								throw new ArgumentParsingException("No arguments were given.");
 						} catch (ArgumentParsingException | ArrayIndexOutOfBoundsException ex) {
