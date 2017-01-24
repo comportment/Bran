@@ -72,7 +72,7 @@ public class RegionalCommand {
 				.setDescription("Makes a phrase cool.")
 				.setExample("reg This phrase is cool")
 				.setAction((event, rawArgs) -> {
-					String phrase = (String) event.getArgument("phrase").get();
+					String phrase = ((String) event.getArgument("phrase").get()).toLowerCase();
 					String[] characters = phrase.split("");
 					String formatted = String.join("", Stream.of(characters).map(RegionalCommand::toRegional).collect(Collectors.toList()));
 					event.sendMessage(formatted).queue();

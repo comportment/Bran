@@ -18,7 +18,7 @@ public class MathCommand {
 				.setDescription("Resolves a Mathematical Expression!")
 				.setArgs(new Argument<>("expression", String.class))
 				.setAction((event) -> {
-					String expression = (String) event.getArgument("expression").get();
+					String expression = ((String) event.getArgument("expression").get()).toLowerCase();
 					double result;
 					try {
 						result = calculator.evaluate(expression);

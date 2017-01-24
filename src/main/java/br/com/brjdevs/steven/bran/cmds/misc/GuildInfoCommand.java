@@ -5,7 +5,6 @@ import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -63,30 +62,14 @@ public class GuildInfoCommand {
 					embedBuilder.addField("Role Count", String.valueOf(guild.getRoles().size()), true);
 					List<Role> roles = guild.getRoles().stream()
 							.filter(role -> !role.getName().equals("@everyone")).collect(Collectors.toList());
-					String strRoles = "";
-					int i = roles.size();
-					for (Role role : roles) {
-						if (strRoles.length() > EmbedBuilder.VALUE_MAX_LENGTH - 100) break;
-						strRoles += role.getName();
-						i--;
-					}
-					strRoles = StringUtils.replaceLast(strRoles, ", ", "");
-					if (i != 0)
-						strRoles += " *(+" + i + " roles)*";
-					embedBuilder.addField("Roles", strRoles, false);
+					String strRoles = roles.stream().map(Role::getName).collect(Collectors.joining(", "));
+					if (strRoles.length() <= EmbedBuilder.VALUE_MAX_LENGTH)
+						embedBuilder.addField("Roles", strRoles, false);
 					if (hasEmotes) {
 						List<Emote> emotes = guild.getEmotes();
-						String strEmotes = "";
-						int emotesSize = emotes.size();
-						for (Emote emote : emotes) {
-							if (strEmotes.length() > EmbedBuilder.VALUE_MAX_LENGTH - 100) break;
-							strEmotes += emote.getAsMention();
-							emotesSize--;
-						}
-						strEmotes = StringUtils.replaceLast(strEmotes, ", ", "");
-						if (emotesSize != 0)
-							strEmotes += " *(+" + emotesSize + " emote)*";
-						embedBuilder.addField("Emotes", strEmotes, true);
+						String strEmotes = emotes.stream().map(Emote::getAsMention).collect(Collectors.joining(", "));
+						if (strEmotes.length() <= EmbedBuilder.VALUE_MAX_LENGTH)
+							embedBuilder.addField("Emotes", strEmotes, true);
 					}
 					event.sendMessage(embedBuilder.build()).queue();
 				})

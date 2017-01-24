@@ -30,7 +30,7 @@ public class WordFilterListener implements EventListener {
 		if (!wordFilter.isEnabled()) return;
 		boolean bool = false;
 		for (String word : wordFilter.asList()) {
-			if (event.getMessage().getRawContent().contains(word))
+			if (event.getMessage().getRawContent().toLowerCase().contains(word.toLowerCase()))
 				bool = true;
 		}
 		if (bool) {
