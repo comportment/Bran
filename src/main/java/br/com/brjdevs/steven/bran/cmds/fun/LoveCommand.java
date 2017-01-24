@@ -8,9 +8,6 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 public class LoveCommand {
 	
 	@Command
@@ -21,27 +18,22 @@ public class LoveCommand {
 				.setDescription("Gives you the love percentage between to names!")
 				.setArgs(new Argument<>("firstName", String.class), new Argument<>("secondName", String.class))
 				.setAction((event) -> {
-					try {
-						String firstName = URLEncoder.encode((String) event.getArgument("firstName").get(), "UTF-8");
-						String secondName = URLEncoder.encode((String) event.getArgument("secondName").get(), "UTF-8");
-						if (firstName.isEmpty() || secondName.isEmpty()) {
-							event.sendMessage("You have to provide me at least two names!").queue();
-							return;
-						}
-						JSONObject response;
-						try {
-							response = calculate(firstName, secondName);
-						} catch (Exception e) {
-							event.sendMessage(Quotes.FAIL, "Could not calculate love, try someone else!").queue();
-							return;
-						}
-						String percentage = response.getString("percentage");
-						String result = response.getString("result");
-						event.sendMessage("**" + percentage + "%** of love between " + firstName + " and " + secondName + "!\n" + result).queue();
-						
-					} catch (UnsupportedEncodingException e) {
-						event.sendMessage("Failed to encode URL.").queue();
+					String firstName = ((String) event.getArgument("firstName").get());
+					String secondName = ((String) event.getArgument("secondName").get());
+					if (firstName.isEmpty() || secondName.isEmpty()) {
+						event.sendMessage("You have to provide me at least two names!").queue();
+						return;
 					}
+					JSONObject response;
+					try {
+						response = calculate(firstName, secondName);
+					} catch (Exception e) {
+						event.sendMessage(Quotes.FAIL, "Could not calculate love, try someone else!").queue();
+						return;
+					}
+					String percentage = response.getString("percentage");
+					String result = response.getString("result");
+					event.sendMessage("**" + percentage + "%** of love between " + firstName + " and " + secondName + "!\n" + result).queue();
 				})
 				.build();
 	}
