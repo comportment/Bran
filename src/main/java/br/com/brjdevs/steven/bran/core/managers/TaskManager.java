@@ -51,8 +51,8 @@ public class TaskManager {
                 JsonObject info = musicTimeout.get(guild.getId()).getAsJsonObject();
 	            info.addProperty("timeout", info.get("timeout").getAsInt() - 10);
 	            musicTimeout.remove(guild.getId());
-                if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
-                    return;
+	            if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect() || guild.getSelfMember().getVoiceState().isMuted())
+		            return;
 	            VoiceChannel channel = guild.getVoiceChannelById(info.get("channelId").getAsString());
 	            if (channel == null || !AudioUtils.isAlone(channel)) return;
 	            if (info.get("timeout").getAsInt() == 0) {

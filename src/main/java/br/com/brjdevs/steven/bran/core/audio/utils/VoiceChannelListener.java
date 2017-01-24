@@ -3,16 +3,15 @@ package br.com.brjdevs.steven.bran.core.audio.utils;
 import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.audio.MusicManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
+import br.com.brjdevs.steven.bran.core.audio.TrackScheduler;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.google.gson.JsonObject;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.guild.voice.GenericGuildVoiceEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.core.events.guild.voice.*;
 import net.dv8tion.jda.core.hooks.EventListener;
 
 public class VoiceChannelListener implements EventListener {
@@ -53,6 +52,22 @@ public class VoiceChannelListener implements EventListener {
 		musicTimeout.add(guild.getId(), info);
 	}
 	
+	public static void onMute(VoiceChannel voiceChannel) {
+		Guild guild = voiceChannel.getGuild();
+		if (voiceChannel.getGuild().getSelfMember().getVoiceState().isSelfMuted()) {
+			guild.getAudioManager().setSelfMuted(false);
+			return;
+		}
+		JDA jda = guild.getJDA();
+		if (musicTimeout.has(guild.getId())) musicTimeout.remove(guild.getId());
+		MusicManager musicManager = AudioUtils.getManager().get(guild);
+		TrackScheduler scheduler = musicManager.getTrackScheduler();
+		TrackContext currentTrack = scheduler.getCurrentTrack();
+		if (currentTrack != null && currentTrack.getContext(jda) != null && currentTrack.getContext(jda).canTalk())
+			currentTrack.getContext(jda).sendMessage("Someone muted me in `" + voiceChannel + "` so I stopped the player and cleaned the queue.").queue();
+		scheduler.stop();
+	}
+	
 	@Override
 	public void onEvent(Event e) {
 		if (!(e instanceof GenericGuildVoiceEvent)) return;
@@ -64,5 +79,7 @@ public class VoiceChannelListener implements EventListener {
 			onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
 		else if (event instanceof GuildVoiceLeaveEvent)
 			onLeave(event.getGuild(), ((GuildVoiceLeaveEvent) event).getChannelLeft());
+		else if (event instanceof GuildVoiceSelfMuteEvent && event.getVoiceState().inVoiceChannel())
+			onMute(event.getVoiceState().getChannel());
 	}
 }

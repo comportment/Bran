@@ -40,10 +40,6 @@ public class AudioUtils {
 	public static MusicPlayerManager getManager() {
 		return musicPlayerManager;
 	}
-	public static boolean canSpeak(VoiceChannel channel) {
-		Member selfMember = channel.getGuild().getSelfMember();
-		return selfMember.hasPermission(channel, Permission.VOICE_SPEAK);
-	}
 	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan) {
 		if (!canConnect()) {
 			tchan.sendMessage("I'm sorry about this but I'm a bit overloaded right now (" + Bot.getSession().cpuUsage + "% cpu) so can you ask me to join the channel later? I can't push myself too hard, I'm still in testing phase \uD83D\uDE26").queue();
@@ -55,11 +51,22 @@ public class AudioUtils {
 			tchan.sendMessage("I can't connect to `" + vchan.getName() + "` due to a lack of permission!").queue();
 			return null;
 		}
-		if (!canSpeak(vchan)) {
-			tchan.sendMessage("I won't join `" + vchan.getName() + "` because I can't speak!").queue();
+		Member selfMember = vchan.getGuild().getSelfMember();
+		if (!selfMember.hasPermission(vchan, Permission.VOICE_CONNECT)) {
+			tchan.sendMessage("I can't join `" + vchan.getName() + "` due to a lack of permission. (VOICE_CONNECT)").queue();
+			return null;
+		}
+		if (!selfMember.hasPermission(vchan, Permission.VOICE_SPEAK)) {
+			tchan.sendMessage("I won't join `" + vchan.getName() + "` because I don't have `VOICE_SPEAK` permission!").queue();
+			return null;
+		}
+		if (selfMember.getVoiceState().isGuildMuted()) {
+			tchan.sendMessage("I won't join `" + vchan.getName() + "` because someone's muted me!").queue();
 			return null;
 		}
 		AudioManager audioManager = vchan.getGuild().getAudioManager();
+		if (selfMember.getVoiceState().isSelfMuted())
+			audioManager.setSelfMuted(false);
 		if (audioManager.isAttemptingToConnect()) {
 			Message message = tchan.sendMessage("Attempting to Connect to " + audioManager.getQueuedAudioConnection().getName() + "..." + (shouldWarn ? "\n" + warning : "")).complete();
 			while (audioManager.isAttemptingToConnect())
