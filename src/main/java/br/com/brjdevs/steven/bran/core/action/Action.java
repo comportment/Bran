@@ -68,6 +68,7 @@ public class Action {
 	}
 	
 	public void addUser(User user) {
+		if (Action.getAction(user.getId()) != null) remove(getAction(user.getId()));
 		usersId.add(user.getId());
 	}
 	

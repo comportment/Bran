@@ -26,7 +26,7 @@ public class KickCommand {
 				.setDescription("Does this really need a Description?")
 				.setExample("kick <@219186621008838669>")
 				.setArgs(new Argument<>("mention", String.class))
-				.setRequiredPermission(Permissions.BAN_USER)
+				.setRequiredPermission(Permissions.KICK_USR)
 				.setAction((event) -> {
 					if (!event.getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
 						event.sendMessage("I can't perform this action due to a lack of permission. Missing Permission: KICK_MEMBERS").queue();
