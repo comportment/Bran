@@ -25,8 +25,11 @@ public class MusicPlayerManager {
 	}
 	
 	public void unregister(Long guildId) {
-		if (musicManagers.containsKey(guildId))
-			musicManagers.remove(guildId).getGuild().getAudioManager().setSendingHandler(null);
+		if (musicManagers.containsKey(guildId)) {
+			MusicManager manager = musicManagers.remove(guildId);
+			if (manager.getGuild() != null)
+				manager.getGuild().getAudioManager().setSendingHandler(null);
+		}
 	}
 	
 	public AudioPlayerManager getAudioPlayerManager() {
