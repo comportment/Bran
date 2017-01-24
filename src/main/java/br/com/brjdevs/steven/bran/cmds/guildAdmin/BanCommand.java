@@ -10,6 +10,7 @@ import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.exceptions.PermissionException;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +41,16 @@ public class BanCommand {
 						event.sendMessage("I can only ban 5 users per command!").queue();
 						return;
 					}
-					users.forEach(user -> event.getGuild().getController().ban(user, 7).queue());
+					for (User user : users) {
+						event.getGuild().getController().ban(user.getId(), 7).queue(null,
+								throwable -> {
+									if (throwable instanceof PermissionException) {
+										event.sendMessage("I can't ban that user because its higher than me in the role hierarchy!").queue();
+									} else {
+										event.sendMessage("An unexpected error occurred! " + throwable.getMessage()).queue();
+									}
+								});
+					}
 					String out = "Banned " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
 					event.sendMessage(Quotes.SUCCESS, out).queue();
 				})
