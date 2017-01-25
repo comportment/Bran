@@ -22,7 +22,7 @@ public class HelpCommand {
 				.setDescription("Gives you information on all the available commands")
 				.setName("Help Command")
 				.setAction((event) -> {
-					if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+					if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
 						return;
 					}
@@ -38,7 +38,9 @@ public class HelpCommand {
 						builder = new StringBuilder(StringUtils.replaceLast(builder.toString(), ", ", ""));
 						builder.append('\n');
 					}
-					Color color = event.getGuild().getSelfMember().getColor();
+					Color color = null;
+					if (event.getGuild() != null)
+						color = event.getGuild().getSelfMember().getColor();
 					builder.append("\n**If you need a detailed description on a command [click here](http://bran.readthedocs.io/en/latest/)** *(WIP)*\n")
 							.append("**To get help on a command use `" + event.getPrefix() + "[cmd] help`.**");
 					MessageEmbed embed = new EmbedBuilder()

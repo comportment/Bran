@@ -63,7 +63,8 @@ public class CommandEvent {
         return getChannel().sendMessage(msg);
     }
     public RestAction<Message> sendMessage(Message message) {
-        return sendMessage(message.getRawContent());
+	    getChannel().sendTyping().complete();
+	    return getChannel().sendMessage(message);
     }
     public RestAction<Message> sendMessage(MessageEmbed embed) {
         getChannel().sendTyping().complete();

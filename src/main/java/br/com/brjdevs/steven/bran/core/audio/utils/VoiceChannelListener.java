@@ -63,8 +63,14 @@ public class VoiceChannelListener implements EventListener {
 			GenericGuildVoiceEvent event = (GenericGuildVoiceEvent) e;
 			if (event instanceof GuildVoiceMoveEvent) {
 				VoiceChannel joined = ((GuildVoiceMoveEvent) event).getChannelJoined();
-				if (joined.getMembers().isEmpty())
+				VoiceChannel left = ((GuildVoiceMoveEvent) event).getChannelLeft();
+				if (AudioUtils.isAlone(joined) && event.getMember().equals(event.getGuild().getSelfMember()))
 					onLeave(joined.getGuild(), joined);
+				else if (AudioUtils.isAlone(left))
+					onLeave(left.getGuild(), left);
+				else
+					onJoin(joined.getGuild(), joined, event.getMember());
+				
 			} else if (event instanceof GuildVoiceJoinEvent)
 				onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
 			else if (event instanceof GuildVoiceLeaveEvent)

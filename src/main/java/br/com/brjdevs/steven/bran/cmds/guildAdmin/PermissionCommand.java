@@ -13,8 +13,10 @@ import br.com.brjdevs.steven.bran.core.operations.ResultType.OperationResult;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 
 import javax.xml.ws.Holder;
@@ -135,6 +137,53 @@ public class PermissionCommand {
 							embedBuilder.setDescription(Permissions.toCollection(Permissions.BOT_OWNER).stream().collect(Collectors.joining(", ")));
 							embedBuilder.setFooter("Requested by " + Util.getUser(event.getAuthor()), Util.getAvatarUrl(event.getAuthor()));
 							embedBuilder.setColor(Color.decode("#9318E6"));
+							event.sendMessage(embedBuilder.build()).queue();
+						})
+						.build())
+				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
+						.setAliases("setdefault")
+						.setName("Permission SetDefault Command")
+						.setDescription("Sets the default permissions for new users")
+						.setArgs(new Argument<>("permissions", String.class))
+						.setRequiredPermission(Permissions.PERMSYS_GO)
+						.setAction((event) -> {
+							int toBeSet = 0, toBeUnset = 0;
+							String[] r = ((String) event.getArgument("permissions").get()).split("\\s+");
+							for (String each : r) {
+								if (each.charAt(0) == '+') {
+									String p = each.substring(1).toUpperCase();
+									if (Permissions.perms.containsKey(p)) {
+										toBeSet |= Permissions.perms.get(p);
+									} else {
+										event.sendMessage("Permission `" + p + "` not found.").queue();
+										return;
+									}
+								} else if (each.charAt(0) == '-') {
+									String p = each.substring(1).toUpperCase();
+									if (Permissions.perms.containsKey(p)) {
+										toBeUnset |= Permissions.perms.get(p);
+									} else {
+										event.sendMessage("Permission `" + p + "` not found.").queue();
+										return;
+									}
+								} else {
+									event.sendMessage("You have to include `+` or `-` before the permission name!").queue();
+									return;
+								}
+							}
+							long defaultPerm = event.getDiscordGuild().getDefaultPermission();
+							int fset = toBeSet, funset = toBeUnset;
+							event.getDiscordGuild().getMembers().forEach(m -> m.setPermission(event, fset, funset));
+							event.getDiscordGuild().setDefaultPermission(defaultPerm ^ (defaultPerm & toBeUnset) | toBeSet);
+							Message m = new MessageBuilder()
+									.append(Quotes.getQuote(Quotes.SUCCESS))
+									.append("Now these are the default permissions:")
+									.setEmbed(new EmbedBuilder()
+											.setDescription((String.join(", ", Permissions.toCollection(event.getDiscordGuild().getDefaultPermission()))) + "\n\nRaw: " + event.getDiscordGuild().getDefaultPermission())
+											.setTitle("Default Permission(s)")
+											.build())
+									.build();
+							event.sendMessage(m).queue();
 						})
 						.build())
 				.build();

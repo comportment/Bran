@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
@@ -70,7 +71,10 @@ public class AudioLoader implements AudioLoadResultHandler {
 					for (int i = tracks.size(); i > 0; i--) {
 						inputs.add(String.valueOf(i));
 					}
-					Action action = new Action(ActionType.MESSAGE, onInvalidResponse.CANCEL, msg, response -> {
+					Action action = new Action(ActionType.MESSAGE, onInvalidResponse.CANCEL, msg, (message, args) -> {
+						if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
+							message.deleteMessage().queue();
+						String response = message.getContent();
 						if (response.matches("^(c|cancel)$")) {
 							if (msg != null)
 								msg.editMessage("Query canceled!").queue();

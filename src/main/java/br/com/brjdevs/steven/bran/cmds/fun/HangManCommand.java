@@ -111,7 +111,8 @@ public class HangManCommand {
 										msg.addReaction(ACCEPT).queue();
 										msg.addReaction(DENY).queue();
 										Action action = new Action(ActionType.REACTION, onInvalidResponse.IGNORE, msg,
-												response -> {
+												(message, a) -> {
+													String response = a[0];
 													if (response.equals(ACCEPT)) {
 														msg.editMessage(Util.getUser(user) + ", you've joined the session!").queue();
 														session.invite(profile);

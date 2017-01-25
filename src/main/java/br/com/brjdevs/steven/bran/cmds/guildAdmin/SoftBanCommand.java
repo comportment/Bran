@@ -27,6 +27,7 @@ public class SoftBanCommand {
 				.setExample("softban <@219186621008838669>")
 				.setArgs(new Argument<>("mention", String.class))
 				.setRequiredPermission(Permissions.BAN_USER)
+				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					if (!event.getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 						event.sendMessage("I can't perform this action due to a lack of permission. Missing Permission: BAN_USER").queue();

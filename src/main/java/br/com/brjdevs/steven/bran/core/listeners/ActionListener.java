@@ -30,7 +30,7 @@ public class ActionListener implements EventListener {
 			} else if (!containsEqualsIgnoreCase(action.getExpectedInput(), reaction) && action.getOnInvalidResponse() == onInvalidResponse.CANCEL) {
 				action.getChannel().sendMessage("You didn't type " + StringUtils.replaceLast((String.join(", ", action.getExpectedInput().stream().map(s -> "`" + s + "`").collect(Collectors.toList()))), ", ", " or ") + ", query canceled!").queue();
 			} else {
-				action.getListener().onRespond(reaction);
+				action.getListener().onRespond(event.getChannel().getMessageById(event.getMessageId()).complete(), event.getReaction().getEmote().getName());
 			}
 		} else if (e instanceof MessageReceivedEvent) {
 			MessageReceivedEvent event = (MessageReceivedEvent) e;
@@ -45,7 +45,7 @@ public class ActionListener implements EventListener {
 			} else if (!containsEqualsIgnoreCase(action.getExpectedInput(), message) && action.getOnInvalidResponse() == onInvalidResponse.CANCEL) {
 				action.getChannel().sendMessage("You didn't type " + StringUtils.replaceLast((String.join(", ", action.getExpectedInput().stream().map(s -> "`" + s + "`").collect(Collectors.toList()))), ", ", " or ") + ", query canceled!").queue();
 			} else {
-				action.getListener().onRespond(message);
+				action.getListener().onRespond(event.getMessage());
 			}
 		}
 	}

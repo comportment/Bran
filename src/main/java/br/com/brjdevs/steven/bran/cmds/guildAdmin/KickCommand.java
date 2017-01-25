@@ -26,6 +26,7 @@ public class KickCommand {
 				.setDescription("Does this really need a Description?")
 				.setExample("kick <@219186621008838669>")
 				.setArgs(new Argument<>("mention", String.class))
+				.setPrivateAvailable(false)
 				.setRequiredPermission(Permissions.KICK_USR)
 				.setAction((event) -> {
 					if (!event.getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {

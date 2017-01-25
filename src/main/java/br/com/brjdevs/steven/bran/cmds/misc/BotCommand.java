@@ -50,7 +50,7 @@ public class BotCommand {
 						.setName("InviteMe Command")
 						.setDescription("Gives you my OAuth URL!")
 						.setAction((event) -> {
-							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+							if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 								event.sendMessage("You can invite me to your server using this link: https://discordapp.com/oauth2/authorize?client_id=219186621008838669&scope=bot&permissions=0").queue();
 								return;
 							}

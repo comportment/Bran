@@ -45,11 +45,11 @@ public class DiscordLog {
         s.append(event.getGuild().getName());
         builder.setTitle(s.toString());
         s.delete(0, s.toString().length());
-        s.append("**ID** ").append(event.getGuild().getId()).append('\n');
-        s.append("**Owner** ").append(Util.getUser(event.getGuild().getOwner().getUser()))
-                .append('\n');
-        s.append("**Members** ").append(event.getGuild().getMembers().size()).append(" (").append(RequirementsUtils.getBotsPercentage(event.getGuild())).append("% bots)\n");
-        builder.setDescription(s.toString());
+	    s.append("**ID:** ").append(event.getGuild().getId()).append('\n');
+	    s.append("**Owner:** ").append(Util.getUser(event.getGuild().getOwner().getUser())).append('\n');
+	    s.append("**Region:** ").append(event.getGuild().getRegion()).append('\n');
+	    s.append("**Members:** ").append(event.getGuild().getMembers().size()).append(" (").append(RequirementsUtils.getBotsPercentage(event.getGuild())).append("% bots)\n");
+	    builder.setDescription(s.toString());
         builder.setColor(COLOR);
         builder.setTimestamp(Instant.now().atOffset(ZoneOffset.UTC));
         LOG_CHAN.sendMessage(builder.build()).queue();
