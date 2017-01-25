@@ -20,7 +20,7 @@ public class AnnounceCommands {
 				.setAliases("announce", "ann")
 				.setName("Announce Command")
 				.setDescription("Why not be gentile? Welcome people using this command!")
-				.setExample("announce set join Welcome to $guild, $user!")
+				.setExample("announce set join Welcome to %guild%, %user%!")
 				.setHelp("ann ?")
 				.setPrivateAvailable(false)
 				.setRequiredPermission(Permissions.ANNOUNCE)
@@ -46,7 +46,7 @@ public class AnnounceCommands {
 								.setName("Set Join Announce Command")
 								.setDescription("Sets the Join Message Announce.")
 								.setArgs(new Argument<>("joinmsg", String.class))
-								.setExample("announce set join Welcome to $guild, $user!")
+								.setExample("announce set join Welcome to %guild%, %user%!")
 								.setPrivateAvailable(false)
 								.setAction((event, args) -> {
 									String message = (String) event.getArgument("joinmsg").get();
@@ -60,7 +60,7 @@ public class AnnounceCommands {
 								.setName("Set JoinDM Announce Command")
 								.setDescription("Sets the Join DM Announce message.")
 								.setArgs(new Argument<>("joindmmsg", String.class))
-								.setExample("announce set joindm Hello, thank you for joining $guild!")
+								.setExample("announce set joindm Hello, thank you for joining %guild%!")
 								.setPrivateAvailable(false)
 								.setAction((event, args) -> {
 									String message = (String) event.getArgument("joindmmsg").get();
@@ -74,7 +74,7 @@ public class AnnounceCommands {
 								.setName("Set Leave Announce Command")
 								.setDescription("Sets the Leave Announce message.")
 								.setArgs(new Argument<>("leavemsg", String.class))
-								.setExample("announce set leave Goodbye $user, we won't miss you!")
+								.setExample("announce set leave Goodbye %user%, we won't miss you!")
 								.setPrivateAvailable(false)
 								.setAction((event, args) -> {
 									String message = (String) event.getArgument("leavemsg").get();

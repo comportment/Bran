@@ -69,7 +69,6 @@ public class MusicPersistence {
 			data.put("paused", trackScheduler.isPaused());
 			data.put("shuffle", trackScheduler.isShuffle());
 			data.put("repeat", trackScheduler.isRepeat());
-			data.put("volume", trackScheduler.getVolume());
 			data.put("voteskips", trackScheduler.getVoteSkips());
 			
 			if (trackScheduler.getCurrentTrack() != null)
