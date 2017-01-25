@@ -120,14 +120,6 @@ public class TrackScheduler implements AudioEventListener {
 		getAudioPlayer().setPaused(paused);
 	}
 	
-	public int getVolume() {
-		return getAudioPlayer().getVolume();
-	}
-	
-	public void setVolume(int volume) {
-		getAudioPlayer().setVolume(volume);
-	}
-	
 	public TrackContext provideNextTrack(boolean isSkipped) {
 		if (isRepeat && !isSkipped && currentTrack != null) {
 			return currentTrack.makeClone();

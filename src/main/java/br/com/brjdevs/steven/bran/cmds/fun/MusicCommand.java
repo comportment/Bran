@@ -71,15 +71,15 @@ public class MusicCommand {
 							MusicManager musicManager = AudioUtils.getManager().get(event.getGuild());
 							
 							if (trackUrl.isEmpty()) {
-								if (musicManager.getPlayer().isPaused()) {
-									musicManager.getPlayer().setPaused(false);
+								if (musicManager.getTrackScheduler().isPaused()) {
+									musicManager.getTrackScheduler().setPaused(false);
 									event.sendMessage("Resumed the Player!").queue();
 								} else
 									event.sendMessage("You have to tell me a song name or link!").queue();
 								return;
 							}
-							if (musicManager.getPlayer().isPaused()) {
-								musicManager.getPlayer().setPaused(false);
+							if (musicManager.getTrackScheduler().isPaused()) {
+								musicManager.getTrackScheduler().setPaused(false);
 								event.sendMessage("Resumed the Player!").queue();
 							}
 							if (event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE))
@@ -111,7 +111,7 @@ public class MusicCommand {
 							AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
 							TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
 							EmbedBuilder embedBuilder = new EmbedBuilder();
-							embedBuilder.setAuthor((musicManager.getPlayer().isPaused() ? PAUSED : PLAYING) + " Now Playing", context.getURL(), null);
+							embedBuilder.setAuthor((musicManager.getTrackScheduler().isPaused() ? PAUSED : PLAYING) + " Now Playing", context.getURL(), null);
 							embedBuilder.addField("Title", info.title, false)
 									.addField("Duration", AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length), true)
 									.addField("Author", info.author, true);
@@ -188,8 +188,8 @@ public class MusicCommand {
 								event.sendMessage("I can't pause if I'm not playing anything.").queue();
 								return;
 							}
-							musicManager.getPlayer().setPaused(!musicManager.getPlayer().isPaused());
-							event.sendMessage(musicManager.getPlayer().isPaused() ? "The player is now paused. Use `" + event.getPrefix() + "m pause` again to resume." : "The player is no longer paused.").queue();
+							musicManager.getTrackScheduler().setPaused(!musicManager.getTrackScheduler().isPaused());
+							event.sendMessage(musicManager.getTrackScheduler().isPaused() ? "The player is now paused. Use `" + event.getPrefix() + "m pause` again to resume." : "The player is no longer paused.").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)

@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.Event;
+import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
@@ -28,7 +29,7 @@ public class VoiceChannelListener implements EventListener {
 		VoiceChannel channel = guild.getJDA().getVoiceChannelById(info.get("channelId").getAsString());
 		if (channel == null || channel != voiceChannel) return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect()) AudioUtils.connect(channel, track.getContext(channel.getJDA()));
-		player.getPlayer().setPaused(false);
+		player.getTrackScheduler().setPaused(false);
 		if (track != null && track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
 			track.getContext(guild.getJDA()).sendMessage(Util.getUser(member.getUser()) + " joined the channel, resumed the player!").queue();
 		musicTimeout.remove(guild.getId());
@@ -42,7 +43,7 @@ public class VoiceChannelListener implements EventListener {
 			guild.getAudioManager().closeAudioConnection();
 			return;
 		}
-		musicManager.getPlayer().setPaused(true);
+		musicManager.getTrackScheduler().setPaused(true);
 		if (track == null) track = musicManager.getTrackScheduler().getPreviousTrack();
 		if (track != null && track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
 			track.getContext(guild.getJDA()).sendMessage("I was left alone in `" + voiceChannel.getName() + "`, so I paused the player. If nobody reenter in this channel I'll stop que player, clean the queue and leave the channel.").queue();
@@ -56,14 +57,18 @@ public class VoiceChannelListener implements EventListener {
 	
 	@Override
 	public void onEvent(Event e) {
-		if (!(e instanceof GenericGuildVoiceEvent)) return;
-		GenericGuildVoiceEvent event = (GenericGuildVoiceEvent) e;
-		if (event instanceof GuildVoiceMoveEvent) {
-			onLeave(event.getGuild(), ((GuildVoiceMoveEvent) event).getChannelLeft());
-			onJoin(event.getGuild(), ((GuildVoiceMoveEvent) event).getChannelJoined(), event.getMember());
-		} else if (event instanceof GuildVoiceJoinEvent)
-			onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
-		else if (event instanceof GuildVoiceLeaveEvent)
-			onLeave(event.getGuild(), ((GuildVoiceLeaveEvent) event).getChannelLeft());
+		if (e instanceof VoiceChannelDeleteEvent) {
+			AudioUtils.getManager().unregister(Long.parseLong(((VoiceChannelDeleteEvent) e).getGuild().getId()));
+		} else if (e instanceof GenericGuildVoiceEvent) {
+			GenericGuildVoiceEvent event = (GenericGuildVoiceEvent) e;
+			if (event instanceof GuildVoiceMoveEvent) {
+				VoiceChannel joined = ((GuildVoiceMoveEvent) event).getChannelJoined();
+				if (joined.getMembers().isEmpty())
+					onLeave(joined.getGuild(), joined);
+			} else if (event instanceof GuildVoiceJoinEvent)
+				onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
+			else if (event instanceof GuildVoiceLeaveEvent)
+				onLeave(event.getGuild(), ((GuildVoiceLeaveEvent) event).getChannelLeft());
+		}
 	}
 }

@@ -65,6 +65,10 @@ public class Bot implements EventListener {
 		return OWNER;
 	}
 	
+	public static String[] getPrefixes() {
+		return PREFIXES;
+	}
+	
 	public static SelfUser getSelfUser(JDA jda) {
 		return jda.getSelfUser();
 	}

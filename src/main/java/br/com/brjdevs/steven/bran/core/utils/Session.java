@@ -95,8 +95,8 @@ public class Session {
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
 		long queueSize = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";
-		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getPlayer().isPaused()).count();
-		long paused = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().isPaused()).count();
+		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
+		long paused = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
 		String out = "";
 		out += "```prolog\n";
 		out += "--Bot Stats--\n";
