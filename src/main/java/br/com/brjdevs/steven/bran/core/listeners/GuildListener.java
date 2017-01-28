@@ -19,7 +19,7 @@ public class GuildListener implements EventListener {
 		if (event instanceof GenericGuildEvent) {
 			Guild guild = ((GenericGuildEvent) event).getGuild();
 			EmbedBuilder embedBuilder = new EmbedBuilder();
-			embedBuilder.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Region:** " + guild.getRegion().name() + "\n**Members:** + " + guild.getMembers().size() + "  (" + RequirementsUtils.getBotsPercentage(guild) + "% bots)\n**Owner:** " + Util.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")");
+			embedBuilder.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "  (" + RequirementsUtils.getBotsPercentage(guild) + "% bots)\n**Owner:** " + Util.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")");
 			if (event instanceof GuildJoinEvent) {
 				embedBuilder.setTitle("\uD83C\uDFE0 Joined Guild");
 			} else if (event instanceof GuildLeaveEvent) {
