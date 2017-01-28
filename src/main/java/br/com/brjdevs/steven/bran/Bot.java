@@ -2,6 +2,7 @@ package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.core.data.bot.BotData;
 import br.com.brjdevs.steven.bran.core.data.bot.Config;
+import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.Session;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.google.gson.Gson;
@@ -11,6 +12,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.entities.*;
@@ -34,7 +36,7 @@ public class Bot implements EventListener {
 	private static final String abal = "https://bots.discord.pw/api/bots/{0}/stats";
 	private static final Session session = new Session();
 	public static SimpleLog LOG = SimpleLog.getLog("Application");
-	public static TextChannel LOG_CHANNEL;
+	public static TextChannel LOGCHANNEL;
 	static User OWNER = null;
 	static Config CONFIG = new Config();
 	static Map<Integer, JDA> shards = new HashMap<>();
@@ -45,6 +47,13 @@ public class Bot implements EventListener {
 	
 	public static void main(String[] args) throws Throwable {
 	    try {
+		    Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+			    String url = Hastebin.post(Util.getStackTrace(throwable));
+			    EmbedBuilder embedBuilder = new EmbedBuilder();
+			    embedBuilder.setTitle("Uncaught exception in Thread " + thread.getName());
+			    embedBuilder.setDescription("An unexpected `" + throwable.getClass().getSimpleName() + "` occurred.\nMessage: " + throwable.getMessage() + "\nStackTrace: " + url);
+			    LOGCHANNEL.sendMessage(embedBuilder.build()).queue();
+		    });
 		    BotManager.preInit();
 		    BotManager.init();
 	    } catch (LoginException e) {

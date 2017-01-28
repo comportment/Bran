@@ -104,7 +104,7 @@ public class BotManager {
 		JDALoader jdaLoader = new JDALoaderImpl(requiredShards < 2 ? LoaderType.SINGLE : LoaderType.SHARDED);
 		
 		Bot.shards = jdaLoader.build(true, requiredShards);
-		Bot.LOG_CHANNEL = Bot.shards.entrySet().stream().map(entry -> entry.getValue().getTextChannelById("249971874430320660")).filter(Objects::nonNull).findFirst().orElse(null);
+		Bot.LOGCHANNEL = Bot.shards.entrySet().stream().map(entry -> entry.getValue().getTextChannelById("249971874430320660")).filter(Objects::nonNull).findFirst().orElse(null);
 		LOG.info("Logged in as " + Util.getUser(Bot.getSelfUser(Bot.shards.get(0))));
 		Bot.OWNER = Bot.shards.entrySet().stream().map(entry -> entry.getValue().getUserById(Bot.getConfig().getOwnerId())).filter(Objects::nonNull).findFirst().orElse(null);
 		if (Bot.OWNER == null) {

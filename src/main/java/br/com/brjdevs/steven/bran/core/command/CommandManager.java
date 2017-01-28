@@ -7,8 +7,10 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
+import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -115,7 +117,12 @@ public class CommandManager implements EventListener {
 						cmd.execute(e);
 					} catch (Exception ex) {
 						Bot.LOG.log(ex);
-						e.sendMessage(Quotes.FAIL, "A `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.").queue();
+						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.").queue();
+						String url = Hastebin.post(Util.getStackTrace(ex));
+						EmbedBuilder embedBuilder = new EmbedBuilder();
+						embedBuilder.setTitle("Uncaught exception in Thread " + Thread.currentThread().getName() + " (" + cmd.getName() + ")");
+						embedBuilder.setDescription("An unexpected `" + ex.getClass().getSimpleName() + "` occurred.\nMessage: " + ex.getMessage() + "\nStackTrace: " + url);
+						Bot.LOGCHANNEL.sendMessage(embedBuilder.build()).queue();
 					}
 				}).run();
 	}
