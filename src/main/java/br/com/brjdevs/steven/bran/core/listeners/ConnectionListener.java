@@ -1,7 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
 import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.utils.DiscordLog;
 import net.dv8tion.jda.core.events.DisconnectEvent;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReconnectedEvent;
@@ -20,9 +19,9 @@ public class ConnectionListener implements EventListener {
 	@Override
 	public void onEvent(Event event) {
 		if (event instanceof ReconnectedEvent) {
-			DiscordLog.log((ReconnectedEvent) event);
+			LOG.info("ReconnectedEvent on Shard " + Bot.getShardId(event.getJDA()));
 		} else if (event instanceof DisconnectEvent) {
-			DiscordLog.log((DisconnectEvent) event);
+			LOG.info("DisconnectEvent on Shard " + Bot.getShardId(event.getJDA()));
 		} else if (event instanceof ShutdownEvent) {
 			LOG.info("ShutdownEvent on Shard " + Bot.getShardId(event.getJDA()));
 		}

@@ -38,7 +38,12 @@ public class PollCommand {
 						.setArgs(new Argument<>("argument", String.class))
 						.setAction((event) -> {
 							String name = ((String) event.getArgument("argument").get());
-							name = name.substring(0, name.indexOf(";"));
+							int index = name.indexOf(";");
+							if (index < 0) {
+								event.sendMessage("You have to supply options splitted by a `;`!").queue();
+								return;
+							}
+							name = name.substring(0, index);
 							String rawOptions = ((String) event.getArgument("argument").get()).substring(name.length() + 1).trim();
 							name = name.trim();
 							LinkedList<String> list = new LinkedList<>(Arrays.stream(rawOptions.split("(?<=[^\\\\]);")).filter(string -> !string.isEmpty()).map(String::trim).collect(Collectors.toList()));

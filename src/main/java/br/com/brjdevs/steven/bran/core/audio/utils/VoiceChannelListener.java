@@ -16,26 +16,28 @@ import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 
+import static br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils.isAlone;
+
 public class VoiceChannelListener implements EventListener {
 	
 	public static final JsonObject musicTimeout = new JsonObject();
 	
 	private static void onJoin(Guild guild, VoiceChannel voiceChannel, Member member) {
-		if (member.equals(guild.getSelfMember()) || !musicTimeout.has(guild.getId())) return;
+		if (!musicTimeout.has(guild.getId())) return;
 		MusicManager player = AudioUtils.getManager().get(guild);
 		TrackContext track = player.getTrackScheduler().getCurrentTrack();
 		if (track == null) track = player.getTrackScheduler().getPreviousTrack();
 		JsonObject info = musicTimeout.get(guild.getId()).getAsJsonObject();
 		VoiceChannel channel = guild.getJDA().getVoiceChannelById(info.get("channelId").getAsString());
-		if (channel == null || channel != voiceChannel) return;
+		if (voiceChannel != channel && !member.equals(guild.getSelfMember())) return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect()) AudioUtils.connect(channel, track.getContext(channel.getJDA()));
 		player.getTrackScheduler().setPaused(false);
 		if (track != null && track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
-			track.getContext(guild.getJDA()).sendMessage(Util.getUser(member.getUser()) + " joined the channel, resumed the player!").queue();
+			track.getContext(guild.getJDA()).sendMessage(member.equals(guild.getSelfMember()) ? "Resumed the player!" : Util.getUser(member.getUser()) + " joined the channel, resumed the player!").queue();
 		musicTimeout.remove(guild.getId());
 	}
-
-	private static void onLeave(Guild guild, VoiceChannel voiceChannel) {
+	
+	public static void onLeave(Guild guild, VoiceChannel voiceChannel) {
 		if (!AudioUtils.isAlone(voiceChannel)) return;
 		MusicManager musicManager = AudioUtils.getManager().get(guild);
 		TrackContext track = musicManager.getTrackScheduler().getCurrentTrack();
@@ -64,17 +66,26 @@ public class VoiceChannelListener implements EventListener {
 			if (event instanceof GuildVoiceMoveEvent) {
 				VoiceChannel joined = ((GuildVoiceMoveEvent) event).getChannelJoined();
 				VoiceChannel left = ((GuildVoiceMoveEvent) event).getChannelLeft();
-				if (AudioUtils.isAlone(joined) && event.getMember().equals(event.getGuild().getSelfMember()))
-					onLeave(joined.getGuild(), joined);
-				else if (AudioUtils.isAlone(left))
-					onLeave(left.getGuild(), left);
-				else
-					onJoin(joined.getGuild(), joined, event.getMember());
+				boolean isSelf = event.getMember().equals(event.getGuild().getSelfMember());
+				if (isSelf) {
+					if (isAlone(joined))
+						onLeave(joined.getGuild(), joined);
+					else
+						onJoin(joined.getGuild(), joined, event.getMember());
+				} else {
+					if (isAlone(left) && left == event.getGuild().getAudioManager().getConnectedChannel())
+						onLeave(left.getGuild(), left);
+					else if (!isAlone(joined) && joined == event.getGuild().getAudioManager().getConnectedChannel())
+						onJoin(joined.getGuild(), joined, event.getMember());
+				}
 				
-			} else if (event instanceof GuildVoiceJoinEvent)
-				onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
-			else if (event instanceof GuildVoiceLeaveEvent)
-				onLeave(event.getGuild(), ((GuildVoiceLeaveEvent) event).getChannelLeft());
+			} else if (event instanceof GuildVoiceJoinEvent) {
+				if (((GuildVoiceJoinEvent) event).getChannelJoined() == event.getGuild().getAudioManager().getConnectedChannel())
+					onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
+			} else if (event instanceof GuildVoiceLeaveEvent) {
+				if (((GuildVoiceLeaveEvent) event).getChannelLeft() == event.getGuild().getAudioManager().getConnectedChannel())
+					onLeave(event.getGuild(), ((GuildVoiceLeaveEvent) event).getChannelLeft());
+			}
 		}
 	}
 }

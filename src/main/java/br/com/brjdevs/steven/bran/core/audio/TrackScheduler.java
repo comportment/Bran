@@ -165,6 +165,8 @@ public class TrackScheduler implements AudioEventListener {
 	}
 	
 	public void play(TrackContext trackContext, boolean noInterrupt) {
+		if (isPaused())
+			setPaused(false);
 		player.startTrack(trackContext != null ? trackContext.getTrack() : null, noInterrupt);
 		if (isStopped())
 			onSchedulerStop();
@@ -304,6 +306,5 @@ public class TrackScheduler implements AudioEventListener {
 		if (getPreviousTrack() != null && getPreviousTrack().getContext(getJDA()) != null && getPreviousTrack().getContext(getJDA()).canTalk())
 			getPreviousTrack().getContext(getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + Bot.getDefaultPrefixes()[0] + "music play [SONG]`.").queue();
 		getGuild().getAudioManager().closeAudioConnection();
-		//AudioUtils.getManager().unregister(guildId);
 	}
 }

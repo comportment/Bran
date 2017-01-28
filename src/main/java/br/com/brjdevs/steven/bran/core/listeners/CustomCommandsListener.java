@@ -27,6 +27,7 @@ public class CustomCommandsListener implements EventListener {
 		answer = answer.replaceAll("%channel%", textChannel.getAsMention());
 		answer = answer.replaceAll("%guild%", guild.getName());
 		answer = answer.replaceAll("%input%", args);
+		answer = answer.replaceAll("%id%", member.getUser().getId());
 		Matcher matcher = RANDOM_PATTERN.matcher(answer);
 		while (matcher.find()) {
 			String group = matcher.group(0);
@@ -36,7 +37,7 @@ public class CustomCommandsListener implements EventListener {
 			answer = answer.replaceAll(group,
 					options[random]);
 		}
-		return answer;
+		return answer.trim();
 	}
 	
 	@Override

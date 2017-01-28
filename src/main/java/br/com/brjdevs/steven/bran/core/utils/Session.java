@@ -2,6 +2,7 @@ package br.com.brjdevs.steven.bran.core.utils;
 
 import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
+import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
 import br.com.brjdevs.steven.bran.core.command.CommandEvent;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -16,7 +17,6 @@ import java.util.List;
 public class Session {
 	
 	private final Runtime instance = Runtime.getRuntime();
-	private final int mb = 1024 * 1024;
 	public double cpuUsage;
 	public long cmds;
 	public long msgsReceived;
@@ -39,7 +39,7 @@ public class Session {
 		List<User> users = Bot.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
 		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).map(entry -> entry.getValue().getTrackScheduler().getQueue().size()).count();
-		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";
+		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
 		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null).count();
 		JDA jda = event.getJDA();
 		
@@ -94,9 +94,15 @@ public class Session {
 		List<User> users = Bot.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
 		long queueSize = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
-		String ram = ((instance.totalMemory() - instance.freeMemory()) / mb) + " MB/" + (instance.totalMemory() / mb) + " MB";
+		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
 		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
 		long paused = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
+		String check = "✅";
+		if (audioConnections > nowPlaying + paused) {
+			for (Guild guild : jda.getGuilds())
+				if (guild.getAudioManager().isConnected() && !VoiceChannelListener.musicTimeout.has(guild.getId()) && AudioUtils.isAlone(guild.getAudioManager().getConnectedChannel()))
+					check = "❌";
+		}
 		String out = "";
 		out += "```prolog\n";
 		out += "--Bot Stats--\n";
@@ -117,7 +123,7 @@ public class Session {
 		out += "Executed Commands: " + cmds + "\n";
 		out += "Running Polls: " + Poll.getRunningPolls().size() +"\n\n";
 		out += "--Music--\n";
-		out += "Connections: " + audioConnections + "\n";
+		out += "Connections: " + audioConnections + " '" + check + "'\n";
 		out += "Queue Size: " + queueSize + "\n";
 		out += "Now Playing: " + nowPlaying + "\n";
 		out += "Paused: " + paused;

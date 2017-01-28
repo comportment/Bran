@@ -110,7 +110,7 @@ public class PermissionCommand {
 						.setArgs(new Argument<>("user", String.class, true))
 						.setExample("perms get <@219186621008838669>")
                         .setAction((event, a) -> {
-	                        if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+	                        if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 		                        event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
 		                        return;
 	                        }
@@ -132,6 +132,10 @@ public class PermissionCommand {
 						.setName("Permission List Command")
 						.setDescription("Lists you all the available permissions to be assigned")
 						.setAction((event) -> {
+							if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+								event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
+								return;
+							}
 							EmbedBuilder embedBuilder = new EmbedBuilder();
 							embedBuilder.setTitle("All of my permissions");
 							embedBuilder.setDescription(Permissions.toCollection(Permissions.BOT_OWNER).stream().collect(Collectors.joining(", ")));
@@ -147,6 +151,10 @@ public class PermissionCommand {
 						.setArgs(new Argument<>("permissions", String.class))
 						.setRequiredPermission(Permissions.PERMSYS_GO)
 						.setAction((event) -> {
+							if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+								event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
+								return;
+							}
 							int toBeSet = 0, toBeUnset = 0;
 							String[] r = ((String) event.getArgument("permissions").get()).split("\\s+");
 							for (String each : r) {

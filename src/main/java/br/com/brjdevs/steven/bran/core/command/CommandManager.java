@@ -7,7 +7,6 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.DiscordLog;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.events.Event;
@@ -117,7 +116,6 @@ public class CommandManager implements EventListener {
 					} catch (Exception ex) {
 						Bot.LOG.log(ex);
 						e.sendMessage(Quotes.FAIL, "A `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.").queue();
-						DiscordLog.log(ex);
 					}
 				}).run();
 	}

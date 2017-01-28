@@ -71,23 +71,23 @@ public class AudioLoader implements AudioLoadResultHandler {
 					for (int i = tracks.size(); i > 0; i--) {
 						inputs.add(String.valueOf(i));
 					}
-					Action action = new Action(ActionType.MESSAGE, onInvalidResponse.CANCEL, msg, (message, args) -> {
+					Action action = new Action(ActionType.MESSAGE, onInvalidResponse.CONTINUE, msg, (message, args) -> {
 						if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
 							message.deleteMessage().queue();
 						String response = message.getContent();
-						if (response.matches("^(c|cancel)$")) {
+						if (Util.containsEqualsIgnoreCase(inputs, response)) {
+							int i = Integer.parseInt(response);
+							TrackContext trackContext = tracks.get(i - 1);
+							musicManager.getTrackScheduler().queue(trackContext);
+							if (msg != null)
+								msg.deleteMessage().queue();
+						} else {
 							if (msg != null)
 								msg.editMessage("Query canceled!").queue();
 							else
 								channel.sendMessage("Query canceled!").queue();
 							if (musicManager.getTrackScheduler().isStopped())
 								channel.getGuild().getAudioManager().closeAudioConnection();
-						} else if (Util.containsEqualsIgnoreCase(inputs, response)) {
-							int i = Integer.parseInt(response);
-							TrackContext trackContext = tracks.get(i - 1);
-							musicManager.getTrackScheduler().queue(trackContext);
-							if (msg != null)
-								msg.deleteMessage().queue();
 						}
 					}, inputs);
 					action.addUser(user);

@@ -35,6 +35,7 @@ public class TaskManager {
 			    ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
 	    startAsyncTask(
 			    () -> Bot.getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100), 5);
+	
 	    startAsyncTask(() -> musicTimeout.entrySet().forEach(entry -> {
 		    try {
 			    JDA jda = Bot.getShard(entry.getValue().getAsJsonObject().get("shard").getAsInt());
@@ -47,8 +48,8 @@ public class TaskManager {
 				    musicTimeout.remove(entry.getKey());
 				    return;
 			    }
-			    JsonObject info = musicTimeout.get(guild.getId()).getAsJsonObject();
-			    info.addProperty("timeout", info.get("timeout").getAsInt() - 10);
+			    JsonObject info = entry.getValue().getAsJsonObject();
+			    info.addProperty("timeout", info.get("timeout").getAsInt() - 1);
 			    musicTimeout.remove(guild.getId());
 			    if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect() || guild.getSelfMember().getVoiceState().isMuted())
 				    return;
@@ -62,7 +63,7 @@ public class TaskManager {
 				    scheduler.getQueue().clear();
 				    scheduler.play(player.getTrackScheduler().provideNextTrack(true), false);
 				    if (track.getContext(jda) != null && track.getContext(jda).canTalk())
-					    track.getContext(jda).sendMessage("Nobody rejoined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
+					    track.getContext(jda).sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
 				    player.getTrackScheduler().setPaused(false);
 				    if (guild.getAudioManager().isConnected())
 					    guild.getAudioManager().closeAudioConnection();
@@ -72,6 +73,6 @@ public class TaskManager {
 		    } catch (Exception e) {
 			    e.printStackTrace();
 		    }
-	    }), 10);
+	    }), 1);
     }
 }

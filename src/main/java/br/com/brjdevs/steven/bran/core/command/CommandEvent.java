@@ -121,7 +121,8 @@ public class CommandEvent {
         return (TextChannel) getChannel();
     }
     public Member getSelfMember() {
-        return guild.getSelfMember();
+	    if (isPrivate()) return null;
+	    return guild.getSelfMember();
     }
     public MessageReceivedEvent getEvent() {
         return event;

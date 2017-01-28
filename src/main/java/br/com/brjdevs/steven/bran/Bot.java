@@ -40,7 +40,7 @@ public class Bot implements EventListener {
 	static Map<Integer, JDA> shards = new HashMap<>();
 	private static String WORKING_DIR = System.getProperty("user.dir") + "/data/";
 	private static BotData DATA = new BotData();
-	private static String[] PREFIXES = {"b!"};//{"!!", "."};
+	private static String[] PREFIXES = {"!!", "."};
 	private static long START_TIME = System.currentTimeMillis();
 	
 	public static void main(String[] args) throws Throwable {

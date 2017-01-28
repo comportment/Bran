@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.core.audio.utils;
 
 import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.core.audio.ConnectionListenerImpl;
 import br.com.brjdevs.steven.bran.core.audio.MusicPlayerManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
 import br.com.brjdevs.steven.bran.core.utils.Util;
@@ -8,7 +9,10 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.Region;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.managers.AudioManager;
 
 public class AudioUtils {
@@ -67,26 +71,23 @@ public class AudioUtils {
 		AudioManager audioManager = vchan.getGuild().getAudioManager();
 		if (selfMember.getVoiceState().isSelfMuted())
 			audioManager.setSelfMuted(false);
-		if (audioManager.isAttemptingToConnect()) {
-			Message message = tchan.sendMessage("Attempting to Connect to " + audioManager.getQueuedAudioConnection().getName() + "..." + (shouldWarn ? "\n" + warning : "")).complete();
-			while (audioManager.isAttemptingToConnect())
-				Util.sleep(100);
-			message.editMessage("Connected to **" + audioManager.getConnectedChannel().getName() + "**!" + (shouldWarn ? "\n" + warning : "")).queue();
-			return audioManager.getConnectedChannel();
-		}
 		if (audioManager.isConnected()) return audioManager.getConnectedChannel();
 		try {
 			audioManager.setSelfDeafened(true);
+			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild()));
 			audioManager.openAudioConnection(vchan);
 		} catch (Exception e) {
 			tchan.sendMessage("I couldn't connect to the voice channel! " + (shouldWarn ? "\n" + warning : "I'm not sure why... `" + e.getMessage())).queue();
 			return null;
 		}
-		return connect(vchan, tchan);
+		while (audioManager.isAttemptingToConnect())
+			Util.sleep(100);
+		return audioManager.getConnectedChannel();
 	}
 	public static boolean isAlone(VoiceChannel channel) {
-		return channel.getMembers().size() == 1
-				&& channel.getMembers().get(0).getUser().equals(Bot.getSelfUser(channel.getJDA()));
+		for (Member member : channel.getMembers())
+			if (!member.getUser().isBot()) return false;
+		return true;
 	}
 	public static boolean isAllowed(User user, TrackContext context) {
 		return context.getDJ(user.getJDA()) != null && context.getDJId().equals(user.getId());

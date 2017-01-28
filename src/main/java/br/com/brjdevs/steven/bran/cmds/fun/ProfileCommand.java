@@ -35,14 +35,13 @@ public class ProfileCommand {
 				.setHelp("profile ?")
 				.setDescription("Manage and View your Profile!")
 				.onNotFound(CommandAction.REDIRECT)
-				.setPrivateAvailable(false)
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("view")
 						.setDescription("Gives you information on the requested profile.")
 						.setArgs(new Argument<>("mention", String.class, true))
 						.setName("Profile View Command")
 						.setAction((event) -> {
-							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+							if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 								event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
 								return;
 							}

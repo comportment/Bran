@@ -28,7 +28,7 @@ public class LookupCommand {
 				.setDescription("Gives you information on a website")
 				.setArgs(new Argument<>("site", String.class))
 				.setAction((event, rawArgs) -> {
-					if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+					if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
 						return;
 					}
