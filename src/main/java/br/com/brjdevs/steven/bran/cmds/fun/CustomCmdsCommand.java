@@ -41,7 +41,7 @@ public class CustomCmdsCommand {
 								event.sendMessage("You have to enable Custom Commands using `" + event.getPrefix() + "cmds enabled toggle` to use this command!").queue();
 								return;
 							}
-							String cmdName = (String) event.getArgument("name").get();
+							String cmdName = ((String) event.getArgument("name").get()).toLowerCase();
 							if (event.getDiscordGuild().getCustomCommands().hasCustomCommand(cmdName)) {
 								event.sendMessage(Quotes.FAIL, "This Guild already has a command named **" + cmdName + "**, if you want to add answers to the command use `" + event.getPrefix() + "cmds addanswer " + cmdName + " [answer]`.").queue();
 								return;
@@ -203,13 +203,13 @@ public class CustomCmdsCommand {
 						.setDescription("Renames Custom Commands.")
 						.setArgs(new Argument<>("old name", String.class), new Argument<>("new name", String.class))
 						.setAction((event) -> {
-							String oldName = (String) event.getArgument("old name").get();
+							String oldName = ((String) event.getArgument("old name").get()).toLowerCase();
 							CustomCommand command = event.getDiscordGuild().getCustomCommands().getCustomCommand(oldName);
 							if (command == null) {
 								event.sendMessage(String.format("I didn't find any commands named `%s` in this guild!", oldName)).queue();
 								return;
 							}
-							String newName = (String) event.getArgument("new name").get();
+							String newName = ((String) event.getArgument("new name").get()).toLowerCase();
 							if (newName.contains(" ")) {
 								event.sendMessage("The new name cannot contain spaces.").queue();
 								return;

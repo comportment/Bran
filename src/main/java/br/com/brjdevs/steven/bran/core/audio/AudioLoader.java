@@ -5,7 +5,6 @@ import br.com.brjdevs.steven.bran.core.action.Action.onInvalidResponse;
 import br.com.brjdevs.steven.bran.core.action.ActionType;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -75,7 +74,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 						if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
 							message.deleteMessage().queue();
 						String response = message.getContent();
-						if (Util.containsEqualsIgnoreCase(inputs, response)) {
+						if (response.matches("^[1-" + tracks.size() + "]$")) {
 							int i = Integer.parseInt(response);
 							TrackContext trackContext = tracks.get(i - 1);
 							musicManager.getTrackScheduler().queue(trackContext);
