@@ -88,7 +88,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 							if (musicManager.getTrackScheduler().isStopped())
 								channel.getGuild().getAudioManager().closeAudioConnection();
 						}
-					}, inputs);
+					}, inputs, musicManager.container);
 					action.addUser(user);
 				});
 				return;

@@ -1,75 +1,43 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
-import br.com.brjdevs.steven.bran.core.command.CommandEvent;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
-import net.dv8tion.jda.core.EmbedBuilder;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.events.Event;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.hooks.EventListener;
 
-import java.awt.*;
 import java.lang.management.ManagementFactory;
 import java.util.List;
 
-public class Session {
+public class Session implements EventListener {
 	
 	private final Runtime instance = Runtime.getRuntime();
 	public double cpuUsage;
 	public long cmds;
 	public long msgsReceived;
 	public long msgsSent;
-	public Session() {
+	public BotContainer container;
+	
+	public Session(BotContainer container) {
 		this.cpuUsage = 0;
 		this.cmds = 0;
 		this.msgsReceived = 0;
 		this.msgsSent = 0;
+		this.container = container;
 	}
 
 	public void readMessage(boolean isSelf) {
 		if (isSelf) msgsSent++; else msgsReceived++;
 	}
-
-	public MessageEmbed toEmbed (CommandEvent event) {
-		List<Guild> guilds = Bot.getGuilds();
-		List<TextChannel> channels = Bot.getTextChannels();
-		List<VoiceChannel> voiceChannels = Bot.getVoiceChannels();
-		List<User> users = Bot.getUsers();
-		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
-		long queueSize = AudioUtils.getManager().getMusicManagers().entrySet().stream().filter(entry -> !entry.getValue().getTrackScheduler().getQueue().isEmpty()).map(entry -> entry.getValue().getTrackScheduler().getQueue().size()).count();
-		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
-		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null).count();
-		JDA jda = event.getJDA();
-		
-		EmbedBuilder embedBuilder = new EmbedBuilder();
-		embedBuilder.setAuthor("Bot Stats (" + Util.getUser(jda.getSelfUser()) + ")", null, jda.getSelfUser().getAvatarUrl());
-		embedBuilder.addField("Uptime", getUptime(), false);
-		embedBuilder.addField("Threads", String.valueOf(Thread.activeCount()), true);
-		embedBuilder.addField("RAM (USAGE/MAX)", String.valueOf(ram), true);
-		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", true);
-		embedBuilder.addField("JDA Version", JDAInfo.VERSION, true);
-		embedBuilder.addField("API Responses", jda.getResponseTotal() + "\n\n**General**", true);
-		embedBuilder.addField("Shards (ONLINE/TOTAL)", Bot.getShards().size() + "/" + Bot.getOnlineShards(), true);
-		//General Stats
-		embedBuilder.addField("Guilds", String.valueOf(guilds.size()), true);
-		embedBuilder.addField("Users", String.valueOf(users.size()), true);
-		embedBuilder.addField("Text Channels", String.valueOf(channels.size()), true);
-		embedBuilder.addField("Voice Channels", String.valueOf(voiceChannels.size()), true);
-		embedBuilder.addField("Sent Messages", String.valueOf(msgsSent) + "\n\n**Music**", true);
-		embedBuilder.addField("Messages Received", String.valueOf(msgsReceived), true);
-		//embedBuilder.addField("Running Polls", String.valueOf(Poll.getRunningPolls().size()), true);
-		//Music Stats
-		embedBuilder.addField("Connections", String.valueOf(audioConnections), true);
-		embedBuilder.addField("Queue Size", String.valueOf(queueSize), true);
-		embedBuilder.addField("Now Playing", String.valueOf(nowPlaying), true);
-		
-		Color color = event.getGuild().getSelfMember().getColor();
-		embedBuilder.setColor(color == null ? Color.decode("#F1AC1A") : color);
-		
-		return embedBuilder.build();
-	}
+	
 	public String getUptime(){
 		final long
 				duration = ManagementFactory.getRuntimeMXBean().getUptime(),
@@ -88,15 +56,15 @@ public class Session {
 	}
 	
 	public String toString(JDA jda) {
-		List<Guild> guilds = Bot.getGuilds();
-		List<TextChannel> channels = Bot.getTextChannels();
-		List<VoiceChannel> voiceChannels = Bot.getVoiceChannels();
-		List<User> users = Bot.getUsers();
+		List<Guild> guilds = container.getGuilds();
+		List<TextChannel> channels = container.getTextChannels();
+		List<VoiceChannel> voiceChannels = container.getVoiceChannels();
+		List<User> users = container.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
-		long queueSize = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
+		long queueSize = container.musicPlayerManager.getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
-		long nowPlaying = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
-		long paused = AudioUtils.getManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
+		long nowPlaying = container.musicPlayerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
+		long paused = container.musicPlayerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
 		String check = "✅";
 		if (audioConnections > nowPlaying + paused) {
 			for (Guild guild : jda.getGuilds())
@@ -129,5 +97,13 @@ public class Session {
 		out += "Paused: " + paused;
 		out += "```";
 		return out;
+	}
+	
+	@Override
+	public void onEvent(Event e) {
+		if (e instanceof MessageReceivedEvent) {
+			MessageReceivedEvent event = ((MessageReceivedEvent) e);
+			container.getSession().readMessage(event.getAuthor().getId().equals(event.getJDA().getSelfUser().getId()));
+		}
 	}
 }

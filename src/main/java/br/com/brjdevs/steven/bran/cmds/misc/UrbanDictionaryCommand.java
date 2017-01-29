@@ -1,12 +1,12 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.refactor.Main;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -44,7 +44,7 @@ public class UrbanDictionaryCommand {
 							jsonstring += scan.next() + " ";
 						}
 						scan.close();
-						JsonObject json = Bot.GSON.fromJson(jsonstring, JsonElement.class).getAsJsonObject();
+						JsonObject json = Main.GSON.fromJson(jsonstring, JsonElement.class).getAsJsonObject();
 						if(json.get("result_type").getAsString().equals("no_results")){
 							event.sendMessage("There aren't any definitions for `" + params + "` yet.").queue();
 							return;

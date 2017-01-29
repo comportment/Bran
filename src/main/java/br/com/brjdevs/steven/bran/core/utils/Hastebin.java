@@ -24,6 +24,6 @@ public class Hastebin {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+	    return "Could not post!";
     }
 }

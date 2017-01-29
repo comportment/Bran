@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.events.DisconnectEvent;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReconnectedEvent;
@@ -16,14 +16,20 @@ public class ConnectionListener implements EventListener {
 		LOG = SimpleLog.getLog("Connection Listener");
 	}
 	
+	public BotContainer container;
+	
+	public ConnectionListener(BotContainer container) {
+		this.container = container;
+	}
+	
 	@Override
 	public void onEvent(Event event) {
 		if (event instanceof ReconnectedEvent) {
-			LOG.info("ReconnectedEvent on Shard " + Bot.getShardId(event.getJDA()));
+			LOG.info("ReconnectedEvent on Shard " + container.getShardId(event.getJDA()));
 		} else if (event instanceof DisconnectEvent) {
-			LOG.info("DisconnectEvent on Shard " + Bot.getShardId(event.getJDA()));
+			LOG.info("DisconnectEvent on Shard " + container.getShardId(event.getJDA()));
 		} else if (event instanceof ShutdownEvent) {
-			LOG.info("ShutdownEvent on Shard " + Bot.getShardId(event.getJDA()));
+			LOG.info("ShutdownEvent on Shard " + container.getShardId(event.getJDA()));
 		}
 	}
 }

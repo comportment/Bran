@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -30,7 +29,7 @@ public class UserInfoCommand {
 				.setName("User Info Command")
 				.setDescription("Gives you info on the mentioned user")
 				.setArgs(new Argument<>("mention", String.class, true))
-				.setExample("user " + Bot.getSelfUser(Bot.getShard(0)).getId())
+				.setExample("user 219186621008838669")
 				.setPrivateAvailable(false)
 				.setAction((event, args) -> {
 					if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {

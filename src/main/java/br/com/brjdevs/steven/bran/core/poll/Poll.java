@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.core.poll;
 
-import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.refactor.Bot;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.core.JDA;
@@ -25,13 +26,14 @@ public class Poll {
 	@Getter
 	@Setter
 	private int shardId;
-	public Poll(String pollName, Member creator, LinkedList<Option> options, TextChannel channel) {
+	
+	public Poll(String pollName, Member creator, LinkedList<Option> options, TextChannel channel, BotContainer container) {
 		this.pollName = pollName;
 		this.creatorId = creator.getUser().getId();
 		this.options = options;
 		this.channelId = channel.getId();
 		this.guildId = channel.getGuild().getId();
-		setShardId(Bot.getShardId(channel.getJDA()));
+		setShardId(container.getShardId(channel.getJDA()));
 		polls.add(this);
 	}
 	
@@ -43,16 +45,20 @@ public class Poll {
 		return polls.stream().filter(poll -> poll.getChannelId().equals(channel.getId())).findFirst().orElse(null);
 	}
 	
-	public JDA getJDA() {
-		return Bot.getShard(shardId);
+	public Bot getShard(BotContainer container) {
+		return container.getShards()[shardId];
+	}
+	
+	public JDA getJDA(BotContainer container) {
+		return getShard(container).getJDA();
 	}
 	
 	public String getGuildId() {
 		return guildId;
 	}
 	
-	public Guild getGuild() {
-		return getJDA().getGuildById(getGuildId());
+	public Guild getGuild(BotContainer container) {
+		return getJDA(container).getGuildById(getGuildId());
 	}
 
 	public String getPollName() {
@@ -63,8 +69,8 @@ public class Poll {
 		return creatorId;
 	}
 	
-	public User getCreator() {
-		return getJDA().getUserById(getCreatorId());
+	public User getCreator(BotContainer container) {
+		return getJDA(container).getUserById(getCreatorId());
 	}
 
 	public LinkedList<Option> getOptions() {
@@ -75,8 +81,8 @@ public class Poll {
 		return channelId;
 	}
 	
-	public TextChannel getChannel() {
-		return getJDA().getTextChannelById(getChannelId());
+	public TextChannel getChannel(BotContainer container) {
+		return getJDA(container).getTextChannelById(getChannelId());
 	}
 
 	public Option getOption(int optionIndex) {

@@ -42,7 +42,7 @@ public class WordFilterCommand {
 						.setDescription("Lists the filtered words in the current guild.")
 						.setAction((event) -> {
 							if (!event.getDiscordGuild().getWordFilter().isEnabled()) {
-								event.sendMessage("The WordFilter is disabled in this guild." + (event.getGuildMember().hasPermission(Permissions.GUILD_MANAGE, event.getJDA()) ? " Use `" + event.getPrefix() + "wf toggle` to enable it." : "")).queue();
+								event.sendMessage("The WordFilter is disabled in this guild." + (event.getGuildMember().hasPermission(Permissions.GUILD_MANAGE, event.getJDA(), event.getBotContainer()) ? " Use `" + event.getPrefix() + "wf toggle` to enable it." : "")).queue();
 								return;
 							}
 							event.sendPrivate("These are the filtered words in " + event.getGuild().getName()

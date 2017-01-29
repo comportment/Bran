@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.core.command;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
@@ -10,7 +9,8 @@ import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import net.dv8tion.jda.core.EmbedBuilder;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
+import br.com.brjdevs.steven.bran.refactor.DiscordLog.Level;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -32,23 +32,30 @@ import java.util.stream.Collectors;
 import static br.com.brjdevs.steven.bran.core.utils.Util.isEmpty;
 
 public class CommandManager implements EventListener {
-    private static final List<ICommand> commands = new ArrayList<>();
-	private static final SimpleLog LOG = SimpleLog.getLog("Command Manager");
-
-    public static void addCommand (ICommand command) {
-        if (command != null)
+	
+	private final BotContainer container;
+	private final List<ICommand> commands = new ArrayList<>();
+	private final SimpleLog LOG = SimpleLog.getLog("Command Manager");
+	
+	public CommandManager(BotContainer botContainer) {
+		this.container = botContainer;
+		load();
+	}
+	
+	public void addCommand(ICommand command) {
+		if (command != null)
             commands.add(command);
     }
-
-    public static List<ICommand> getCommands () {
-        return commands;
+	
+	public List<ICommand> getCommands() {
+		return commands;
     }
-
-    public static List<ICommand> getCommands(Category category) {
-        return getCommands().stream().filter(cmd -> cmd.getCategory() == category).collect(Collectors.toList());
+	
+	public List<ICommand> getCommands(Category category) {
+		return getCommands().stream().filter(cmd -> cmd.getCategory() == category).collect(Collectors.toList());
     }
-
-    public static void load() {
+	
+	private void load() {
 	    String url = "br.com.brjdevs.steven.bran.cmds";
 	    Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage(url)).setScanners(new SubTypesScanner(),
 			    new TypeAnnotationsScanner(), new MethodAnnotationsScanner()).filterInputsBy(new FilterBuilder().includePackage(url)));
@@ -88,7 +95,8 @@ public class CommandManager implements EventListener {
 		    }
 		    method.setAccessible(false);
 	    });
-    }
+		LOG.info("Finished loading all Commands.");
+	}
 	
 	@Override
 	public void onEvent(Event ev) {
@@ -97,32 +105,29 @@ public class CommandManager implements EventListener {
 		if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
-		DiscordGuild discordGuild = event.getGuild() != null ? DiscordGuild.getInstance(event.getGuild()) : null;
-		String prefix = PrefixManager.getPrefix(args[0], discordGuild);
+		DiscordGuild discordGuild = event.getGuild() != null ? DiscordGuild.getInstance(event.getGuild(), container) : null;
+		String prefix = PrefixManager.getPrefix(args[0], discordGuild, container);
 		if (prefix == null) return;
 		String baseCmd = args[0].substring(prefix.length());
-		ICommand cmd = CommandUtils.getCommand(baseCmd);
+		ICommand cmd = CommandUtils.getCommand(container.commandManager, baseCmd);
 		if (cmd == null) return;
-		CommandEvent e = new CommandEvent(event, cmd, discordGuild, event.getMessage().getRawContent(), prefix);
-		if (TooFast.isEnabled() && !TooFast.checkCanExecute(e)) return;
+		CommandEvent e = new CommandEvent(event, cmd, discordGuild, event.getMessage().getRawContent(), prefix, container);
+		//if (TooFast.isEnabled() && !TooFast.checkCanExecute(e)) return;
 		if (!cmd.isPrivateAvailable() && Util.isPrivate(event)) {
 			e.sendMessage(Quotes.FAIL, "This command is not available through PMs, " +
 					"use it in a Text Channel please.").queue();
 			return;
 		}
-		Bot.getSession().cmds++;
+		container.getSession().cmds++;
 		Util.async(cmd.getName() + ">" + Util.getUser(event.getAuthor()),
 				() -> {
 					try {
 						cmd.execute(e);
 					} catch (Exception ex) {
-						Bot.LOG.log(ex);
+						LOG.log(ex);
 						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.").queue();
 						String url = Hastebin.post(Util.getStackTrace(ex));
-						EmbedBuilder embedBuilder = new EmbedBuilder();
-						embedBuilder.setTitle("Uncaught exception in Thread " + Thread.currentThread().getName() + " (" + cmd.getName() + ")");
-						embedBuilder.setDescription("An unexpected `" + ex.getClass().getSimpleName() + "` occurred.\nMessage: " + ex.getMessage() + "\nStackTrace: " + url);
-						Bot.LOGCHANNEL.sendMessage(embedBuilder.build()).queue();
+						container.getDiscordLog().logToDiscord("Uncaught exception in Thread " + Thread.currentThread().getName(), "An unexpected `" + ex.getClass().getSimpleName() + "` occurred.\nMessage: " + ex.getMessage() + "\nStackTrace: " + url, Level.FATAL);
 					}
 				}).run();
 	}

@@ -1,30 +1,42 @@
 package br.com.brjdevs.steven.bran.core.command;
 
-import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import com.google.gson.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class TooFast {
-	private static final Map<String, JsonObject> userTimeout = new HashMap<>();
-	private static boolean enabled = Bot.getConfig().isTooFastEnabled();
-	static {
-			TaskManager.startAsyncTask(() -> {
-				synchronized (userTimeout) {
-					userTimeout.replaceAll((user, json) -> {
-						int count = Math.max(0, json.get("timeout").getAsInt() - 1);
-						json.addProperty("timeout", count);
-						if (count == 0 && json.get("warned").getAsBoolean())
-							json.addProperty("warned", false);
-						return json;
-					});
-				}
-			}, 5);
+	
+	private final Map<String, JsonObject> userTimeout = new HashMap<>();
+	private BotContainer container;
+	private boolean enabled;
+	
+	public TooFast(BotContainer container) {
+		this.container = container;
+		enabled = container.config.isTooFastEnabled();
+		container.taskManager.startAsyncTask(() -> {
+			synchronized (userTimeout) {
+				userTimeout.replaceAll((user, json) -> {
+					int count = Math.max(0, json.get("timeout").getAsInt() - 1);
+					json.addProperty("timeout", count);
+					if (count == 0 && json.get("warned").getAsBoolean())
+						json.addProperty("warned", false);
+					return json;
+				});
+			}
+		}, 5);
 	}
-	public static boolean checkCanExecute(CommandEvent event) {
+	
+	private static JsonObject defaultObject() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty("timeout", 0);
+		jsonObject.addProperty("warned", false);
+		return jsonObject;
+	}
+	
+	public boolean checkCanExecute(CommandEvent event) {
 		JsonObject jsonObject;
 		int count;
 		synchronized (userTimeout) {
@@ -40,16 +52,12 @@ public class TooFast {
 		}
 		return false;
 	}
-	public static boolean isEnabled() {
+	
+	public boolean isEnabled() {
 		return enabled;
 	}
-	public static void setEnabled(boolean enabled) {
-		TooFast.enabled = enabled;
-	}
-	private static JsonObject defaultObject() {
-		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty("timeout", 0);
-		jsonObject.addProperty("warned", false);
-		return jsonObject;
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 }

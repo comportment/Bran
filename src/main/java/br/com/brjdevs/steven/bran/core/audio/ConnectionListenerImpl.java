@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.core.entities.Guild;
@@ -12,15 +12,17 @@ import net.dv8tion.jda.core.entities.User;
 
 public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.ConnectionListener {
 	
+	public BotContainer container;
 	private int attempts;
 	private long guildId;
 	private int shard;
 	private Message message;
 	
-	public ConnectionListenerImpl(Guild guild) {
+	public ConnectionListenerImpl(Guild guild, BotContainer container) {
 		this.attempts = -1;
 		this.guildId = Long.parseLong(guild.getId());
-		this.shard = Bot.getShardId(guild.getJDA());
+		this.container = container;
+		this.shard = container.getShardId(guild.getJDA());
 	}
 	
 	@Override
@@ -57,7 +59,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			send("The channel I was connected to got deleted, stopped the queue.");
 			scheduler.stop();
 		} else if (connectionStatus == ConnectionStatus.DISCONNECTED_REMOVED_FROM_GUILD) {
-			AudioUtils.getManager().unregister(guildId);
+			container.musicPlayerManager.unregister(guildId);
 		}
 	}
 	
@@ -66,17 +68,17 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	}
 	
 	public MusicManager getMusicManager() {
-		return AudioUtils.getManager().get(getGuild());
+		return container.musicPlayerManager.get(getGuild());
 	}
 	
 	public Guild getGuild() {
-		return Bot.getShard(shard).getGuildById(String.valueOf(guildId));
+		return container.getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
 	public void send(String content) {
 		if (message != null) message.deleteMessage().queue();
 		TrackScheduler scheduler = getMusicManager().getTrackScheduler();
-		JDA jda = scheduler.getJDA();
+		JDA jda = scheduler.getShard().getJDA();
 		TextChannel textChannel = null;
 		if (scheduler.getCurrentTrack() != null)
 			textChannel = scheduler.getCurrentTrack().getContext(jda);

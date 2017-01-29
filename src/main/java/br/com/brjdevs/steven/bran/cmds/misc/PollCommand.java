@@ -58,7 +58,7 @@ public class PollCommand {
 							LinkedList<Option> options = new LinkedList<>();
 							for (String string : list)
 								options.add(new Option(list.indexOf(string), string));
-							new Poll(name, event.getMember(), options, event.getTextChannel());
+							new Poll(name, event.getMember(), options, event.getTextChannel(), event.getBotContainer());
 							event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll add reactions to the message as the votes get added/removed.").queue();
 						})
 						.build())
@@ -94,7 +94,7 @@ public class PollCommand {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
 							}
-							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
+							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getBotContainer())) {
 								event.sendMessage("You can't do this... You're not the creator of this poll nor a Guild Moderator to end this poll!").queue();
 								return;
 							}

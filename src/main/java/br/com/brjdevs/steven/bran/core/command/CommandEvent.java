@@ -7,6 +7,8 @@ import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember.FakeGuild
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.refactor.Bot;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -30,28 +32,39 @@ public class CommandEvent {
     private String prefix;
 	private Map<String, Argument> argsMap;
 	private Argument[] arguments;
+	private BotContainer botContainer;
 	
-	public CommandEvent(MessageReceivedEvent event, ICommand command, DiscordGuild discordGuild, String args, String prefix) {
-        this.event = event;
+	public CommandEvent(MessageReceivedEvent event, ICommand command, DiscordGuild discordGuild, String args, String prefix, BotContainer botContainer) {
+		this.event = event;
         this.command = command;
         this.message = event.getMessage();
         this.author = event.getAuthor();
         this.args = args;
         this.prefix = prefix;
 	    this.argsMap = new HashMap<>();
-	    this.arguments = CommandUtils.copy(command);
+		this.botContainer = botContainer;
+		this.arguments = CommandUtils.copy(command);
 		Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
 		if (!Util.isPrivate(event)) {
             this.discordGuild = discordGuild;
             this.member = event.getMember();
             this.guild = event.getGuild();
-            this.guildMember = discordGuild.getMember(author);
-        }
+			this.guildMember = discordGuild.getMember(author, botContainer);
+		}
         if (this.guildMember == null)
-	        this.guildMember = new FakeGuildMember(author, null);
-    }
-    public String getPrefix() {
-        return prefix;
+	        this.guildMember = new FakeGuildMember(author, null, botContainer);
+	}
+	
+	public Bot getShard() {
+		return botContainer.getShards()[botContainer.getShardId(event.getJDA())];
+	}
+	
+	public BotContainer getBotContainer() {
+		return botContainer;
+	}
+	
+	public String getPrefix() {
+		return prefix;
     }
 	
 	public RestAction<Message> sendMessage(Quotes quote, String msg) {
@@ -142,8 +155,8 @@ public class CommandEvent {
 	
 	public CommandEvent createChild(ICommand command, boolean b) {
         String newArgs = b ? args : args.replaceFirst(" ", "");
-        CommandEvent event = new CommandEvent(this.event, command, discordGuild, newArgs, prefix);
-        Thread.currentThread().setName(command.getName() + ">" + Util.getUser(event.getAuthor()));
+		CommandEvent event = new CommandEvent(this.event, command, discordGuild, newArgs, prefix, botContainer);
+		Thread.currentThread().setName(command.getName() + ">" + Util.getUser(event.getAuthor()));
 	    command.execute(event);
 		return event;
     }

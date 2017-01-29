@@ -1,9 +1,8 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
-import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import com.sedmelluq.discord.lavaplayer.tools.io.MessageInput;
 import com.sedmelluq.discord.lavaplayer.tools.io.MessageOutput;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -33,14 +32,21 @@ public class MusicPersistence {
 		LOG = SimpleLog.getLog("Music Persistence");
 	}
 	
+	private BotContainer container;
+	
+	public MusicPersistence(BotContainer container) {
+		this.container = container;
+		reloadPlaylists();
+	}
+	
 	@SneakyThrows(Exception.class)
-	public static boolean savePlaylists() {
-		if (!Bot.getConfig().isMusicPersistenceEnabled()) {
+	public boolean savePlaylists() {
+		if (!container.config.isMusicPersistenceEnabled()) {
 			LOG.info("Music Persistence is disabled in config.json.");
 			return true;
 		}
 		LOG.info("Initiating MusicPersistence pre shutdown.");
-		File dir = new File(System.getProperty("user.dir") + "/music_persistence");
+		File dir = new File(System.getProperty("user.dir"), "music_persistence");
 		if (!dir.exists()) {
 			try {
 				if (!dir.mkdirs()) throw new RuntimeException("Could not create dir.");
@@ -51,7 +57,7 @@ public class MusicPersistence {
 			}
 		}
 		String msg = "I'm going to restart, I'll be back in a minute and the current playlist will be reloaded!";
-		for (MusicManager musicManager : AudioUtils.getManager().getMusicManagers().values()) {
+		for (MusicManager musicManager : container.musicPlayerManager.getMusicManagers().values()) {
 			if (musicManager == null || musicManager.getGuild() == null) continue;
 			TrackScheduler trackScheduler = musicManager.getTrackScheduler();
 			if (trackScheduler == null) continue;
@@ -62,8 +68,8 @@ public class MusicPersistence {
 			if (trackScheduler.isStopped())
 				continue;
 			if (trackScheduler.getVoiceChannel() == null) continue;
-			if (trackScheduler.getCurrentTrack() != null && trackScheduler.getCurrentTrack().getContext(trackScheduler.getJDA()) != null)
-				trackScheduler.getCurrentTrack().getContext(trackScheduler.getJDA()).sendMessage(msg).queue();
+			if (trackScheduler.getCurrentTrack() != null && trackScheduler.getCurrentTrack().getContext(trackScheduler.getShard().getJDA()) != null)
+				trackScheduler.getCurrentTrack().getContext(trackScheduler.getShard().getJDA()).sendMessage(msg).queue();
 			JSONObject data = new JSONObject();
 			data.put("vc", trackScheduler.getVoiceChannel().getId());
 			data.put("paused", trackScheduler.isPaused());
@@ -77,7 +83,7 @@ public class MusicPersistence {
 			List<JSONObject> sources = new ArrayList<>();
 			for (TrackContext track : trackScheduler.getRemainingTracks()) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				AudioUtils.getManager().getAudioPlayerManager().encodeTrack(new MessageOutput(baos), track.getTrack());
+				container.musicPlayerManager.getAudioPlayerManager().encodeTrack(new MessageOutput(baos), track.getTrack());
 				JSONObject src = new JSONObject();
 				src.put("track", Base64.encodeBase64String(baos.toByteArray()));
 				src.put("channel", track.getContextId());
@@ -94,12 +100,12 @@ public class MusicPersistence {
 		return true;
 	}
 	
-	public static boolean reloadPlaylists() {
-		if (!Bot.getConfig().isMusicPersistenceEnabled()) {
+	public boolean reloadPlaylists() {
+		if (!container.config.isMusicPersistenceEnabled()) {
 			LOG.info("Music Persistence is disabled in config.json.");
 			return true;
 		}
-		File dir = new File(System.getProperty("user.dir") + "/music_persistence");
+		File dir = new File(System.getProperty("user.dir"), "music_persistence");
 		if (!dir.exists()) return true;
 		
 		File[] files = dir.listFiles();
@@ -124,8 +130,8 @@ public class MusicPersistence {
 				if (!file.delete()) {
 					LOG.warn("Could not delete File named '" + guildId + "'");
 				}
-				int shardId = (int) (Long.parseLong(guildId) >> 22) % Bot.getShards().size();
-				JDA jda = Bot.getShard(shardId);
+				int shardId = (int) (Long.parseLong(guildId) >> 22) % container.getShards().length;
+				JDA jda = container.getShards()[shardId].getJDA();
 				if (jda == null) continue;
 				Guild guild = jda.getGuildById(guildId);
 				if (guild == null) continue;
@@ -141,7 +147,7 @@ public class MusicPersistence {
 				boolean repeat = data.getBoolean("repeat");
 				JSONArray voteSkips = data.getJSONArray("voteskips");
 				
-				TrackScheduler trackScheduler = AudioUtils.getManager().get(jda.getGuildById(guildId)).getTrackScheduler();
+				TrackScheduler trackScheduler = container.musicPlayerManager.get(jda.getGuildById(guildId)).getTrackScheduler();
 				
 				trackScheduler.setPaused(isPaused);
 				trackScheduler.setShuffle(shuffle);
@@ -157,7 +163,7 @@ public class MusicPersistence {
 					
 					try {
 						ByteArrayInputStream bais = new ByteArrayInputStream(track);
-						audioTrack = AudioUtils.getManager().getAudioPlayerManager().decodeTrack(new MessageInput(bais)).decodedTrack;
+						audioTrack = container.musicPlayerManager.getAudioPlayerManager().decodeTrack(new MessageInput(bais)).decodedTrack;
 					} catch (Exception e) {
 						LOG.fatal("Failed to decode Audio Track");
 						LOG.log(e);

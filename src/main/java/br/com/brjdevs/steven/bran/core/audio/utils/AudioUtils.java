@@ -1,10 +1,9 @@
 package br.com.brjdevs.steven.bran.core.audio.utils;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.audio.ConnectionListenerImpl;
-import br.com.brjdevs.steven.bran.core.audio.MusicPlayerManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.Permission;
@@ -16,7 +15,6 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.managers.AudioManager;
 
 public class AudioUtils {
-	private static final MusicPlayerManager musicPlayerManager = new MusicPlayerManager();
 	
 	public static String format(long length) {
 		long hours = length / 3600000L % 24,
@@ -26,8 +24,8 @@ public class AudioUtils {
 				+ (minutes == 0 ? "00" : decimal(minutes)) + ":" + (seconds == 0 ? "00" : decimal(seconds));
 	}
 	
-	public static boolean canConnect() {
-		return Bot.getSession().cpuUsage < 40;
+	public static boolean canConnect(BotContainer container) {
+		return container.getSession().cpuUsage < 40;
 	}
 	public static long getLength(AudioPlaylist audioPlaylist) {
 		long[] total = {0};
@@ -41,12 +39,10 @@ public class AudioUtils {
 		if (num > 9) return String.valueOf(num);
 		return "0" + num;
 	}
-	public static MusicPlayerManager getManager() {
-		return musicPlayerManager;
-	}
-	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan) {
-		if (!canConnect()) {
-			tchan.sendMessage("I'm sorry about this but I'm a bit overloaded right now (" + Bot.getSession().cpuUsage + "% cpu) so can you ask me to join the channel later? I can't push myself too hard, I'm still in testing phase \uD83D\uDE26").queue();
+	
+	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan, BotContainer container) {
+		if (!canConnect(container)) {
+			tchan.sendMessage("I'm sorry about this but I'm a bit overloaded right now (" + container.getSession().cpuUsage + "% cpu) so can you ask me to join the channel later? I can't push myself too hard, I'm still in testing phase \uD83D\uDE26").queue();
 			return null;
 		}
 		String warning = "Please note, this guild is located in Brazil so if you notice some slutter or can't hear the song consider changing the server region. (Recommended Region: US South)";
@@ -74,7 +70,7 @@ public class AudioUtils {
 		if (audioManager.isConnected()) return audioManager.getConnectedChannel();
 		try {
 			audioManager.setSelfDeafened(true);
-			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild()));
+			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild(), container));
 			audioManager.openAudioConnection(vchan);
 		} catch (Exception e) {
 			tchan.sendMessage("I couldn't connect to the voice channel! " + (shouldWarn ? "\n" + warning : "I'm not sure why... `" + e.getMessage())).queue();

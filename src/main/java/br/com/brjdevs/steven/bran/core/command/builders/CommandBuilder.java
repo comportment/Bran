@@ -92,7 +92,7 @@ public class CommandBuilder {
 					event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
 					return;
 				}
-				if (!event.getGuildMember().hasPermission(perm, event.getJDA())) {
+				if (!event.getGuildMember().hasPermission(perm, event.getJDA(), event.getBotContainer())) {
 					event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
 					return;
 				}
@@ -108,9 +108,12 @@ public class CommandBuilder {
 				if (args != null) {
 					for (int i = 0; i < args.length; i++) {
 						try {
+							if (s[i].trim().isEmpty() && !args[i].isOptional()) {
+								throw new ArgumentParsingException("Invalid or no were given.");
+							}
 							args[i].parse(s[i].trim());
 							if (!args[i].isPresent() && !args[i].isOptional())
-								throw new ArgumentParsingException("No arguments were given.");
+								throw new ArgumentParsingException("Invalid or no were given.");
 						} catch (ArgumentParsingException | ArrayIndexOutOfBoundsException ex) {
 							if (!args[i].isOptional()) {
 								event.sendMessage("**Bad Arguments:** " + ex.getMessage() + ".\nExpected arguments: " + (String.join(" ", Arrays.stream(getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new)))).queue();

@@ -4,6 +4,7 @@ import br.com.brjdevs.steven.bran.core.action.Action;
 import br.com.brjdevs.steven.bran.core.action.Action.onInvalidResponse;
 import br.com.brjdevs.steven.bran.core.action.ActionType;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -15,6 +16,13 @@ import java.util.stream.Collectors;
 import static br.com.brjdevs.steven.bran.core.utils.Util.containsEqualsIgnoreCase;
 
 public class ActionListener implements EventListener {
+	
+	private BotContainer container;
+	
+	public ActionListener(BotContainer container) {
+		this.container = container;
+	}
+	
 	
 	@Override
 	public void onEvent(Event e) {

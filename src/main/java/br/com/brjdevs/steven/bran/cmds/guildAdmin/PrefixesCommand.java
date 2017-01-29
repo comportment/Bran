@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -57,8 +56,8 @@ public class PrefixesCommand {
 						.setAction((event, rawArgs) -> {
 							DiscordGuild discordGuild = event.getDiscordGuild();
 							try{
-								if(discordGuild.getPrefixes().size() > Bot.MAX_PREFIXES) {
-									event.sendMessage("You cannot have more than " + Bot.MAX_PREFIXES + " prefixes.").queue();
+								if (discordGuild.getPrefixes().size() > 5) {
+									event.sendMessage("You cannot have more than " + 5 + " prefixes.").queue();
 									return;
 								}
 								String[] prefixes = ((String) event.getArgument("prefixes").get()).split("\\s+");

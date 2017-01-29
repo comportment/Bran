@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -30,7 +29,7 @@ public class YodaCommand {
 					try {
 						String string = URLEncoder.encode((String) argument.get(), "UTF-8");
 						response = Unirest.get("https://yoda.p.mashape.com/yoda?sentence=" + string)
-								.header("X-Mashape-Key", Bot.getConfig().getMashapeKey())
+								.header("X-Mashape-Key", event.getBotContainer().config.getMashapeKey())
 								.header("Accept", "text/plain")
 								.asString();
 					} catch (Exception e) {

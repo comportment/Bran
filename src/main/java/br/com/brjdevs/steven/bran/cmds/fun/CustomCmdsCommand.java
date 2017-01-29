@@ -71,7 +71,7 @@ public class CustomCmdsCommand {
 							}
 							CustomCommand command = event.getDiscordGuild().getCustomCommands().getCustomCommand(cmdName);
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getBotContainer())) {
 								event.sendMessage("You can't add responses to this command because you're not its creator or has GUILD_MOD permission.").queue();
 								return;
 							}
@@ -102,7 +102,7 @@ public class CustomCmdsCommand {
 								return;
 							}
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getBotContainer())) {
 								event.sendMessage("You can't delete responses from this command because you're not its owner or has GUILD_MOD permission!").queue();
 								return;
 							}
@@ -136,7 +136,7 @@ public class CustomCmdsCommand {
 								return;
 							}
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getBotContainer())) {
 								event.sendMessage("You can't delete this command because you're not its owner or has GUILD_MOD permission!").queue();
 								return;
 							}

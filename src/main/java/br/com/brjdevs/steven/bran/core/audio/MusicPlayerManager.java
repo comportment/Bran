@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
@@ -13,9 +14,12 @@ import java.util.Map;
 public class MusicPlayerManager {
 	private final AudioPlayerManager playerManager;
 	private final Map<Long, MusicManager> musicManagers;
-	public MusicPlayerManager() {
-		musicManagers = new HashMap<>();
-		playerManager = new DefaultAudioPlayerManager();
+	private final BotContainer container;
+	
+	public MusicPlayerManager(BotContainer container) {
+		this.container = container;
+		this.musicManagers = new HashMap<>();
+		this.playerManager = new DefaultAudioPlayerManager();
 		AudioSourceManagers.registerRemoteSources(playerManager);
 		AudioSourceManagers.registerLocalSource(playerManager);
 	}
@@ -39,7 +43,7 @@ public class MusicPlayerManager {
 	public synchronized MusicManager get(Guild guild) {
 		long guildId = Long.parseLong(guild.getId());
 		MusicManager musicManager = musicManagers
-				.computeIfAbsent(guildId, k -> new MusicManager(playerManager, guild));
+				.computeIfAbsent(guildId, k -> new MusicManager(playerManager, guild, container));
 		
 		if (guild.getAudioManager().getSendingHandler() == null)
 			guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());

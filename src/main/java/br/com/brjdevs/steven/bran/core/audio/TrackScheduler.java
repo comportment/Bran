@@ -1,10 +1,11 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.refactor.Bot;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.*;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity;
@@ -12,7 +13,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
@@ -30,7 +30,7 @@ public class TrackScheduler implements AudioEventListener {
 	private static final SimpleLog LOG = SimpleLog.getLog("Track Scheduler");
 	private static final String announce = "\uD83D\uDD0A Now Playing in **%s**: `%s` (`%s`) added by %s.";
 	private static final Random rand = new Random();
-	
+	public BotContainer container;
 	private AudioPlayer player;
 	private boolean isRepeat;
 	private boolean isShuffle;
@@ -42,7 +42,7 @@ public class TrackScheduler implements AudioEventListener {
 	private int shard;
 	private AtomicReference<Message> messageReference;
 	
-	public TrackScheduler(AudioPlayer player, Long guildId, int shard) {
+	public TrackScheduler(AudioPlayer player, Long guildId, int shard, BotContainer container) {
 		this.player = player;
 		this.isRepeat = false;
 		this.isShuffle = false;
@@ -53,6 +53,7 @@ public class TrackScheduler implements AudioEventListener {
 		this.voteSkips = new ArrayList<>();
 		this.shard = shard;
 		this.queue = new LinkedBlockingQueue<>();
+		this.container = container;
 	}
 	
 	public String getQueueDuration() {
@@ -95,7 +96,7 @@ public class TrackScheduler implements AudioEventListener {
 	}
 	
 	public Guild getGuild() {
-		return getJDA().getGuildById(String.valueOf(guildId));
+		return getShard().getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
 	public BlockingQueue<TrackContext> getQueue() {
@@ -144,8 +145,8 @@ public class TrackScheduler implements AudioEventListener {
 		}
 	}
 	
-	public JDA getJDA() {
-		return Bot.getShard(shard);
+	public Bot getShard() {
+		return container.getShards()[shard];
 	}
 	
 	public boolean isStopped() {
@@ -189,8 +190,8 @@ public class TrackScheduler implements AudioEventListener {
 	public void queue(TrackContext context) {
 		queue.offer(context);
 		AudioTrackInfo info = context.getTrack().getInfo();
-		if (context.getDJ(getJDA()) != null && context.getContext(getJDA()) != null)
-			context.getContext(getJDA()).sendMessage(context.getDJ(getJDA()).getAsMention() + " has added `" + info.title + "` to the queue. (`" + AudioUtils.format(info.length) + "`)").queue();
+		if (context.getDJ(getShard().getJDA()) != null && context.getContext(getShard().getJDA()) != null)
+			context.getContext(getShard().getJDA()).sendMessage(context.getDJ(getShard().getJDA()).getAsMention() + " has added `" + info.title + "` to the queue. (`" + AudioUtils.format(info.length) + "`)").queue();
 		if (player.getPlayingTrack() == null)
 			play(provideNextTrack(false), true);
 	}
@@ -266,11 +267,11 @@ public class TrackScheduler implements AudioEventListener {
 			TrackStartEvent event = (TrackStartEvent) audioEvent;
 			if (currentTrack == null && getAudioPlayer().getPlayingTrack() != null) {
 				LOG.fatal("Got TrackStartEvent with null AudioTrackContext in Guild " + guildId + ", finished session.");
-				AudioUtils.getManager().getMusicManagers().remove(guildId);
+				container.musicPlayerManager.getMusicManagers().remove(guildId);
 				return;
 			}
-			if (currentTrack.getContext(getJDA()) != null && !isRepeat) {
-				currentTrack.getContext(getJDA()).sendMessage(String.format(announce, getVoiceChannel().getName(), currentTrack.getTrack().getInfo().title, AudioUtils.format(currentTrack.getTrack()), Util.getUser(currentTrack.getDJ(getJDA())))).queue(message -> {
+			if (currentTrack.getContext(getShard().getJDA()) != null && !isRepeat) {
+				currentTrack.getContext(getShard().getJDA()).sendMessage(String.format(announce, getVoiceChannel().getName(), currentTrack.getTrack().getInfo().title, AudioUtils.format(currentTrack.getTrack()), Util.getUser(currentTrack.getDJ(getShard().getJDA())))).queue(message -> {
 					Message msg = messageReference.get();
 					if (msg != null && !msg.isEdited()) msg.deleteMessage().queue();
 					messageReference.set(message);
@@ -278,22 +279,22 @@ public class TrackScheduler implements AudioEventListener {
 			}
 		} else if (audioEvent instanceof TrackExceptionEvent) {
 			TrackExceptionEvent event = (TrackExceptionEvent) audioEvent;
-			if (currentTrack != null && currentTrack.getContext(getJDA()) != null
-					&& currentTrack.getContext(getJDA()).canTalk()) {
-				if (currentTrack.getContext(getJDA()) != null && currentTrack.getContext(getJDA()).canTalk()) {
+			if (currentTrack != null && currentTrack.getContext(getShard().getJDA()) != null
+					&& currentTrack.getContext(getShard().getJDA()).canTalk()) {
+				if (currentTrack.getContext(getShard().getJDA()) != null && currentTrack.getContext(getShard().getJDA()).canTalk()) {
 					String string = "\u274c Failed to Load `" + currentTrack.getTrack().getInfo().title + "`!\n" +
 							(event.exception.severity.equals(Severity.COMMON) ? StringUtils.neat(event.track.getSourceManager().getSourceName()) + " said: " : event.exception.severity.equals(Severity.SUSPICIOUS) ? "I don't know what exactly caused it, but I've got this: " : "This error might be caused by the library (Lavaplayer) or an external unidentified factor: ") + "`" + event.exception.getMessage() + "`";
 					Message msg = messageReference.get();
 					if (msg != null)
 						msg.editMessage(string).queue();
 					else
-						currentTrack.getContext(getJDA()).sendMessage(string).queue();
+						currentTrack.getContext(getShard().getJDA()).sendMessage(string).queue();
 				}
 			}
 		} else if (audioEvent instanceof TrackStuckEvent) {
 			TrackStuckEvent event = (TrackStuckEvent) audioEvent;
-			if (currentTrack != null && currentTrack.getContext(getJDA()) != null)
-				currentTrack.getContext(getJDA()).sendMessage("Track got stuck, skipping...").queue();
+			if (currentTrack != null && currentTrack.getContext(getShard().getJDA()) != null)
+				currentTrack.getContext(getShard().getJDA()).sendMessage("Track got stuck, skipping...").queue();
 			play(provideNextTrack(true), false);
 		}
 	}
@@ -303,8 +304,8 @@ public class TrackScheduler implements AudioEventListener {
 			LOG.fatal("Got onSchedulerStop with currentTrack not null.");
 			return;
 		}
-		if (getPreviousTrack() != null && getPreviousTrack().getContext(getJDA()) != null && getPreviousTrack().getContext(getJDA()).canTalk())
-			getPreviousTrack().getContext(getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + Bot.getDefaultPrefixes()[0] + "music play [SONG]`.").queue();
+		if (getPreviousTrack() != null && getPreviousTrack().getContext(getShard().getJDA()) != null && getPreviousTrack().getContext(getShard().getJDA()).canTalk())
+			getPreviousTrack().getContext(getShard().getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + container.config.getDefaultPrefixes().get(0) + "music play [SONG]`.").queue();
 		getGuild().getAudioManager().closeAudioConnection();
 	}
 }

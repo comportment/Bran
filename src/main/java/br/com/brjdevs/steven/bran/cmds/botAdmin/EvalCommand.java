@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.cmds.botAdmin;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -16,8 +15,6 @@ public class EvalCommand {
 	
 	static {
 		eval = new ScriptEngineManager().getEngineByName("nashorn");
-		eval.put("cfg", Bot.getConfig());
-		eval.put("owner", Bot.getOwner());
 	}
 	
 	@Command
@@ -30,7 +27,9 @@ public class EvalCommand {
                 .setRequiredPermission(Permissions.EVAL)
 				.setArgs(new Argument<>("js code", String.class))
 				.setAction((event, args) -> {
-                    eval.put("jda", event.getJDA());
+					eval.put("shard", event.getShard());
+					eval.put("container", event.getBotContainer());
+					eval.put("jda", event.getJDA());
                     eval.put("event", event);
                     eval.put("args", args);
                     eval.put("author", event.getAuthor());

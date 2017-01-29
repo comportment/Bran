@@ -4,6 +4,7 @@ import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.WordFilterSettings;
 import br.com.brjdevs.steven.bran.core.utils.RestActionSleep;
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
@@ -15,6 +16,12 @@ import java.util.concurrent.TimeUnit;
 
 public class WordFilterListener implements EventListener {
 	
+	public BotContainer container;
+	
+	public WordFilterListener(BotContainer container) {
+		this.container = container;
+	}
+	
 	private static boolean canManageMessages(TextChannel channel) {
 		return channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE);
 	}
@@ -25,7 +32,7 @@ public class WordFilterListener implements EventListener {
 		GenericGuildMessageEvent event = (GenericGuildMessageEvent) e;
 		if (event.getMessage() == null) return;
 		if (!canManageMessages(event.getChannel())) return;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild());
+		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
 		WordFilterSettings wordFilter = discordGuild.getWordFilter();
 		if (!wordFilter.isEnabled()) return;
 		boolean bool = false;

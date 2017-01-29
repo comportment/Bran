@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
-import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 public class RequirementsUtils {
     //TODO spam check
     public static final float MAX_BOTS = 75f;
-
-    public static List<Guild> getBotCollections() {
-	    return Bot.getGuilds().stream()
+	
+	public static List<Guild> getBotCollections(BotContainer container) {
+		return container.getGuilds().stream()
 			    .filter(g ->
 					    (100f / (float) g.getMembers().size())
                                 * (float) getBots(g).size() > MAX_BOTS)

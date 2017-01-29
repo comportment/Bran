@@ -9,8 +9,8 @@ public class CommandUtils {
 		return tree.getSubCommands().stream().filter(sub -> sub.getAliases().contains(alias)).findFirst().orElse(null);
 	}
 	
-	public static ICommand getCommand(String alias) {
-		return CommandManager.getCommands().stream().filter(cmd -> cmd.getAliases().contains(alias)).findFirst().orElse(null);
+	public static ICommand getCommand(CommandManager manager, String alias) {
+		return manager.getCommands().stream().filter(cmd -> cmd.getAliases().contains(alias)).findFirst().orElse(null);
 	}
 	
 	public static Argument[] copy(ICommand cmd) {

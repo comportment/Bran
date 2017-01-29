@@ -1,20 +1,17 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
-
-import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.BotManager;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.DataManager;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
 import br.com.brjdevs.steven.bran.core.utils.RequirementsUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.refactor.ExitCodes;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
@@ -26,6 +23,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static br.com.brjdevs.steven.bran.core.managers.Permissions.BOT_ADMIN;
 
@@ -43,7 +41,7 @@ public class BotCommand {
 						.setAliases("info")
 						.setName("Info Command")
 						.setDescription("Gives you information about me!")
-						.setAction((event) -> event.sendMessage(Bot.getInfo()).queue())
+						.setAction((event) -> event.sendMessage(event.getShard().getInfo()).queue())
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("inviteme", "invite")
@@ -67,7 +65,7 @@ public class BotCommand {
 						.setAliases("stats", "status")
 						.setName("Stats Command")
 						.setDescription("Gives you my current statistics!")
-						.setAction((event) -> event.sendMessage(Bot.getSession().toString(event.getJDA())).queue())
+						.setAction((event) -> event.sendMessage(event.getBotContainer().getSession().toString(event.getJDA())).queue())
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("ping")
@@ -92,7 +90,7 @@ public class BotCommand {
 								.setDescription("Saves Guild and Bot Data.")
 								.setAction((event) -> {
 									try {
-										DataManager.saveData();
+										event.getBotContainer().dataManager.saveData();
 										event.sendMessage(Quotes.SUCCESS, "Successfully saved Bot and Guild data.").queue();
 									} catch (Exception e) {
 										event.sendMessage(Quotes.FAIL, "There was an error while saving the data: " + Hastebin.post(Util.getStackTrace(e))).queue();
@@ -104,9 +102,8 @@ public class BotCommand {
 								.setName("Shutdown Command")
 								.setDescription("Saves Guild and Bot Data and stops the bot.")
 								.setAction((event, args) -> {
-									BotManager.preShutdown();
 									event.sendMessage("\uD83D\uDC4B").complete();
-									BotManager.shutdown(false, 0);
+									event.getBotContainer().shutdownAll(ExitCodes.SHUTDOWN);
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -114,9 +111,8 @@ public class BotCommand {
 								.setName("Restart Command")
 								.setDescription("Restarts the Bot")
 								.setAction((event) -> {
-									BotManager.preShutdown();
 									event.sendMessage(":wave:").queue();
-									BotManager.shutdown(false, 15);
+									event.getBotContainer().shutdownAll(ExitCodes.RESTART);
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -124,7 +120,7 @@ public class BotCommand {
 								.setName("Update Stats Command")
 								.setDescription("Updates the current guild amount in DiscordBots.")
 								.setAction((event) -> {
-									Bot.updateStats();
+									event.getShard().updateStats();
 									event.sendMessage(Quotes.SUCCESS, "Updated status at Discord Bots!\nhttps://bots.discord.pw/bots/219186621008838669").queue();
 								})
 								.build())
@@ -164,7 +160,7 @@ public class BotCommand {
 										.setArgs(new Argument<>("name", String.class))
 										.setAction((event, args) -> {
 											String name = (String) event.getArgument("name").get();
-											Bot.getShards().forEach((i, shard) -> shard.getSelfUser().getManager().setName(name).queue());
+											Stream.of(event.getBotContainer().getShards()).forEach((shard) -> shard.getJDA().getSelfUser().getManager().setName(name).queue());
 											event.sendMessage("Updated my name! Yay, I've got a new name, cool! :smile:").queue();
 										})
 										.build())
@@ -180,14 +176,14 @@ public class BotCommand {
 										.setDescription("Lists you the Bot Collection Guilds.")
 										.setArgs(new Argument<>("page", Integer.class, true))
 										.setAction((event, args) -> {
-											if (RequirementsUtils.getBotCollections().isEmpty()) {
+											if (RequirementsUtils.getBotCollections(event.getBotContainer()).isEmpty()) {
 												event.sendMessage("Oh yeah, I'm not in any Bot Collection Guilds!").queue();
 												return;
 											}
 											Argument pageArg = event.getArgument("amount");
 											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
-											ListBuilder listBuilder = new ListBuilder(RequirementsUtils.getBotCollections().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getShardId(g.getJDA()) + "]) Bots: " + Util.DECIMAL_FORMAT.format(RequirementsUtils.getBotsPercentage(g))).collect(Collectors.toList()), page, 15);
-											listBuilder.setName("Bot Collection Guilds").setFooter("Total Guilds: " + RequirementsUtils.getBotCollections().size());
+											ListBuilder listBuilder = new ListBuilder(RequirementsUtils.getBotCollections(event.getBotContainer()).stream().map(g -> g.getName() + " (" + g.getId() + "[" + event.getBotContainer().getShardId(g.getJDA()) + "]) Bots: " + Util.DECIMAL_FORMAT.format(RequirementsUtils.getBotsPercentage(g))).collect(Collectors.toList()), page, 15);
+											listBuilder.setName("Bot Collection Guilds").setFooter("Total Guilds: " + RequirementsUtils.getBotCollections(event.getBotContainer()).size());
 											event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 										})
 										.build())
@@ -199,8 +195,8 @@ public class BotCommand {
 										.setAction((event, args) -> {
 											Argument pageArg = event.getArgument("page");
 											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
-											ListBuilder listBuilder = new ListBuilder(Bot.getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bot.getShardId(g.getJDA()) + "]) | Owner: " + Util.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
-											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + Bot.getGuilds().size());
+											ListBuilder listBuilder = new ListBuilder(event.getBotContainer().getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + event.getBotContainer().getShardId(g.getJDA()) + "]) | Owner: " + Util.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
+											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + event.getBotContainer().getGuilds().size());
 											event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 										})
 										.build())
@@ -218,7 +214,7 @@ public class BotCommand {
 											}
 											guild.leave().queue();
 											event.sendMessage(Quotes.SUCCESS, "Left " + guild.getName() + "." +
-													(RequirementsUtils.getBotCollections().contains(guild) ? " *Finally, I really wanted to leave that Bot Collection Guild...*" : " But... Why?! That Guild wasn't a Bot Collection!")).queue();
+													(RequirementsUtils.getBotCollections(event.getBotContainer()).contains(guild) ? " *Finally, I really wanted to leave that Bot Collection Guild...*" : " But... Why?! That Guild wasn't a Bot Collection!")).queue();
 										})
 										.build())
 								.build())

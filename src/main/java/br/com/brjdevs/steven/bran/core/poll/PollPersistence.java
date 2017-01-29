@@ -1,9 +1,7 @@
 package br.com.brjdevs.steven.bran.core.poll;
 
-import br.com.brjdevs.steven.bran.Bot;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -17,24 +15,31 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.charset.Charset;
 
+import static br.com.brjdevs.steven.bran.refactor.Main.GSON;
+
 public class PollPersistence {
 	
 	private static final SimpleLog LOG;
-	private static final Gson GSON;
 	
 	static {
 		LOG = SimpleLog.getLog("Poll Persistence");
-		GSON = new GsonBuilder().serializeNulls().create();
+	}
+	
+	private BotContainer container;
+	
+	public PollPersistence(BotContainer container) {
+		this.container = container;
+		reloadPolls();
 	}
 	
 	@SneakyThrows(Exception.class)
-	public static boolean savePolls() {
-		if (!Bot.getConfig().isPollPersistenceEnabled()) {
+	public boolean savePolls() {
+		if (!container.config.isPollPersistenceEnabled()) {
 			LOG.info("Poll Persistence is disabled in config.json.");
 			return true;
 		}
 		LOG.info("Initiating PollPersistence pre shutdown.");
-		File dir = new File(System.getProperty("user.dir") + "/poll_persistence");
+		File dir = new File(System.getProperty("user.dir"), "poll_persistence");
 		if (!dir.exists()) {
 			try {
 				if (!dir.mkdirs()) throw new RuntimeException("Could not create dir.");
@@ -52,12 +57,12 @@ public class PollPersistence {
 	}
 	
 	@SneakyThrows(Exception.class)
-	public static boolean reloadPolls() {
-		if (!Bot.getConfig().isPollPersistenceEnabled()) {
+	public boolean reloadPolls() {
+		if (!container.config.isPollPersistenceEnabled()) {
 			LOG.info("Poll Persistence is disabled in config.json.");
 			return true;
 		}
-		File dir = new File(System.getProperty("user.dir") + "/poll_persistence");
+		File dir = new File(System.getProperty("user.dir"), "poll_persistence");
 		if (!dir.exists()) return true;
 		File[] files = dir.listFiles();
 		if (files == null) {
@@ -70,13 +75,13 @@ public class PollPersistence {
 		}
 		for (File file : files) {
 			String guildId = file.getName();
-			int shardId = (int) (Long.parseLong(guildId) >> 22) % Bot.getShards().size();
+			int shardId = (int) (Long.parseLong(guildId) >> 22) % container.getShards().length;
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			Poll poll = GSON.fromJson(reader, Poll.class);
 			poll.setShardId(shardId);
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setTitle(poll.getPollName());
-			builder.setFooter("This Poll was created by " + Util.getUser(poll.getCreator()), Util.getAvatarUrl(poll.getCreator()));
+			builder.setFooter("This Poll was created by " + Util.getUser(poll.getCreator(container)), Util.getAvatarUrl(poll.getCreator(container)));
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append("**Current Votes**\n");
 			poll.getOptions().forEach(option ->
@@ -84,9 +89,9 @@ public class PollPersistence {
 			builder.setDescription(stringBuilder.toString());
 			builder.setColor(Color.decode("#F89F3F"));
 			Message message = new MessageBuilder().setEmbed(builder.build())
-					.append("I had to restart but I reloaded the Poll from where it stopped!")
+					.append("I just restarted for a short time but the Poll is back!")
 					.build();
-			poll.getChannel().sendMessage(message).queue();
+			poll.getChannel(container).sendMessage(message).queue();
 			Poll.getRunningPolls().add(poll);
 			if (!file.delete()) {
 				LOG.fatal("Failed to delete File " + file.getPath());

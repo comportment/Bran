@@ -6,6 +6,7 @@ import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -19,6 +20,11 @@ import java.util.regex.Pattern;
 public class CustomCommandsListener implements EventListener {
 	
 	private static Pattern RANDOM_PATTERN = Pattern.compile("(\\$random\\{.+?;+.+?})", Pattern.CASE_INSENSITIVE);
+	public BotContainer container;
+	
+	public CustomCommandsListener(BotContainer container) {
+		this.container = container;
+	}
 	
 	private static String parseTag(String answer, Member member, TextChannel textChannel, Guild guild, String args) {
 		answer = answer.replace("%user%", member.getEffectiveName());
@@ -42,12 +48,13 @@ public class CustomCommandsListener implements EventListener {
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild());
+		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
 		if (!discordGuild.getCustomCommands().check()) return;
 		String msg = event.getMessage().getRawContent().trim().toLowerCase().split("\\s+")[0];
 		String prefix = PrefixManager.getPrefix0(msg, discordGuild);
 		if (prefix == null) return;
-		if (!discordGuild.getMember(event.getAuthor()).hasPermission(Permissions.RUN_USRCMD, event.getJDA())) return;
+		if (!discordGuild.getMember(event.getAuthor(), container).hasPermission(Permissions.RUN_USRCMD, event.getJDA(), container))
+			return;
 		String baseCmd = msg.substring(prefix.length()).split("\\s+")[0];
 		CustomCommand command = discordGuild.getCustomCommands().getCustomCommand(baseCmd);
 		if (command == null) return;

@@ -1,7 +1,5 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
-import br.com.brjdevs.steven.bran.Bot;
-
 import java.util.Random;
 
 public class MathUtils {
@@ -22,7 +20,7 @@ public class MathUtils {
 		return "0" + i;
 	}
 	public static boolean isInRange(int check, int min, int max) {
-		if (min > max) Bot.LOG.fatal("Attempted to check Range with min > max.");
+		if (min > max) throw new IndexOutOfBoundsException("min > max (" + min + ">" + max + ")");
 		return check > min && check < max;
 	}
 	public static int parseIntOrDefault(String str, int d) {

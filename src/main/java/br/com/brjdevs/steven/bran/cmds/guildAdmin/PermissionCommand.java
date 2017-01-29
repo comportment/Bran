@@ -78,13 +78,13 @@ public class PermissionCommand {
 							List<Member> members = event.getGuild().getMembers().stream().filter(member -> member.getUser() != event.getAuthor() && !member.getUser().isBot() && !member.getUser().isFake()).collect(Collectors.toList());
 							OperationResult operationResult = null;
 	                        if (!isEveryone) {
-		                        operationResult = event.getDiscordGuild().getMember(user).setPermission(event, toBeSet, toBeUnset);
+		                        operationResult = event.getDiscordGuild().getMember(user, event.getBotContainer()).setPermission(event, toBeSet, toBeUnset);
 	                        }
 	                        else {
 		                        long fToBeSet = toBeSet;
 		                        long fToBeUnset = toBeUnset;
 		                        members.forEach(member -> {
-			                        if (event.getDiscordGuild().getMember(member).setPermission(event, fToBeSet, fToBeUnset).getResult() == ResultType.SUCCESS)
+			                        if (event.getDiscordGuild().getMember(member, event.getBotContainer()).setPermission(event, fToBeSet, fToBeUnset).getResult() == ResultType.SUCCESS)
 				                        holder.value++;
 		                        });
 	                        }
@@ -116,11 +116,11 @@ public class PermissionCommand {
 	                        }
 	                        User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getJDA().getUserById((String) event.getArgument("user").get()) : event.getMessage().getMentionedUsers().get(0);
 	                        if (user == null) user = event.getAuthor();
-	                        GuildMember member = event.getDiscordGuild().getMember(user);
+	                        GuildMember member = event.getDiscordGuild().getMember(user, event.getBotContainer());
 	                        EmbedBuilder builder = new EmbedBuilder();
                             builder.setTitle("Permissions for " + Util.getUser(user));
-                            builder.setDescription((String.join(", ", member.getPermissions(event.getJDA()))) + "\n\nRaw: " + member.getRawPermissions(event.getJDA()));
-                            builder.setThumbnail(Util.getAvatarUrl(user));
+	                        builder.setDescription((String.join(", ", member.getPermissions(event.getJDA(), event.getBotContainer()))) + "\n\nRaw: " + member.getRawPermissions(event.getJDA(), event.getBotContainer()));
+	                        builder.setThumbnail(Util.getAvatarUrl(user));
                             builder.setFooter("Requested by " + Util.getUser(event.getAuthor()), Util.getAvatarUrl(event.getAuthor()));
                             builder.setColor(Color.decode("#9318E6"));
                             event.sendMessage(builder.build()).queue();

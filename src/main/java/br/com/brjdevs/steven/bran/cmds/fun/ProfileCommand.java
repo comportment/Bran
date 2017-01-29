@@ -46,8 +46,8 @@ public class ProfileCommand {
 								return;
 							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getAuthor() : event.getMessage().getMentionedUsers().get(0);
-							GuildMember member = event.getDiscordGuild().getMember(user);
-							event.sendMessage(member.getProfile().createEmbed(event.getJDA())).queue();
+							GuildMember member = event.getDiscordGuild().getMember(user, event.getBotContainer());
+							event.sendMessage(member.getProfile(event.getBotContainer()).createEmbed(event.getJDA())).queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -55,7 +55,7 @@ public class ProfileCommand {
 						.setDescription("Shows you your inventory.")
 						.setArgs(new Argument<>("page", Integer.class, true))
 						.setAction((event) -> {
-							Inventory inventory = event.getGuildMember().getProfile().getInventory();
+							Inventory inventory = event.getGuildMember().getProfile(event.getBotContainer()).getInventory();
 							if (inventory.isEmpty()) {
 								event.sendMessage("Your inventory is empty!").queue();
 								return;
@@ -83,7 +83,7 @@ public class ProfileCommand {
 								.setArgs(new Argument<>("hex", String.class, true))
 								.setDescription("Set or update your custom color!")
 								.setAction((event, rawArgs) -> {
-									Profile profile = event.getGuildMember().getProfile();
+									Profile profile = event.getGuildMember().getProfile(event.getBotContainer());
 									Argument argument = event.getArgument("hex");
 									if (!argument.isPresent()) {
 										if (profile.getCustomHex() != null) {

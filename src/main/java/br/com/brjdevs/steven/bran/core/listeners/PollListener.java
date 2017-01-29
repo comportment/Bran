@@ -6,6 +6,7 @@ import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
+import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -15,6 +16,13 @@ import java.util.regex.Pattern;
 
 public class PollListener implements EventListener {
 	private static final Pattern OPTION_INDEX = Pattern.compile("^([0-9]{1,2})$");
+	
+	public BotContainer container;
+	
+	public PollListener(BotContainer container) {
+		this.container = container;
+	}
+	
 	@Override
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
@@ -24,9 +32,9 @@ public class PollListener implements EventListener {
 		String msg = event.getMessage().getRawContent();
 		if (!MathUtils.isInteger(msg)) return;
 		if (!OPTION_INDEX.matcher(msg).matches()) return;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild());
-		GuildMember guildMember = discordGuild.getMember(event.getAuthor());
-		if (!guildMember.hasPermission(Permissions.POLL, event.getJDA())) return;
+		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
+		GuildMember guildMember = discordGuild.getMember(event.getAuthor(), container);
+		if (!guildMember.hasPermission(Permissions.POLL, event.getJDA(), container)) return;
 		Poll poll = Poll.getPoll(event.getChannel());
 		if (poll == null) return;
 		int i = Integer.parseInt(msg) - 1;
