@@ -44,12 +44,14 @@ public class DiscordLog {
 	}
 	
 	public void logToDiscord(GuildJoinEvent event) {
+		Guild guild = event.getGuild();
 		logChannel.sendMessage(Level.INFO.getBaseEmbed("\uD83C\uDFE0 Joined Guild")
 				.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "  (" + RequirementsUtils.getBotsPercentage(guild) + "% bots)\n**Owner:** " + Util.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")")
 				.build()).queue();
 	}
 	
 	public void logToDiscord(GuildLeaveEvent event) {
+		Guild guild = event.getGuild();
 		logChannel.sendMessage(Level.INFO.getBaseEmbed("\uD83C\uDFDA Left Guild")
 				.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "  (" + RequirementsUtils.getBotsPercentage(guild) + "% bots)\n**Owner:** " + Util.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")")
 				.build()).queue();

@@ -34,7 +34,7 @@ public class VoiceChannelListener implements EventListener {
 		MusicManager player = container.playerManager.get(guild);
 		TrackContext track = player.getTrackScheduler().getCurrentTrack();
 		if (track == null) track = player.getTrackScheduler().getPreviousTrack();
-		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.TIMING_OUT.get(guild.getId()).left.toString());
+		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.TIMING_OUT.get(guild.getId()).right);
 		if (voiceChannel != channel && !member.equals(guild.getSelfMember())) return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
 			AudioUtils.connect(channel, track.getContext(channel.getJDA()), container);
@@ -84,8 +84,9 @@ public class VoiceChannelListener implements EventListener {
 				}
 				
 			} else if (event instanceof GuildVoiceJoinEvent) {
-				if (((GuildVoiceJoinEvent) event).getChannelJoined() == event.getGuild().getAudioManager().getConnectedChannel())
+				if (((GuildVoiceJoinEvent) event).getChannelJoined() == event.getGuild().getAudioManager().getConnectedChannel()) {
 					onJoin(event.getGuild(), ((GuildVoiceJoinEvent) event).getChannelJoined(), event.getMember());
+				}
 			} else if (event instanceof GuildVoiceLeaveEvent) {
 				if (((GuildVoiceLeaveEvent) event).getChannelLeft() == event.getGuild().getAudioManager().getConnectedChannel())
 					onLeave(event.getGuild(), ((GuildVoiceLeaveEvent) event).getChannelLeft());
