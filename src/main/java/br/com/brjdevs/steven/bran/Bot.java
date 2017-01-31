@@ -1,10 +1,11 @@
-package br.com.brjdevs.steven.bran.refactor;
+package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.mashape.unirest.http.Unirest;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import org.json.JSONObject;
 
@@ -32,13 +33,18 @@ public class Bot {
 	
 	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
 		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(container.config.getToken());
+		if (!Util.isEmpty(container.config.getGame()))
+			jdaBuilder.setGame(
+					container.config.isGameStream() ? Game.of(container.config.getGame(), "https://twitch.tv/ ") : Game.of(container.config.getGame()));
 		if (totalShards > 1)
 			jdaBuilder.useSharding(shardId, totalShards);
 		jdaBuilder.setEventManager(eventManager);
 		jdaBuilder.setBulkDeleteSplittingEnabled(false);
 		jdaBuilder.setEnableShutdownHook(false);
+		jdaBuilder.setAutoReconnect(true);
 		jda = jdaBuilder.buildBlocking();
-		this.startup = System.currentTimeMillis();
+		if (startup == 0)
+			this.startup = System.currentTimeMillis();
 		this.lastReboot = System.currentTimeMillis();
 	}
 	

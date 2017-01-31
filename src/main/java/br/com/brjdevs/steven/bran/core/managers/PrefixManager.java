@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.managers;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 
 import java.util.ArrayList;
 import java.util.List;

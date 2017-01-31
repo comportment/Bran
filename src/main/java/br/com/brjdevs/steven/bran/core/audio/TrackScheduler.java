@@ -1,11 +1,11 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
+import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import br.com.brjdevs.steven.bran.refactor.Bot;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.*;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -263,11 +264,13 @@ public class TrackScheduler implements AudioEventListener {
 			if (endReason.mayStartNext) {
 				play(provideNextTrack(false), false);
 			}
+			container.taskManager.getChannelLeaveTimer().removeMusicPlayer(guildId.toString());
+			container.taskManager.getMusicRegisterTimeout().removeMusicPlayer(guildId.toString());
 		} else if (audioEvent instanceof TrackStartEvent) {
 			TrackStartEvent event = (TrackStartEvent) audioEvent;
 			if (currentTrack == null && getAudioPlayer().getPlayingTrack() != null) {
 				LOG.fatal("Got TrackStartEvent with null AudioTrackContext in Guild " + guildId + ", finished session.");
-				container.musicPlayerManager.getMusicManagers().remove(guildId);
+				container.playerManager.getMusicManagers().remove(guildId);
 				return;
 			}
 			if (currentTrack.getContext(getShard().getJDA()) != null && !isRepeat) {
@@ -306,6 +309,7 @@ public class TrackScheduler implements AudioEventListener {
 		}
 		if (getPreviousTrack() != null && getPreviousTrack().getContext(getShard().getJDA()) != null && getPreviousTrack().getContext(getShard().getJDA()).canTalk())
 			getPreviousTrack().getContext(getShard().getJDA()).sendMessage("Finished playing queue, disconnecting... If you want to play more music use `" + container.config.getDefaultPrefixes().get(0) + "music play [SONG]`.").queue();
+		container.taskManager.getMusicRegisterTimeout().addMusicPlayer(guildId.toString(), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(30));
 		getGuild().getAudioManager().closeAudioConnection();
 	}
 }

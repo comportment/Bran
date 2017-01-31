@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 
 public class EventListener implements IEventListener {
 	

@@ -1,12 +1,12 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -60,7 +60,9 @@ public class CustomCommandsListener implements EventListener {
 		if (command == null) return;
 		String args = StringUtils.splitArgs(event.getMessage().getRawContent(), 2)[1];
 		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args);
-		event.getChannel().sendTyping().queue(success ->
-				event.getChannel().sendMessage(answer).queue());
+		if (!answer.isEmpty()) {
+			event.getChannel().sendTyping().queue(success ->
+					event.getChannel().sendMessage(answer).queue());
+		}
 	}
 }

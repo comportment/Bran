@@ -1,4 +1,4 @@
-package br.com.brjdevs.steven.bran.refactor;
+package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.RequirementsUtils;

@@ -1,10 +1,10 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.action.Action;
 import br.com.brjdevs.steven.bran.core.action.Action.onInvalidResponse;
 import br.com.brjdevs.steven.bran.core.action.ActionType;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;

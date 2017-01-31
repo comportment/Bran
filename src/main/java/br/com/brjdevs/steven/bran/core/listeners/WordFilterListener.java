@@ -1,10 +1,10 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.WordFilterSettings;
 import br.com.brjdevs.steven.bran.core.utils.RestActionSleep;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;

@@ -1,5 +1,7 @@
 package br.com.brjdevs.steven.bran.core.command;
 
+import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
@@ -9,8 +11,6 @@ import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
-import br.com.brjdevs.steven.bran.refactor.DiscordLog.Level;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.EventListener;

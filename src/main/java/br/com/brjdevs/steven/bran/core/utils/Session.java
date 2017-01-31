@@ -1,9 +1,8 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
 import net.dv8tion.jda.core.entities.Guild;
@@ -61,14 +60,14 @@ public class Session implements EventListener {
 		List<VoiceChannel> voiceChannels = container.getVoiceChannels();
 		List<User> users = container.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
-		long queueSize = container.musicPlayerManager.getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
+		long queueSize = container.playerManager.getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
-		long nowPlaying = container.musicPlayerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
-		long paused = container.musicPlayerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
+		long nowPlaying = container.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
+		long paused = container.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
 		String check = "✅";
 		if (audioConnections > nowPlaying + paused) {
 			for (Guild guild : jda.getGuilds())
-				if (guild.getAudioManager().isConnected() && !VoiceChannelListener.musicTimeout.has(guild.getId()) && AudioUtils.isAlone(guild.getAudioManager().getConnectedChannel()))
+				if (guild.getAudioManager().isConnected() && !container.taskManager.getChannelLeaveTimer().TIMING_OUT.containsKey(guild.getId()) && AudioUtils.isAlone(guild.getAudioManager().getConnectedChannel()))
 					check = "❌";
 		}
 		String out = "";

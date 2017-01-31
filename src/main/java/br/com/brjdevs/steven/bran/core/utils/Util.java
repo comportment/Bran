@@ -1,6 +1,12 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
+import br.com.brjdevs.steven.bran.Bot;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.ChannelType;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
@@ -77,5 +83,28 @@ public class Util {
 	}
 	public static boolean containsEqualsIgnoreCase(Collection<String> collection, String s) {
 		return collection.stream().anyMatch((item) -> item.equalsIgnoreCase(s));
+	}
+	
+	public static MessageEmbed createShardInfo(Bot shard) {
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		JDA jda = shard.getJDA();
+		embedBuilder.setTitle("Shard #" + shard.getId());
+		embedBuilder.addField("Total Uptime", DateUtils.format(System.currentTimeMillis() - shard.getStartup()), true);
+		embedBuilder.addField("Last Reboot", DateUtils.format(System.currentTimeMillis() - shard.getLastReboot()), true);
+		embedBuilder.addField("Last Event", DateUtils.format(System.currentTimeMillis() - shard.container.getLastEvents().get(shard.getId())), true);
+		embedBuilder.addField("Event Manager Shutdown", String.valueOf(shard.getEventManager().executor.isShutdown()), true);
+		embedBuilder.addField("Status", jda.getStatus().name(), true);
+		embedBuilder.addField("General", "**Users:** " + jda.getUsers().size() + "\n**Guilds:** " + jda.getGuilds().size() + "\n**Audio Connections:** " + jda.getGuilds().stream().filter(guild -> guild.getAudioManager().isConnected()).count(), true);
+		return embedBuilder.build();
+	}
+	
+	public static <T> T deepCopy(T object, Class<T> type) {
+		try {
+			Gson gson = new GsonBuilder().serializeNulls().create();
+			return gson.fromJson(gson.toJson(object, type), type);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

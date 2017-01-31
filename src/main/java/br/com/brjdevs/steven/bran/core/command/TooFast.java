@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.command;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import com.google.gson.JsonObject;
 
 import java.util.HashMap;

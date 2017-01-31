@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.poll;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.charset.Charset;
 
-import static br.com.brjdevs.steven.bran.refactor.Main.GSON;
+import static br.com.brjdevs.steven.bran.Main.GSON;
 
 public class PollPersistence {
 	

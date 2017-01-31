@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
+import br.com.brjdevs.steven.bran.BotContainer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
@@ -21,7 +21,6 @@ public class MusicPlayerManager {
 		this.musicManagers = new HashMap<>();
 		this.playerManager = new DefaultAudioPlayerManager();
 		AudioSourceManagers.registerRemoteSources(playerManager);
-		AudioSourceManagers.registerLocalSource(playerManager);
 	}
 	
 	public Map<Long, MusicManager> getMusicManagers() {
@@ -31,6 +30,8 @@ public class MusicPlayerManager {
 	public void unregister(Long guildId) {
 		if (musicManagers.containsKey(guildId)) {
 			MusicManager manager = musicManagers.remove(guildId);
+			container.taskManager.getChannelLeaveTimer().removeMusicPlayer(guildId.toString());
+			container.taskManager.getMusicRegisterTimeout().removeMusicPlayer(guildId.toString());
 			if (manager.getGuild() != null)
 				manager.getGuild().getAudioManager().setSendingHandler(null);
 		}

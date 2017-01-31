@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.core.entities.Guild;
@@ -41,7 +41,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			if (!scheduler.isStopped() && scheduler.isPaused())
 				scheduler.setPaused(false);
 			attempts = 0;
-			if (AudioUtils.isAlone(getGuild().getAudioManager().getConnectedChannel()) && !VoiceChannelListener.musicTimeout.has(getGuild().getId()))
+			if (AudioUtils.isAlone(getGuild().getAudioManager().getConnectedChannel()) && !container.taskManager.getChannelLeaveTimer().TIMING_OUT.containsKey(getGuild().getId()))
 				VoiceChannelListener.onLeave(getGuild(), getGuild().getAudioManager().getConnectedChannel());
 		} else if (connectionStatus == ConnectionStatus.AUDIO_REGION_CHANGE) {
 			scheduler.setPaused(true);
@@ -59,7 +59,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			send("The channel I was connected to got deleted, stopped the queue.");
 			scheduler.stop();
 		} else if (connectionStatus == ConnectionStatus.DISCONNECTED_REMOVED_FROM_GUILD) {
-			container.musicPlayerManager.unregister(guildId);
+			container.playerManager.unregister(guildId);
 		}
 	}
 	
@@ -68,7 +68,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	}
 	
 	public MusicManager getMusicManager() {
-		return container.musicPlayerManager.get(getGuild());
+		return container.playerManager.get(getGuild());
 	}
 	
 	public Guild getGuild() {

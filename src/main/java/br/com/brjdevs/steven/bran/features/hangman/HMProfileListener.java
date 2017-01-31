@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class HMProfileListener implements IProfileListener {

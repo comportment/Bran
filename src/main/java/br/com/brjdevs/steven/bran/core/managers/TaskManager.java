@@ -1,32 +1,33 @@
 package br.com.brjdevs.steven.bran.core.managers;
 
-import br.com.brjdevs.steven.bran.core.audio.MusicManager;
-import br.com.brjdevs.steven.bran.core.audio.TrackContext;
-import br.com.brjdevs.steven.bran.core.audio.TrackScheduler;
-import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.utils.Hastebin;
-import br.com.brjdevs.steven.bran.core.utils.Util;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
-import br.com.brjdevs.steven.bran.refactor.DiscordLog.Level;
-import com.google.gson.JsonObject;
+import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.core.audio.timers.ChannelLeaveTimer;
+import br.com.brjdevs.steven.bran.core.audio.timers.MusicRegisterTimeout;
 import com.sun.management.OperatingSystemMXBean;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.VoiceChannel;
 
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener.musicTimeout;
-
 public class TaskManager {
 	
 	public BotContainer container;
+	private MusicRegisterTimeout musicRegisterTimeout;
+	private ChannelLeaveTimer channelLeaveTimer;
 	
 	public TaskManager(BotContainer container) {
 		this.container = container;
+		this.musicRegisterTimeout = new MusicRegisterTimeout(container);
+		this.channelLeaveTimer = new ChannelLeaveTimer(container);
 		startAsyncTasks();
+	}
+	
+	public ChannelLeaveTimer getChannelLeaveTimer() {
+		return channelLeaveTimer;
+	}
+	
+	public MusicRegisterTimeout getMusicRegisterTimeout() {
+		return musicRegisterTimeout;
 	}
 	
 	public void startAsyncTask(Runnable run, int seconds) {
@@ -40,10 +41,9 @@ public class TaskManager {
 	    startAsyncTask(
 			    () -> container.getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100), 5);
 		
-		startAsyncTask(() -> {
+		/*startAsyncTask(() -> {
 		    try {
-			    JsonObject copy = new JsonObject();
-			    musicTimeout.entrySet().forEach(entry -> copy.add(entry.getKey(), entry.getValue()));
+			    JsonObject copy = Util.deepCopy(musicTimeout, JsonObject.class);
 			    copy.entrySet().forEach(entry -> {
 				    JDA jda = container.getShards()[entry.getValue().getAsJsonObject().get("shard").getAsInt()].getJDA();
 				    if (jda == null) {
@@ -63,7 +63,7 @@ public class TaskManager {
 				    VoiceChannel channel = guild.getVoiceChannelById(info.get("channelId").getAsString());
 				    if (channel == null || !AudioUtils.isAlone(channel)) return;
 				    if (info.get("timeout").getAsInt() == 0) {
-					    MusicManager player = container.musicPlayerManager.get(guild);
+					    MusicManager player = container.playerManager.get(guild);
 					    TrackScheduler scheduler = player.getTrackScheduler();
 					    TrackContext track = scheduler.getCurrentTrack();
 					    if (track == null) track = scheduler.getPreviousTrack();
@@ -83,6 +83,6 @@ public class TaskManager {
 			    String url = Hastebin.post(Util.getStackTrace(e));
 			    container.getDiscordLog().logToDiscord("Uncaught exception in Thread " + Thread.currentThread().getName(), "An unexpected `" + e.getClass().getSimpleName() + "` occurred.\nMessage: " + e.getMessage() + "\nStackTrace: " + url, Level.FATAL);
 		    }
-		}, 1);
+		}, 1);*/
 	}
 }

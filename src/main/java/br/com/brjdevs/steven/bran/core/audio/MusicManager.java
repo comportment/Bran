@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.refactor.Bot;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
+import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.BotContainer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import net.dv8tion.jda.core.entities.Guild;
@@ -13,6 +13,7 @@ public class MusicManager {
 	private final int shard;
 	public BotContainer container;
 	private Long guildId;
+	private PlayerSendHandler sendHandler;
 	
 	public MusicManager(AudioPlayerManager manager, Guild guild, BotContainer container) {
 		player = manager.createPlayer();
@@ -21,6 +22,7 @@ public class MusicManager {
 		this.container = container;
 		scheduler = new TrackScheduler(player, guildId, shard, container);
 		player.addListener(scheduler);
+		this.sendHandler = new PlayerSendHandler(player);
 	}
 	public Guild getGuild() {
 		return getShard().getJDA().getGuildById(String.valueOf(guildId));
@@ -37,6 +39,6 @@ public class MusicManager {
 	}
 	
 	public PlayerSendHandler getSendHandler() {
-		return new PlayerSendHandler(player);
+		return sendHandler;
 	}
 }

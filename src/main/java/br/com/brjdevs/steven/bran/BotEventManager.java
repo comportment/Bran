@@ -1,4 +1,4 @@
-package br.com.brjdevs.steven.bran.refactor;
+package br.com.brjdevs.steven.bran;
 
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.hooks.EventListener;

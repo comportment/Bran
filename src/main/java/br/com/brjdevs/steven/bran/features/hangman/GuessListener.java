@@ -1,10 +1,10 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.features.hangman.events.LeaveGameEvent;
 import br.com.brjdevs.steven.bran.features.hangman.events.LooseEvent;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;

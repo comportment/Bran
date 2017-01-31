@@ -1,8 +1,7 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
+import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
-import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
 import com.sedmelluq.discord.lavaplayer.tools.io.MessageInput;
 import com.sedmelluq.discord.lavaplayer.tools.io.MessageOutput;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -57,12 +56,12 @@ public class MusicPersistence {
 			}
 		}
 		String msg = "I'm going to restart, I'll be back in a minute and the current playlist will be reloaded!";
-		for (MusicManager musicManager : container.musicPlayerManager.getMusicManagers().values()) {
+		for (MusicManager musicManager : container.playerManager.getMusicManagers().values()) {
 			if (musicManager == null || musicManager.getGuild() == null) continue;
 			TrackScheduler trackScheduler = musicManager.getTrackScheduler();
 			if (trackScheduler == null) continue;
-			if (VoiceChannelListener.musicTimeout.has(musicManager.getGuild().getId())) {
-				VoiceChannelListener.musicTimeout.remove(musicManager.getGuild().getId());
+			if (container.taskManager.getChannelLeaveTimer().TIMING_OUT.containsKey(musicManager.getGuild().getId())) {
+				container.taskManager.getChannelLeaveTimer().removeMusicPlayer(musicManager.getGuild().getId());
 				musicManager.getTrackScheduler().setPaused(false);
 			}
 			if (trackScheduler.isStopped())
@@ -83,7 +82,7 @@ public class MusicPersistence {
 			List<JSONObject> sources = new ArrayList<>();
 			for (TrackContext track : trackScheduler.getRemainingTracks()) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				container.musicPlayerManager.getAudioPlayerManager().encodeTrack(new MessageOutput(baos), track.getTrack());
+				container.playerManager.getAudioPlayerManager().encodeTrack(new MessageOutput(baos), track.getTrack());
 				JSONObject src = new JSONObject();
 				src.put("track", Base64.encodeBase64String(baos.toByteArray()));
 				src.put("channel", track.getContextId());
@@ -147,7 +146,7 @@ public class MusicPersistence {
 				boolean repeat = data.getBoolean("repeat");
 				JSONArray voteSkips = data.getJSONArray("voteskips");
 				
-				TrackScheduler trackScheduler = container.musicPlayerManager.get(jda.getGuildById(guildId)).getTrackScheduler();
+				TrackScheduler trackScheduler = container.playerManager.get(jda.getGuildById(guildId)).getTrackScheduler();
 				
 				trackScheduler.setPaused(isPaused);
 				trackScheduler.setShuffle(shuffle);
@@ -163,7 +162,7 @@ public class MusicPersistence {
 					
 					try {
 						ByteArrayInputStream bais = new ByteArrayInputStream(track);
-						audioTrack = container.musicPlayerManager.getAudioPlayerManager().decodeTrack(new MessageInput(bais)).decodedTrack;
+						audioTrack = container.playerManager.getAudioPlayerManager().decodeTrack(new MessageInput(bais)).decodedTrack;
 					} catch (Exception e) {
 						LOG.fatal("Failed to decode Audio Track");
 						LOG.log(e);

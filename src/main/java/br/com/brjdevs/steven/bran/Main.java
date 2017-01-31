@@ -1,8 +1,8 @@
-package br.com.brjdevs.steven.bran.refactor;
+package br.com.brjdevs.steven.bran;
 
+import br.com.brjdevs.steven.bran.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.Util;
-import br.com.brjdevs.steven.bran.refactor.DiscordLog.Level;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

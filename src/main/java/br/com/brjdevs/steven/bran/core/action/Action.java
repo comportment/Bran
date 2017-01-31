@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.action;
 
-import br.com.brjdevs.steven.bran.refactor.Bot;
-import br.com.brjdevs.steven.bran.refactor.BotContainer;
+import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.BotContainer;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.core.entities.Message;
