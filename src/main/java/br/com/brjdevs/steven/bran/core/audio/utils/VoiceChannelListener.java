@@ -57,7 +57,6 @@ public class VoiceChannelListener implements EventListener {
 		if (track == null) track = musicManager.getTrackScheduler().getPreviousTrack();
 		if (track != null && track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
 			track.getContext(guild.getJDA()).sendMessage("I was left alone in `" + voiceChannel.getName() + "`, so I paused the player. If nobody reenter in this channel I'll stop que player, clean the queue and leave the channel.").queue();
-		System.out.println(voiceChannel.getName());
 		timer.addMusicPlayer(guild.getId(), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(2), voiceChannel.getId());
 	}
 	
