@@ -75,7 +75,7 @@ public class ShopCommand {
 										"(" + event.getGuildMember().getProfile(event.getBotContainer()).getCoins() + "/" + item.getPrice() + ")").queue();
 							} else {
 								inventory.put(item);
-								event.sendMessage("You've bought a " + item.getName() + "! Remaining coins: " + event.getGuildMember().getProfile(event.getBotContainer()).getCoins()).queue();
+								event.sendMessage("\uD83D\uDECD You've bought a " + item.getName() + "! Remaining coins: " + event.getGuildMember().getProfile(event.getBotContainer()).getCoins()).queue();
 							}
 						})
 						.build())

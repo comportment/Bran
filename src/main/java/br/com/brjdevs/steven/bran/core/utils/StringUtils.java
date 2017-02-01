@@ -3,6 +3,10 @@ package br.com.brjdevs.steven.bran.core.utils;
 import java.util.Arrays;
 
 public class StringUtils {
+	
+	private static final String ACTIVE_BLOCK = "\u2588";
+	private static final String EMPTY_BLOCK = "\u200b";
+	
     public static String[] splitArgs(String args, int expectedArgs) {
         String[] raw = args.split("\\s+", expectedArgs);
         if (expectedArgs < 1) return raw;
@@ -65,5 +69,12 @@ public class StringUtils {
 	
 	public static boolean containsEqualsIgnoreCase(String toCheck, String s) {
 		return Util.containsEqualsIgnoreCase(Arrays.asList(toCheck.split("")), s);
+	}
+	
+	public static String getProgressBar(int percent, int total) {
+		int activeBlocks = (int) ((float) percent / 100f * total);
+		StringBuilder builder = new StringBuilder().append(EMPTY_BLOCK);
+		for (int i = 0; i < total; i++) builder.append(activeBlocks >= i ? ACTIVE_BLOCK : ' ');
+		return builder.append(EMPTY_BLOCK).toString();
 	}
 }

@@ -26,7 +26,7 @@ public class MathCommand {
 						event.sendMessage("Could not resolve `" + expression + "`").queue();
 						return;
 					}
-					event.sendMessage(String.valueOf(result).replaceAll("[.]?0+$", "")).queue();
+					event.sendMessage("\uD83D\uDD22 Operation result: `" + String.valueOf(result).replaceAll("[.]?0+$", "") + "`").queue();
 				})
 				.build();
 	}

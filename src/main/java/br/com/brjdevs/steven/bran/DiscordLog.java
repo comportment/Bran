@@ -18,8 +18,10 @@ public class DiscordLog {
 	public TextChannel logChannel;
 	private boolean isEnabled;
 	private Guild guild;
+	private BotContainer container;
 	
 	public DiscordLog(BotContainer botContainer) {
+		this.container = botContainer;
 		for (Bot bot : botContainer.getShards()) {
 			guild = bot.getJDA().getGuildById("219256419684188161");
 			if (guild != null) break;
@@ -46,7 +48,7 @@ public class DiscordLog {
 	public void logToDiscord(GuildJoinEvent event) {
 		Guild guild = event.getGuild();
 		logChannel.sendMessage(Level.INFO.getBaseEmbed("\uD83C\uDFE0 Joined Guild")
-				.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "  (" + RequirementsUtils.getBotsPercentage(guild) + "% bots)\n**Owner:** " + Util.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")")
+				.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Shard:** " + container.getShardId(guild.getJDA()) + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "  (" + RequirementsUtils.getBotsPercentage(guild) + "% bots)\n**Owner:** " + Util.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")")
 				.build()).queue();
 	}
 	

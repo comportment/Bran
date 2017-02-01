@@ -67,7 +67,7 @@ public class Session implements EventListener {
 		String check = "✅";
 		if (audioConnections > nowPlaying + paused) {
 			for (Guild guild : jda.getGuilds())
-				if (guild.getAudioManager().isConnected() && !container.taskManager.getChannelLeaveTimer().TIMING_OUT.containsKey(guild.getId()) && AudioUtils.isAlone(guild.getAudioManager().getConnectedChannel()))
+				if (guild.getAudioManager().isConnected() && !container.taskManager.getChannelLeaveTimer().has(guild.getId()) && AudioUtils.isAlone(guild.getAudioManager().getConnectedChannel()))
 					check = "❌";
 		}
 		String out = "";

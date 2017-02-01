@@ -36,7 +36,7 @@ public class RollCommand {
 							return;
 						}
 						int roll = MathUtils.random(min, max);
-						event.sendMessage("**You rolled a `" + roll + "`!**").queue();
+						event.sendMessage("\uD83C\uDFB2 **You rolled a `" + roll + "`!**").queue();
 						
 					} catch (NumberFormatException ex) {
 						String input = ex.getMessage().substring(ex.getMessage().indexOf("\"") + 1).replace("\"", "");

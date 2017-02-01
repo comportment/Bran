@@ -39,7 +39,7 @@ public class GuildInfoCommand {
 					Argument argument = event.getArgument("guildId");
 					Guild guild = argument.isPresent() ? event.getJDA().getGuildById((String) argument.get()) : event.getGuild();
 					if (guild == null) guild = event.getGuild();
-					Member guildOnwer = guild.getOwner();
+					Member guildOwner = guild.getOwner();
 					OffsetDateTime creation = guild.getCreationTime();
 					String creationDate = neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + creation.getHour() + ":" + creation.getMinute() + ":" + creation.getSecond() + " GMT";
 					boolean hasEmotes = !guild.getEmotes().isEmpty();
@@ -48,9 +48,10 @@ public class GuildInfoCommand {
 					embedBuilder.setFooter("Requested by " + Util.getUser(event.getAuthor()),
 							Util.getAvatarUrl(event.getAuthor()));
 					embedBuilder.setColor(
-							guildOnwer.getColor() == null ? Color.decode("#F38630") : guildOnwer.getColor());
-					embedBuilder.addField("Guild", guild.getName() + "\n(ID: " + guild.getId() + ")", true);
-					embedBuilder.addField("Owner", Util.getUser(guildOnwer.getUser()) + "\n(ID: " + guildOnwer.getUser().getId() + ")", true);
+							guildOwner.getColor() == null ? Color.decode("#F38630") : guildOwner.getColor());
+					embedBuilder.setTitle("\uD83C\uDFE0 Guild information on " + guild.getName());
+					embedBuilder.addField("ID", guild.getId(), true);
+					embedBuilder.addField("Owner", Util.getUser(guildOwner.getUser()) + "\n(ID: " + guildOwner.getUser().getId() + ")", true);
 					embedBuilder.addField("Region", guild.getRegion().toString(), true);
 					embedBuilder.addField("Created at", creationDate, true);
 					List<Member> online = guild.getMembers().stream().filter(m -> m.getOnlineStatus() == OnlineStatus.ONLINE).collect(Collectors.toList());

@@ -6,10 +6,11 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
+import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import net.dv8tion.jda.core.entities.User;
 import org.json.JSONObject;
 
 public class LoveCommand {
-	
 	@Command
 	private static ICommand love() {
 		return new CommandBuilder(Category.FUN)
@@ -20,6 +21,14 @@ public class LoveCommand {
 				.setAction((event) -> {
 					String firstName = ((String) event.getArgument("firstName").get());
 					String secondName = ((String) event.getArgument("secondName").get());
+					if (firstName.equals(secondName)) {
+						event.sendMessage("So lonely...").queue();
+						return;
+					}
+					for (User user : event.getMessage().getMentionedUsers()) {
+						firstName = firstName.replaceAll("<@!?" + user.getId() + ">", user.getName());
+						secondName = secondName.replaceAll("<@!?" + user.getId() + ">", user.getName());
+					}
 					if (firstName.isEmpty() || secondName.isEmpty()) {
 						event.sendMessage("You have to provide me at least two names!").queue();
 						return;
@@ -33,7 +42,7 @@ public class LoveCommand {
 					}
 					String percentage = response.getString("percentage");
 					String result = response.getString("result");
-					event.sendMessage("**" + percentage + "%** of love between " + firstName + " and " + secondName + "!\n" + result).queue();
+					event.sendMessage("**LOVE CALCULATOR**\n\uD83D\uDC97 *`" + firstName + "`*\n\uD83D\uDC97 *`" + secondName + "`*\n**" + percentage + "%** `" + StringUtils.getProgressBar(Integer.parseInt(percentage), 15) + "` " + result).queue();
 				})
 				.build();
 	}
@@ -46,13 +55,15 @@ public class LoveCommand {
 		if (percentage <= 20)
 			r = "Better luck next time.";
 		else if (percentage <= 40)
-			r = "You can choose someone better.";
+			r = "Not so bad.";
+		else if (percentage == 69)
+			r = "( ͡° ͜ʖ ͡°)";
 		else if (percentage <= 60)
-			r = "A lovely ship.";
+			r = "Pretty great!";
 		else if (percentage <= 80)
-			r = "Love was handmade for each other.";
-		else
 			r = "A lovely ship!";
+		else
+			r = "Perfect! \u2764";
 		v.put("result", r);
 		return v;
 	}

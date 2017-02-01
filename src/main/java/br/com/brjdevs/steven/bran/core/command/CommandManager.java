@@ -119,6 +119,7 @@ public class CommandManager implements EventListener {
 			return;
 		}
 		container.getSession().cmds++;
+		CommandStatsManager.log(cmd);
 		Util.async(cmd.getName() + ">" + Util.getUser(event.getAuthor()),
 				() -> {
 					try {

@@ -30,11 +30,11 @@ public class VoiceChannelListener implements EventListener {
 	
 	private static void onJoin(Guild guild, VoiceChannel voiceChannel, Member member) {
 		ChannelLeaveTimer timer = container.taskManager.getChannelLeaveTimer();
-		if (!timer.TIMING_OUT.containsKey(guild.getId())) return;
+		if (!timer.has(guild.getId())) return;
 		MusicManager player = container.playerManager.get(guild);
 		TrackContext track = player.getTrackScheduler().getCurrentTrack();
 		if (track == null) track = player.getTrackScheduler().getPreviousTrack();
-		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.TIMING_OUT.get(guild.getId()).right);
+		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.get(guild.getId()).right);
 		if (voiceChannel != channel && !member.equals(guild.getSelfMember())) return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
 			AudioUtils.connect(channel, track.getContext(channel.getJDA()), container);

@@ -41,7 +41,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			if (!scheduler.isStopped() && scheduler.isPaused())
 				scheduler.setPaused(false);
 			attempts = 0;
-			if (AudioUtils.isAlone(getGuild().getAudioManager().getConnectedChannel()) && !container.taskManager.getChannelLeaveTimer().TIMING_OUT.containsKey(getGuild().getId()))
+			if (AudioUtils.isAlone(getGuild().getAudioManager().getConnectedChannel()) && !container.taskManager.getChannelLeaveTimer().has(getGuild().getId()))
 				VoiceChannelListener.onLeave(getGuild(), getGuild().getAudioManager().getConnectedChannel());
 		} else if (connectionStatus == ConnectionStatus.AUDIO_REGION_CHANGE) {
 			scheduler.setPaused(true);

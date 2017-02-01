@@ -110,10 +110,10 @@ public class ProfileCommand {
 									} catch (Exception ignored) {}
 									if (isHex) {
 										boolean success = profile.setCustomColor(hex);
-										event.sendMessage(success + "").queue();
-										return;
+										event.sendMessage(success ? "Updated your profile Color!" : "Failed to update your profile color!").queue();
+									} else {
+										event.sendMessage("This does not look like a known hex...").queue();
 									}
-									event.sendMessage("This does not look like a known hex...").queue();
 								})
 								.build())
 						.build())

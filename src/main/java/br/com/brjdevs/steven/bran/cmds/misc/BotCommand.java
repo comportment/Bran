@@ -76,7 +76,7 @@ public class BotCommand {
 							long time = System.currentTimeMillis();
 							event.getChannel().sendTyping().queue(success -> {
 								long ping = System.currentTimeMillis() - time;
-								event.getChannel().sendMessage("Pong: `" + ping + "ms`").queue();
+								event.getChannel().sendMessage("\uD83C\uDFD3 Pong: `" + ping + "ms`").queue();
 							});
 						})
 						.build())

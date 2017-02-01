@@ -264,9 +264,8 @@ public class TrackScheduler implements AudioEventListener {
 			if (endReason.mayStartNext) {
 				play(provideNextTrack(false), false);
 			}
-			container.taskManager.getChannelLeaveTimer().removeMusicPlayer(guildId.toString());
-			container.taskManager.getMusicRegisterTimeout().removeMusicPlayer(guildId.toString());
 		} else if (audioEvent instanceof TrackStartEvent) {
+			container.taskManager.getMusicRegisterTimeout().removeMusicPlayer(guildId.toString());
 			TrackStartEvent event = (TrackStartEvent) audioEvent;
 			if (currentTrack == null && getAudioPlayer().getPlayingTrack() != null) {
 				LOG.fatal("Got TrackStartEvent with null AudioTrackContext in Guild " + guildId + ", finished session.");

@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 public class MusicRegisterTimeout {
 	
 	public final BotContainer container;
-	public final Map<String, Long> TIMING_OUT;
+	private final Map<String, Long> TIMING_OUT;
 	private boolean timingOutUpdated = false;
 	
 	public MusicRegisterTimeout(BotContainer container) {

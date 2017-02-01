@@ -60,8 +60,7 @@ public class MusicPersistence {
 			if (musicManager == null || musicManager.getGuild() == null) continue;
 			TrackScheduler trackScheduler = musicManager.getTrackScheduler();
 			if (trackScheduler == null) continue;
-			if (container.taskManager.getChannelLeaveTimer().TIMING_OUT.containsKey(musicManager.getGuild().getId())) {
-				container.taskManager.getChannelLeaveTimer().removeMusicPlayer(musicManager.getGuild().getId());
+			if (container.taskManager.getChannelLeaveTimer().removeMusicPlayer(musicManager.getGuild().getId())) {
 				musicManager.getTrackScheduler().setPaused(false);
 			}
 			if (trackScheduler.isStopped())
@@ -116,7 +115,7 @@ public class MusicPersistence {
 			LOG.info("No files in path.");
 			return true;
 		}
-		
+		fileLoop:
 		for (File file : files) {
 			InputStream inputStream = null;
 			boolean[] isFirst = {true};
@@ -129,7 +128,7 @@ public class MusicPersistence {
 				if (!file.delete()) {
 					LOG.warn("Could not delete File named '" + guildId + "'");
 				}
-				int shardId = (int) (Long.parseLong(guildId) >> 22) % container.getShards().length;
+				int shardId = container.calcShardId(Long.parseLong(guildId));
 				JDA jda = container.getShards()[shardId].getJDA();
 				if (jda == null) continue;
 				Guild guild = jda.getGuildById(guildId);
@@ -139,6 +138,7 @@ public class MusicPersistence {
 				if (vc == null || vc.getMembers().isEmpty()) continue;
 				if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect()) {
 					guild.getAudioManager().setSelfDeafened(true);
+					guild.getAudioManager().setConnectionListener(new ConnectionListenerImpl(guild, container));
 					guild.getAudioManager().openAudioConnection(vc);
 				}
 				boolean isPaused = data.getBoolean("paused");

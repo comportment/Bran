@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 public class ChannelLeaveTimer {
 	
 	public final BotContainer container;
-	public final Map<String, ImmutablePair<Long, String>> TIMING_OUT;
+	private final Map<String, ImmutablePair<Long, String>> TIMING_OUT;
 	private boolean timingOutUpdated = false;
 	
 	public ChannelLeaveTimer(BotContainer container) {
@@ -28,9 +28,13 @@ public class ChannelLeaveTimer {
 		this.TIMING_OUT = Collections.synchronizedMap(timingOut);
 		this.container = container;
 		
-		Thread thread = new Thread(this::threadcode, "MusicRegisterTimeout");
+		Thread thread = new Thread(this::threadcode, "ChannelLeaveTimeout");
 		thread.setDaemon(true);
 		thread.start();
+	}
+	
+	public ImmutablePair<Long, String> get(String key) {
+		return TIMING_OUT.get(key);
 	}
 	
 	public void addMusicPlayer(String id, Long milis, String voiceChannel) {
@@ -41,14 +45,20 @@ public class ChannelLeaveTimer {
 		}
 	}
 	
-	public void removeMusicPlayer(String id) {
+	public boolean has(String key) {
+		return TIMING_OUT.containsKey(key);
+	}
+	
+	public boolean removeMusicPlayer(String id) {
 		if (TIMING_OUT.containsKey(id)) {
 			TIMING_OUT.remove(id);
 			timingOutUpdated = true;
 			synchronized (this) {
 				notify();
 			}
+			return true;
 		}
+		return false;
 	}
 	
 	private void threadcode() {

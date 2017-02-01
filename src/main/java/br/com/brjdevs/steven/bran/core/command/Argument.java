@@ -28,7 +28,7 @@ public class Argument<T> {
 		List<String> results = new ArrayList<>();
 		Matcher matcher = ARG_PATTERN.matcher(input);
 		while (matcher.find()) {
-			if (results.size() >= size - 1) {
+			if (results.size() >= size) {
 				results.add(input.substring(String.join(" ", results).length()));
 				break;
 			}
