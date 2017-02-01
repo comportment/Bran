@@ -31,7 +31,7 @@ public class CommandStatsCommand {
 						}
 						
 						if (what.equals("daily")) {
-							event.getChannel().sendMessage(fillEmbed(DAY_CMDS, baseEmbed(event, "Command Stats | Daily")).build()).queue();
+							event.sendMessage(fillEmbed(DAY_CMDS, baseEmbed(event, "Command Stats | Daily")).build()).queue();
 							return;
 						}
 						

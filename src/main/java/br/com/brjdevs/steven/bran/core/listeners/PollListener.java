@@ -41,13 +41,13 @@ public class PollListener implements EventListener {
 		try {
 			boolean added = poll.vote(event.getAuthor().getId(), i);
 			if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
-				event.getChannel().sendMessage(added ? "\u2705" : "\u2796").queue();
+				container.getMessenger().sendMessage(event.getChannel(), added ? "\u2705" : "\u2796").queue();
 				return;
 			}
 			event.getMessage().addReaction(added ? "\u2705" : "\u2796").queue();
 		} catch (NullPointerException ex) {
 			if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
-				event.getChannel().sendMessage("\u274c").queue();
+				container.getMessenger().sendMessage(event.getChannel(), "\u274c").queue();
 				return;
 			}
 			event.getMessage().addReaction("\u274c").queue();

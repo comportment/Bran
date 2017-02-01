@@ -10,9 +10,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChannelLeaveTimer {
 	
@@ -21,7 +21,7 @@ public class ChannelLeaveTimer {
 	private boolean timingOutUpdated = false;
 	
 	public ChannelLeaveTimer(BotContainer container) {
-		this(new HashMap<>(), container);
+		this(new ConcurrentHashMap<>(), container);
 	}
 	
 	public ChannelLeaveTimer(Map<String, ImmutablePair<Long, String>> timingOut, BotContainer container) {

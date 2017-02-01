@@ -4,9 +4,9 @@ import br.com.brjdevs.steven.bran.BotContainer;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MusicRegisterTimeout {
 	
@@ -15,7 +15,7 @@ public class MusicRegisterTimeout {
 	private boolean timingOutUpdated = false;
 	
 	public MusicRegisterTimeout(BotContainer container) {
-		this(new HashMap<>(), container);
+		this(new ConcurrentHashMap<>(), container);
 	}
 	
 	public MusicRegisterTimeout(Map<String, Long> timingOut, BotContainer container) {

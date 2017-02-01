@@ -71,8 +71,12 @@ public class StringUtils {
 		return Util.containsEqualsIgnoreCase(Arrays.asList(toCheck.split("")), s);
 	}
 	
-	public static String getProgressBar(int percent, int total) {
-		int activeBlocks = (int) ((float) percent / 100f * total);
+	public static String getProgressBar(long percent, long total) {
+		return getProgressBar(percent, 100, total);
+	}
+	
+	public static String getProgressBar(long percent, long duration, long total) {
+		int activeBlocks = (int) ((float) percent / duration * total);
 		StringBuilder builder = new StringBuilder().append(EMPTY_BLOCK);
 		for (int i = 0; i < total; i++) builder.append(activeBlocks >= i ? ACTIVE_BLOCK : ' ');
 		return builder.append(EMPTY_BLOCK).toString();

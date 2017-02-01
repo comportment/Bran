@@ -60,9 +60,6 @@ public class CustomCommandsListener implements EventListener {
 		if (command == null) return;
 		String args = StringUtils.splitArgs(event.getMessage().getRawContent(), 2)[1];
 		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args);
-		if (!answer.isEmpty()) {
-			event.getChannel().sendTyping().queue(success ->
-					event.getChannel().sendMessage(answer).queue());
-		}
+		container.getMessenger().sendMessage(event.getChannel(), answer).queue();
 	}
 }

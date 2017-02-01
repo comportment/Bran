@@ -6,6 +6,7 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember.FakeGuildMember;
+import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
@@ -55,6 +56,10 @@ public class CommandEvent {
 	        this.guildMember = new FakeGuildMember(author, null, botContainer);
 	}
 	
+	public Messenger getMessenger() {
+		return botContainer.getMessenger();
+	}
+	
 	public Bot getShard() {
 		return botContainer.getShards()[botContainer.getShardId(event.getJDA())];
 	}
@@ -72,31 +77,31 @@ public class CommandEvent {
 	}
 	
 	public RestAction<Message> sendMessage(String msg) {
-        getChannel().sendTyping().complete();
-        return getChannel().sendMessage(msg);
-    }
+		return getMessenger().sendMessage(getChannel(), msg);
+	}
     public RestAction<Message> sendMessage(Message message) {
-	    getChannel().sendTyping().complete();
-	    return getChannel().sendMessage(message);
+	    return getMessenger().sendMessage(getChannel(), message);
     }
     public RestAction<Message> sendMessage(MessageEmbed embed) {
-        getChannel().sendTyping().complete();
-        return getChannel().sendMessage(embed);
+	    return getMessenger().sendMessage(getChannel(), embed);
     }
     public RestAction<Message>  sendPrivate(String msg) {
-        getChannel().sendTyping().complete();
-        return getPrivateChannel().sendMessage(msg);
+	    return getMessenger().sendMessage(getPrivateChannel(), msg);
     }
-    public RestAction<Message> sendPrivate(Message message) {
-        return sendPrivate(message.getRawContent());
-    }
-    public PrivateChannel getPrivateChannel() {
+	
+	public RestAction<Message> sendPrivate(Message message) {
+		return getMessenger().sendMessage(getPrivateChannel(), message);
+	}
+	
+	public PrivateChannel getPrivateChannel() {
         return getAuthor().openPrivateChannel().complete();
     }
-    public User getAuthor() {
+	
+	public User getAuthor() {
         return author;
     }
-    public JDA getJDA() {
+	
+	public JDA getJDA() {
         return event.getJDA();
     }
 	

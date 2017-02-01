@@ -105,7 +105,7 @@ public class HangManCommand {
 								event.sendMessage(Quotes.FAIL, "**" + Util.getUser(user) + "** is already playing with you.").queue();
 								return;
 							}
-							event.getChannel().sendMessage(Util.getUser(user) + ", react to this message with " + ACCEPT + " to join the game or with " + DENY + " to deny.")
+							event.sendMessage(Util.getUser(user) + ", react to this message with " + ACCEPT + " to join the game or with " + DENY + " to deny.")
 									.queue(msg -> {
 										msg.addReaction(ACCEPT).queue();
 										msg.addReaction(DENY).queue();

@@ -8,6 +8,7 @@ import br.com.brjdevs.steven.bran.core.command.CommandManager;
 import br.com.brjdevs.steven.bran.core.data.DataManager;
 import br.com.brjdevs.steven.bran.core.data.bot.BotData;
 import br.com.brjdevs.steven.bran.core.data.bot.Config;
+import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.poll.PollPersistence;
 import br.com.brjdevs.steven.bran.core.utils.Session;
@@ -51,6 +52,7 @@ public class BotContainer {
 	private AtomicLongArray lastEvents;
 	private volatile User owner;
 	private Session session;
+	private Messenger messenger;
 	
 	public BotContainer() throws LoginException, InterruptedException, RateLimitedException {
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
@@ -70,6 +72,7 @@ public class BotContainer {
 		this.commandManager = new CommandManager(this);
 		this.discordLog = new DiscordLog(this);
 		this.session = new Session(this);
+		this.messenger = new Messenger(this);
 		this.taskManager = new TaskManager(this);
 	}
 	
@@ -112,6 +115,10 @@ public class BotContainer {
 			users.addAll(shard.getJDA().getUsers());
 		}
 		return users;
+	}
+	
+	public Messenger getMessenger() {
+		return messenger;
 	}
 	
 	public List<TextChannel> getTextChannels() {

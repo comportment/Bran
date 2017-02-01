@@ -14,13 +14,12 @@ import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
+import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
-import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -108,22 +107,14 @@ public class MusicCommand {
 							}
 							AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
 							TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
-							EmbedBuilder embedBuilder = new EmbedBuilder();
-							embedBuilder.setAuthor((musicManager.getTrackScheduler().isPaused() ? PAUSED : PLAYING) + " Now Playing", context.getURL(), null);
-							embedBuilder.addField("Title", info.title, false)
-									.addField("Duration", AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length), true)
-									.addField("Author", info.author, true);
-							embedBuilder.addField("DJ", Util.getUser(context.getDJ(event.getJDA())), true);
-							if (!musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().isContinuous()) {
-								context = musicManager.getTrackScheduler().getQueue().peek();
-								info = context.getTrack().getInfo();
-								embedBuilder.addField("Next Up", info.title, false)
-										.addField("Duration", AudioUtils.format(info.length), true)
-										.addField("Author", info.author, true);
-								embedBuilder.addField("DJ", Util.getUser(context.getDJ(event.getJDA())), true);
-							}
-							embedBuilder.setColor(Color.decode("#b31217"));
-							event.sendMessage(embedBuilder.build()).queue();
+							TrackScheduler scheduler = musicManager.getTrackScheduler();
+							String out = scheduler.isPaused() ? PAUSED : PLAYING + " **Current song information**\n";
+							out += "**Title:** " + info.title + "\n";
+							out += "**Author:** " + info.author + "\n";
+							out += "**URL:** " + context.getURL() + "\n";
+							out += "**DJ:** " + Util.getUser(context.getDJ(event.getJDA())) + "\n";
+							out += "**Duration:** " + AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "     [`" + StringUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length, 15) + "`]\n";
+							event.sendMessage(out).queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -151,16 +142,16 @@ public class MusicCommand {
 							builder.append("Paused: `").append(scheduler.isPaused()).append("`\n\n");
 							if (musicManager.getPlayer().getPlayingTrack() != null) {
 								AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
-								builder.append("**__Now Playing__**\n").append("Title: `" + info.title + "`\n");
-								builder.append("Author: `" + info.author + "`\n");
-								builder.append("Duration: `" + AudioUtils.format(musicManager.getPlayer().getPlayingTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "`\n");
-								builder.append("DJ: `" + Util.getUser(musicManager.getTrackScheduler().getCurrentTrack().getDJ(event.getJDA())) + "`\n");
-								builder.append("URL: `" + scheduler.getCurrentTrack().getURL() + "`\n");
+								builder.append("**__Now Playing__**\n").append("Title: `").append(info.title).append("`\n");
+								builder.append("Author: `").append(info.author).append("`\n");
+								builder.append("Duration: `").append(AudioUtils.format(musicManager.getPlayer().getPlayingTrack().getPosition())).append("/").append(AudioUtils.format(info.length)).append("`\n");
+								builder.append("DJ: `").append(Util.getUser(musicManager.getTrackScheduler().getCurrentTrack().getDJ(event.getJDA()))).append("`\n");
+								builder.append("URL: `").append(scheduler.getCurrentTrack().getURL()).append("`\n");
 							}
 							ListBuilder listBuilder = new ListBuilder(list, page, 15);
-							builder.append("\n**__Queue__** (" + scheduler.getQueue().size() + " entries) - Page " + page + "/" + listBuilder.getMaxPages() + "\n\n");
+							builder.append("\n**__Queue__** (").append(scheduler.getQueue().size()).append(" entries) - Page ").append(page).append("/").append(listBuilder.getMaxPages()).append("\n\n");
 							builder.append(listBuilder.format(Format.NONE));
-							builder.append("\n\n__Total Queue Duration__: " + scheduler.getQueueDuration());
+							builder.append("\n\n__Total Queue Duration__: ").append(scheduler.getQueueDuration());
 							event.sendMessage(builder.toString()).queue();
 						})
 						.build())
