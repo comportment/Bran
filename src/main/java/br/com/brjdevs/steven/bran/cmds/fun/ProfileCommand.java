@@ -9,7 +9,6 @@ import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile.Rank;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
@@ -46,8 +45,7 @@ public class ProfileCommand {
 								return;
 							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getAuthor() : event.getMessage().getMentionedUsers().get(0);
-							GuildMember member = event.getDiscordGuild().getMember(user, event.getBotContainer());
-							event.sendMessage(member.getProfile(event.getBotContainer()).createEmbed(event.getJDA())).queue();
+							event.sendMessage(event.getBotContainer().getProfile(user).createEmbed(event.getJDA())).queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -55,7 +53,7 @@ public class ProfileCommand {
 						.setDescription("Shows you your inventory.")
 						.setArgs(new Argument<>("page", Integer.class, true))
 						.setAction((event) -> {
-							Inventory inventory = event.getGuildMember().getProfile(event.getBotContainer()).getInventory();
+							Inventory inventory = event.getBotContainer().getProfile(event.getAuthor()).getInventory();
 							if (inventory.isEmpty()) {
 								event.sendMessage("Your inventory is empty!").queue();
 								return;
@@ -83,7 +81,7 @@ public class ProfileCommand {
 								.setArgs(new Argument<>("hex", String.class, true))
 								.setDescription("Set or update your custom color!")
 								.setAction((event, rawArgs) -> {
-									Profile profile = event.getGuildMember().getProfile(event.getBotContainer());
+									Profile profile = event.getBotContainer().getProfile(event.getAuthor());
 									Argument argument = event.getArgument("hex");
 									if (!argument.isPresent()) {
 										if (profile.getCustomHex() != null) {

@@ -2,7 +2,6 @@ package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
-import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.features.hangman.events.LeaveGameEvent;
 import br.com.brjdevs.steven.bran.features.hangman.events.LooseEvent;
 import net.dv8tion.jda.core.Permission;
@@ -23,8 +22,7 @@ public class GuessListener implements EventListener {
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
-		Profile profile = discordGuild.getMember(event.getAuthor(), container).getProfile(container);
+		Profile profile = container.getProfile(event.getAuthor());
 		HangManGame game = HangManGame.getSession(profile);
 		if (game == null) return;
 		String msg = event.getMessage().getRawContent();

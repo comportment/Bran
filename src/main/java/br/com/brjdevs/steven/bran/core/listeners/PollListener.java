@@ -33,7 +33,7 @@ public class PollListener implements EventListener {
 		if (!MathUtils.isInteger(msg)) return;
 		if (!OPTION_INDEX.matcher(msg).matches()) return;
 		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
-		GuildMember guildMember = discordGuild.getMember(event.getAuthor(), container);
+		GuildMember guildMember = discordGuild.getMember(event.getMember(), container);
 		if (!guildMember.hasPermission(Permissions.POLL, event.getJDA(), container)) return;
 		Poll poll = Poll.getPoll(event.getChannel());
 		if (poll == null) return;

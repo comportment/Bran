@@ -50,7 +50,7 @@ public class CommandEvent {
             this.discordGuild = discordGuild;
             this.member = event.getMember();
             this.guild = event.getGuild();
-			this.guildMember = discordGuild.getMember(author, botContainer);
+			this.guildMember = discordGuild.getMember(member, botContainer);
 		}
         if (this.guildMember == null)
 	        this.guildMember = new FakeGuildMember(author, null, botContainer);

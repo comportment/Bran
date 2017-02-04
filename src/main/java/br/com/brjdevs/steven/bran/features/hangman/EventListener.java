@@ -33,7 +33,7 @@ public class EventListener implements IEventListener {
 			event.getGame().getChannel(container).sendMessage(event.getGame().createEmbed(container).setDescription(String.format(s, Util.getUser(event.getProfile().getUser(event.getJDA())))).build()).queue(event.getGame()::setLastMessage);
 		} else if (hangManEvent instanceof LooseEvent) {
 			LooseEvent event = (LooseEvent) hangManEvent;
-			event.getGame().getChannel(container).sendMessage(!event.isGiveup() ? event.getGame().createEmbed(container).setDescription("Well, I think you did great but it wasn't this time. The word was '" + event.getGame().getWord() + "'.").build() : event.getGame().createEmbed(container).setDescription("Aww man... I know you could've done it! The word was '" + event.getGame().getWord() + "'").build()).queue(event.getGame()::setLastMessage);
+			event.getGame().getChannel(container).sendMessage(!event.isGiveup() ? event.getGame().createEmbed(container).setDescription("\uD83D\uDE15 Well, I think you did great but it wasn't this time \uD83D\uDE0A. The word was '" + event.getGame().getWord() + "'.").build() : event.getGame().createEmbed(container).setDescription("Aww man... I know you could've done it! The word was '" + event.getGame().getWord() + "'").build()).queue(event.getGame()::setLastMessage);
 			event.getGame().end();
 			event.getGame().getProfiles().forEach(p -> {
 				p.getHMStats().addDefeat();

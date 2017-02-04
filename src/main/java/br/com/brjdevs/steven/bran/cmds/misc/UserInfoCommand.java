@@ -57,12 +57,15 @@ public class UserInfoCommand {
 					List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
 					joins.sort(Comparator.comparing(Member::getJoinDate));
 					int index = joins.indexOf(member);
+					int joinPos = -1;
 					index -= 3;
 					if(index < 0)
 						index = 0;
 					String str = "";
-					if (joins.get(index).equals(member))
+					if (joins.get(index).equals(member)) {
 						str += "**" + joins.get(index).getUser().getName() + "**";
+						joinPos = index;
+					}
 					else
 						str += joins.get(index).getUser().getName();
 					for (int i = index + 1; i < index + 7; i++)
@@ -71,10 +74,13 @@ public class UserInfoCommand {
 							break;
 						Member m = joins.get(i);
 						String name = m.getUser().getName();
-						if (m.equals(member))
+						if (m.equals(member)) {
 							name = "**" + name + "**";
+							joinPos = i + 1;
+						}
 						str += " > "+ name;
 					}
+					embed.addField("Join Position", String.valueOf(joinPos), true);
 					Color color = member.getColor() == null ? Color.decode("#FFA300") : member.getColor();
 					embed.setColor(color);
 					embed.addField("Join Order", str, false);

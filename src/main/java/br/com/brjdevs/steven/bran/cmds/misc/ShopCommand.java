@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
@@ -35,11 +36,12 @@ public class ShopCommand {
 						.setAction((event) -> {
 							Argument arg = event.getArgument("page");
 							int page = arg.isPresent() && (int) arg.get() > 0 ? (int) arg.get() : 1;
+							Profile profile = event.getBotContainer().getProfile(event.getAuthor());
 							List<String> items = ItemContainer.map()
 									.entrySet().stream()
 									.map(entry -> {
 										Item item = entry.getValue();
-										return item.getName() + " - Price: " + item.getPrice() + (item.getMinimumRank().getLevel() > event.getGuildMember().getProfile(event.getBotContainer()).getRank().getLevel() ? " You must be at least rank " + item.getMinimumRank() + " to buy this item!" : "");
+										return item.getName() + " - Price: " + item.getPrice() + (item.getMinimumRank().getLevel() > profile.getRank().getLevel() ? " You must be at least rank " + item.getMinimumRank() + " to buy this item!" : "");
 									}).collect(Collectors.toList());
 							ListBuilder listBuilder = new ListBuilder(items, page, 15);
 							listBuilder.setName("Available Items");
@@ -60,22 +62,23 @@ public class ShopCommand {
 								event.sendMessage("No items named \"" + name + "\".").queue();
 								return;
 							}
+							Profile profile = event.getBotContainer().getProfile(event.getAuthor());
 							Item item = result.getValue();
-							if (item.getMinimumRank().getLevel() > event.getGuildMember().getProfile(event.getBotContainer()).getRank().getLevel()) {
+							if (item.getMinimumRank().getLevel() > profile.getRank().getLevel()) {
 								event.sendMessage("You must be at least rank " + item.getMinimumRank() + " to buy this item!").queue();
 								return;
 							}
-							Inventory inventory = event.getGuildMember().getProfile(event.getBotContainer()).getInventory();
+							Inventory inventory = profile.getInventory();
 							if (inventory.getAmountOf(item) > item.getMaxStack()) {
 								event.sendMessage("You have too much of this item! (" + inventory.getAmountOf(item) + "/" + item.getMaxStack() + ")").queue();
 								return;
 							}
-							if (!event.getGuildMember().getProfile(event.getBotContainer()).takeCoins(item.getPrice())) {
+							if (!profile.takeCoins(item.getPrice())) {
 								event.sendMessage("You don't have enough coins to buy this item! " +
-										"(" + event.getGuildMember().getProfile(event.getBotContainer()).getCoins() + "/" + item.getPrice() + ")").queue();
+										"(" + profile.getCoins() + "/" + item.getPrice() + ")").queue();
 							} else {
 								inventory.put(item);
-								event.sendMessage("\uD83D\uDECD You've bought a " + item.getName() + "! Remaining coins: " + event.getGuildMember().getProfile(event.getBotContainer()).getCoins()).queue();
+								event.sendMessage("\uD83D\uDECD You've bought a " + item.getName() + "! Remaining coins: " + profile.getCoins()).queue();
 							}
 						})
 						.build())

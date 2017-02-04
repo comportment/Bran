@@ -16,12 +16,23 @@ import net.dv8tion.jda.core.managers.AudioManager;
 
 public class AudioUtils {
 	
+	private final static String BLOCK_INACTIVE = "\u25AC";
+	private final static String BLOCK_ACTIVE = "\uD83D\uDD18";
+	private static final int TOTAL_BLOCKS = 10;
+	
 	public static String format(long length) {
 		long hours = length / 3600000L % 24,
 				minutes = length / 60000L % 60,
 				seconds = length / 1000L % 60;
 		return (hours == 0 ? "" : decimal(hours) + ":")
 				+ (minutes == 0 ? "00" : decimal(minutes)) + ":" + (seconds == 0 ? "00" : decimal(seconds));
+	}
+	
+	public static String getProgressBar(long percent, long duration) {
+		int activeBlocks = (int) ((float) percent / duration * TOTAL_BLOCKS);
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < TOTAL_BLOCKS; i++) builder.append(activeBlocks == i ? BLOCK_ACTIVE : BLOCK_INACTIVE);
+		return builder.append(BLOCK_INACTIVE).toString();
 	}
 	
 	public static boolean canConnect(BotContainer container) {

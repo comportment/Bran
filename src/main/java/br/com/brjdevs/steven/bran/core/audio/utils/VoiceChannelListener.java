@@ -9,7 +9,6 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
@@ -63,9 +62,7 @@ public class VoiceChannelListener implements EventListener {
 	
 	@Override
 	public void onEvent(Event e) {
-		if (e instanceof VoiceChannelDeleteEvent) {
-			container.playerManager.unregister(Long.parseLong(((VoiceChannelDeleteEvent) e).getGuild().getId()));
-		} else if (e instanceof GenericGuildVoiceEvent) {
+		if (e instanceof GenericGuildVoiceEvent) {
 			GenericGuildVoiceEvent event = (GenericGuildVoiceEvent) e;
 			if (event instanceof GuildVoiceMoveEvent) {
 				VoiceChannel joined = ((GuildVoiceMoveEvent) event).getChannelJoined();

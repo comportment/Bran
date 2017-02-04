@@ -110,7 +110,7 @@ public class TrackScheduler implements AudioEventListener {
 	
 	public TrackContext getByPosition(int index) {
 		LinkedList<TrackContext> list = new LinkedList<>(queue);
-		if (index >= list.size()) return null;
+		if (index > list.size()) return null;
 		return list.get(index);
 	}
 	
@@ -177,9 +177,15 @@ public class TrackScheduler implements AudioEventListener {
 	public void queue(AudioPlaylist playlist, List<TrackContext> trackContexts, User dj, TextChannel context) {
 		Message msg = context.sendMessage("Found playlist `" + playlist.getName() + "` with `" + playlist.getTracks().size() + "` tracks, give me a second to queue them...").complete();
 		for (TrackContext trackContext : trackContexts) {
-			if (getQueue().size() > 600) {
-				context.sendMessage("Queue has reached its limit! (" + 600 + ")").queue();
-				return;
+			if (getQueue().size() > AudioLoader.MAX_QUEUE_SIZE) {
+				context.sendMessage("Queue has reached its limit! (" + AudioLoader.MAX_QUEUE_SIZE + ")").queue();
+				break;
+			}
+			if (trackContext.getTrack().getInfo().length > AudioLoader.MAX_SONG_LENGTH) {
+				AudioTrackInfo info = trackContext.getTrack().getInfo();
+				String maxlength = AudioUtils.format(AudioLoader.MAX_SONG_LENGTH);
+				context.sendMessage("Could not queue `" + info.title + "`, track duration is longer than " + maxlength + "! (" + AudioUtils.format(info.length) + "/" + maxlength + ")").queue();
+				continue;
 			}
 			queue.offer(trackContext);
 		}

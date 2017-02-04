@@ -78,7 +78,7 @@ public class PermissionCommand {
 							List<Member> members = event.getGuild().getMembers().stream().filter(member -> member.getUser() != event.getAuthor() && !member.getUser().isBot() && !member.getUser().isFake()).collect(Collectors.toList());
 							OperationResult operationResult = null;
 	                        if (!isEveryone) {
-		                        operationResult = event.getDiscordGuild().getMember(user, event.getBotContainer()).setPermission(event, toBeSet, toBeUnset);
+		                        operationResult = event.getDiscordGuild().getMember(event.getGuild().getMember(user), event.getBotContainer()).setPermission(event, toBeSet, toBeUnset);
 	                        }
 	                        else {
 		                        long fToBeSet = toBeSet;
@@ -116,7 +116,7 @@ public class PermissionCommand {
 	                        }
 	                        User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getJDA().getUserById((String) event.getArgument("user").get()) : event.getMessage().getMentionedUsers().get(0);
 	                        if (user == null) user = event.getAuthor();
-	                        GuildMember member = event.getDiscordGuild().getMember(user, event.getBotContainer());
+	                        GuildMember member = event.getDiscordGuild().getMember(event.getGuild().getMember(user), event.getBotContainer());
 	                        EmbedBuilder builder = new EmbedBuilder();
                             builder.setTitle("Permissions for " + Util.getUser(user));
 	                        builder.setDescription((String.join(", ", member.getPermissions(event.getJDA(), event.getBotContainer()))) + "\n\nRaw: " + member.getRawPermissions(event.getJDA(), event.getBotContainer()));

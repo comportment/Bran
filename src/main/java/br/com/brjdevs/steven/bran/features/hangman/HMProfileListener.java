@@ -3,7 +3,6 @@ package br.com.brjdevs.steven.bran.features.hangman;
 import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
-import net.dv8tion.jda.core.EmbedBuilder;
 
 public class HMProfileListener implements IProfileListener {
 	
@@ -17,11 +16,11 @@ public class HMProfileListener implements IProfileListener {
 	
 	@Override
 	public void onLevelUp(Profile profile, boolean rankUp) {
-		game.getChannel(container).sendMessage(new EmbedBuilder(profile.createEmbed(game.getShard(container).getJDA())).setDescription("**You leveled UP!**").build()).queue();
+		game.getChannel(container).sendMessage("You leveled UP! You're now at level " + profile.getLevel() + (rankUp ? "and you ranked up from " + profile.getRank().previous() + " to " + profile.getRank() : "") + "!").queue();
 	}
 	
 	@Override
 	public void onLevelDown(Profile profile, boolean rankDown) {
-		game.getChannel(container).sendMessage(new EmbedBuilder(profile.createEmbed(game.getShard(container).getJDA())).setDescription("**You leveled DOWN!**").build()).queue();
+		game.getChannel(container).sendMessage("You leveled down! You're now at level " + profile.getLevel() + (rankDown ? "and you ranked down from " + profile.getRank().next() + " to " + profile.getRank() : "") + "!").queue();
 	}
 }

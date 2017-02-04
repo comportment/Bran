@@ -48,12 +48,13 @@ public class CustomCommandsListener implements EventListener {
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
+		if (event.getAuthor().isBot()) return;
 		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
 		if (!discordGuild.getCustomCommands().check()) return;
 		String msg = event.getMessage().getRawContent().trim().toLowerCase().split("\\s+")[0];
 		String prefix = PrefixManager.getPrefix0(msg, discordGuild);
 		if (prefix == null) return;
-		if (!discordGuild.getMember(event.getAuthor(), container).hasPermission(Permissions.RUN_USRCMD, event.getJDA(), container))
+		if (!discordGuild.getMember(event.getMember(), container).hasPermission(Permissions.RUN_USRCMD, event.getJDA(), container))
 			return;
 		String baseCmd = msg.substring(prefix.length()).split("\\s+")[0];
 		CustomCommand command = discordGuild.getCustomCommands().getCustomCommand(baseCmd);
