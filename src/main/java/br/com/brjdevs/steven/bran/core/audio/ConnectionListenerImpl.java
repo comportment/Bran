@@ -58,8 +58,6 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 		} else if (connectionStatus == ConnectionStatus.DISCONNECTED_CHANNEL_DELETED) {
 			send("The channel I was connected to got deleted, stopped the queue.");
 			scheduler.stop();
-		} else if (connectionStatus == ConnectionStatus.DISCONNECTED_REMOVED_FROM_GUILD) {
-			container.playerManager.unregister(guildId);
 		}
 	}
 	
