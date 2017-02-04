@@ -43,6 +43,10 @@ public class KickCommand {
 						return;
 					}
 					for (User user : users) {
+						if (user.equals(event.getJDA().getSelfUser())) {
+							event.sendMessage("Cannot remove myself from the Guild with Moderation Commands, please remove me own your own.").queue();
+							continue;
+						}
 						event.getGuild().getController().kick(user.getId()).queue(null,
 								throwable -> {
 									if (throwable instanceof PermissionException) {

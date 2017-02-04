@@ -43,6 +43,10 @@ public class BanCommand {
 						return;
 					}
 					for (User user : users) {
+						if (user.equals(event.getJDA().getSelfUser())) {
+							event.sendMessage("Cannot remove myself from the Guild with Moderation Commands, please remove me own your own.").queue();
+							continue;
+						}
 						event.getGuild().getController().ban(user.getId(), 7).queue(null,
 								throwable -> {
 									if (throwable instanceof PermissionException) {
