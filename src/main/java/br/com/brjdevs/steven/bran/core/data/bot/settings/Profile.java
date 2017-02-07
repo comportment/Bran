@@ -141,12 +141,13 @@ public class Profile {
 	public MessageEmbed createEmbed(JDA jda) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setAuthor(getUser(jda).getName() + "'s profile information", null, Util.getAvatarUrl(getUser(jda)));
+		builder.setDescription(EMPTY + "\n" + EMPTY);
 		builder.addField("\u2694 Level", String.valueOf(getLevel()), true);
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);
 		builder.addField("\u2b50 Experience to Next Level", String.valueOf(expForNextLevel(getLevel())), true);
 		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(getCoins()), true);
 		builder.addField("\uD83D\uDCBC Inventory", String.valueOf(inventory.size(false)), true);
-		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", "These are your Game Stats!", true).addBlankField(true);
+		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
 		builder.addField("\uD83D\uDD79 Game", "HangMan", true).addField("\uD83C\uDFC6 Victories", String.valueOf(getHMStats().getVictories()), true).addField("☠ Defeats", String.valueOf(getHMStats().getDefeats()), true);
 		builder.setColor(this.getEffectiveColor());
 		return builder.build();

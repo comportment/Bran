@@ -9,6 +9,7 @@ import br.com.brjdevs.steven.bran.core.data.DataManager;
 import br.com.brjdevs.steven.bran.core.data.bot.BotData;
 import br.com.brjdevs.steven.bran.core.data.bot.Config;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.poll.PollPersistence;
@@ -75,6 +76,7 @@ public class BotContainer {
 		this.session = new Session(this);
 		this.messenger = new Messenger(this);
 		this.taskManager = new TaskManager(this);
+		ItemContainer.loadItems();
 	}
 	
 	public Bot[] getShards() {
