@@ -2,6 +2,7 @@ package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.mashape.unirest.http.Unirest;
+import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -34,14 +35,14 @@ public class Bot {
 	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
 		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(container.config.getToken());
 		if (!Util.isEmpty(container.config.getGame()))
-			jdaBuilder.setGame(
-					container.config.isGameStream() ? Game.of(container.config.getGame(), "https://twitch.tv/ ") : Game.of(container.config.getGame()));
+			jdaBuilder.setGame(container.config.isGameStream() ? Game.of(container.config.getGame(), "https://twitch.tv/ ") : Game.of(container.config.getGame()));
 		if (totalShards > 1)
 			jdaBuilder.useSharding(shardId, totalShards);
 		jdaBuilder.setEventManager(eventManager);
 		jdaBuilder.setBulkDeleteSplittingEnabled(false);
 		jdaBuilder.setEnableShutdownHook(false);
 		jdaBuilder.setAutoReconnect(true);
+		jdaBuilder.setAudioSendFactory(new NativeAudioSendFactory());
 		jda = jdaBuilder.buildBlocking();
 		if (startup == 0)
 			this.startup = System.currentTimeMillis();

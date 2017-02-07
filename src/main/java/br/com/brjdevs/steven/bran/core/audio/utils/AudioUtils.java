@@ -52,10 +52,6 @@ public class AudioUtils {
 	}
 	
 	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan, BotContainer container) {
-		if (!canConnect(container)) {
-			tchan.sendMessage("I'm sorry about this but I'm a bit overloaded right now (" + container.getSession().cpuUsage + "% cpu) so can you ask me to join the channel later? I can't push myself too hard, I'm still in testing phase \uD83D\uDE26").queue();
-			return null;
-		}
 		String warning = "Please note, this guild is located in Brazil so if you notice some slutter or can't hear the song consider changing the server region. (Recommended Region: US South)";
 		boolean shouldWarn = vchan.getGuild().getRegion() == Region.BRAZIL;
 		if (!vchan.getGuild().getSelfMember().hasPermission(vchan, Permission.VOICE_CONNECT)) {
@@ -73,6 +69,10 @@ public class AudioUtils {
 		}
 		if (selfMember.getVoiceState().isGuildMuted()) {
 			tchan.sendMessage("I won't join `" + vchan.getName() + "` because someone's muted me!").queue();
+			return null;
+		}
+		if (!canConnect(container)) {
+			tchan.sendMessage("I'm sorry about this but I'm a bit overloaded right now (" + container.getSession().cpuUsage + "% cpu) so can you ask me to join the channel later? I can't push myself too hard, I'm still in testing phase \uD83D\uDE26").queue();
 			return null;
 		}
 		AudioManager audioManager = vchan.getGuild().getAudioManager();

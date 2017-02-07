@@ -101,9 +101,10 @@ public class CommandBuilder {
 					event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
 					return;
 				}
-				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\')
+				split[1] = split[1].trim();
+				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\' && split[1].matches("^(\\?|help)$"))
 					split[1] = split[1].substring(1);
-				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
+				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length - 1)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
 				Argument[] args = event.getArguments();
 				if (args != null) {
 					for (int i = 0; i < args.length; i++) {

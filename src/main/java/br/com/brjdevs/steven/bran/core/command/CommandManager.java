@@ -103,6 +103,7 @@ public class CommandManager implements EventListener {
 		if (!(ev instanceof MessageReceivedEvent)) return;
 		MessageReceivedEvent event = (MessageReceivedEvent) ev;
 		if (event.getAuthor().isBot() || event.getAuthor().isFake()) return;
+		if (!Util.isPrivate(event) && !((MessageReceivedEvent) ev).getTextChannel().canTalk()) return;
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
 		DiscordGuild discordGuild = event.getGuild() != null ? DiscordGuild.getInstance(event.getGuild(), container) : null;
@@ -112,7 +113,6 @@ public class CommandManager implements EventListener {
 		ICommand cmd = CommandUtils.getCommand(container.commandManager, baseCmd);
 		if (cmd == null) return;
 		CommandEvent e = new CommandEvent(event, cmd, discordGuild, event.getMessage().getRawContent(), prefix, container);
-		//if (TooFast.isEnabled() && !TooFast.checkCanExecute(e)) return;
 		if (!cmd.isPrivateAvailable() && Util.isPrivate(event)) {
 			e.sendMessage(Quotes.FAIL, "This command is not available through PMs, " +
 					"use it in a Text Channel please.").queue();

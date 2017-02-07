@@ -44,6 +44,7 @@ public class UrbanDictionaryCommand {
 							jsonstring += scan.next() + " ";
 						}
 						scan.close();
+						in.close();
 						JsonObject json = Main.GSON.fromJson(jsonstring, JsonElement.class).getAsJsonObject();
 						if(json.get("result_type").getAsString().equals("no_results")){
 							event.sendMessage("There aren't any definitions for `" + params + "` yet.").queue();

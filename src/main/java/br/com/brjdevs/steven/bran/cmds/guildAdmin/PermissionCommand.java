@@ -100,8 +100,8 @@ public class PermissionCommand {
 	                        }
 	                        else
 		                        s = "Updated " + holder.value + " members permissions! Could not update " + (members.size() - holder.value) + " members permissions.";
-	                        event.sendMessage(Quotes.SUCCESS, s).queue();
-                        })
+							event.sendMessage(s).queue();
+						})
                         .build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("get")
@@ -181,8 +181,13 @@ public class PermissionCommand {
 							}
 							long defaultPerm = event.getDiscordGuild().getDefaultPermission();
 							int fset = toBeSet, funset = toBeUnset;
+							long newPerm = defaultPerm ^ (defaultPerm & toBeUnset) | toBeSet;
+							if (!event.getGuildMember().hasPermission(newPerm, event.getJDA(), event.getBotContainer())) {
+								event.sendMessage("You don't have enough permissions!").queue();
+								return;
+							}
+							event.getDiscordGuild().setDefaultPermission(newPerm);
 							event.getDiscordGuild().getMembers().forEach(m -> m.setPermission(event, fset, funset));
-							event.getDiscordGuild().setDefaultPermission(defaultPerm ^ (defaultPerm & toBeUnset) | toBeSet);
 							Message m = new MessageBuilder()
 									.append(Quotes.getQuote(Quotes.SUCCESS))
 									.append("Now these are the default permissions:")

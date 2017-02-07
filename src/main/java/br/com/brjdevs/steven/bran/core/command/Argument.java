@@ -29,7 +29,11 @@ public class Argument<T> {
 		Matcher matcher = ARG_PATTERN.matcher(input);
 		while (matcher.find()) {
 			if (results.size() >= size) {
-				results.add(input.substring(String.join(" ", results).length()));
+				String s = input.substring(String.join(" ", results).length());
+				results.add(s);
+				System.out.println(s);
+				System.out.println(results.toString());
+				System.out.println("a");
 				break;
 			}
 			if (matcher.group(1) != null) {
