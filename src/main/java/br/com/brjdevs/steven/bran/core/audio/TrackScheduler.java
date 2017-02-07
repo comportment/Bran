@@ -110,7 +110,7 @@ public class TrackScheduler implements AudioEventListener {
 	
 	public TrackContext getByPosition(int index) {
 		LinkedList<TrackContext> list = new LinkedList<>(queue);
-		if (index > list.size()) return null;
+		if (index >= list.size()) return null;
 		return list.get(index);
 	}
 	

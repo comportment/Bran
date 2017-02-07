@@ -31,9 +31,6 @@ public class Argument<T> {
 			if (results.size() >= size) {
 				String s = input.substring(String.join(" ", results).length());
 				results.add(s);
-				System.out.println(s);
-				System.out.println(results.toString());
-				System.out.println("a");
 				break;
 			}
 			if (matcher.group(1) != null) {

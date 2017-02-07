@@ -122,11 +122,6 @@ public class MusicCommand {
 								out += "\uD83D\uDC49 DJ » `" + Util.getUser(next.getDJ(event.getJDA())) + "`\n";
 								out += "\uD83D\uDC49 Duration » " + " `" + AudioUtils.format(info.length) + "`";
 							}
-							/*out += "**Title:** " + info.title + "\n";
-							out += "**Author:** " + info.author + "\n";
-							out += "**URL:** " + context.getURL() + "\n";
-							out += "**DJ:** " + Util.getUser(context.getDJ(event.getJDA())) + "\n";
-							out += "**Duration:** " + AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "     [" + AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length) + "]\n";*/
 							event.sendMessage(out).queue();
 						})
 						.build())
