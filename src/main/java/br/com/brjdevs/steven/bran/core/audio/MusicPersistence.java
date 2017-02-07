@@ -66,8 +66,9 @@ public class MusicPersistence {
 			if (trackScheduler.isStopped())
 				continue;
 			if (trackScheduler.getVoiceChannel() == null) continue;
-			if (trackScheduler.getCurrentTrack() != null && trackScheduler.getCurrentTrack().getContext(trackScheduler.getShard().getJDA()) != null)
+			if (trackScheduler.getCurrentTrack() != null && trackScheduler.getCurrentTrack().getContext(trackScheduler.getShard().getJDA()) != null) {
 				trackScheduler.getCurrentTrack().getContext(trackScheduler.getShard().getJDA()).sendMessage(msg).queue();
+			}
 			JSONObject data = new JSONObject();
 			data.put("vc", trackScheduler.getVoiceChannel().getId());
 			data.put("paused", trackScheduler.isPaused());

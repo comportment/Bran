@@ -1,0 +1,14 @@
+{
+  "BOT_TOKEN": "MjE5MTg2NjIxMDA4ODM4NjY5.C3F0HQ.xN3scj6JYHiBSrXfSprRLPDtFYg",
+  "OWNER_ID": "189167684296900608",
+  "DBOTS_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiIxODkxNjc2ODQyOTY5MDA2MDgiLCJyYW5kIjo2MTAsImlhdCI6MTQ4MTIyNTEyMX0.dewQUt_ZY3mBd2cKV_RcumXIljjyl5RYz0Y-GWjefkE",
+  "MASHAPE_KEY": "vPanVptLZomshf3VqeeNUB2Y520sp1tGqMnjsnsqkyiLsLnSbo",
+  "DEFAULT_PREFIXES": [
+    "!!",
+    "."
+  ],
+  "DEFAULT_GAME": ".help | .bot inviteme",
+  "STREAM": true,
+  "MUSIC_PERSISTENCE": true,
+  "POLL_PERSISTENCE": true
+}

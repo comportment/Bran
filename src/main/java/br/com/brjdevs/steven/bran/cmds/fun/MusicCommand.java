@@ -49,6 +49,21 @@ public class MusicCommand {
 						.setExample("music play Mercy - Shawn Mendes")
 						.setArgs(new Argument<>("title/url", String.class, true))
 						.setAction((event, args) -> {
+							String trackUrl = event.getArgument("title/url").isPresent() ? ((String) event.getArgument("title/url").get()) : "";
+							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
+							
+							if (trackUrl.isEmpty()) {
+								if (musicManager.getTrackScheduler().isPaused()) {
+									musicManager.getTrackScheduler().setPaused(false);
+									event.sendMessage("Resumed the Player!").queue();
+								} else
+									event.sendMessage("You have to tell me a song name or link!").queue();
+								return;
+							}
+							if (musicManager.getTrackScheduler().isPaused()) {
+								musicManager.getTrackScheduler().setPaused(false);
+								event.sendMessage("Resumed the Player!").queue();
+							}
 							VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
 							if (vchan == null && event.getMember().getVoiceState().inVoiceChannel()) {
 								vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel(), event.getBotContainer());
@@ -64,21 +79,6 @@ public class MusicCommand {
 							if (!vchan.getMembers().contains(event.getMember())) {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
-							}
-							String trackUrl = event.getArgument("title/url").isPresent() ? ((String) event.getArgument("title/url").get()) : "";
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
-							
-							if (trackUrl.isEmpty()) {
-								if (musicManager.getTrackScheduler().isPaused()) {
-									musicManager.getTrackScheduler().setPaused(false);
-									event.sendMessage("Resumed the Player!").queue();
-								} else
-									event.sendMessage("You have to tell me a song name or link!").queue();
-								return;
-							}
-							if (musicManager.getTrackScheduler().isPaused()) {
-								musicManager.getTrackScheduler().setPaused(false);
-								event.sendMessage("Resumed the Player!").queue();
 							}
 							if (event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE))
 								event.getMessage().deleteMessage().queue();

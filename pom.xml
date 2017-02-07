@@ -74,11 +74,6 @@
             <version>1.16.12</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.sedmelluq</groupId>
-            <artifactId>jda-nas</artifactId>
-            <version>1.0.3</version>
-        </dependency>
     </dependencies>
 
     <repositories>

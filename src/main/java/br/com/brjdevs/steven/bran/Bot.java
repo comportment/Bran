@@ -2,7 +2,6 @@ package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.mashape.unirest.http.Unirest;
-import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -42,7 +41,6 @@ public class Bot {
 		jdaBuilder.setBulkDeleteSplittingEnabled(false);
 		jdaBuilder.setEnableShutdownHook(false);
 		jdaBuilder.setAutoReconnect(true);
-		jdaBuilder.setAudioSendFactory(new NativeAudioSendFactory());
 		jda = jdaBuilder.buildBlocking();
 		if (startup == 0)
 			this.startup = System.currentTimeMillis();
