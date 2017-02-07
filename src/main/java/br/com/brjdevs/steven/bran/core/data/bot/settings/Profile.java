@@ -37,7 +37,8 @@ public class Profile {
 		this.HMStats = new HMStats();
 		this.rank = Rank.ROOKIE;
 		this.level = 0;
-		this.level = 0;
+		this.experience = 0;
+		this.coins = 10;
 		this.customHex = null;
 		this.inventory = new Inventory();
 		this.listeners = new ArrayList<>();
