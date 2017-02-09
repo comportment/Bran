@@ -15,7 +15,7 @@ public class EventListener implements IEventListener {
 	@Override
 	public void onEvent(HangManEvent hangManEvent) {
 		try {
-			hangManEvent.getGame().getLastMessage().get().deleteMessage().queue();
+			hangManEvent.getGame().getLastMessage().get().delete().queue();
 		} catch (Exception ignored) {
 		}
 		if (hangManEvent instanceof GuessEvent) {

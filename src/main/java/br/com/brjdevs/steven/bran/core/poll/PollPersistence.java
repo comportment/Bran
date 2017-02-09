@@ -80,7 +80,7 @@ public class PollPersistence {
 			Poll poll = GSON.fromJson(reader, Poll.class);
 			poll.setShardId(shardId);
 			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle(poll.getPollName());
+			builder.setTitle(poll.getPollName(), null);
 			builder.setFooter("This Poll was created by " + Util.getUser(poll.getCreator(container)), Util.getAvatarUrl(poll.getCreator(container)));
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append("**Current Votes**\n");

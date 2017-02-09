@@ -43,7 +43,7 @@ public class UserInfoCommand {
 					String createdAt = StringUtils.neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + StringUtils.neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + MathUtils.toOctalInteger(creation.getHour()) + ":" + MathUtils.toOctalInteger(creation.getMinute()) + ":" + MathUtils.toOctalInteger(creation.getSecond()) + " GMT";
 					User user = member.getUser();
 					EmbedBuilder embed = new EmbedBuilder();
-					embed.setTitle("\uD83D\uDC65 User information on " + Util.getUser(user));
+					embed.setTitle("\uD83D\uDC65 User information on " + Util.getUser(user), null);
 					embed.addField("ID", user.getId(), true);
 					if (member.getNickname() != null)
 						embed.addField("Nickname", member.getNickname(), true);

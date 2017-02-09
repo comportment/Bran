@@ -76,7 +76,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	}
 	
 	public void send(String content) {
-		if (message != null) message.deleteMessage().queue();
+		if (message != null) message.delete().queue();
 		TrackScheduler scheduler = getMusicManager().getTrackScheduler();
 		JDA jda = scheduler.getShard().getJDA();
 		TextChannel textChannel = null;

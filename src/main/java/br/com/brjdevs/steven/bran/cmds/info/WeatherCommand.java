@@ -74,7 +74,7 @@ public class WeatherCommand {
 						String text = conditionObject.get("text").getAsString();
 						
 						EmbedBuilder embedBuilder = new EmbedBuilder();
-						embedBuilder.setTitle("Weather for " + location);
+						embedBuilder.setTitle("Weather for " + location, null);
 						embedBuilder.addField("Last updated at", lastUpdate, false);
 						embedBuilder.addField("Wind", "**Speed:** " + windSpeed + "     **Direction:** " + windDirecton + "     **Chill:** " + windChill + "\n", false);
 						embedBuilder.addField("Atmosphere", "**Humidity**: " + humidity + "     **Pressure:** " + pressure + "\n", false);
@@ -85,7 +85,6 @@ public class WeatherCommand {
 					} catch (Exception e) {
 						event.sendMessage("There was a parsing error while building the info. `" + e.getMessage() + "`").queue();
 						e.printStackTrace();
-						return;
 					}
 				})
 				.build();

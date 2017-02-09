@@ -81,7 +81,7 @@ public class MusicCommand {
 								return;
 							}
 							if (event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE))
-								event.getMessage().deleteMessage().queue();
+								event.getMessage().delete().queue();
 							TrackScheduler scheduler = event.getBotContainer().playerManager.get(event.getGuild()).getTrackScheduler();
 							List<TrackContext> tracksByUser = scheduler.getTracksBy(event.getAuthor());
 							if (event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser() > 0 && tracksByUser.size() >= event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser()) {

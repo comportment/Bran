@@ -38,15 +38,15 @@ public class FlushCommand {
 								.filter(msg -> msg.getAuthor() == event.getJDA().getSelfUser()
 										&& !msg.isPinned()).collect(Collectors.toList());
 						if (messages.isEmpty()) {
-							event.sendMessage("I didn't send any messages in the latest 100! *but this one, which I'm just deleting...*").queue(message -> new RestActionSleep(message.deleteMessage()).sleepAndThen(30000, RestAction::queue));
+							event.sendMessage("I didn't send any messages in the latest 100! *but this one, which I'm just deleting...*").queue(message -> new RestActionSleep(message.delete()).sleepAndThen(30000, RestAction::queue));
 							return;
 						}
 						RestAction<Message> restAction = event.sendMessage(Quotes.SUCCESS, "Deleted " + messages.size() + " messages!");
 						if (messages.size() < 2) {
-							messages.get(0).deleteMessage().queue(success -> restAction.queue(message -> new RestActionSleep(message.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+							messages.get(0).delete().queue(success -> restAction.queue(message -> new RestActionSleep(message.delete()).sleepAndThen(30000, RestAction::queue)));
 						} else {
 							try {
-								event.getTextChannel().deleteMessages(messages).queue(success -> restAction.queue(message -> new RestActionSleep(message.deleteMessage()).sleepAndThen(30000, RestAction::queue)));
+								event.getTextChannel().deleteMessages(messages).queue(success -> restAction.queue(message -> new RestActionSleep(message.delete()).sleepAndThen(30000, RestAction::queue)));
 							} catch (IllegalArgumentException e) {
 								event.sendMessage(e.getMessage()).queue();
 							}

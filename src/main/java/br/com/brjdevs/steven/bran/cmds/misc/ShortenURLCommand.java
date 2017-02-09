@@ -39,7 +39,7 @@ public class ShortenURLCommand {
 	
 	private static String shorten(String url) throws IOException {
 		try {
-			return HttpUtils.read(String.format(baseURL, URLEncoder.encode(url)));
+			return HttpUtils.read(String.format(baseURL, URLEncoder.encode(url, "UTF-8")));
 		} catch (IOException e1) {
 			throw new IOException("Please, input a valid URL.");
 		}

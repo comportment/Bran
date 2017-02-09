@@ -44,6 +44,6 @@ public class GuessListener implements EventListener {
 		if (!msg.matches("^([A-Za-z]{1})$")) return;
 		game.guess(msg, profile, container);
 		if (event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
-			event.getMessage().deleteMessage().queue();
+			event.getMessage().delete().queue();
 	}
 }

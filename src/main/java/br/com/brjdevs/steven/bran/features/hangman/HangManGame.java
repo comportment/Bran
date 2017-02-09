@@ -209,7 +209,7 @@ public class HangManGame {
 	
 	public EmbedBuilder createEmbed(BotContainer container) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("Hang Man");
+		builder.setTitle("Hang Man", null);
 		builder.setFooter("Session created by " + getCreator().getUser(getShard(container).getJDA()).getName(), Util.getAvatarUrl(getCreator().getUser(getShard(container).getJDA())));
 		builder.setColor(getCreator().getEffectiveColor());
 		builder.addField(getCurrentGuessesField(false));

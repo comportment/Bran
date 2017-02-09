@@ -73,7 +73,7 @@ public class DiscordLog {
 		}
 		
 		public EmbedBuilder getBaseEmbed(String message) {
-			return new EmbedBuilder().setColor(color).setTitle("[" + this + "] {}".replace("{}", message));
+			return new EmbedBuilder().setColor(color).setTitle("[" + this + "] {}".replace("{}", message), null);
 		}
 	}
 }

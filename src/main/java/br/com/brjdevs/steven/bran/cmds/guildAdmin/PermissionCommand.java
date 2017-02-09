@@ -118,7 +118,7 @@ public class PermissionCommand {
 	                        if (user == null) user = event.getAuthor();
 	                        GuildMember member = event.getDiscordGuild().getMember(event.getGuild().getMember(user), event.getBotContainer());
 	                        EmbedBuilder builder = new EmbedBuilder();
-                            builder.setTitle("Permissions for " + Util.getUser(user));
+	                        builder.setTitle("Permissions for " + Util.getUser(user), null);
 	                        builder.setDescription((String.join(", ", member.getPermissions(event.getJDA(), event.getBotContainer()))) + "\n\nRaw: " + member.getRawPermissions(event.getJDA(), event.getBotContainer()));
 	                        builder.setThumbnail(Util.getAvatarUrl(user));
                             builder.setFooter("Requested by " + Util.getUser(event.getAuthor()), Util.getAvatarUrl(event.getAuthor()));
@@ -137,7 +137,7 @@ public class PermissionCommand {
 								return;
 							}
 							EmbedBuilder embedBuilder = new EmbedBuilder();
-							embedBuilder.setTitle("All of my permissions");
+							embedBuilder.setTitle("All of my permissions", null);
 							embedBuilder.setDescription(Permissions.toCollection(Permissions.BOT_OWNER).stream().collect(Collectors.joining(", ")));
 							embedBuilder.setFooter("Requested by " + Util.getUser(event.getAuthor()), Util.getAvatarUrl(event.getAuthor()));
 							embedBuilder.setColor(Color.decode("#9318E6"));
@@ -193,7 +193,7 @@ public class PermissionCommand {
 									.append("Now these are the default permissions:")
 									.setEmbed(new EmbedBuilder()
 											.setDescription((String.join(", ", Permissions.toCollection(event.getDiscordGuild().getDefaultPermission()))) + "\n\nRaw: " + event.getDiscordGuild().getDefaultPermission())
-											.setTitle("Default Permission(s)")
+											.setTitle("Default Permission(s)", null)
 											.build())
 									.build();
 							event.sendMessage(m).queue();

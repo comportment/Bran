@@ -59,8 +59,7 @@ public class UrbanDictionaryCommand {
 						String word = result.get("word").getAsString();
 						EmbedBuilder builder = new EmbedBuilder()
 										.setFooter("Powered by Urban Dictionary", "https://cdn.discordapp.com/attachments/225694598465454082/248910958280441868/photo.png")
-										.setAuthor(word + " definition by " + author, null, null)
-										.setUrl("https://www.urbandictionary.com/define.php?term=" + query)
+								.setTitle(word + " definition by " + author, "https://www.urbandictionary.com/define.php?term=" + query)
 										.addField("Definition: ", Util.isEmpty(definition) ? "No definition provided." : definition.length() > EmbedBuilder.VALUE_MAX_LENGTH ? "Definition is too big, click [here](https://www.urbandictionary.com/define.php?term=" + query +") to see it." : definition, false)
 										.addField("\u00ad\nExample: ", Util.isEmpty(example) ? "No example provided." : example.length() > EmbedBuilder.VALUE_MAX_LENGTH ? "Example is too big, click [here](https://www.urbandictionary.com/define.php?term=" + query +") to see it." : example, false)
 										.addField("\uD83D\uDC4D", String.valueOf(thumbsup), true)
@@ -70,7 +69,7 @@ public class UrbanDictionaryCommand {
 							event.sendMessage("An unexpected error occurred.").queue();
 							throwable.printStackTrace();
 						});
-					} catch (MalformedURLException e) {
+					} catch (MalformedURLException ignored) {
 					} catch (IOException | IndexOutOfBoundsException e) {
 						event.sendMessage("Something went wrong!").queue();
 						e.printStackTrace();

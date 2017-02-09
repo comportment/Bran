@@ -29,11 +29,12 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import javax.security.auth.login.LoginException;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BotContainer {
@@ -112,40 +113,24 @@ public class BotContainer {
 		return session;
 	}
 	
-	public List<Guild> getGuilds() {
-		List<Guild> guilds = new ArrayList<>();
-		for (Bot shard : shards) {
-			guilds.addAll(shard.getJDA().getGuilds());
-		}
-		return guilds;
-	}
-	
-	public List<User> getUsers() {
-		List<User> users = new ArrayList<>();
-		for (Bot shard : shards) {
-			users.addAll(shard.getJDA().getUsers());
-		}
-		return users;
-	}
-	
 	public Messenger getMessenger() {
 		return messenger;
 	}
 	
+	public List<Guild> getGuilds() {
+		return Arrays.stream(shards).map(bot -> bot.getJDA().getGuilds()).flatMap(List::stream).collect(Collectors.toList());
+	}
+	
+	public List<User> getUsers() {
+		return Arrays.stream(shards).map(bot -> bot.getJDA().getUsers()).flatMap(List::stream).collect(Collectors.toList());
+	}
+	
 	public List<TextChannel> getTextChannels() {
-		List<TextChannel> channels = new ArrayList<>();
-		for (Bot shard : shards) {
-			channels.addAll(shard.getJDA().getTextChannels());
-		}
-		return channels;
+		return Arrays.stream(shards).map(bot -> bot.getJDA().getTextChannels()).flatMap(List::stream).collect(Collectors.toList());
 	}
 	
 	public List<VoiceChannel> getVoiceChannels() {
-		List<VoiceChannel> channels = new ArrayList<>();
-		for (Bot shard : shards) {
-			channels.addAll(shard.getJDA().getVoiceChannels());
-		}
-		return channels;
+		return Arrays.stream(shards).map(bot -> bot.getJDA().getVoiceChannels()).flatMap(List::stream).collect(Collectors.toList());
 	}
 	
 	public AtomicLongArray getLastEvents() {

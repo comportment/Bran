@@ -73,12 +73,12 @@ public class PollCommand {
 								return;
 							}
 							EmbedBuilder builder = new EmbedBuilder();
-							builder.setTitle(poll.getPollName());
+							builder.setTitle(poll.getPollName(), null);
 							builder.setFooter("This Poll was created by " + Util.getUser(event.getJDA().getUserById(poll.getCreatorId())), Util.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
 							StringBuilder stringBuilder = new StringBuilder();
 							stringBuilder.append("**Current Votes**\n");
 							poll.getOptions().forEach(option ->
-								stringBuilder.append("**" + (option.getIndex() + 1) + ".** " + option.getContent() + "    *(Votes: " + option.getVotes().size() + ")*\n"));
+									stringBuilder.append("**").append(option.getIndex() + 1).append(".** ").append(option.getContent()).append("    *(Votes: ").append(option.getVotes().size()).append(")*\n"));
 							builder.setDescription(stringBuilder.toString());
 							builder.setColor(Color.decode("#F89F3F"));
 							event.sendMessage(builder.build()).queue();
@@ -100,7 +100,7 @@ public class PollCommand {
 							}
 							boolean wasOwner = poll.getCreatorId().equals(event.getAuthor().getId());
 							EmbedBuilder builder = new EmbedBuilder();
-							builder.setTitle(poll.getPollName());
+							builder.setTitle(poll.getPollName(), null);
 							builder.setFooter("This Poll was created by " + Util.getUser(event.getJDA().getUserById(poll.getCreatorId())), Util.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
 							StringBuilder stringBuilder = new StringBuilder();
 							if (!wasOwner) stringBuilder.append("**This Poll was forcibly ended by a moderator!**\n\n");
@@ -108,7 +108,7 @@ public class PollCommand {
 							if (!poll.getLeadership().isEmpty()) {
 								stringBuilder.append("**Results**\n");
 								poll.getOptions().forEach(option ->
-										stringBuilder.append("**" + (option.getIndex() + 1) + ".** " + option.getContent() + "    *(Votes: " + option.getVotes().size() + ")*\n"));
+										stringBuilder.append("**").append(option.getIndex() + 1).append(".** ").append(option.getContent()).append("    *(Votes: ").append(option.getVotes().size()).append(")*\n"));
 							} else {
 								stringBuilder.append("**That's kinda sad I guess, no one voted to the Poll!**");
 							}

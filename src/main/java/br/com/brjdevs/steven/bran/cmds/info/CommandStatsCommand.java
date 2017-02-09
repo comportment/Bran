@@ -61,6 +61,6 @@ public class CommandStatsCommand {
 		Color color = Color.decode("#8B4AEC");
 		if (event.getGuild() != null && event.getSelfMember().getColor() != null)
 			color = event.getSelfMember().getColor();
-		return new EmbedBuilder().setTitle(title).setColor(color);
+		return new EmbedBuilder().setTitle(title, null).setColor(color);
 	}
 }

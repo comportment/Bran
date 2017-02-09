@@ -49,7 +49,7 @@ public class GuildInfoCommand {
 							Util.getAvatarUrl(event.getAuthor()));
 					embedBuilder.setColor(
 							guildOwner.getColor() == null ? Color.decode("#F38630") : guildOwner.getColor());
-					embedBuilder.setTitle("\uD83C\uDFE0 Guild information on " + guild.getName());
+					embedBuilder.setTitle("\uD83C\uDFE0 Guild information on " + guild.getName(), null);
 					embedBuilder.addField("ID", guild.getId(), true);
 					embedBuilder.addField("Owner", Util.getUser(guildOwner.getUser()) + "\n(ID: " + guildOwner.getUser().getId() + ")", true);
 					embedBuilder.addField("Region", guild.getRegion().toString(), true);

@@ -76,14 +76,14 @@ public class AudioLoader implements AudioLoadResultHandler {
 					}
 					Action action = new Action(ActionType.MESSAGE, onInvalidResponse.CONTINUE, msg, (message, args) -> {
 						if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
-							message.deleteMessage().queue();
+							message.delete().queue();
 						String response = message.getContent();
 						if (MathUtils.isInRange(MathUtils.parseIntOrDefault(response, -1), 0, inputs.size() - 1)) {
 							int i = Integer.parseInt(response);
 							TrackContext trackContext = tracks.get(i - 1);
 							musicManager.getTrackScheduler().queue(trackContext);
 							if (msg != null)
-								msg.deleteMessage().queue();
+								msg.delete().queue();
 						} else {
 							if (msg != null)
 								msg.editMessage("Query canceled!").queue();

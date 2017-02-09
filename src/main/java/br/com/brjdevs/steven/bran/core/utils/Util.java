@@ -88,7 +88,7 @@ public class Util {
 	public static MessageEmbed createShardInfo(Bot shard) {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		JDA jda = shard.getJDA();
-		embedBuilder.setTitle("Shard #" + shard.getId());
+		embedBuilder.setTitle("Shard #" + shard.getId(), null);
 		embedBuilder.addField("Total Uptime", DateUtils.format(System.currentTimeMillis() - shard.getStartup()), true);
 		embedBuilder.addField("Last Reboot", DateUtils.format(System.currentTimeMillis() - shard.getLastReboot()), true);
 		embedBuilder.addField("Last Event", DateUtils.format(System.currentTimeMillis() - shard.container.getLastEvents().get(shard.getId())), true);

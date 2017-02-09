@@ -41,8 +41,8 @@ public class WordFilterListener implements EventListener {
 				bool = true;
 		}
 		if (bool) {
-			event.getMessage().deleteMessage().queue();
-			container.getMessenger().sendMessage(event.getChannel(), "**" + Util.getUser(event.getAuthor()) + "** you can't say that!!").queue(msg -> new RestActionSleep(msg.deleteMessage()).sleepAndThen(TimeUnit.SECONDS.toMillis(1), RestAction::queue));
+			event.getMessage().delete().queue();
+			container.getMessenger().sendMessage(event.getChannel(), "**" + Util.getUser(event.getAuthor()) + "** you can't say that!!").queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(TimeUnit.SECONDS.toMillis(1), RestAction::queue));
 		}
 	}
 }

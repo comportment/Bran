@@ -281,7 +281,7 @@ public class TrackScheduler implements AudioEventListener {
 			if (currentTrack.getContext(getShard().getJDA()) != null && !isRepeat) {
 				currentTrack.getContext(getShard().getJDA()).sendMessage(String.format(announce, getVoiceChannel().getName(), currentTrack.getTrack().getInfo().title, AudioUtils.format(currentTrack.getTrack()), Util.getUser(currentTrack.getDJ(getShard().getJDA())))).queue(message -> {
 					Message msg = messageReference.get();
-					if (msg != null && !msg.isEdited()) msg.deleteMessage().queue();
+					if (msg != null && !msg.isEdited()) msg.delete().queue();
 					messageReference.set(message);
 				});
 			}
