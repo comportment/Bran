@@ -1,8 +1,6 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class StringUtils {
 	
@@ -22,48 +20,6 @@ public class StringUtils {
         if (expectedArgs < 1) return raw;
         return normalizeArray(raw, expectedArgs);
     }
-	
-	public static String[] advancedSplitArgs(String args, int expectedArgs) {
-		List<String> result = new ArrayList<>();
-		boolean inAString = false;
-		StringBuilder currentBlock = new StringBuilder();
-		for (int i = 0; i < args.length(); i++) {
-			if (args.charAt(i) == '"' && (i == 0 || args.charAt(i - 1) != '\\' || args.charAt(i - 2) == '\\'))
-				inAString = !inAString;
-			
-			if (inAString)
-				currentBlock.append(args.charAt(i));
-			else if (Character.isSpaceChar(args.charAt(i))) {
-				if (currentBlock.length() != 0) {
-					if (currentBlock.charAt(0) == '"' && currentBlock.charAt(currentBlock.length() - 1) == '"') {
-						currentBlock.deleteCharAt(0);
-						currentBlock.deleteCharAt(currentBlock.length() - 1);
-					}
-					
-					result.add(advSplArgUnb(currentBlock.toString()));
-					currentBlock = new StringBuilder();
-				}
-			} else currentBlock.append(args.charAt(i));
-		}
-		
-		if (currentBlock.length() != 0) {
-			if (currentBlock.charAt(0) == '"' && currentBlock.charAt(currentBlock.length() - 1) == '"') {
-				currentBlock.deleteCharAt(0);
-				currentBlock.deleteCharAt(currentBlock.length() - 1);
-			}
-			
-			result.add(advSplArgUnb(currentBlock.toString()));
-		}
-		
-		String[] raw = result.toArray(new String[result.size()]);
-		
-		if (expectedArgs < 1) return raw;
-		return normalizeArray(raw, expectedArgs);
-	}
-	
-	private static String advSplArgUnb(String s) {
-		return s.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t").replace("\\\"", "\"").replace("\\\\", "\\");
-	}
 	
 	public static String[] normalizeArray(String[] raw, int expectedSize) {
         String[] normalized = new String[expectedSize];

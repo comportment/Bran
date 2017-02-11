@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.DiscordLog.Level;
+import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.google.gson.Gson;
@@ -12,6 +13,7 @@ public class Main {
 	private static BotContainer container;
 	
 	public static void main(String[] args) {
+		System.out.println(String.join("\n", Argument.split("\"\"\" b\"", 2)));
 		try {
 			container = new BotContainer();
 			Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
