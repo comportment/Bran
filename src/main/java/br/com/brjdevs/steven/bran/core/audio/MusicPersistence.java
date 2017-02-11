@@ -2,8 +2,10 @@ package br.com.brjdevs.steven.bran.core.audio;
 
 import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
-import com.sedmelluq.discord.lavaplayer.tools.io.MessageInput;
-import com.sedmelluq.discord.lavaplayer.tools.io.MessageOutput;
+import br.com.brjdevs.steven.bran.core.utils.Util;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.core.JDA;
@@ -12,12 +14,13 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.utils.SimpleLog;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +38,7 @@ public class MusicPersistence {
 	
 	public MusicPersistence(BotContainer container) {
 		this.container = container;
-		reloadPlaylists();
+		this.reloadPlaylists();
 	}
 	
 	@SneakyThrows(Exception.class)
@@ -81,10 +84,7 @@ public class MusicPersistence {
 			
 			List<JSONObject> sources = new ArrayList<>();
 			for (TrackContext track : trackScheduler.getRemainingTracks()) {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				container.playerManager.getAudioPlayerManager().encodeTrack(new MessageOutput(baos), track.getTrack());
 				JSONObject src = new JSONObject();
-				src.put("track", Base64.encodeBase64String(baos.toByteArray()));
 				src.put("channel", track.getContextId());
 				src.put("user", track.getDJId());
 				src.put("url", track.getURL());
@@ -116,7 +116,6 @@ public class MusicPersistence {
 			LOG.info("No files in path.");
 			return true;
 		}
-		fileLoop:
 		for (File file : files) {
 			InputStream inputStream = null;
 			boolean[] isFirst = {true};
@@ -152,23 +151,15 @@ public class MusicPersistence {
 				trackScheduler.setPaused(isPaused);
 				trackScheduler.setShuffle(shuffle);
 				trackScheduler.setRepeat(repeat);
-				
 				voteSkips.forEach(o -> trackScheduler.getVoteSkips().add((String) o));
-				
+				PersistenceAudioLoader audioLoader = new PersistenceAudioLoader();
 				sources.forEach((Object o) -> {
 					JSONObject ident = (JSONObject) o;
-					byte[] track = Base64.decodeBase64(ident.getString("track"));
 					
-					AudioTrack audioTrack;
+					container.playerManager.getAudioPlayerManager()
+							.loadItemOrdered(container.playerManager.get(jda.getGuildById(guildId)), ident.getString("url"), audioLoader);
 					
-					try {
-						ByteArrayInputStream bais = new ByteArrayInputStream(track);
-						audioTrack = container.playerManager.getAudioPlayerManager().decodeTrack(new MessageInput(bais)).decodedTrack;
-					} catch (Exception e) {
-						LOG.fatal("Failed to decode Audio Track");
-						LOG.log(e);
-						return;
-					}
+					AudioTrack audioTrack = audioLoader.result();
 					
 					if (audioTrack == null) {
 						LOG.info("Loaded null track! Skipping...");
@@ -194,5 +185,43 @@ public class MusicPersistence {
 			}
 		}
 		return true;
+	}
+	
+	private static class PersistenceAudioLoader implements AudioLoadResultHandler {
+		
+		private AudioTrack result;
+		private boolean called = false;
+		
+		@Override
+		public void trackLoaded(AudioTrack audioTrack) {
+			this.result = audioTrack;
+			this.called = true;
+		}
+		
+		@Override
+		public void playlistLoaded(AudioPlaylist audioPlaylist) {
+			this.called = true;
+			throw new UnsupportedOperationException("Playlist aren't supported in this Audio Loader!");
+		}
+		
+		@Override
+		public void noMatches() {
+			this.called = true;
+			this.result = null;
+		}
+		
+		@Override
+		public void loadFailed(FriendlyException e) {
+			this.called = true;
+			this.result = null;
+		}
+		
+		public AudioTrack result() {
+			while (!called) Util.sleep(100);
+			if (result == null) return null;
+			AudioTrack track = result.makeClone();
+			result = null;
+			return track;
+		}
 	}
 }

@@ -1,8 +1,5 @@
 package br.com.brjdevs.steven.bran.core.command;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Argument<T> {
@@ -22,41 +19,6 @@ public class Argument<T> {
 	
 	public Argument(String name, Class<T> type) {
 		this(name, type, false);
-	}
-	
-	public static String[] split(String input, int size) {
-		List<String> results = new ArrayList<>();
-		Matcher matcher = ARG_PATTERN.matcher(input);
-		while (matcher.find()) {
-			if (results.size() >= size) {
-				String s = input.substring(String.join(" ", results).length());
-				results.add(s);
-				break;
-			}
-			if (matcher.group(1) != null) {
-				results.add(matcher.group(1));
-			} else if (matcher.group(2) != null) {
-				results.add(matcher.group(2));
-			} else {
-				results.add(matcher.group());
-			}
-		}
-		return results.toArray(new String[0]);
-	}
-	
-	public static String[] split(String input) {
-		List<String> results = new ArrayList<>();
-		Matcher matcher = ARG_PATTERN.matcher(input);
-		while (matcher.find()) {
-			if (matcher.group(1) != null) {
-				results.add(matcher.group(1));
-			} else if (matcher.group(2) != null) {
-				results.add(matcher.group(2));
-			} else {
-				results.add(matcher.group());
-			}
-		}
-		return results.toArray(new String[0]);
 	}
 	
 	public boolean isOptional() {

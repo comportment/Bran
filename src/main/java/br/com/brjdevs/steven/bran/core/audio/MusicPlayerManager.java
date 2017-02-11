@@ -54,7 +54,6 @@ public class MusicPlayerManager {
 	
 	public void loadAndPlay(final User user, final TextChannel channel, final String trackUrl) {
 		MusicManager musicManager = get(channel.getGuild());
-		
 		playerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoader(channel, user, trackUrl, musicManager));
 	}
 }

@@ -15,23 +15,23 @@ import java.awt.*;
 public class DiscordLog {
 	
 	private static SimpleLog LOG = SimpleLog.getLog("DiscordLog");
-	public TextChannel logChannel;
+	public String channelId;
 	private boolean isEnabled;
-	private Guild guild;
+	private long guildId;
 	private BotContainer container;
+	private int shard;
 	
 	public DiscordLog(BotContainer botContainer) {
 		this.container = botContainer;
-		for (Bot bot : botContainer.getShards()) {
-			guild = bot.getJDA().getGuildById("219256419684188161");
-			if (guild != null) break;
-		}
+		this.guildId = Long.parseLong("219256419684188161");
+		this.shard = container.calcShardId(guildId);
+		Guild guild = container.getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
 		if (guild == null) {
 			this.isEnabled = false;
 			LOG.fatal("Could not find Discord Log Guild.");
 			return;
 		}
-		logChannel = guild.getTextChannelById("249971874430320660");
+		channelId = "249971874430320660";
 		this.isEnabled = true;
 	}
 	
@@ -40,27 +40,35 @@ public class DiscordLog {
 	}
 	
 	public void logToDiscord(Throwable throwable, String extra) {
-		logChannel.sendMessage(Level.FATAL.getBaseEmbed("Uncaught exception in Thread '" + Thread.currentThread().getName() + "'")
+		getLogChannel().sendMessage(Level.FATAL.getBaseEmbed("Uncaught exception in Thread '" + Thread.currentThread().getName() + "'")
 				.setDescription("An unexpected `" + throwable.getClass().getSimpleName() + "` occurred.\n**Message:** " + throwable.getMessage() + "\n**StackTrace:** " + Hastebin.post(Util.getStackTrace(throwable)) + "\n**Extras:** " + (Util.isEmpty(extra) ? "No extra information was given." : extra))
 				.build()).queue();
 	}
 	
 	public void logToDiscord(GuildJoinEvent event) {
 		Guild guild = event.getGuild();
-		logChannel.sendMessage(Level.INFO.getBaseEmbed("\uD83C\uDFE0 Joined Guild")
+		getLogChannel().sendMessage(Level.INFO.getBaseEmbed("\uD83C\uDFE0 Joined Guild")
 				.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Shard:** " + container.getShardId(guild.getJDA()) + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "  (" + RequirementsUtils.getBotsPercentage(guild) + "% bots)\n**Owner:** " + Util.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")")
 				.build()).queue();
 	}
 	
 	public void logToDiscord(GuildLeaveEvent event) {
 		Guild guild = event.getGuild();
-		logChannel.sendMessage(Level.INFO.getBaseEmbed("\uD83C\uDFDA Left Guild")
+		getLogChannel().sendMessage(Level.INFO.getBaseEmbed("\uD83C\uDFDA Left Guild")
 				.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "  (" + RequirementsUtils.getBotsPercentage(guild) + "% bots)\n**Owner:** " + Util.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")")
 				.build()).queue();
 	}
 	
 	public void logToDiscord(String title, String description, Level level) {
-		logChannel.sendMessage(level.getBaseEmbed(title).setDescription(description).build()).queue();
+		getLogChannel().sendMessage(level.getBaseEmbed(title).setDescription(description).build()).queue();
+	}
+	
+	public TextChannel getLogChannel() {
+		return getGuild().getTextChannelById(channelId);
+	}
+	
+	public Guild getGuild() {
+		return container.getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
 	public enum Level {

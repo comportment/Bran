@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.HelpContainer;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
+import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 
 import java.util.ArrayList;
@@ -104,7 +105,7 @@ public class CommandBuilder {
 				split[1] = split[1].trim();
 				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\' && split[1].matches("^(\\?|help)$"))
 					split[1] = split[1].substring(1);
-				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length - 1)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
+				String[] s = args.length > 1 ? Arrays.stream(StringUtils.advancedSplitArgs(split[1], args.length)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
 				Argument[] args = event.getArguments();
 				if (args != null) {
 					for (int i = 0; i < args.length; i++) {
