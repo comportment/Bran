@@ -12,6 +12,7 @@ import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
+import br.com.brjdevs.steven.bran.core.managers.jenkins.Jenkins;
 import br.com.brjdevs.steven.bran.core.poll.PollPersistence;
 import br.com.brjdevs.steven.bran.core.utils.Session;
 import br.com.brjdevs.steven.bran.core.utils.Util;
@@ -49,6 +50,7 @@ public class BotContainer {
 	public DataManager dataManager;
 	public CommandManager commandManager;
 	public MusicPlayerManager playerManager;
+	public Jenkins jenkins;
 	private Bot[] shards;
 	private DiscordLog discordLog;
 	private int totalShards;
@@ -77,6 +79,7 @@ public class BotContainer {
 		this.session = new Session(this);
 		this.messenger = new Messenger(this);
 		this.taskManager = new TaskManager(this);
+		this.jenkins = new Jenkins(this);
 		ItemContainer.loadItems();
 	}
 	

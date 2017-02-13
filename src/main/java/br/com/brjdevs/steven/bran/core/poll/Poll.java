@@ -62,7 +62,7 @@ public class Poll {
 	}
 
 	public String getPollName() {
-		return pollName;
+		return pollName.isEmpty() ? "\u00AD" : pollName;
 	}
 
 	public String getCreatorId() {

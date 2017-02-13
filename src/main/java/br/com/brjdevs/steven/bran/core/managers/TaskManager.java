@@ -3,6 +3,7 @@ package br.com.brjdevs.steven.bran.core.managers;
 import br.com.brjdevs.steven.bran.BotContainer;
 import br.com.brjdevs.steven.bran.core.audio.timers.ChannelLeaveTimer;
 import br.com.brjdevs.steven.bran.core.audio.timers.MusicRegisterTimeout;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.management.OperatingSystemMXBean;
 
 import java.lang.management.ManagementFactory;
@@ -31,9 +32,9 @@ public class TaskManager {
 	}
 	
 	public void startAsyncTask(Runnable run, int seconds) {
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(
-                run, 0, seconds, TimeUnit.SECONDS);
-    }
+		Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Async Task-%d").build()).scheduleAtFixedRate(
+				run, 0, seconds, TimeUnit.SECONDS);
+	}
 	
 	private void startAsyncTasks() {
 	    final OperatingSystemMXBean os =

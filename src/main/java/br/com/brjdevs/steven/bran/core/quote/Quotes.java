@@ -4,7 +4,7 @@ import java.util.Random;
 
 public enum Quotes {
 	
-	FAIL("Something went wrong :confused:", "Well... I don't have anything to talk about this: ", "I wonder: *Why?* :thinking:..."),
+	FAIL("Something went wrong :confused:", "I blame the cows.", "I wonder: *Why?* :thinking:..."),
 	SUCCESS("This was easy, I want a real challenge! :laughing: ", "1, 2, 3 and *dramatic pause*... Done!", "Fast, huh? :muscle: ", "I hope you like it :smile:", "Oh yea boi! :ok_hand:");
 	
 	private static final Random random = new Random();

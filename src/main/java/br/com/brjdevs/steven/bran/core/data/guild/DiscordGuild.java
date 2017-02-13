@@ -26,6 +26,7 @@ public class DiscordGuild {
 	private CustomCmdsSettings cmdsSettings = new CustomCmdsSettings();
 	private WordFilterSettings wordFilter = new WordFilterSettings(false);
 	private MusicSettings musicSettings = new MusicSettings();
+	private Giveaway giveaway = null;
 	private long defaultPermission = Permissions.BASE_USR;
 	
 	public DiscordGuild(BotContainer container) {
@@ -94,6 +95,14 @@ public class DiscordGuild {
 	
 	public void setDefaultPermission(long defaultPermission) {
 		this.defaultPermission = defaultPermission;
+	}
+	
+	public Giveaway getGiveaway() {
+		return giveaway;
+	}
+	
+	public void setGiveaway(Giveaway giveaway) {
+		this.giveaway = giveaway;
 	}
 	
 	public void save(BotContainer container) {

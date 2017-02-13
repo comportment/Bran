@@ -187,7 +187,7 @@ public class MusicPersistence {
 		return true;
 	}
 	
-	private static class PersistenceAudioLoader implements AudioLoadResultHandler {
+	public static class PersistenceAudioLoader implements AudioLoadResultHandler {
 		
 		private AudioTrack result;
 		private boolean called = false;

@@ -128,7 +128,7 @@ public class TreeCommandBuilder {
 						alias = defaultCmd;
 						isDefault = true;
 					} else {
-						if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+						if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 							event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
 						} else {
 							event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();

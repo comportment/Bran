@@ -84,8 +84,7 @@ public class HangManCommand {
 							if (session == null) {
 								event.sendMessage(Quotes.FAIL, "You don't have a Game Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to start one!").queue();
 								return;
-							}
-							if (session.getChannel(event.getBotContainer()) != event.getTextChannel()) {
+							} else if (session.getChannel(event.getBotContainer()) != event.getTextChannel()) {
 								event.sendMessage(Quotes.FAIL, "You can only invite users in " + session.getChannel(event.getBotContainer()).getAsMention() + " because that's where the Game is running...").queue();
 								return;
 							}
@@ -93,12 +92,10 @@ public class HangManCommand {
 							if (user == null) {
 								event.sendMessage(Quotes.FAIL, "You have to mention an User to play with you!").queue();
 								return;
-							}
-							if (user.isBot() || user.isFake()) {
+							} else if (user.isBot() || user.isFake()) {
 								event.sendMessage(Quotes.FAIL, "You can't invite Bots to play with you!.").queue();
 								return;
-							}
-							if (user.equals(event.getAuthor())) {
+							} else if (user.equals(event.getAuthor())) {
 								event.sendMessage(Quotes.FAIL, "You really just tried to invite yourself?! I hope that wasn't intentional...").queue();
 								return;
 							}
@@ -137,8 +134,7 @@ public class HangManCommand {
 							if (session == null) {
 								event.sendMessage(Quotes.FAIL, "You don't have a Session Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to create one!").queue();
 								return;
-							}
-							if (session.getChannel(event.getBotContainer()) != event.getTextChannel()) {
+							} else if (session.getChannel(event.getBotContainer()) != event.getTextChannel()) {
 								event.sendMessage(Quotes.FAIL, "You can only do this in " + session.getChannel(event.getBotContainer()).getAsMention() + " because that's where the Game is running...").queue();
 								return;
 							}
@@ -167,32 +163,27 @@ public class HangManCommand {
 							if (session == null) {
 								event.sendMessage(Quotes.FAIL, "You don't have a Session Running in anywhere, if you want you can use `" + event.getPrefix() + "hm start` to create one!").queue();
 								return;
-							}
-							if (session.getChannel(event.getBotContainer()) != event.getTextChannel()) {
+							} else if (session.getChannel(event.getBotContainer()) != event.getTextChannel()) {
 								event.sendMessage(Quotes.FAIL, "You can only do this in " + session.getChannel(event.getBotContainer()).getAsMention() + " because that's where the Game is running...").queue();
 								return;
-							}
-							if (session.isMultiplayer()) {
+							} else if (session.isMultiplayer()) {
 								event.sendMessage("You can't use items in a MultiPlayer session!").queue();
-								return;
-							}
-							int matches = StringUtils.countMatches(session.getGuessedLetters(), '_');
-							if (matches <= 1) {
-								event.sendMessage("You can't use items now because you only have one guess left!").queue();
 								return;
 							}
 							String itemName = (String) event.getArgument("item name").get();
 							Item item = ItemContainer.getItemById("HangMan_" + StringUtils.neat(itemName));
-							if (item == null) {
+							Inventory inventory = profile.getInventory();
+							int matches = StringUtils.countMatches(session.getGuessedLetters(), '_');
+							if (matches <= 1) {
+								event.sendMessage("You can't use items now because you only have one guess left!").queue();
+								return;
+							} else if (item == null) {
 								event.sendMessage("No such Item named \"" + itemName + "\" usable in HangMan!").queue();
 								return;
-							}
-							Inventory inventory = profile.getInventory();
-							if (inventory.getAmountOf(item) == 0) {
+							} else if (inventory.getAmountOf(item) == 0) {
 								event.sendMessage("You don't have any " + item.getName() + " in your inventory!").queue();
 								return;
-							}
-							if (session.getUsedItems() > 2) {
+							} else if (session.getUsedItems() > 2) {
 								event.sendMessage("You can only use 2 items per session!").queue();
 								return;
 							}
@@ -206,7 +197,6 @@ public class HangManCommand {
 									return;
 								}
 								event.sendMessage("**Here's a small tip:** " + Util.random(event.getBotContainer().data.getHangManWords().get(session.getWord()))).queue();
-								return;
 							} else if (item.getName().equals("Guesser")) {
 								String r = session.getRandomLetter();
 								session.guess(r);

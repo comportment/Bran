@@ -28,17 +28,17 @@ public class Permissions {
             PERMSYS_BO = bits(15),
             PRUNE_CLEANUP = bits(16),
             EVAL = bits(17),
-            ANNOY = bits(18),
-            BLACKLIST = bits(19),
-            LOAD_SAVE = bits(20),
+		    CREATE_GIVEAWAY = bits(18),
+		    BLACKLIST = bits(19),
+		    LOAD_SAVE = bits(20),
             STOP_RESET = bits(21),
             BOT_ADMIN = bits(22);
 
     public static final long
             BASE_USR = RUN_BASECMD | RUN_USRCMD | MUSIC | CUSTOM_CMDS | POLL,
-            GUILD_MOD = BASE_USR | DJ | BAN_USER | KICK_USR | PERMSYS_GM | WORD_FILTER,
-            GUILD_OWNER = GUILD_MOD | PERMSYS_GO | PREFIX | ANNOUNCE | PRUNE_CLEANUP | GUILD_MANAGE | ANNOY,
-            BOT_OWNER = GUILD_OWNER | PERMSYS_BO | EVAL | STOP_RESET | LOAD_SAVE | BLACKLIST | BOT_ADMIN;
+		    GUILD_MOD = BASE_USR | DJ | BAN_USER | KICK_USR | PERMSYS_GM | WORD_FILTER | CREATE_GIVEAWAY,
+		    GUILD_OWNER = GUILD_MOD | PERMSYS_GO | PREFIX | ANNOUNCE | PRUNE_CLEANUP | GUILD_MANAGE,
+		    BOT_OWNER = GUILD_OWNER | PERMSYS_BO | EVAL | STOP_RESET | LOAD_SAVE | BLACKLIST | BOT_ADMIN;
 	
 	public static Map<String, Long> perms = new HashMap<>();
 	

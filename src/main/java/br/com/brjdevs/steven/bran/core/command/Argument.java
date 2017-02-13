@@ -31,16 +31,16 @@ public class Argument<T> {
 		while (matcher.find()) {
 			if (results.size() >= size) {
 				String s = input.substring(String.join(" ", results).length());
-				if (s.length() > 3) s = s.substring(3);
+				if (s.length() > 3 && results.get(results.size() - 1).contains(" ")) s = s.substring(3);
 				results.add(s);
 				break;
 			}
 			if (matcher.group(1) != null) {
-				results.add(matcher.group(1));
+				results.add(matcher.group(1).trim());
 			} else if (matcher.group(2) != null) {
-				results.add(matcher.group(2));
+				results.add(matcher.group(2).trim());
 			} else {
-				results.add(matcher.group());
+				results.add(matcher.group().trim());
 			}
 		}
 		return results.toArray(new String[0]);
@@ -69,7 +69,7 @@ public class Argument<T> {
 				obj = input;
 				break;
 			case "Integer":
-				if (!input.matches("^-?[0-9]+$"))
+				if (!input.matches("^(\\+|-)?[0-9]$"))
 					throw new ArgumentParsingException(type.getSimpleName(), input);
 				obj = Integer.parseInt(input);
 				break;

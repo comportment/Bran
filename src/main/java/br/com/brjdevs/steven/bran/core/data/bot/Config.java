@@ -13,6 +13,10 @@ public class Config {
 	
 	private static final SimpleLog LOG = SimpleLog.getLog("Config Load");
 	
+	private String JENKINS_USER = "";
+	private String JENKINS_PASS = "";
+	private String JENKINS_TOKEN = "";
+	private String JENKINS_LATEST_BUILD = "http://144.217.94.249:8080/job/Bran/lastSuccessfulBuild/artifact/target/DiscordBot-1.0-SNAPSHOT.jar";
 	private String BOT_TOKEN = "";
 	private String OWNER_ID = "";
 	private String DBOTS_TOKEN = "";
@@ -60,6 +64,22 @@ public class Config {
 			LOG.fatal(exception);
 		}
 		return config;
+	}
+	
+	public String getJenkinsUser() {
+		return JENKINS_USER;
+	}
+	
+	public String getJenkinsPass() {
+		return JENKINS_PASS;
+	}
+	
+	public String getJenkinsToken() {
+		return JENKINS_TOKEN;
+	}
+	
+	public String getJenkinsLatestBuild() {
+		return JENKINS_LATEST_BUILD;
 	}
 	
 	public List<String> getDefaultPrefixes() {

@@ -20,6 +20,7 @@ public class WordFilterCommand {
 				.setHelp("wordfilter ?")
 				.setDescription("Don't want people talking trash in your server? This will help you.")
 				.setPrivateAvailable(false)
+				.setRequiredPermission(Permissions.GUILD_MANAGE)
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 						.setAliases("add")
 						.setName("WordFilter Add Command")

@@ -14,9 +14,9 @@ public class Hastebin {
     public static String post(String data) {
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost("https://hastebin.com/documents");
-        
-        try {
-            post.setEntity(new StringEntity(data));
+	
+	    try {
+		    post.setEntity(new StringEntity(data));
             
             HttpResponse response = client.execute(post);
             String result = EntityUtils.toString(response.getEntity());

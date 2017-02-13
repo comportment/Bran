@@ -34,7 +34,7 @@ public class BotData {
 	}
 	
 	public Profile getProfile(User user) {
-		return getProfiles().get(user.getId());
+		return getProfiles().computeIfAbsent(user.getId(), u -> new Profile(user));
 	}
 	
 	public Map<String, List<String>> getHangManWords() {

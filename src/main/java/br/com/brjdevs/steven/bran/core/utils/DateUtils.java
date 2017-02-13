@@ -1,6 +1,14 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
+import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class DateUtils {
+	
+	private static final Pattern pattern = Pattern.compile("\\d+?[a-zA-Z]");
 	
 	public static String format(long time) {
 		final long years = time / 31104000000L,
@@ -15,6 +23,62 @@ public class DateUtils {
 				+ (hours == 0 ? "" : decimal(hours) + ":")
 				+ (minutes == 0 ? "00" : decimal(minutes)) + ":"
 				+ (seconds == 0 ? "00" : decimal(seconds));
+	}
+	
+	public static Iterable<String> iterate(Matcher matcher) {
+		return new Iterable<String>() {
+			
+			@Override
+			public Iterator<String> iterator() {
+				return new Iterator<String>() {
+					
+					@Override
+					public boolean hasNext() {
+						return matcher.find();
+					}
+					
+					@Override
+					public String next() {
+						return matcher.group();
+					}
+				};
+			}
+			
+			@Override
+			public void forEach(Consumer<? super String> action) {
+				while (matcher.find()) {
+					action.accept(matcher.group());
+				}
+			}
+		};
+	}
+	
+	public static long getTime(String s, TimeUnit u) {
+		s = s.toLowerCase();
+		long[] time = {0};
+		iterate(pattern.matcher(s)).forEach(string -> {
+			String l = string.substring(0, string.length() - 1);
+			TimeUnit unit;
+			switch (string.charAt(string.length() - 1)) {
+				case 's':
+					unit = TimeUnit.SECONDS;
+					break;
+				case 'm':
+					unit = TimeUnit.MINUTES;
+					break;
+				case 'h':
+					unit = TimeUnit.HOURS;
+					break;
+				case 'd':
+					unit = TimeUnit.DAYS;
+					break;
+				default:
+					unit = TimeUnit.SECONDS;
+					break;
+			}
+			time[0] += unit.toMillis(Long.parseLong(l));
+		});
+		return u.convert(time[0], TimeUnit.MILLISECONDS);
 	}
 	
 	public static String formatTimeBetween(long first, long second) {

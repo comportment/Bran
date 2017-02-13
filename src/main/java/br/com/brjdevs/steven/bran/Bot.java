@@ -33,10 +33,15 @@ public class Bot {
 	
 	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
 		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(container.config.getToken());
+		Game game = null;
 		if (!Util.isEmpty(container.config.getGame()))
-			jdaBuilder.setGame(container.config.isGameStream() ? Game.of(container.config.getGame(), "https://twitch.tv/ ") : Game.of(container.config.getGame()));
-		if (totalShards > 1)
+			game = container.config.isGameStream() ? Game.of(container.config.getGame(), "https://twitch.tv/ ") : Game.of(container.config.getGame());
+		if (totalShards > 1) {
 			jdaBuilder.useSharding(shardId, totalShards);
+			if (game != null)
+				game = Game.of(game.getName() + " | [" + shardId + "]", game.getUrl());
+		}
+		jdaBuilder.setGame(game);
 		jdaBuilder.setEventManager(eventManager);
 		jdaBuilder.setBulkDeleteSplittingEnabled(false);
 		jdaBuilder.setEnableShutdownHook(false);

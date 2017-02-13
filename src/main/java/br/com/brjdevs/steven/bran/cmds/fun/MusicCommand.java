@@ -111,14 +111,15 @@ public class MusicCommand {
 							TrackScheduler scheduler = musicManager.getTrackScheduler();
 							Iterator<TrackContext> it = scheduler.getQueue().iterator();
 							TrackContext next = it.hasNext() ? it.next() : null;
-							String out = "[Current song information for `" + event.getGuild().getAudioManager().getConnectedChannel().getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
+							VoiceChannel channel = event.getGuild().getAudioManager().isAttemptingToConnect() ? event.getGuild().getAudioManager().getQueuedAudioConnection() : event.getGuild().getAudioManager().getConnectedChannel();
+							String out = "[Current song information for `" + channel.getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
 							out += "\uD83D\uDC49 DJ » `" + Util.getUser(context.getDJ(event.getJDA())) + "`\n\n";
 							out += (scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : PLAYING) + " ";
 							out += AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length) + " [" + AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "]";
 							if (next != null) {
 								info = next.getTrack().getInfo();
 								out += "\n\n";
-								out += "[Next up in ` " + event.getGuild().getAudioManager().getConnectedChannel().getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
+								out += "[Next up in ` " + channel.getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
 								out += "\uD83D\uDC49 DJ » `" + Util.getUser(next.getDJ(event.getJDA())) + "`\n";
 								out += "\uD83D\uDC49 Duration » " + " `" + AudioUtils.format(info.length) + "`";
 							}
@@ -144,10 +145,11 @@ public class MusicCommand {
 								return "**" + (musicManager.getTrackScheduler().getPosition(track) + 1) + "**) " + i.title + " » (`" + AudioUtils.format(i.length) + "`)" + " (DJ: `" + Util.getUser(track.getDJ(event.getJDA())) + "`)";
 							}).collect(Collectors.toList());
 							TrackScheduler scheduler = musicManager.getTrackScheduler();
+							VoiceChannel channel = event.getGuild().getAudioManager().isAttemptingToConnect() ? event.getGuild().getAudioManager().getQueuedAudioConnection() : event.getGuild().getAudioManager().getConnectedChannel();
 							if (musicManager.getPlayer().getPlayingTrack() != null) {
 								AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
 								TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
-								builder.append("[Current song information for `").append(event.getGuild().getAudioManager().getConnectedChannel().getName()).append("`] \uD83C\uDFB6 ").append(info.title).append("\n\n");
+								builder.append("[Current song information for `").append(channel.getName()).append("`] \uD83C\uDFB6 ").append(info.title).append("\n\n");
 								builder.append("\uD83D\uDC49 DJ » `").append(Util.getUser(context.getDJ(event.getJDA()))).append("`\n\n");
 								builder.append(scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : PLAYING).append(" ");
 								builder.append(AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length)).append(" [").append(AudioUtils.format(context.getTrack().getPosition())).append("/").append(AudioUtils.format(info.length)).append("]");

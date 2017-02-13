@@ -1,7 +1,6 @@
 package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.DiscordLog.Level;
-import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.google.gson.Gson;
@@ -13,7 +12,6 @@ public class Main {
 	private static BotContainer container;
 	
 	public static void main(String[] args) {
-		System.out.println(String.join("\n", Argument.split("\"\"\" b\"", 2)));
 		try {
 			container = new BotContainer();
 			Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
@@ -21,6 +19,14 @@ public class Main {
 				String url = Hastebin.post(Util.getStackTrace(throwable));
 				container.getDiscordLog().logToDiscord("Uncaught exception in Thread " + thread.getName(), "An unexpected `" + throwable.getClass().getSimpleName() + "` occurred.\nMessage: " + throwable.getMessage() + "\nStackTrace: " + url, Level.FATAL);
 			});
+			
+			/*Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				try {
+					SimpleLog.getLog("SHUTDOWN HOOK").fatal("Something caused the Application to be shutdown improperly!");
+					container.dataManager.saveData();
+				} catch (Exception e) {
+				}
+			}));*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

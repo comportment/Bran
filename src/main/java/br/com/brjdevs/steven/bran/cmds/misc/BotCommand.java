@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.managers.jenkins.Jenkins;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
@@ -20,6 +21,7 @@ import net.dv8tion.jda.core.entities.Icon;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -85,6 +87,22 @@ public class BotCommand {
 						.setName("Bot Admin Command")
 						.setHelp("bot admin ?")
 						.setRequiredPermission(BOT_ADMIN)
+						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
+								.setAliases("update")
+								.setName("Bot Update Command")
+								.setDescription("Downloads and switch the Jars.")
+								.setAction((event) -> {
+									Jenkins jenkins = event.getBotContainer().jenkins;
+									try {
+										jenkins.downloadFile(System.getProperty("user.dir") + File.separator + "cache");
+										event.sendMessage("Downloaded and switched Jars, I'll be back soon! *I hope*").complete();
+										event.getBotContainer().shutdownAll(ExitCodes.RESTART);
+									} catch (IOException e) {
+										event.sendMessage("Something went wrong while downloading the JAR. " + Hastebin.post(Util.getStackTrace(e))).queue();
+										return;
+									}
+								})
+								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("save")
 								.setName("Save Command")
