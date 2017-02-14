@@ -35,7 +35,8 @@ public class Util {
         }
     }
     public static String getAvatarUrl(User user) {
-        return user.getAvatarUrl() == null ? user.getDefaultAvatarUrl() : user.getAvatarUrl();
+	    if (user == null) return null;
+	    return user.getAvatarUrl() == null ? user.getDefaultAvatarUrl() : user.getAvatarUrl();
     }
     public static Runnable async(final Runnable doAsync) {
         return new Thread(doAsync)::start;

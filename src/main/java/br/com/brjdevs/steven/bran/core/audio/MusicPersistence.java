@@ -38,7 +38,7 @@ public class MusicPersistence {
 	
 	public MusicPersistence(BotContainer container) {
 		this.container = container;
-		this.reloadPlaylists();
+		new Thread(this::reloadPlaylists);
 	}
 	
 	@SneakyThrows(Exception.class)
@@ -116,6 +116,7 @@ public class MusicPersistence {
 			LOG.info("No files in path.");
 			return true;
 		}
+		PersistenceAudioLoader audioLoader = new PersistenceAudioLoader();
 		for (File file : files) {
 			InputStream inputStream = null;
 			boolean[] isFirst = {true};
@@ -152,7 +153,6 @@ public class MusicPersistence {
 				trackScheduler.setShuffle(shuffle);
 				trackScheduler.setRepeat(repeat);
 				voteSkips.forEach(o -> trackScheduler.getVoteSkips().add((String) o));
-				PersistenceAudioLoader audioLoader = new PersistenceAudioLoader();
 				sources.forEach((Object o) -> {
 					JSONObject ident = (JSONObject) o;
 					
@@ -162,7 +162,6 @@ public class MusicPersistence {
 					AudioTrack audioTrack = audioLoader.result();
 					
 					if (audioTrack == null) {
-						LOG.info("Loaded null track! Skipping...");
 						return;
 					}
 					TextChannel channel = jda.getTextChannelById(ident.getString("channel"));

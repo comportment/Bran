@@ -29,7 +29,7 @@ public class PollPersistence {
 	
 	public PollPersistence(BotContainer container) {
 		this.container = container;
-		reloadPolls();
+		new Thread(this::reloadPolls);
 	}
 	
 	@SneakyThrows(Exception.class)
@@ -74,27 +74,30 @@ public class PollPersistence {
 			return true;
 		}
 		for (File file : files) {
-			String guildId = file.getName();
-			int shardId = (int) (Long.parseLong(guildId) >> 22) % container.getShards().length;
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			Poll poll = GSON.fromJson(reader, Poll.class);
-			poll.setShardId(shardId);
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle(poll.getPollName(), null);
-			builder.setFooter("This Poll was created by " + Util.getUser(poll.getCreator(container)), Util.getAvatarUrl(poll.getCreator(container)));
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("**Current Votes**\n");
-			poll.getOptions().forEach(option ->
-					stringBuilder.append("**" + (option.getIndex() + 1) + ".** " + option.getContent() + "    *(Votes: " + option.getVotes().size() + ")*\n"));
-			builder.setDescription(stringBuilder.toString());
-			builder.setColor(Color.decode("#F89F3F"));
-			Message message = new MessageBuilder().setEmbed(builder.build())
-					.append("I just restarted for a short time but the Poll is back!")
-					.build();
-			poll.getChannel(container).sendMessage(message).queue();
-			Poll.getRunningPolls().add(poll);
-			if (!file.delete()) {
-				LOG.fatal("Failed to delete File " + file.getPath());
+			try {
+				String guildId = file.getName();
+				int shardId = (int) (Long.parseLong(guildId) >> 22) % container.getShards().length;
+				BufferedReader reader = new BufferedReader(new FileReader(file));
+				Poll poll = GSON.fromJson(reader, Poll.class);
+				poll.setShardId(shardId);
+				EmbedBuilder builder = new EmbedBuilder();
+				builder.setTitle(poll.getPollName(), null);
+				builder.setFooter("This Poll was created by " + Util.getUser(poll.getCreator(container)), Util.getAvatarUrl(poll.getCreator(container)));
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append("**Current Votes**\n");
+				poll.getOptions().forEach(option ->
+						stringBuilder.append("**" + (option.getIndex() + 1) + ".** " + option.getContent() + "    *(Votes: " + option.getVotes().size() + ")*\n"));
+				builder.setDescription(stringBuilder.toString());
+				builder.setColor(Color.decode("#F89F3F"));
+				Message message = new MessageBuilder().setEmbed(builder.build())
+						.append("I just restarted for a short time but the Poll is back!")
+						.build();
+				poll.getChannel(container).sendMessage(message).queue();
+				Poll.getRunningPolls().add(poll);
+				if (!file.delete()) {
+					LOG.fatal("Failed to delete File " + file.getPath());
+				}
+			} catch (Exception ignored) {
 			}
 		}
 		LOG.info("Reloaded all Polls.");
