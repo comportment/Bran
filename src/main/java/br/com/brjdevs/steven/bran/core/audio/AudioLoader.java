@@ -42,6 +42,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 	public void trackLoaded(AudioTrack track) {
 		if (track.getInfo().length > MAX_SONG_LENGTH) {
 			channel.sendMessage("This song is too long! The maximum supported length is 3 hours. *" + AudioUtils.format(track) + "/" + AudioUtils.format(MAX_SONG_LENGTH) + "*").queue();
+			if (musicManager.getTrackScheduler().isStopped())
+				channel.getGuild().getAudioManager().closeAudioConnection();
 			return;
 		}
 		if (musicManager.getTrackScheduler().getQueue().size() > MAX_QUEUE_SIZE) {
@@ -56,6 +58,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 	public void playlistLoaded(AudioPlaylist playlist) {
 		if (musicManager.getTrackScheduler().getQueue().size() > MAX_QUEUE_SIZE) {
 			channel.sendMessage("Queue has reached its limit! (" + MAX_QUEUE_SIZE + ")").queue();
+			if (musicManager.getTrackScheduler().isStopped())
+				channel.getGuild().getAudioManager().closeAudioConnection();
 			return;
 		}
 		if (playlist.getTracks().isEmpty()) {
@@ -99,6 +103,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 			}
 			long duration = AudioUtils.getLength(playlist);
 			if (duration > MAX_PLAYLIST_LENGTH) {
+				if (musicManager.getTrackScheduler().isStopped())
+					channel.getGuild().getAudioManager().closeAudioConnection();
 				channel.sendMessage("This playlist is too long! The maximum supported length is 30 hours. *" + AudioUtils.format(duration) + "/" + AudioUtils.format(MAX_PLAYLIST_LENGTH) + "*").queue();
 				return;
 			}
