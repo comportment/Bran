@@ -47,8 +47,9 @@ public class Jenkins {
 		}
 	}
 	
-	public void downloadFile(String saveDir)
-			throws IOException {
+	public void downloadFile(String saveDir) throws IOException {
+		File f = new File(saveDir);
+		if (!f.exists()) f.createNewFile();
 		DefaultHttpClient client = new DefaultHttpClient();
 		
 		// Then provide the right credentials

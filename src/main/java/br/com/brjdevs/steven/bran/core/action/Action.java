@@ -14,10 +14,11 @@ import net.dv8tion.jda.core.entities.User;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Action {
 	
-	private static final List<Action> actions = new ArrayList<>();
+	private static final CopyOnWriteArrayList<Action> actions = new CopyOnWriteArrayList<>();
 	private static final Expirator EXPIRATOR = new Expirator();
 	@Getter
 	private final List<String> usersId;

@@ -62,11 +62,11 @@ public class DiscordGuild {
 		return members;
 	}
 	
-	public GuildMember getMember(Member m1, BotContainer container) {
-		User user = m1.getUser();
+	public GuildMember getMember(Member r, BotContainer container) {
+		User user = r.getUser();
 		GuildMember member = members.stream().filter(m -> m.getUserId().equals(user.getId())).findFirst().orElse(null);
 		if (member == null) {
-			member = new GuildMember(user, m1.getGuild().getId(), container);
+			member = new GuildMember(user, r.getGuild().getId(), container);
 			if (!user.isBot() && !user.isFake())
 				members.add(member);
 		}
