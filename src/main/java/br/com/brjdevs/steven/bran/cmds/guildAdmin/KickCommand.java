@@ -47,7 +47,10 @@ public class KickCommand {
 							event.sendMessage("Cannot remove myself from the Guild with Moderation Commands, please remove me own your own.").queue();
 							continue;
 						}
-						event.getGuild().getController().kick(user.getId()).queue(null,
+						event.getGuild().getController().kick(user.getId()).queue(s -> {
+									String out = "Kicked " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
+									event.sendMessage(Quotes.SUCCESS, out).queue();
+								},
 								throwable -> {
 									if (throwable instanceof PermissionException) {
 										event.sendMessage("I can't kick that user because its higher than me in the role hierarchy!").queue();
@@ -56,8 +59,6 @@ public class KickCommand {
 									}
 								});
 					}
-					String out = "Kicked " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
-					event.sendMessage(Quotes.SUCCESS, out).queue();
 				})
 				.build();
 	}

@@ -47,7 +47,10 @@ public class BanCommand {
 							event.sendMessage("Cannot remove myself from the Guild with Moderation Commands, please remove me own your own.").queue();
 							continue;
 						}
-						event.getGuild().getController().ban(user.getId(), 7).queue(null,
+						event.getGuild().getController().ban(user.getId(), 7).queue(b -> {
+									String out = "Banned " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
+									event.sendMessage(Quotes.SUCCESS, out).queue();
+								},
 								throwable -> {
 									if (throwable instanceof PermissionException) {
 										event.sendMessage("I can't ban that user because its higher than me in the role hierarchy!").queue();
@@ -56,8 +59,6 @@ public class BanCommand {
 									}
 								});
 					}
-					String out = "Banned " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
-					event.sendMessage(Quotes.SUCCESS, out).queue();
 				})
 				.build();
 	}

@@ -48,7 +48,14 @@ public class SoftBanCommand {
 							continue;
 						}
 						event.getGuild().getController().ban(user, 7)
-								.queue(success -> event.getGuild().getController().unban(user).queue(),
+								.queue(success -> {
+											event.getGuild().getController().unban(user).queue(s -> {
+												String out = "SoftBanned " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
+												event.sendMessage(Quotes.SUCCESS, out).queue();
+											}, throwable -> {
+												event.sendMessage("Failed to unban user!").queue();
+											});
+										},
 										throwable -> {
 											if (throwable instanceof PermissionException) {
 												event.sendMessage("I can't softban that user because its higher than me in the role hierarchy!").queue();
@@ -57,8 +64,6 @@ public class SoftBanCommand {
 											}
 										});
 					}
-					String out = "SoftBanned " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
-					event.sendMessage(Quotes.SUCCESS, out).queue();
 				})
 				.build();
 	}
