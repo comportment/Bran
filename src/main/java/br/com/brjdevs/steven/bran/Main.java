@@ -20,13 +20,15 @@ public class Main {
 				container.getDiscordLog().logToDiscord("Uncaught exception in Thread " + thread.getName(), "An unexpected `" + throwable.getClass().getSimpleName() + "` occurred.\nMessage: " + throwable.getMessage() + "\nStackTrace: " + url, Level.FATAL);
 			});
 			
-			/*Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 				try {
-					SimpleLog.getLog("SHUTDOWN HOOK").fatal("Something caused the Application to be shutdown improperly!");
+					for (Bot bot : container.getOnlineShards()) {
+						bot.getJDA().shutdown();
+					}
 					container.dataManager.saveData();
 				} catch (Exception e) {
 				}
-			}));*/
+			}));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
