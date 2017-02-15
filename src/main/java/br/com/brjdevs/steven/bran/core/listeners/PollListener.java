@@ -8,12 +8,10 @@ import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Invite;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class PollListener implements EventListener {
@@ -29,11 +27,6 @@ public class PollListener implements EventListener {
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
-		if (event.getMember() == null) {
-			List<Invite> i = event.getGuild().getPublicChannel().getInvites().complete();
-			container.getOwner().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("FOUND THE NULL SON OF A BITCH MEMBER! Guild: " + event.getGuild().getName() + " Invite Code: " + (i.isEmpty() ? "none" : "https://discord.gg/" + i.get(0).getCode())).queue());
-			return;
-		}
 		Action action = Action.getAction(event.getAuthor().getId());
 		if (action != null && !action.getChannelId().equals(event.getChannel().getId())) return;
 		String msg = event.getMessage().getRawContent();
