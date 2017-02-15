@@ -79,6 +79,7 @@ public class Session implements EventListener {
 		out += "JDA Version: " + JDAInfo.VERSION + '\n';
 		out += "RAM (USAGE/MAX): " + ram + '\n';
 		out += "CPU Usage: " + cpuUsage + "%\n";
+		out += "Shards (ONLINE/TOTAL): " + container.getOnlineShards().length + "/" + container.getTotalShards() + "\n";
 		out += "API Responses: " + jda.getResponseTotal() + "\n\n";
 		out += "--General--\n";
 		out += "Guilds: " + guilds.size() + "\n";

@@ -20,6 +20,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -102,6 +103,10 @@ public class BotContainer {
 	
 	public int getTotalShards() {
 		return totalShards;
+	}
+	
+	public Bot[] getOnlineShards() {
+		return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(Bot[]::new);
 	}
 	
 	public DiscordLog getDiscordLog() {
