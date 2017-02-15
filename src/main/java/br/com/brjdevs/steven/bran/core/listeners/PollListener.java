@@ -27,6 +27,7 @@ public class PollListener implements EventListener {
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
+		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		Action action = Action.getAction(event.getAuthor().getId());
 		if (action != null && !action.getChannelId().equals(event.getChannel().getId())) return;
 		String msg = event.getMessage().getRawContent();

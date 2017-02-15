@@ -22,6 +22,7 @@ public class GuessListener implements EventListener {
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
+		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		Profile profile = container.getProfile(event.getAuthor());
 		HangManGame game = HangManGame.getSession(profile);
 		if (game == null) return;

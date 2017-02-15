@@ -48,7 +48,7 @@ public class CustomCommandsListener implements EventListener {
 	public void onEvent(Event e) {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
-		if (event.getAuthor().isBot()) return;
+		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
 		if (!discordGuild.getCustomCommands().check()) return;
 		String msg = event.getMessage().getRawContent().trim().toLowerCase().split("\\s+")[0];
