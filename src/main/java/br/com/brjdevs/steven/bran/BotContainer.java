@@ -141,6 +141,10 @@ public class BotContainer {
 		return Arrays.stream(shards).map(bot -> bot.getJDA().getVoiceChannels()).flatMap(List::stream).collect(Collectors.toList());
 	}
 	
+	public long getResponseTotal() {
+		return Arrays.stream(shards).map(bot -> bot.getJDA().getResponseTotal()).mapToLong(Long::longValue).sum();
+	}
+	
 	public AtomicLongArray getLastEvents() {
 		return lastEvents;
 	}

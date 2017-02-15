@@ -1,7 +1,6 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
 import br.com.brjdevs.steven.bran.BotContainer;
-import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
@@ -64,12 +63,6 @@ public class Session implements EventListener {
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
 		long nowPlaying = container.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
 		long paused = container.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
-		String check = "✅";
-		if (audioConnections > nowPlaying + paused) {
-			for (Guild guild : jda.getGuilds())
-				if (guild.getAudioManager().isConnected() && !container.taskManager.getChannelLeaveTimer().has(guild.getId()) && AudioUtils.isAlone(guild.getAudioManager().getConnectedChannel()))
-					check = "❌";
-		}
 		String out = "";
 		out += "```prolog\n";
 		out += "--Bot Stats--\n";
@@ -80,7 +73,7 @@ public class Session implements EventListener {
 		out += "RAM (USAGE/MAX): " + ram + '\n';
 		out += "CPU Usage: " + cpuUsage + "%\n";
 		out += "Shards (ONLINE/TOTAL): " + container.getOnlineShards().length + "/" + container.getTotalShards() + "\n";
-		out += "API Responses: " + jda.getResponseTotal() + "\n\n";
+		out += "API Responses: " + container.getResponseTotal() + "\n\n";
 		out += "--General--\n";
 		out += "Guilds: " + guilds.size() + "\n";
 		out += "Users: " + users.size() + "\n";
@@ -91,7 +84,7 @@ public class Session implements EventListener {
 		out += "Executed Commands: " + cmds + "\n";
 		out += "Running Polls: " + Poll.getRunningPolls().size() +"\n\n";
 		out += "--Music--\n";
-		out += "Connections: " + audioConnections + " '" + check + "'\n";
+		out += "Connections: " + audioConnections + "\n";
 		out += "Queue Size: " + queueSize + "\n";
 		out += "Now Playing: " + nowPlaying + "\n";
 		out += "Paused: " + paused;
