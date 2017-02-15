@@ -55,7 +55,9 @@ public class VoiceChannelListener implements EventListener {
 		}
 		musicManager.getTrackScheduler().setPaused(true);
 		if (track == null) track = musicManager.getTrackScheduler().getPreviousTrack();
-		if (track != null && track.getContext(guild.getJDA()) != null && track.getContext(guild.getJDA()).canTalk())
+		if (track != null
+				&& track.getContext(guild.getJDA()) != null
+				&& track.getContext(guild.getJDA()).canTalk())
 			track.getContext(guild.getJDA()).sendMessage("I was left alone in `" + voiceChannel.getName() + "`, so I paused the player. If nobody reenter in this channel I'll stop que player, clean the queue and leave the channel.").queue();
 		timer.addMusicPlayer(guild.getId(), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(2), voiceChannel.getId());
 	}
@@ -65,6 +67,7 @@ public class VoiceChannelListener implements EventListener {
 	public void onEvent(Event e) {
 		if (e instanceof GenericGuildVoiceEvent) {
 			GenericGuildVoiceEvent event = (GenericGuildVoiceEvent) e;
+			if (event.getGuild() == null) return;
 			if (event instanceof GuildVoiceMoveEvent) {
 				VoiceChannel joined = ((GuildVoiceMoveEvent) event).getChannelJoined();
 				VoiceChannel left = ((GuildVoiceMoveEvent) event).getChannelLeft();
