@@ -49,7 +49,7 @@ public class Jenkins {
 	
 	public void downloadFile(String saveDir) throws IOException {
 		File f = new File(saveDir);
-		if (!f.exists()) f.createNewFile();
+		if (!f.exists()) f.mkdirs();
 		DefaultHttpClient client = new DefaultHttpClient();
 		
 		// Then provide the right credentials
@@ -82,7 +82,7 @@ public class Jenkins {
 			
 		}
 		response.close();
-		copyFile(new File(saveDir), new File(System.getProperty("user.dir"), "DiscordBot.jar"));
+		copyFile(new File(saveDir, "DiscordBot-1.0-SNAPSHOT.jar"), new File(System.getProperty("user.dir"), "DiscordBot.jar"));
 	}
 	
 }
