@@ -31,6 +31,7 @@ public class MusicCommand {
 	private static final String PLAYING = "\u25b6";
 	private static final String PAUSED = "\u23f8";
 	private static final String REPEAT = "\uD83D\uDD01";
+	private static final String SHUFFLE = "\uD83D\uDD00";
 	
 	@Command
 	private static ICommand music() {
@@ -114,7 +115,7 @@ public class MusicCommand {
 							VoiceChannel channel = event.getGuild().getAudioManager().isAttemptingToConnect() ? event.getGuild().getAudioManager().getQueuedAudioConnection() : event.getGuild().getAudioManager().getConnectedChannel();
 							String out = "[Current song information for `" + channel.getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
 							out += "\uD83D\uDC49 DJ » `" + Util.getUser(context.getDJ(event.getJDA())) + "`\n\n";
-							out += (scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : PLAYING) + " ";
+							out += (scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : scheduler.isShuffle() ? SHUFFLE : PLAYING) + " ";
 							out += AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length) + " [" + AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "]";
 							if (next != null) {
 								info = next.getTrack().getInfo();
@@ -151,7 +152,7 @@ public class MusicCommand {
 								TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
 								builder.append("[Current song information for `").append(channel.getName()).append("`] \uD83C\uDFB6 ").append(info.title).append("\n\n");
 								builder.append("\uD83D\uDC49 DJ » `").append(Util.getUser(context.getDJ(event.getJDA()))).append("`\n\n");
-								builder.append(scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : PLAYING).append(" ");
+								builder.append(scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : scheduler.isShuffle() ? SHUFFLE : PLAYING).append(" ");
 								builder.append(AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length)).append(" [").append(AudioUtils.format(context.getTrack().getPosition())).append("/").append(AudioUtils.format(info.length)).append("]");
 								builder.append("\n");
 							}

@@ -67,10 +67,6 @@ public class AudioUtils {
 			tchan.sendMessage("I won't join `" + vchan.getName() + "` because I don't have `VOICE_SPEAK` permission!").queue();
 			return null;
 		}
-		if (selfMember.getVoiceState().isGuildMuted()) {
-			tchan.sendMessage("I won't join `" + vchan.getName() + "` because someone's muted me!").queue();
-			return null;
-		}
 		if (!canConnect(container)) {
 			tchan.sendMessage("I'm sorry about this but I'm a bit overloaded right now (" + container.getSession().cpuUsage + "% cpu) so can you ask me to join the channel later? I can't push myself too hard, I'm still in testing phase \uD83D\uDE26").queue();
 			return null;
