@@ -47,10 +47,15 @@ public class TaskManager {
 	    startAsyncTask(
 			    () -> container.getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100), 5);
 		startAsyncTask(() -> Arrays.stream(container.getShards()).forEach(shard -> {
+			if (shard.getCurrentGuildCount() < shard.getJDA().getGuilds().size()) return;
 			try {
 				shard.updateStats();
+				shard.updateCurrentGuildCount();
 			} catch (UnirestException e) {
-				container.getDiscordLog().logToDiscord("Failed to update Shard Stats at DiscordBots", "Unexpected exception occurred while updating Shard " + shard.getId() + " server count!\n" + Hastebin.post(Util.getStackTrace(e)), Level.WARN);
+				container.getDiscordLog()
+						.logToDiscord("Failed to update Shard Stats at DiscordBots",
+								"Unexpected exception occurred while updating Shard " + shard.getId() + " server count!\n" + Hastebin.post(Util.getStackTrace(e)),
+								Level.WARN);
 			}
 		}), 216000);
 	}

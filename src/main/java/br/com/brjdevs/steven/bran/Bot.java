@@ -23,6 +23,7 @@ public class Bot {
 	private volatile JDA jda;
 	private long startup;
 	private long lastReboot;
+	private int currentGuildCount;
 	
 	public Bot(int shardId, int totalShards, BotContainer container) throws LoginException, InterruptedException, RateLimitedException {
 		this.shardId = shardId;
@@ -53,6 +54,7 @@ public class Bot {
 		if (startup == 0)
 			this.startup = System.currentTimeMillis();
 		this.lastReboot = System.currentTimeMillis();
+		this.currentGuildCount = jda.getGuilds().size();
 	}
 	
 	public JDA getJDA() {
@@ -82,6 +84,14 @@ public class Bot {
 	
 	public String getInfo() {
 		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + Util.getUser(container.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + container.config.getDefaultPrefixes().get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + container.config.getDefaultPrefixes().get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
+	}
+	
+	public void updateCurrentGuildCount() {
+		currentGuildCount = jda.getGuilds().size();
+	}
+	
+	public int getCurrentGuildCount() {
+		return currentGuildCount;
 	}
 	
 	public HttpResponse<JsonNode> updateStats() throws UnirestException {
