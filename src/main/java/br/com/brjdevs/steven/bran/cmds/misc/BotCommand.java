@@ -94,6 +94,7 @@ public class BotCommand {
 								.setAction((event) -> {
 									Jenkins jenkins = event.getBotContainer().jenkins;
 									try {
+										event.sendMessage("Downloading JAR from Jenkins...").queue();
 										jenkins.downloadFile(System.getProperty("user.dir") + File.separator + "cache");
 										event.sendMessage("Downloaded and switched Jars, I'll be back soon! *I hope*").complete();
 										event.getBotContainer().shutdownAll(ExitCodes.RESTART);
