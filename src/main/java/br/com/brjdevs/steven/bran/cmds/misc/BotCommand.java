@@ -134,15 +134,6 @@ public class BotCommand {
 									event.getBotContainer().shutdownAll(ExitCodes.RESTART);
 								})
 								.build())
-						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
-								.setAliases("updatestats")
-								.setName("Update Stats Command")
-								.setDescription("Updates the current guild amount in DiscordBots.")
-								.setAction((event) -> {
-									event.getShard().updateStats();
-									event.sendMessage(Quotes.SUCCESS, "Updated status at Discord Bots!\nhttps://bots.discord.pw/bots/219186621008838669").queue();
-								})
-								.build())
 						.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("account", "acc")
 								.setName("Bot Account Command")

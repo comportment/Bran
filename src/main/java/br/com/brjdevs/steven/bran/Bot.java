@@ -1,7 +1,10 @@
 package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.core.utils.Util;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -81,17 +84,17 @@ public class Bot {
 		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + Util.getUser(container.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + container.config.getDefaultPrefixes().get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + container.config.getDefaultPrefixes().get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
 	}
 	
-	public void updateStats() {
+	public HttpResponse<JsonNode> updateStats() throws UnirestException {
 		JSONObject data = new JSONObject();
 		data.put("server_count", jda.getGuilds().size());
 		if (totalShards > 1) {
 			data.put("shard_id", shardId);
 			data.put("shard_count", totalShards);
 		}
-		Unirest.post("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
+		return Unirest.post("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
 				.header("Authorization", container.config.getDiscordBotsToken())
 				.header("Content-Type", "application/json")
 				.body(data.toString())
-				.asJsonAsync();
+				.asJson();
 	}
 }
