@@ -7,7 +7,6 @@ import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.Region;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -35,9 +34,6 @@ public class AudioUtils {
 		return builder.append(BLOCK_INACTIVE).toString();
 	}
 	
-	public static boolean canConnect(BotContainer container) {
-		return container.getSession().cpuUsage < 40;
-	}
 	public static long getLength(AudioPlaylist audioPlaylist) {
 		long[] total = {0};
 		audioPlaylist.getTracks().forEach(track -> total[0] += track.getInfo().length);
@@ -52,8 +48,6 @@ public class AudioUtils {
 	}
 	
 	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan, BotContainer container) {
-		String warning = "Please note, this guild is located in Brazil so if you notice some slutter or can't hear the song consider changing the server region. (Recommended Region: US South)";
-		boolean shouldWarn = vchan.getGuild().getRegion() == Region.BRAZIL;
 		if (!vchan.getGuild().getSelfMember().hasPermission(vchan, Permission.VOICE_CONNECT)) {
 			tchan.sendMessage("I can't connect to `" + vchan.getName() + "` due to a lack of permission!").queue();
 			return null;
@@ -67,10 +61,6 @@ public class AudioUtils {
 			tchan.sendMessage("I won't join `" + vchan.getName() + "` because I don't have `VOICE_SPEAK` permission!").queue();
 			return null;
 		}
-		if (!canConnect(container)) {
-			tchan.sendMessage("I'm sorry about this but I'm a bit overloaded right now (" + container.getSession().cpuUsage + "% cpu) so can you ask me to join the channel later? I can't push myself too hard, I'm still in testing phase \uD83D\uDE26").queue();
-			return null;
-		}
 		AudioManager audioManager = vchan.getGuild().getAudioManager();
 		if (selfMember.getVoiceState().isSelfMuted())
 			audioManager.setSelfMuted(false);
@@ -80,7 +70,7 @@ public class AudioUtils {
 			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild(), container));
 			audioManager.openAudioConnection(vchan);
 		} catch (Exception e) {
-			tchan.sendMessage("I couldn't connect to the voice channel! " + (shouldWarn ? "\n" + warning : "I'm not sure why... `" + e.getMessage())).queue();
+			tchan.sendMessage("I couldn't connect to the voice channel! ").queue();
 			return null;
 		}
 		while (audioManager.isAttemptingToConnect())

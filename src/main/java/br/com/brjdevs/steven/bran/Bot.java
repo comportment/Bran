@@ -75,7 +75,6 @@ public class Bot {
 	public void shutdown() {
 		jda.shutdown();
 		eventManager.executor.shutdown();
-		
 	}
 	
 	public String getInfo() {
