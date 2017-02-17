@@ -51,6 +51,7 @@ public class TaskManager {
 			try {
 				shard.updateStats();
 				shard.updateCurrentGuildCount();
+				container.getDiscordLog().logToDiscord("Updated server_count in DiscordBots (Shard[" + shard.getId() + "])", "Successfully updated server_count at [Discord Bots](https://bots.discord.pw/bots/" + shard.getJDA().getSelfUser().getId() + ")", Level.INFO);
 			} catch (UnirestException e) {
 				container.getDiscordLog()
 						.logToDiscord("Failed to update Shard Stats at DiscordBots",

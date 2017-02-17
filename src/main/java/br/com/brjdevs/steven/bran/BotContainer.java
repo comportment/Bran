@@ -1,7 +1,6 @@
 package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.core.audio.MusicManager;
-import br.com.brjdevs.steven.bran.core.audio.MusicPersistence;
 import br.com.brjdevs.steven.bran.core.audio.MusicPlayerManager;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.command.CommandManager;
@@ -45,7 +44,6 @@ public class BotContainer {
 	public Config config;
 	public BotData data;
 	public File workingDir;
-	public MusicPersistence musicPersistence;
 	public PollPersistence pollPersistence;
 	public TaskManager taskManager;
 	public DataManager dataManager;
@@ -56,11 +54,14 @@ public class BotContainer {
 	private DiscordLog discordLog;
 	private int totalShards;
 	private AtomicLongArray lastEvents;
-	private volatile User owner;
+	private long ownerId;
+	private int ownerShardId;
 	private Session session;
 	private Messenger messenger;
 	
 	public BotContainer() throws LoginException, InterruptedException, RateLimitedException {
+		this.ownerId = 0;
+		this.ownerShardId = 0;
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
 		if (!workingDir.exists() && !workingDir.mkdirs())
 			throw new NullPointerException("Could not create config.json");
@@ -72,7 +73,6 @@ public class BotContainer {
 		initShards();
 		getOwner();
 		this.playerManager = new MusicPlayerManager(this);
-		this.musicPersistence = new MusicPersistence(this);
 		this.pollPersistence = new PollPersistence(this);
 		this.dataManager = new DataManager(this);
 		this.commandManager = new CommandManager(this);
@@ -215,13 +215,16 @@ public class BotContainer {
 	}
 	
 	public User getOwner() {
-		if (owner != null) return owner;
+		if (ownerId != 0) return getShards()[ownerShardId].getJDA().getUserById(String.valueOf(ownerId));
 		for (Bot shard : shards) {
-			owner = shard.getJDA().getUserById(config.getOwnerId());
-			if (owner != null) break;
+			User u = shard.getJDA().getUserById(config.getOwnerId());
+			if (u != null) {
+				ownerId = Long.parseLong(u.getId());
+				break;
+			}
 		}
-		if (owner == null) LOG.fatal("Could not find Owner.");
-		return owner;
+		if (ownerId == 0) LOG.fatal("Could not find Owner.");
+		return getShards()[ownerShardId].getJDA().getUserById(String.valueOf(ownerId));
 	}
 	
 	public int calcShardId(long discordGuildId) {
@@ -230,7 +233,12 @@ public class BotContainer {
 	
 	public void shutdownAll(int exitCode) {
 		
-		if (!musicPersistence.savePlaylists()) LOG.info("Could not complete MusicPersistence savePlaylists.");
+		playerManager.getMusicManagers().forEach((guildId, musicManager) -> {
+			Bot shard = musicManager.getShard();
+			TextChannel channel = musicManager.getTrackScheduler().getCurrentTrack().getContext(shard.getJDA());
+			if (channel == null) return;
+			channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, strong and better.").queue();
+		});
 		if (!pollPersistence.savePolls()) LOG.info("Could not complete PollPersistence savePolls.");
 		
 		dataManager.saveData();
