@@ -44,7 +44,7 @@ public class VoiceChannelListener implements EventListener {
 	}
 	
 	public static void onLeave(Guild guild, VoiceChannel voiceChannel) {
-		if (guild == null) return;
+		if (guild == null || guild.getSelfMember() == null) return;
 		ChannelLeaveTimer timer = container.taskManager.getChannelLeaveTimer();
 		if (!AudioUtils.isAlone(voiceChannel)) return;
 		MusicManager musicManager = container.playerManager.get(guild);
