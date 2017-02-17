@@ -106,6 +106,7 @@ public class DiscordGuild {
 	}
 	
 	public void save(BotContainer container) {
+		if (getOrigin() == null) return;
 		try {
 			File file = new File(container.workingDir, getOrigin().getId() + ".json");
 			if (!file.exists()) assert file.createNewFile();
