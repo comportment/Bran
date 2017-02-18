@@ -1,8 +1,7 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
 import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
+import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
@@ -33,9 +32,8 @@ public class PollListener implements EventListener {
 		String msg = event.getMessage().getRawContent();
 		if (!MathUtils.isInteger(msg)) return;
 		if (!OPTION_INDEX.matcher(msg).matches()) return;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), client);
-		GuildMember guildMember = discordGuild.getMember(event.getMember(), client);
-		if (!guildMember.hasPermission(Permissions.POLL, event.getJDA(), client)) return;
+		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
+		if (!guildData.hasPermission(event.getAuthor(), Permissions.POLL)) return;
 		Poll poll = Poll.getPoll(event.getChannel());
 		if (poll == null) return;
 		int i = Integer.parseInt(msg) - 1;

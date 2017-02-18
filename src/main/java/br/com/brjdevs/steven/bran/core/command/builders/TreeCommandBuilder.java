@@ -154,7 +154,7 @@ public class TreeCommandBuilder {
 							break;
 					}
 					return;
-				} else if (!event.getGuildMember().hasPermission(subCommand.getRequiredPermission(), event.getJDA(), event.getClient())) {
+				} else if (!event.getGuildData().hasPermission(event.getAuthor(), subCommand.getRequiredPermission())) {
 					switch (onMissingPermission) {
 						case SHOW_ERROR:
 							event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();

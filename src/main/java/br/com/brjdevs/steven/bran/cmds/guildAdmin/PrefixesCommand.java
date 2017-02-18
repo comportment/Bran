@@ -6,11 +6,11 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import net.dv8tion.jda.core.MessageBuilder;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class PrefixesCommand {
 	
@@ -30,21 +30,22 @@ public class PrefixesCommand {
 						.setArgs(new Argument<>("prefixes", String.class))
 						.setRequiredPermission(Permissions.PREFIX)
 						.setAction((event, rawArgs) -> {
-							if (event.getDiscordGuild().getPrefixes().size() == 1) {
+							List<String> list = event.getClient().getData().getDataHolderManager().get().getGuild(event.getGuild(), event.getClient().getConfig()).prefixes;
+							if (list.size() == 1) {
 								event.sendMessage("This guild only has one prefix, you can't remove them anymore!").queue();
 								return;
 							}
 							String[] prefixes = ((String) event.getArgument("prefixes").get()).split("\\s+");
-							int amount = event.getDiscordGuild().getPrefixes().size();
-							if (event.getDiscordGuild().getPrefixes().size() <= prefixes.length) {
+							int amount = list.size();
+							if (list.size() <= prefixes.length) {
 								event.sendMessage("You can't remove `" + prefixes.length + "` prefix(es) because you have to keep at least one prefix!").queue();
 								return;
 							}
-							Arrays.stream(prefixes).filter(prefix -> event.getDiscordGuild().getPrefixes().contains(prefix))
-									.forEach(p -> event.getDiscordGuild().getPrefixes().remove(p));
-							amount -= event.getDiscordGuild().getPrefixes().size();
+							Arrays.stream(prefixes).filter(list::contains)
+									.forEach(list::remove);
+							amount -= list.size();
 							if (amount == 0) return;
-							event.sendMessage("Removed " + amount + " prefix" + (amount == 1 ? "" : "es") + ". Now these are my prefixes here: " + (String.join(", ", event.getDiscordGuild().getPrefixes()))).queue();
+							event.sendMessage("Removed " + amount + " prefix" + (amount == 1 ? "" : "es") + ". Now these are my prefixes here: " + (String.join(", ", list))).queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -54,15 +55,15 @@ public class PrefixesCommand {
 						.setArgs(new Argument<>("prefixes", String.class))
 						.setRequiredPermission(Permissions.PREFIX)
 						.setAction((event, rawArgs) -> {
-							DiscordGuild discordGuild = event.getDiscordGuild();
 							try{
-								if (discordGuild.getPrefixes().size() > 5) {
+								if (event.getClient().getData().getDataHolderManager().get().getGuild(event.getGuild(), event.getClient().getConfig()).prefixes.size() > 5) {
 									event.sendMessage("You cannot have more than " + 5 + " prefixes.").queue();
 									return;
 								}
+								List<String> list = event.getClient().getData().getDataHolderManager().get().getGuild(event.getGuild(), event.getClient().getConfig()).prefixes;
 								String[] prefixes = ((String) event.getArgument("prefixes").get()).split("\\s+");
-								Arrays.stream(prefixes).filter(prefix -> !event.getDiscordGuild().getPrefixes().contains(prefix)).forEach(discordGuild.getPrefixes()::add);
-								event.sendMessage("Now these are my prefixes here: " + (String.join(", ", discordGuild.getPrefixes()))).queue();
+								Arrays.stream(prefixes).filter(prefix -> !list.contains(prefix)).forEach(list::add);
+								event.sendMessage("Now these are my prefixes here: " + (String.join(", ", list))).queue();
 							}catch (Exception e1) {
 								e1.printStackTrace();
 							}
@@ -74,7 +75,7 @@ public class PrefixesCommand {
 						.setName("Prefix List Command")
 						.setAction((event, args) -> {
 							MessageBuilder builder = new MessageBuilder().append("These are my prefixes here: ");
-							builder.append(String.join(", ", event.getDiscordGuild().getPrefixes()));
+							builder.append(String.join(", ", event.getClient().getData().getDataHolderManager().get().getGuild(event.getGuild(), event.getClient().getConfig()).prefixes));
 							event.sendMessage(builder.build()).queue();
 						})
 						.build())

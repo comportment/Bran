@@ -103,7 +103,7 @@ public class PollCommand {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
 							}
-							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getClient())) {
+							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildData().hasPermission(event.getAuthor(), Permissions.GUILD_MOD)) {
 								event.sendMessage("You can't do this... You're not the creator of this poll nor a Guild Moderator to end this poll!").queue();
 								return;
 							}

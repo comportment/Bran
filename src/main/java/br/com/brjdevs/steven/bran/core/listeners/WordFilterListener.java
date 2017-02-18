@@ -1,8 +1,7 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
 import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.WordFilterSettings;
+import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.RestActionSleep;
 import net.dv8tion.jda.core.Permission;
@@ -32,11 +31,10 @@ public class WordFilterListener implements EventListener {
 		GenericGuildMessageEvent event = (GenericGuildMessageEvent) e;
 		if (event.getMessage() == null) return;
 		if (!canManageMessages(event.getChannel())) return;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), client);
-		WordFilterSettings wordFilter = discordGuild.getWordFilter();
-		if (!wordFilter.isEnabled()) return;
+		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
+		if (!guildData.isWordFilterEnabled) return;
 		boolean bool = false;
-		for (String word : wordFilter.asList()) {
+		for (String word : guildData.filteredWords) {
 			if (event.getMessage().getRawContent().toLowerCase().contains(word.toLowerCase()))
 				bool = true;
 		}

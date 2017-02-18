@@ -9,7 +9,7 @@ import com.google.gson.GsonBuilder;
 public class Main {
 	
 	public static Gson GSON = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
-	private static Client client;
+	public static Client client;
 	
 	public static void main(String[] args) {
 		try {
@@ -25,7 +25,7 @@ public class Main {
 					for (ClientShard clientShard : client.getOnlineShards()) {
 						clientShard.getJDA().shutdown();
 					}
-					client.dataManager.saveData();
+					client.getData().getConfigDataManager().update();
 				} catch (Exception e) {
 				}
 			}));

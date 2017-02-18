@@ -6,7 +6,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.AnnouncesSettings;
+import br.com.brjdevs.steven.bran.core.listeners.AnnouncesListener;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
@@ -37,7 +37,7 @@ public class AnnounceCommands {
 								.setPrivateAvailable(false)
 								.setAction((event) -> {
 									TextChannel channel = event.getMessage().getMentionedChannels().isEmpty() ? event.getTextChannel() : event.getMessage().getMentionedChannels().get(0);
-									event.getDiscordGuild().getAnnounces().setAnnouncesChannel(channel);
+									event.getGuildData().setAnnounceTextChannel(channel);
 									event.sendMessage(Quotes.SUCCESS, "Now the Announces will be sent in " + channel.getAsMention() + "!").queue();
 								})
 								.build())
@@ -50,9 +50,9 @@ public class AnnounceCommands {
 								.setPrivateAvailable(false)
 								.setAction((event, args) -> {
 									String message = (String) event.getArgument("joinmsg").get();
-									event.getDiscordGuild().getAnnounces().setJoinAnnounce(message);
+									event.getGuildData().joinMsg = message;
 									event.sendMessage(Quotes.SUCCESS, "Successfully set the Join Announce Message. " +
-											"When someone joins this guild, it'll look like this:\n\n" + AnnouncesSettings.parse(message, event.getMember())).queue();
+											"When someone joins this guild, it'll look like this:\n\n" + AnnouncesListener.parse(message, event.getMember())).queue();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -64,9 +64,9 @@ public class AnnounceCommands {
 								.setPrivateAvailable(false)
 								.setAction((event, args) -> {
 									String message = (String) event.getArgument("joindmmsg").get();
-									event.getDiscordGuild().getAnnounces().setJoinDMAnnounce(message);
+									event.getGuildData().joinMsgDM = message;
 									event.sendMessage(Quotes.SUCCESS, "Successfully set the Join DM Announce Message. " +
-											"When someone joins this guild, it'll receive this message:\n\n" + AnnouncesSettings.parse(message, event.getMember())).queue();
+											"When someone joins this guild, it'll receive this message:\n\n" + AnnouncesListener.parse(message, event.getMember())).queue();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -78,9 +78,9 @@ public class AnnounceCommands {
 								.setPrivateAvailable(false)
 								.setAction((event, args) -> {
 									String message = (String) event.getArgument("leavemsg").get();
-									event.getDiscordGuild().getAnnounces().setLeaveAnnounce(message);
+									event.getGuildData().leaveMsg = message;
 									event.sendMessage(Quotes.SUCCESS, "Successfully set the Leave Announce Message. " +
-											"When someone leaves this guild, it'll look like this:\n\n" + AnnouncesSettings.parse(message, event.getMember())).queue();
+											"When someone leaves this guild, it'll look like this:\n\n" + AnnouncesListener.parse(message, event.getMember())).queue();
 								})
 								.build())
 						.build())
@@ -93,11 +93,11 @@ public class AnnounceCommands {
 								.setDescription("Returns you the Announce Channel.")
 								.setName("Announce Preview Channel Command")
 								.setAction((event) -> {
-									if (event.getDiscordGuild().getAnnounces().getChannel(event.getJDA()) == null) {
+									if (event.getGuildData().getAnnounceTextChannel(event.getJDA()) == null) {
 										event.sendMessage(Quotes.FAIL, "The Announce Channel is not set, please use `" + event.getPrefix() + "ann set channel [MENTION]` to set one.").queue();
 										return;
 									}
-									event.sendMessage("The Announces will be sent in " + event.getDiscordGuild().getAnnounces().getChannel(event.getJDA()).getAsMention() + ".").queue();
+									event.sendMessage("The Announces will be sent in " + event.getGuildData().getAnnounceTextChannel(event.getJDA()).getAsMention() + ".").queue();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -106,12 +106,12 @@ public class AnnounceCommands {
 								.setName("Join Announce Preview Command")
 								.setPrivateAvailable(false)
 								.setAction((event) -> {
-									if (OtherUtils.isEmpty(event.getDiscordGuild().getAnnounces().getJoinAnnounce())) {
+									if (OtherUtils.isEmpty(event.getGuildData().joinMsg)) {
 										event.sendMessage(Quotes.FAIL, "The Join Announce is not set! Please use `" + event.getPrefix() + "ann set join [MESSAGE]` to set it.").queue();
 										return;
 									}
 									String s = "The Join Announce Message will look like this when an user joins here:";
-									s += "\n\n" + AnnouncesSettings.parse(event.getDiscordGuild().getAnnounces().getJoinAnnounce(), event.getMember());
+									s += "\n\n" + AnnouncesListener.parse(event.getGuildData().joinMsg, event.getMember());
 									event.sendMessage(s).queue();
 								})
 								.build())
@@ -121,12 +121,12 @@ public class AnnounceCommands {
 								.setName("Leave Announce Preview Command")
 								.setPrivateAvailable(false)
 								.setAction((event) -> {
-									if (OtherUtils.isEmpty(event.getDiscordGuild().getAnnounces().getLeaveAnnounce())) {
+									if (OtherUtils.isEmpty(event.getGuildData().leaveMsg)) {
 										event.sendMessage(Quotes.FAIL, "The Leave Announce is not set! Please use `" + event.getPrefix() + "ann set leave [MESSAGE]` to set it.").queue();
 										return;
 									}
 									String s = "The Leave Announce Message will look like this when an user joins here:";
-									s += "\n\n" + AnnouncesSettings.parse(event.getDiscordGuild().getAnnounces().getLeaveAnnounce(), event.getMember());
+									s += "\n\n" + AnnouncesListener.parse(event.getGuildData().leaveMsg, event.getMember());
 									event.sendMessage(s).queue();
 								})
 								.build())
@@ -136,12 +136,12 @@ public class AnnounceCommands {
 								.setName("JoinDM Announce Preview Command")
 								.setPrivateAvailable(false)
 								.setAction((event) -> {
-									if (OtherUtils.isEmpty(event.getDiscordGuild().getAnnounces().getJoinDMAnnounce())) {
+									if (OtherUtils.isEmpty(event.getGuildData().joinMsgDM)) {
 										event.sendMessage(Quotes.FAIL, "The Join DM Announce is not set! Please use `" + event.getPrefix() + "ann set joindm [MESSAGE]` to set it.").queue();
 										return;
 									}
 									String s = "The Join DM Announce Message will look like this when an user joins here:";
-									s += "\n\n" + AnnouncesSettings.parse(event.getDiscordGuild().getAnnounces().getJoinDMAnnounce(), event.getMember());
+									s += "\n\n" + AnnouncesListener.parse(event.getGuildData().joinMsgDM, event.getMember());
 									event.sendMessage(s).queue();
 								})
 								.build())

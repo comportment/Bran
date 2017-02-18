@@ -1,4 +1,4 @@
-package br.com.brjdevs.steven.bran.core.data.bot.settings;
+package br.com.brjdevs.steven.bran.core.data;
 
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;

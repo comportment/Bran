@@ -5,7 +5,7 @@ import br.com.brjdevs.steven.bran.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
-import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
+import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
@@ -106,8 +106,8 @@ public class CommandManager implements EventListener {
 			return;
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
-		DiscordGuild discordGuild = event.getGuild() != null ? DiscordGuild.getInstance(event.getGuild(), client) : null;
-		String prefix = PrefixManager.getPrefix(args[0], discordGuild, client);
+		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
+		String prefix = PrefixManager.getPrefix(args[0], guildData, client);
 		if (prefix == null) return;
 		String baseCmd = args[0].substring(prefix.length());
 		ICommand cmd = CommandUtils.getCommand(client.commandManager, baseCmd);
@@ -117,7 +117,7 @@ public class CommandManager implements EventListener {
 					"use it in a Text Channel please.").queue());
 			return;
 		}
-		CommandEvent e = new CommandEvent(event, cmd, discordGuild, event.getMessage().getRawContent(), prefix, client);
+		CommandEvent e = new CommandEvent(event, cmd, guildData, event.getMessage().getRawContent(), prefix, client);
 		client.getSession().cmds++;
 		CommandStatsManager.log(cmd);
 		OtherUtils.async(cmd.getName() + ">" + OtherUtils.getUser(event.getAuthor()),

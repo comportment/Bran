@@ -7,7 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.Giveaway;
+import br.com.brjdevs.steven.bran.core.data.Giveaway;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.CollectionUtils;
@@ -70,8 +70,7 @@ public class GiveawayCommand {
 									return;
 								}
 							}
-							Giveaway giveaway = new Giveaway(event.getMember(), event.getGuild(), role, numOfWinners, e);
-							event.getDiscordGuild().setGiveaway(giveaway);
+							event.getGuildData().giveaway = new Giveaway(event.getMember(), event.getGuild(), role, numOfWinners, e);
 							event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who's participating by typing `.giveaway info`.").queue();
 						})
 						.build())
@@ -81,7 +80,7 @@ public class GiveawayCommand {
 						.setDescription("Shows you information on giveaways running in the current Guild.")
 						.setAction((event) -> {
 							Client client = event.getClient();
-							Giveaway giveaway = event.getDiscordGuild().getGiveaway();
+							Giveaway giveaway = event.getGuildData().giveaway;
 							if (giveaway == null) {
 								event.sendMessage("No giveaway running in the current Guild!").queue();
 								return;
@@ -105,7 +104,7 @@ public class GiveawayCommand {
 						.setName("Giveaway Join Command")
 						.setDescription("Joins a giveaway!")
 						.setAction((event) -> {
-							Giveaway giveaway = event.getDiscordGuild().getGiveaway();
+							Giveaway giveaway = event.getGuildData().giveaway;
 							if (giveaway == null) {
 								event.sendMessage("No giveaways running in this Guild!").queue();
 								return;
@@ -130,18 +129,18 @@ public class GiveawayCommand {
 						.setRequiredPermission(Permissions.CREATE_GIVEAWAY)
 						.setAction((event) -> {
 							Client client = event.getClient();
-							Giveaway giveaway = event.getDiscordGuild().getGiveaway();
+							Giveaway giveaway = event.getGuildData().giveaway;
 							if (giveaway == null) {
 								event.sendMessage(Quotes.FAIL, "No giveaways running in the current Guild!").queue();
 								return;
 							}
-							if (giveaway.getParticipants().isEmpty()) {
-								event.sendMessage("No users were participating in this Giveaway :cry:").queue();
-								event.getDiscordGuild().setGiveaway(null);
-								return;
-							}
 							if (giveaway.isTimingOut()) {
 								event.sendMessage("You **cannot** end Giveaways that are timing out!").queue();
+								return;
+							}
+							if (giveaway.getParticipants().isEmpty()) {
+								event.sendMessage("No users were participating in this Giveaway :cry:").queue();
+								event.getGuildData().giveaway = null;
 								return;
 							}
 							EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -166,7 +165,7 @@ public class GiveawayCommand {
 							event.sendMessage(embedBuilder.build()).queue();
 							event.sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + OtherUtils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)! :smile:").queue();
 							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(client).getName() + ", contact " + OtherUtils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)!").queue()));
-							event.getDiscordGuild().setGiveaway(null);
+							event.getGuildData().giveaway = null;
 						})
 						.build())
 				.build();

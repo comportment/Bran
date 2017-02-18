@@ -36,10 +36,10 @@ public class ClientShard {
 	}
 	
 	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
-		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(client.config.getToken());
+		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(client.getConfig().botToken);
 		Game game = null;
-		if (!OtherUtils.isEmpty(client.config.getGame()))
-			game = client.config.isGameStream() ? Game.of(client.config.getGame(), "https://twitch.tv/ ") : Game.of(client.config.getGame());
+		if (!OtherUtils.isEmpty(client.getConfig().defaultGame))
+			game = client.getConfig().gameStream ? Game.of(client.getConfig().defaultGame, "https://twitch.tv/ ") : Game.of(client.getConfig().defaultGame);
 		if (totalShards > 1) {
 			jdaBuilder.useSharding(shardId, totalShards);
 			if (game != null)
@@ -83,7 +83,7 @@ public class ClientShard {
 	}
 	
 	public String getInfo() {
-		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + OtherUtils.getUser(client.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + client.config.getDefaultPrefixes().get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + client.config.getDefaultPrefixes().get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
+		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + OtherUtils.getUser(client.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + client.getConfig().defaultPrefixes.get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + client.getConfig().defaultPrefixes.get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
 	}
 	
 	public void updateCurrentGuildCount() {
@@ -102,7 +102,7 @@ public class ClientShard {
 			data.put("shard_count", totalShards);
 		}
 		return Unirest.post("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
-				.header("Authorization", client.config.getDiscordBotsToken())
+				.header("Authorization", client.getConfig().discordBotsToken)
 				.header("Content-Type", "application/json")
 				.body(data.toString())
 				.asJson();

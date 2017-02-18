@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.Profile;
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
 
 public class HMProfileListener implements IProfileListener {

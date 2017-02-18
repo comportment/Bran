@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
 import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
+import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
@@ -49,15 +49,15 @@ public class CustomCommandsListener implements EventListener {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), client);
-		if (!discordGuild.getCustomCommands().check()) return;
+		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
+		if (!guildData.customCommands.isEmpty()) return;
 		String msg = event.getMessage().getRawContent().trim().toLowerCase().split("\\s+")[0];
-		String prefix = PrefixManager.getPrefix0(msg, discordGuild);
+		String prefix = PrefixManager.getPrefix0(msg, guildData);
 		if (prefix == null) return;
-		if (!discordGuild.getMember(event.getMember(), client).hasPermission(Permissions.RUN_USRCMD, event.getJDA(), client))
+		if (!guildData.hasPermission(event.getAuthor(), Permissions.RUN_USRCMD))
 			return;
 		String baseCmd = msg.substring(prefix.length()).split("\\s+")[0];
-		CustomCommand command = discordGuild.getCustomCommands().getCustomCommand(baseCmd);
+		CustomCommand command = guildData.customCommands.get(baseCmd);
 		if (command == null) return;
 		String args = StringUtils.splitArgs(event.getMessage().getRawContent(), 2)[1];
 		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args);

@@ -85,8 +85,8 @@ public class MusicCommand {
 								event.getMessage().delete().queue();
 							TrackScheduler scheduler = event.getClient().playerManager.get(event.getGuild()).getTrackScheduler();
 							List<TrackContext> tracksByUser = scheduler.getTracksBy(event.getAuthor());
-							if (event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser() > 0 && tracksByUser.size() >= event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser()) {
-								event.sendMessage("You can only have " + event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser() + " songs in the queue.").queue();
+							if (event.getGuildData().maxSongsPerUser > 0 && tracksByUser.size() >= event.getGuildData().maxSongsPerUser) {
+								event.sendMessage("You can only have " + event.getGuildData().maxSongsPerUser + " songs in the queue.").queue();
 								return;
 							}
 							try {
@@ -337,7 +337,7 @@ public class MusicCommand {
 								event.sendMessage("Could not remove from the queue. Reason: `Index is bigger than queue size`").queue();
 								return;
 							}
-							if (!toRemove.getDJId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.DJ, event.getJDA(), event.getClient())) {
+							if (!toRemove.getDJId().equals(event.getAuthor().getId()) && !event.getGuildData().hasPermission(event.getAuthor(), Permissions.DJ)) {
 								event.sendMessage("You can't do this because you're not this song's DJ!").queue();
 								return;
 							}
@@ -354,13 +354,13 @@ public class MusicCommand {
 						.setAction((event) -> {
 							Argument<Integer> argument = event.getArgument("level");
 							if (!argument.isPresent()) {
-								event.sendMessage("The current FairQueue Level for this Guild is `" + event.getDiscordGuild().getMusicSettings().getFairQueueLevel() + "`.").queue();
+								event.sendMessage("The current FairQueue Level for this Guild is `" + event.getGuildData().fairQueueLevel + "`.").queue();
 							} else if (argument.get() > 2) {
 								event.sendMessage("The biggest FairQueue Level is 2!").queue();
 							} else if (argument.get() < 0) {
 								event.sendMessage("The FairQueue Level has to be bigger or equal 0!").queue();
 							} else {
-								event.getDiscordGuild().getMusicSettings().setFairQueueLevel(argument.get());
+								event.getGuildData().fairQueueLevel = argument.get();
 								event.sendMessage("Done, now the FairQueue Level for this Guild is `" + argument.get() + "`.").queue();
 							}
 						})

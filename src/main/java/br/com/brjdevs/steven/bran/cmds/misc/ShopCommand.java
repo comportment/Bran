@@ -7,7 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.Profile;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;

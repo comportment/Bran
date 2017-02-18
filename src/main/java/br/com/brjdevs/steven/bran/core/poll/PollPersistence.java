@@ -34,10 +34,6 @@ public class PollPersistence {
 	
 	@SneakyThrows(Exception.class)
 	public boolean savePolls() {
-		if (!client.config.isPollPersistenceEnabled()) {
-			LOG.info("Poll Persistence is disabled in config.json.");
-			return true;
-		}
 		LOG.info("Initiating PollPersistence pre shutdown.");
 		File dir = new File(System.getProperty("user.dir"), "poll_persistence");
 		if (!dir.exists()) {
@@ -58,10 +54,6 @@ public class PollPersistence {
 	
 	@SneakyThrows(Exception.class)
 	public boolean reloadPolls() {
-		if (!client.config.isPollPersistenceEnabled()) {
-			LOG.info("Poll Persistence is disabled in config.json.");
-			return true;
-		}
 		File dir = new File(System.getProperty("user.dir"), "poll_persistence");
 		if (!dir.exists()) return true;
 		File[] files = dir.listFiles();

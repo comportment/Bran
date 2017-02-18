@@ -33,7 +33,8 @@ public class ConfigCommand {
 								.setAction((event) -> {
 									Argument argument = event.getArgument("value");
 									if (!argument.isPresent()) {
-										long current = event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser();
+										
+										long current = event.getGuildData().maxSongsPerUser;
 										if (current > 0)
 											event.sendMessage("The current maximum amount of songs per user in the queue is " + current).queue();
 										else
@@ -47,7 +48,7 @@ public class ConfigCommand {
 									}
 									int i = !value.equals("none") ? Integer.parseInt(value) : -1;
 									if (i < -1) i = -1;
-									event.getDiscordGuild().getMusicSettings().setMaxSongsPerUser(i);
+									event.getGuildData().maxSongsPerUser = i;
 									if (i > 0)
 										event.sendMessage("Got it! Now each user can only have " + i + " song(s) in the queue at once.").queue();
 									else

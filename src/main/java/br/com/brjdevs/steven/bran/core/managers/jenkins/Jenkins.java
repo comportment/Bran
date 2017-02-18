@@ -54,7 +54,7 @@ public class Jenkins {
 		
 		// Then provide the right credentials
 		client.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-				new UsernamePasswordCredentials(this.client.config.getJenkinsUser(), this.client.config.getJenkinsPass()));
+				new UsernamePasswordCredentials(this.client.getConfig().jenkinsUser, this.client.getConfig().jenkinsPass));
 		
 		// Generate BASIC scheme object and stick it to the execution context
 		BasicScheme basicAuth = new BasicScheme();
@@ -66,7 +66,7 @@ public class Jenkins {
 		client.addRequestInterceptor(new PreemptiveAuth(), 0);
 		
 		// You get request that will start the build
-		HttpGet get = new HttpGet(this.client.config.getJenkinsLatestBuild() + this.client.config.getJenkinsToken());
+		HttpGet get = new HttpGet(this.client.getConfig().jenkinsLatestBuild + this.client.getConfig().jenkinsToken);
 		CloseableHttpResponse response = client.execute(get, context);
 		
 		if (response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK) {

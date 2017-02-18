@@ -2,7 +2,7 @@ package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.ClientShard;
-import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.Profile;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
@@ -181,7 +181,7 @@ public class HangManGame {
 	}
 	
 	public Field getInvitedUsersField(boolean inline, Client client) {
-		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + client.config.getDefaultPrefixes().get(0) + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getShard(client).getJDA()).getName()).collect(Collectors.toList()))), inline);
+		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + client.getConfig().defaultPrefixes.get(0) + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getShard(client).getJDA()).getName()).collect(Collectors.toList()))), inline);
 	}
 	
 	public int getUsedItems() {

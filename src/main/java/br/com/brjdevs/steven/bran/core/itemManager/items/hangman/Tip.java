@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.itemManager.items.hangman;
 
-import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile.Rank;
+import br.com.brjdevs.steven.bran.core.data.Profile.Rank;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 
 public class Tip implements Item {

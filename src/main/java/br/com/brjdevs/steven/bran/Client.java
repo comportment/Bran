@@ -4,10 +4,9 @@ import br.com.brjdevs.steven.bran.core.audio.MusicManager;
 import br.com.brjdevs.steven.bran.core.audio.MusicPlayerManager;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.command.CommandManager;
-import br.com.brjdevs.steven.bran.core.data.DataManager;
-import br.com.brjdevs.steven.bran.core.data.bot.BotData;
+import br.com.brjdevs.steven.bran.core.data.Data;
+import br.com.brjdevs.steven.bran.core.data.Profile;
 import br.com.brjdevs.steven.bran.core.data.bot.Config;
-import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
@@ -41,15 +40,13 @@ import java.util.stream.Stream;
 public class Client {
 	
 	private static SimpleLog LOG = SimpleLog.getLog("BotContainer");
-	public Config config;
-	public BotData data;
 	public File workingDir;
 	public PollPersistence pollPersistence;
 	public TaskManager taskManager;
-	public DataManager dataManager;
 	public CommandManager commandManager;
 	public MusicPlayerManager playerManager;
 	public Jenkins jenkins;
+	private Data data;
 	private ClientShard[] shards;
 	private DiscordLog discordLog;
 	private int totalShards;
@@ -65,8 +62,7 @@ public class Client {
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
 		if (!workingDir.exists() && !workingDir.mkdirs())
 			throw new NullPointerException("Could not create config.json");
-		this.config = Config.newConfig(this);
-		this.data = new BotData(this);
+		this.data = new Data();
 		this.totalShards = getRecommendedShards();
 		this.lastEvents = new AtomicLongArray(totalShards);
 		this.shards = new ClientShard[totalShards];
@@ -74,7 +70,6 @@ public class Client {
 		getOwner();
 		this.playerManager = new MusicPlayerManager(this);
 		this.pollPersistence = new PollPersistence(this);
-		this.dataManager = new DataManager(this);
 		this.commandManager = new CommandManager(this);
 		this.discordLog = new DiscordLog(this);
 		this.session = new Session(this);
@@ -88,17 +83,17 @@ public class Client {
 		return shards;
 	}
 	
+	public Data getData() {
+		return data;
+	}
+	
 	public int getShardId(JDA jda) {
 		if (jda.getShardInfo() == null) return 0;
 		return jda.getShardInfo().getShardId();
 	}
 	
 	public Profile getProfile(User user) {
-		return data.getProfile(user);
-	}
-	
-	public Map<String, Profile> getProfiles() {
-		return data.getProfiles();
+		return data.getDataHolderManager().get().getUser(user).getProfile();
 	}
 	
 	public int getTotalShards() {
@@ -123,6 +118,10 @@ public class Client {
 	
 	public Messenger getMessenger() {
 		return messenger;
+	}
+	
+	public Config getConfig() {
+		return getData().getConfigDataManager().get();
 	}
 	
 	public List<Guild> getGuilds() {
@@ -192,7 +191,7 @@ public class Client {
 	private int getRecommendedShards() {
 		try {
 			HttpResponse<JsonNode> shards = Unirest.get("https://discordapp.com/api/gateway/bot")
-					.header("Authorization", "Bot " + config.getToken())
+					.header("Authorization", "Bot " + getConfig().botToken)
 					.header("Content-Type", "application/json")
 					.asJson();
 			return shards.getBody().getObject().getInt("shards");
@@ -217,7 +216,7 @@ public class Client {
 	public User getOwner() {
 		if (ownerId != 0) return getShards()[ownerShardId].getJDA().getUserById(String.valueOf(ownerId));
 		for (ClientShard shard : shards) {
-			User u = shard.getJDA().getUserById(config.getOwnerId());
+			User u = shard.getJDA().getUserById(getConfig().ownerId);
 			if (u != null) {
 				ownerId = Long.parseLong(u.getId());
 				break;
@@ -244,7 +243,9 @@ public class Client {
 		});
 		if (!pollPersistence.savePolls()) LOG.info("Could not complete PollPersistence savePolls.");
 		
-		dataManager.saveData();
+		getData().getDataHolderManager().update();
+		getData().getConfigDataManager().update();
+		getData().getHangmanWordsManager().update();
 		
 		Stream.of(shards).forEach(ClientShard::shutdown);
 		

@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.itemManager;
 
-import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile.Rank;
+import br.com.brjdevs.steven.bran.core.data.Profile.Rank;
 
 public interface Item {
 	

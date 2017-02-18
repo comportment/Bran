@@ -100,7 +100,7 @@ public class JavaEvalCommand {
                         }
                         if (o == null || o.toString().isEmpty())
                             o = "Executed without error and no objects returned!";
-		                o = o.toString().replace(event.getClient().config.getToken(), "<BOT TOKEN>");
+		                o = o.toString().replaceAll(event.getClient().getConfig().botToken, "<BOT TOKEN>");
 		                event.sendMessage(o.toString()).queue();
 	                } catch (Exception e) {
 	                    if (x == null) x = e;

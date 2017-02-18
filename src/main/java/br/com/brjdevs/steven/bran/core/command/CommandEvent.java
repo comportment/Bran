@@ -3,9 +3,7 @@ package br.com.brjdevs.steven.bran.core.command;
 import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.ClientShard;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember;
-import br.com.brjdevs.steven.bran.core.data.guild.settings.GuildMember.FakeGuildMember;
+import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
@@ -28,14 +26,13 @@ public class CommandEvent {
     private MessageReceivedEvent event;
     private ICommand command;
     private String args;
-    private DiscordGuild discordGuild;
-    private GuildMember guildMember;
-    private String prefix;
+	private GuildData guildData;
+	private String prefix;
 	private Map<String, Argument> argsMap;
 	private Argument[] arguments;
 	private Client client;
 	
-	public CommandEvent(MessageReceivedEvent event, ICommand command, DiscordGuild discordGuild, String args, String prefix, Client client) {
+	public CommandEvent(MessageReceivedEvent event, ICommand command, GuildData guildData, String args, String prefix, Client client) {
 		this.event = event;
         this.command = command;
         this.message = event.getMessage();
@@ -47,13 +44,10 @@ public class CommandEvent {
 		this.arguments = CommandUtils.copy(command);
 		Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
 		if (!OtherUtils.isPrivate(event)) {
-			this.discordGuild = discordGuild;
-            this.member = event.getMember();
+			this.guildData = guildData;
+			this.member = event.getMember();
             this.guild = event.getGuild();
-			this.guildMember = discordGuild.getMember(member, client);
 		}
-        if (this.guildMember == null)
-	        this.guildMember = new FakeGuildMember(author, null, client);
 	}
 	
 	public Messenger getMessenger() {
@@ -109,9 +103,6 @@ public class CommandEvent {
 		return member;
     }
 	
-	public GuildMember getGuildMember() {
-		return guildMember;
-    }
     public ICommand getCommand() {
         return command;
     }
@@ -125,9 +116,9 @@ public class CommandEvent {
         return message;
     }
 	
-	public DiscordGuild getDiscordGuild() {
-		return discordGuild;
-    }
+	public GuildData getGuildData() {
+		return guildData;
+	}
 	
 	public Guild getGuild() {
 		return guild;
@@ -160,7 +151,7 @@ public class CommandEvent {
 	
 	public CommandEvent createChild(ICommand command, boolean b) {
         String newArgs = b ? args : args.replaceFirst(" ", "");
-		CommandEvent event = new CommandEvent(this.event, command, discordGuild, newArgs, prefix, client);
+		CommandEvent event = new CommandEvent(this.event, command, guildData, newArgs, prefix, client);
 		Thread.currentThread().setName(command.getName() + ">" + OtherUtils.getUser(event.getAuthor()));
 		command.execute(event);
 		return event;

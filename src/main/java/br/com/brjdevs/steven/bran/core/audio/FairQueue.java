@@ -2,7 +2,6 @@ package br.com.brjdevs.steven.bran.core.audio;
 
 import br.com.brjdevs.steven.bran.ClientShard;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
@@ -162,7 +161,7 @@ public class FairQueue<T extends TrackContext> {
 		}
 		if (!canRequest(track)) {
 			String s;
-			switch (DiscordGuild.getInstance(getMusicManager().getGuild(), musicManager.client).getMusicSettings().getFairQueueLevel()) {
+			switch (musicManager.client.getData().getDataHolderManager().get().getGuild(getGuild(), musicManager.client.getConfig()).fairQueueLevel) {
 				case 1:
 					s = "Oops, it looks like you already asked for this song, why don't you try another one? (FairQueue: 1)";
 					break;
@@ -171,7 +170,7 @@ public class FairQueue<T extends TrackContext> {
 					break;
 				default:
 					s = "Unrecognized FairQueue Level '" +
-							DiscordGuild.getInstance(getMusicManager().getGuild(), musicManager.client).getMusicSettings().getFairQueueLevel() + "'\nReport this Message to my Master.";
+							musicManager.client.getData().getDataHolderManager().get().getGuild(getGuild(), musicManager.client.getConfig()).fairQueueLevel + "'\nReport this Message to my Master.";
 			}
 			track.getContext().sendMessage(s).queue();
 			return false;
@@ -190,7 +189,7 @@ public class FairQueue<T extends TrackContext> {
 	}
 	
 	public boolean canRequest(T track) {
-		switch (DiscordGuild.getInstance(getMusicManager().getGuild(), musicManager.client).getMusicSettings().getFairQueueLevel()) {
+		switch (musicManager.client.getData().getDataHolderManager().get().getGuild(getGuild(), musicManager.client.getConfig()).fairQueueLevel) {
 			case 0:
 				return true;
 			case 1:
@@ -199,7 +198,7 @@ public class FairQueue<T extends TrackContext> {
 				return getMatches(queue, track) < 1;
 			default:
 				throw new UnsupportedOperationException("Unrecognized FairQueue Level '" +
-						DiscordGuild.getInstance(getMusicManager().getGuild(), musicManager.client).getMusicSettings().getFairQueueLevel() + "'");
+						musicManager.client.getData().getDataHolderManager().get().getGuild(getGuild(), musicManager.client.getConfig()).fairQueueLevel + "'");
 		}
 	}
 	

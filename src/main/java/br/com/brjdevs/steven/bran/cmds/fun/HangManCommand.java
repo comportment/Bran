@@ -6,8 +6,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.bot.BotData;
-import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
+import br.com.brjdevs.steven.bran.core.data.Profile;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
@@ -64,7 +63,7 @@ public class HangManCommand {
 									return;
 								}
 							}
-							session = new HangManGame(profile, CollectionUtils.getEntryByIndex(event.getClient().data.getHangManWords(), MathUtils.random(event.getClient().data.getHangManWords().size())).getKey(), event.getTextChannel(), event.getClient());
+							session = new HangManGame(profile, CollectionUtils.getEntryByIndex(event.getClient().getData().getHangmanWordsManager().get(), MathUtils.random(event.getClient().getData().getHangmanWordsManager().get().size())).getKey(), event.getTextChannel(), event.getClient());
 							event.sendMessage(session.createEmbed(event.getClient()).setDescription("You started a Hang Man Game in " + event.getTextChannel().getAsMention() + ". Why don't you invite someone to play with you?").build()).queue();
 						})
 						.build())
@@ -192,13 +191,13 @@ public class HangManCommand {
 							session.addUseItem();
 							inventory.remove(item);
 							if (item.getName().equals("Tip")) {
-								List<String> tips = event.getClient().data.getHangManWords().get(session.getWord());
+								List<String> tips = event.getClient().getData().getHangmanWordsManager().get().get(session.getWord());
 								if (tips.isEmpty()) {
 									event.sendMessage("This word doesn't have tips! Sorry!").queue();
 									inventory.put(item);
 									return;
 								}
-								event.sendMessage("**Here's a small tip:** " + CollectionUtils.random(event.getClient().data.getHangManWords().get(session.getWord()))).queue();
+								event.sendMessage("**Here's a small tip:** " + CollectionUtils.random(event.getClient().getData().getHangmanWordsManager().get().get(session.getWord()))).queue();
 							} else if (item.getName().equals("Guesser")) {
 								String r = session.getRandomLetter();
 								session.guess(r);
@@ -223,7 +222,7 @@ public class HangManCommand {
 								.setArgs(new Argument<>("word", String.class))
 								.setAction((event, rawArgs) -> {
 									String word = (String) event.getArgument("word").get();
-									event.getClient().data.getHangManWords().put(word, new ArrayList<>());
+									event.getClient().getData().getHangmanWordsManager().get().put(word, new ArrayList<>());
 									event.sendMessage(Quotes.SUCCESS, "Added word to HangMan, you can add tips to it using `" + event.getPrefix() + "hangman words tip " + word + " [tip]`.").queue();
 								})
 								.build())
@@ -234,13 +233,12 @@ public class HangManCommand {
 								.setArgs(new Argument<>("word", String.class), new Argument<>("tip", String.class))
 								.setAction((event) -> {
 									String word = (String) event.getArgument("word").get();
-									BotData data = event.getClient().data;
-									if (!data.getHangManWords().containsKey(word)) {
+									if (!event.getClient().getData().getHangmanWordsManager().get().containsKey(word)) {
 										event.sendMessage("Could not find word `" + word + "`.").queue();
 										return;
 									}
 									String tip = (String) event.getArgument("tip").get();
-									if (data.getHangManWords().get(word).contains(tip)) {
+									if (event.getClient().getData().getHangmanWordsManager().get().get(word).contains(tip)) {
 										event.sendMessage("This word already has this Tip!").queue();
 										return;
 									}
@@ -248,8 +246,8 @@ public class HangManCommand {
 										event.sendMessage("The Tip can't be the word!").queue();
 										return;
 									}
-									data.getHangManWords().get(word).add(tip);
-									event.sendMessage(Quotes.SUCCESS, "Added new tip to this word! *(Total tips: " + data.getHangManWords().get(word).size() + ")*").queue();
+									event.getClient().getData().getHangmanWordsManager().get().get(word).add(tip);
+									event.sendMessage(Quotes.SUCCESS, "Added new tip to this word! *(Total tips: " + event.getClient().getData().getHangmanWordsManager().get().get(word).size() + ")*").queue();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -260,7 +258,7 @@ public class HangManCommand {
 								.setAction((event, rawArgs) -> {
 									Argument argument = event.getArgument("page");
 									int page = argument.isPresent() && (int) argument.get() > 0 ? (int) argument.get() : 1;
-									List<String> list = event.getClient().data.getHangManWords().entrySet().stream().map(entry -> entry.getKey() + " (" + entry.getValue().size() + " tips)").collect(Collectors.toList());
+									List<String> list = event.getClient().getData().getHangmanWordsManager().get().entrySet().stream().map(entry -> entry.getKey() + " (" + entry.getValue().size() + " tips)").collect(Collectors.toList());
 									StringListBuilder listBuilder = new StringListBuilder(list, page, 10);
 									listBuilder.setName("HangMan Words").setFooter("Total Words: " + list.size());
 									event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
