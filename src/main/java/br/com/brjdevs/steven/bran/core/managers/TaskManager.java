@@ -25,7 +25,7 @@ public class TaskManager {
 		this.client = client;
 		this.musicRegisterTimeout = new MusicRegisterTimeout(client);
 		this.channelLeaveTimer = new ChannelLeaveTimer(client);
-		//startAsyncTasks();
+		startAsyncTasks();
 	}
 	
 	public ChannelLeaveTimer getChannelLeaveTimer() {

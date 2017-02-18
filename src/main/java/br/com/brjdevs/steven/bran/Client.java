@@ -234,10 +234,13 @@ public class Client {
 	public void shutdownAll(int exitCode) {
 		
 		playerManager.getMusicManagers().forEach((guildId, musicManager) -> {
-			if (musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null) return;
-			TextChannel channel = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
-			if (channel == null) return;
-			channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, strong and better.").queue();
+			try {
+				if (musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null) return;
+				TextChannel channel = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
+				if (channel != null && channel.canTalk())
+					channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, strong and better.").queue();
+			} catch (Exception ignored) {
+			}
 		});
 		if (!pollPersistence.savePolls()) LOG.info("Could not complete PollPersistence savePolls.");
 		
