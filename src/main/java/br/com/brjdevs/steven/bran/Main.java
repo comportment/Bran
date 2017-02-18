@@ -6,6 +6,8 @@ import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.Arrays;
+
 public class Main {
 	
 	public static Gson GSON = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
@@ -22,12 +24,10 @@ public class Main {
 			
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 				try {
-					for (ClientShard clientShard : client.getOnlineShards()) {
-						clientShard.getJDA().shutdown();
-					}
 					client.getData().getDataHolderManager().update();
 					client.getData().getConfigDataManager().update();
 					client.getData().getHangmanWordsManager().update();
+					Arrays.stream(client.getShards()).forEach(ClientShard::shutdown);
 				} catch (Exception e) {
 				}
 			}));

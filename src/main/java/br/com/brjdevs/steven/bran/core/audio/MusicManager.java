@@ -17,11 +17,11 @@ public class MusicManager {
 	
 	public MusicManager(AudioPlayerManager manager, Guild guild, Client client) {
 		player = manager.createPlayer();
-		player.addListener(new AudioPlayerListener(getTrackScheduler()));
 		this.guildId = Long.parseLong(guild.getId());
 		this.shard = client.getShardId(guild.getJDA());
 		this.client = client;
 		scheduler = new TrackScheduler(this, player, guildId, shard, client);
+		player.addListener(new AudioPlayerListener(getTrackScheduler()));
 		this.sendHandler = new PlayerSendHandler(player);
 	}
 	public Guild getGuild() {
