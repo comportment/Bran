@@ -93,6 +93,9 @@ public class AudioLoader implements AudioLoadResultHandler {
 										channel.sendMessage("Query canceled!").queue();
 										if (msg != null)
 											msg.delete().queue();
+										if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null)
+											channel.getGuild().getAudioManager().closeAudioConnection();
+										return;
 									}
 									int i = Integer.parseInt(response);
 									TrackContext trackContext = tracks.get(i - 1);
