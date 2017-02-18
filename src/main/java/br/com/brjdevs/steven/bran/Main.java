@@ -25,7 +25,9 @@ public class Main {
 					for (ClientShard clientShard : client.getOnlineShards()) {
 						clientShard.getJDA().shutdown();
 					}
+					client.getData().getDataHolderManager().update();
 					client.getData().getConfigDataManager().update();
+					client.getData().getHangmanWordsManager().update();
 				} catch (Exception e) {
 				}
 			}));

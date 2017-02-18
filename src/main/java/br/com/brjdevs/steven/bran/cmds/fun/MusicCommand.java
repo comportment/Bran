@@ -103,7 +103,7 @@ public class MusicCommand {
 						.setDescription("Gives you information about the current song.")
 						.setAction((event) -> {
 							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
-							if (musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null) {
+							if (musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null || musicManager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I'm not playing anything, use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
 								return;
 							}
@@ -258,7 +258,7 @@ public class MusicCommand {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
-							if (manager.getTrackScheduler().getQueue().getCurrentTrack() == null) {
+							if (manager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I'm not playing anything! Use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
 								return;
 							}

@@ -96,9 +96,10 @@ public class ChannelLeaveTimer {
 				MusicManager musicManager = client.playerManager.get(guild);
 				TrackScheduler scheduler = musicManager.getTrackScheduler();
 				TrackContext track = scheduler.getQueue().getCurrentTrack();
+				if (track == null) track = scheduler.getQueue().getPreviousTrack();
 				scheduler.getQueue().getRawQueue().clear();
 				scheduler.getQueue().next(true);
-				if (track.getContext() != null && track.getContext().canTalk())
+				if (track != null && track.getContext() != null && track.getContext().canTalk())
 					track.getContext().sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
 				musicManager.getTrackScheduler().setPaused(false);
 				if (guild.getAudioManager().isConnected())
