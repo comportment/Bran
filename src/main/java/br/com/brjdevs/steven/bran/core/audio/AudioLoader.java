@@ -8,6 +8,7 @@ import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseEvent;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseTimeoutEvent;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.UnexpectedResponseEvent;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.ValidResponseEvent;
+import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -88,6 +89,11 @@ public class AudioLoader implements AudioLoadResultHandler {
 									if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
 										m.delete().queue();
 									String response = m.getContent();
+									if (!MathUtils.isInteger(response)) {
+										channel.sendMessage("Query canceled!").queue();
+										if (msg != null)
+											msg.delete().queue();
+									}
 									int i = Integer.parseInt(response);
 									TrackContext trackContext = tracks.get(i - 1);
 									musicManager.getTrackScheduler().getQueue().request(trackContext, false);

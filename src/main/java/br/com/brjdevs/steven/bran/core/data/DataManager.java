@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 public class DataManager {
 	
@@ -20,7 +21,7 @@ public class DataManager {
 	}
 	
 	public void saveGuildData() {
-		DiscordGuild.instances.entrySet().stream().map(Entry::getValue).forEach(discordGuild -> discordGuild.save(client));
+		DiscordGuild.instances.entrySet().stream().map(Entry::getValue).filter(Objects::nonNull).forEach(discordGuild -> discordGuild.save(client));
 	}
 	
 	public void saveBotData() {
