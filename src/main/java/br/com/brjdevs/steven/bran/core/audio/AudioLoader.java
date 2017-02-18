@@ -1,23 +1,26 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.core.action.Action;
-import br.com.brjdevs.steven.bran.core.action.Action.onInvalidResponse;
-import br.com.brjdevs.steven.bran.core.action.ActionType;
 import br.com.brjdevs.steven.bran.core.audio.impl.TrackContextImpl;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.utils.MathUtils;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.responsewaiter.ExpectedResponseType;
+import br.com.brjdevs.steven.bran.core.responsewaiter.ResponseWaiter;
+import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseEvent;
+import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseTimeoutEvent;
+import br.com.brjdevs.steven.bran.core.responsewaiter.events.UnexpectedResponseEvent;
+import br.com.brjdevs.steven.bran.core.responsewaiter.events.ValidResponseEvent;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class AudioLoader implements AudioLoadResultHandler {
@@ -41,8 +44,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 	@Override
 	public void trackLoaded(AudioTrack track) {
 		if (track.getInfo().length > MAX_SONG_LENGTH) {
-			channel.sendMessage("This song is too long! The maximum supported length is 3 hours. *" + AudioUtils.format(track) + "/" + AudioUtils.format(MAX_SONG_LENGTH) + "*").queue();
-			if (musicManager.getTrackScheduler().isStopped())
+			channel.sendMessage("This song is too long! The maximum supported length is 3 hours. *" + AudioUtils.format(track.getInfo().length) + "/" + AudioUtils.format(MAX_SONG_LENGTH) + "*").queue();
+			if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null)
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			return;
 		}
@@ -51,14 +54,14 @@ public class AudioLoader implements AudioLoadResultHandler {
 			return;
 		}
 		String url = !track.getSourceManager().getSourceName().equalsIgnoreCase("youtube") ? trackUrl : "https://www.youtube.com/watch?v=" + track.getInfo().identifier;
-		musicManager.getTrackScheduler().queue(track, url, user, channel);
+		musicManager.getTrackScheduler().getQueue().request(new TrackContextImpl(track, url, user, channel, musicManager.getTrackScheduler()), false);
 	}
 	
 	@Override
 	public void playlistLoaded(AudioPlaylist playlist) {
 		if (musicManager.getTrackScheduler().getQueue().size() > MAX_QUEUE_SIZE) {
 			channel.sendMessage("Queue has reached its limit! (" + MAX_QUEUE_SIZE + ")").queue();
-			if (musicManager.getTrackScheduler().isStopped())
+			if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null)
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			return;
 		}
@@ -68,61 +71,63 @@ public class AudioLoader implements AudioLoadResultHandler {
 		if (playlist.getSelectedTrack() != null) {
 			trackLoaded(playlist.getSelectedTrack());
 		} else {
-			List<TrackContext> playlistTracks = playlist.getTracks().stream().map(track -> new TrackContextImpl(track, !track.getSourceManager().getSourceName().equalsIgnoreCase("youtube") ? trackUrl : "https://www.youtube.com/watch?v=" + track.getInfo().identifier, user, channel)).collect(Collectors.toList());
+			List<TrackContext> playlistTracks = playlist.getTracks().stream().map(track -> new TrackContextImpl(track, !track.getSourceManager().getSourceName().equalsIgnoreCase("youtube") ? trackUrl : "https://www.youtube.com/watch?v=" + track.getInfo().identifier, user, channel, musicManager.getTrackScheduler())).collect(Collectors.toList());
 			if (playlist.isSearchResult()) {
 				List<TrackContext> tracks = playlistTracks.stream().filter(track -> playlistTracks.indexOf(track) < 3).collect(Collectors.toList());
-				channel.sendMessage(Util.getUser(user) + ", results found by `" + trackUrl.substring(9).trim() + "`:\n" + String.join("\n", tracks.stream().map(track -> "`[" + (tracks.indexOf(track) + 1) + "]` " + track.getTrack().getInfo().title + " (`" + AudioUtils.format(track.getTrack().getInfo().length) + "`)").collect(Collectors.toList())) + "\n*This will expire in 20 seconds*").queue(msg -> {
-					List<String> inputs = new ArrayList<>();
-					inputs.add("c");
-					inputs.add("cancel");
+				channel.sendMessage(OtherUtils.getUser(user) + ", results found by `" + trackUrl.substring(9).trim() + "`:\n" + String.join("\n", tracks.stream().map(track -> "`[" + (tracks.indexOf(track) + 1) + "]` " + track.getTrack().getInfo().title + " (`" + AudioUtils.format(track.getTrack().getInfo().length) + "`)").collect(Collectors.toList())) + "\n*This will expire in 30 seconds*").queue(msg -> {
+					String[] inputs = new String[2 + tracks.size()];
+					inputs[0] = "c";
+					inputs[1] = "cancel";
 					for (int i = tracks.size(); i > 0; i--) {
-						inputs.add(String.valueOf(i));
+						inputs[1 + i] = String.valueOf(i);
 					}
-					Action action = new Action(ActionType.MESSAGE, onInvalidResponse.CONTINUE, msg, (message, args) -> {
-						if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
-							message.delete().queue();
-						String response = message.getContent();
-						if (MathUtils.isInRange(MathUtils.parseIntOrDefault(response, -1), 0, inputs.size() - 1)) {
-							int i = Integer.parseInt(response);
-							TrackContext trackContext = tracks.get(i - 1);
-							musicManager.getTrackScheduler().queue(trackContext);
-							if (msg != null)
-								msg.delete().queue();
-						} else {
-							if (msg != null)
-								msg.editMessage("Query canceled!").queue();
-							else
-								channel.sendMessage("Query canceled!").queue();
-							if (musicManager.getTrackScheduler().isStopped())
-								channel.getGuild().getAudioManager().closeAudioConnection();
-						}
-					}, inputs, musicManager.container, TimeUnit.SECONDS.toMillis(20));
-					action.addUser(user);
+					new ResponseWaiter(user, channel, musicManager.getShard(), 30000, inputs, ExpectedResponseType.MESSAGE,
+							(ResponseEvent responseEvent) -> {
+								if (responseEvent instanceof ValidResponseEvent) {
+									Message m = ((Message) ((ValidResponseEvent) responseEvent).response);
+									if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
+										m.delete().queue();
+									String response = m.getContent();
+									int i = Integer.parseInt(response);
+									TrackContext trackContext = tracks.get(i - 1);
+									musicManager.getTrackScheduler().getQueue().request(trackContext, false);
+									if (msg != null)
+										msg.delete().queue();
+								} else if (responseEvent instanceof UnexpectedResponseEvent) {
+									channel.sendMessage("You didn't type " + StringUtils.replaceLast(Arrays.stream(inputs).collect(Collectors.joining(", ")), ", ", " or ") + ", query canceled!").queue();
+									if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null)
+										channel.getGuild().getAudioManager().closeAudioConnection();
+								} else if (responseEvent instanceof ResponseTimeoutEvent) {
+									channel.sendMessage("You took too long to pick a song so I've picked the first song!").queue();
+									musicManager.getTrackScheduler().getQueue().request(tracks.get(0), false);
+									
+								}
+							});
 				});
 				return;
 			}
 			long duration = AudioUtils.getLength(playlist);
 			if (duration > MAX_PLAYLIST_LENGTH) {
-				if (musicManager.getTrackScheduler().isStopped())
+				if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null)
 					channel.getGuild().getAudioManager().closeAudioConnection();
 				channel.sendMessage("This playlist is too long! The maximum supported length is 30 hours. *" + AudioUtils.format(duration) + "/" + AudioUtils.format(MAX_PLAYLIST_LENGTH) + "*").queue();
 				return;
 			}
-			musicManager.getTrackScheduler().queue(playlist, playlistTracks, user, channel);
+			playlistTracks.forEach(trackContext -> musicManager.getTrackScheduler().getQueue().request(trackContext, true));
 		}
 	}
 	
 	@Override
 	public void noMatches() {
 		channel.sendMessage("Nothing found by `" + (trackUrl.startsWith("ytsearch:") ? trackUrl.substring(9).trim() : trackUrl) + "`").queue();
-		if (musicManager.getTrackScheduler().isStopped() && channel.getGuild().getAudioManager().isConnected())
+		if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null && channel.getGuild().getAudioManager().isConnected())
 			channel.getGuild().getAudioManager().closeAudioConnection();
 	}
 	
 	@Override
 	public void loadFailed(FriendlyException exception) {
 		channel.sendMessage("Could not play the requested song. `" + exception.getMessage() + " (" + exception.severity + ")`").queue();
-		if (musicManager.getTrackScheduler().isStopped())
+		if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null)
 			channel.getGuild().getAudioManager().closeAudioConnection();
 	}
 }

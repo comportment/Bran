@@ -5,7 +5,7 @@ import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
@@ -45,13 +45,13 @@ public class GuildInfoCommand {
 					boolean hasEmotes = !guild.getEmotes().isEmpty();
 					EmbedBuilder embedBuilder = new EmbedBuilder();
 					embedBuilder.setThumbnail(guild.getIconUrl());
-					embedBuilder.setFooter("Requested by " + Util.getUser(event.getAuthor()),
-							Util.getAvatarUrl(event.getAuthor()));
+					embedBuilder.setFooter("Requested by " + OtherUtils.getUser(event.getAuthor()),
+							OtherUtils.getAvatarUrl(event.getAuthor()));
 					embedBuilder.setColor(
 							guildOwner.getColor() == null ? Color.decode("#F38630") : guildOwner.getColor());
 					embedBuilder.setTitle("\uD83C\uDFE0 Guild information on " + guild.getName(), null);
 					embedBuilder.addField("ID", guild.getId(), true);
-					embedBuilder.addField("Owner", Util.getUser(guildOwner.getUser()) + "\n(ID: " + guildOwner.getUser().getId() + ")", true);
+					embedBuilder.addField("Owner", OtherUtils.getUser(guildOwner.getUser()) + "\n(ID: " + guildOwner.getUser().getId() + ")", true);
 					embedBuilder.addField("Region", guild.getRegion().toString(), true);
 					embedBuilder.addField("Created at", creationDate, true);
 					List<Member> online = guild.getMembers().stream().filter(m -> m.getOnlineStatus() == OnlineStatus.ONLINE).collect(Collectors.toList());

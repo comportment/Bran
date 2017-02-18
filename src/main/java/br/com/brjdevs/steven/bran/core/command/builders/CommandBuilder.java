@@ -7,7 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.HelpContainer;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,7 +92,7 @@ public class CommandBuilder {
 					event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
 					return;
 				}
-				if (!event.getGuildMember().hasPermission(perm, event.getJDA(), event.getBotContainer())) {
+				if (!event.getGuildMember().hasPermission(perm, event.getJDA(), event.getClient())) {
 					event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
 					return;
 				}
@@ -104,7 +104,7 @@ public class CommandBuilder {
 				split[1] = split[1].trim();
 				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\' && split[1].matches("^(\\?|help)$"))
 					split[1] = split[1].substring(1);
-				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length - 1)).filter(a -> !Util.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
+				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length - 1)).filter(a -> !OtherUtils.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
 				Argument[] args = event.getArguments();
 				if (args != null) {
 					for (int i = 0; i < args.length; i++) {

@@ -1,9 +1,8 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
 import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -12,17 +11,17 @@ import net.dv8tion.jda.core.entities.User;
 
 public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.ConnectionListener {
 	
-	public BotContainer container;
+	public Client client;
 	private int attempts;
 	private long guildId;
 	private int shard;
 	private Message message;
 	
-	public ConnectionListenerImpl(Guild guild, BotContainer container) {
+	public ConnectionListenerImpl(Guild guild, Client client) {
 		this.attempts = -1;
 		this.guildId = Long.parseLong(guild.getId());
-		this.container = container;
-		this.shard = container.getShardId(guild.getJDA());
+		this.client = client;
+		this.shard = client.getShardId(guild.getJDA());
 	}
 	
 	@Override
@@ -32,16 +31,16 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	@Override
 	public void onStatusChange(ConnectionStatus connectionStatus) {
 		TrackScheduler scheduler = getMusicManager().getTrackScheduler();
-		if (scheduler.isStopped()) return;
+		if (scheduler.getQueue().isEmpty() && scheduler.getQueue().getCurrentTrack() == null) return;
 		if (connectionStatus == ConnectionStatus.CONNECTING_AWAITING_ENDPOINT) {
 			send("Connecting to " + getGuild().getAudioManager().getQueuedAudioConnection().getName() + "... *(Attempt " + attempts + ")*");
 		} else if (connectionStatus == ConnectionStatus.CONNECTED) {
 			if (attempts > 0)
 				send("Stabilized connection with Voice Channel `" + getGuild().getAudioManager().getConnectedChannel().getName() + "`!");
-			if (!scheduler.isStopped() && scheduler.isPaused())
+			if (!(scheduler.getQueue().isEmpty() && scheduler.getQueue().isEmpty()) && scheduler.isPaused())
 				scheduler.setPaused(false);
 			attempts = 0;
-			if (AudioUtils.isAlone(getGuild().getAudioManager().getConnectedChannel()) && !container.taskManager.getChannelLeaveTimer().has(getGuild().getId()))
+			if (AudioUtils.isAlone(getGuild().getAudioManager().getConnectedChannel()) && !client.taskManager.getChannelLeaveTimer().has(getGuild().getId()))
 				VoiceChannelListener.onLeave(getGuild(), getGuild().getAudioManager().getConnectedChannel());
 		} else if (connectionStatus == ConnectionStatus.AUDIO_REGION_CHANGE) {
 			scheduler.setPaused(true);
@@ -59,7 +58,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			send("The channel I was connected to got deleted, stopped the queue.");
 			scheduler.stop();
 		} else if (connectionStatus == ConnectionStatus.DISCONNECTED_REMOVED_FROM_GUILD) {
-			container.playerManager.unregister(guildId);
+			client.playerManager.unregister(guildId);
 		}
 	}
 	
@@ -68,23 +67,18 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	}
 	
 	public MusicManager getMusicManager() {
-		return container.playerManager.get(getGuild());
+		return client.playerManager.get(getGuild());
 	}
 	
 	public Guild getGuild() {
-		return container.getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
+		return client.getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
 	public void send(String content) {
 		if (message != null) message.delete().queue();
 		TrackScheduler scheduler = getMusicManager().getTrackScheduler();
-		JDA jda = scheduler.getShard().getJDA();
-		TextChannel textChannel = null;
-		if (scheduler.getCurrentTrack() != null)
-			textChannel = scheduler.getCurrentTrack().getContext(jda);
-		if (textChannel == null && scheduler.getPreviousTrack() != null)
-			textChannel = scheduler.getPreviousTrack().getContext(jda);
-		if (textChannel != null && textChannel.canTalk()) {
+		if (scheduler.getQueue().getCurrentTrack() != null) {
+			TextChannel textChannel = scheduler.getQueue().getCurrentTrack().getContext();
 			textChannel.sendMessage(content).queue(this::setMessage);
 		}
 	}

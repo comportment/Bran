@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
@@ -22,14 +22,14 @@ public class Session implements EventListener {
 	public long cmds;
 	public long msgsReceived;
 	public long msgsSent;
-	public BotContainer container;
+	public Client client;
 	
-	public Session(BotContainer container) {
+	public Session(Client client) {
 		this.cpuUsage = 0;
 		this.cmds = 0;
 		this.msgsReceived = 0;
 		this.msgsSent = 0;
-		this.container = container;
+		this.client = client;
 	}
 
 	public void readMessage(boolean isSelf) {
@@ -54,15 +54,15 @@ public class Session implements EventListener {
 	}
 	
 	public String toString(JDA jda) {
-		List<Guild> guilds = container.getGuilds();
-		List<TextChannel> channels = container.getTextChannels();
-		List<VoiceChannel> voiceChannels = container.getVoiceChannels();
-		List<User> users = container.getUsers();
+		List<Guild> guilds = client.getGuilds();
+		List<TextChannel> channels = client.getTextChannels();
+		List<VoiceChannel> voiceChannels = client.getVoiceChannels();
+		List<User> users = client.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
-		long queueSize = container.playerManager.getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
+		long queueSize = client.playerManager.getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
-		long nowPlaying = container.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
-		long paused = container.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
+		long nowPlaying = client.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
+		long paused = client.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
 		StringBuilder sb = new StringBuilder();
 		sb.append("```prolog\n");
 		sb.append("--Bot Stats--\n");
@@ -72,8 +72,8 @@ public class Session implements EventListener {
 		sb.append("JDA Version: ").append(JDAInfo.VERSION).append('\n');
 		sb.append("RAM (USAGE/MAX): ").append(ram).append('\n');
 		sb.append("CPU Usage: ").append(cpuUsage).append("%\n");
-		sb.append("Shards (ONLINE/TOTAL): ").append(container.getOnlineShards().length).append("/").append(container.getTotalShards()).append("\n");
-		sb.append("API Responses: ").append(container.getResponseTotal()).append("\n\n");
+		sb.append("Shards (ONLINE/TOTAL): ").append(client.getOnlineShards().length).append("/").append(client.getTotalShards()).append("\n");
+		sb.append("API Responses: ").append(client.getResponseTotal()).append("\n\n");
 		sb.append("--General--\n");
 		sb.append("Guilds: ").append(guilds.size()).append("\n");
 		sb.append("Users: ").append(users.size()).append("\n");
@@ -96,7 +96,7 @@ public class Session implements EventListener {
 	public void onEvent(Event e) {
 		if (e instanceof MessageReceivedEvent) {
 			MessageReceivedEvent event = ((MessageReceivedEvent) e);
-			container.getSession().readMessage(event.getAuthor().getId().equals(event.getJDA().getSelfUser().getId()));
+			client.getSession().readMessage(event.getAuthor().getId().equals(event.getJDA().getSelfUser().getId()));
 		}
 	}
 }

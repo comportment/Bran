@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
@@ -20,10 +20,10 @@ import java.util.regex.Pattern;
 public class CustomCommandsListener implements EventListener {
 	
 	private static Pattern RANDOM_PATTERN = Pattern.compile("(\\$random\\{.+?;+.+?})", Pattern.CASE_INSENSITIVE);
-	public BotContainer container;
+	public Client client;
 	
-	public CustomCommandsListener(BotContainer container) {
-		this.container = container;
+	public CustomCommandsListener(Client client) {
+		this.client = client;
 	}
 	
 	private static String parseTag(String answer, Member member, TextChannel textChannel, Guild guild, String args) {
@@ -49,18 +49,18 @@ public class CustomCommandsListener implements EventListener {
 		if (!(e instanceof GuildMessageReceivedEvent)) return;
 		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
+		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), client);
 		if (!discordGuild.getCustomCommands().check()) return;
 		String msg = event.getMessage().getRawContent().trim().toLowerCase().split("\\s+")[0];
 		String prefix = PrefixManager.getPrefix0(msg, discordGuild);
 		if (prefix == null) return;
-		if (!discordGuild.getMember(event.getMember(), container).hasPermission(Permissions.RUN_USRCMD, event.getJDA(), container))
+		if (!discordGuild.getMember(event.getMember(), client).hasPermission(Permissions.RUN_USRCMD, event.getJDA(), client))
 			return;
 		String baseCmd = msg.substring(prefix.length()).split("\\s+")[0];
 		CustomCommand command = discordGuild.getCustomCommands().getCustomCommand(baseCmd);
 		if (command == null) return;
 		String args = StringUtils.splitArgs(event.getMessage().getRawContent(), 2)[1];
 		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args);
-		container.getMessenger().sendMessage(event.getChannel(), answer).queue();
+		client.getMessenger().sendMessage(event.getChannel(), answer).queue();
 	}
 }

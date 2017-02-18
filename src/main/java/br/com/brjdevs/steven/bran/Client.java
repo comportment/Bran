@@ -13,8 +13,8 @@ import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.managers.jenkins.Jenkins;
 import br.com.brjdevs.steven.bran.core.poll.PollPersistence;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.Session;
-import br.com.brjdevs.steven.bran.core.utils.Util;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class BotContainer {
+public class Client {
 	
 	private static SimpleLog LOG = SimpleLog.getLog("BotContainer");
 	public Config config;
@@ -50,7 +50,7 @@ public class BotContainer {
 	public CommandManager commandManager;
 	public MusicPlayerManager playerManager;
 	public Jenkins jenkins;
-	private Bot[] shards;
+	private ClientShard[] shards;
 	private DiscordLog discordLog;
 	private int totalShards;
 	private AtomicLongArray lastEvents;
@@ -59,7 +59,7 @@ public class BotContainer {
 	private Session session;
 	private Messenger messenger;
 	
-	public BotContainer() throws LoginException, InterruptedException, RateLimitedException {
+	public Client() throws LoginException, InterruptedException, RateLimitedException {
 		this.ownerId = 0;
 		this.ownerShardId = 0;
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
@@ -69,7 +69,7 @@ public class BotContainer {
 		this.data = new BotData(this);
 		this.totalShards = getRecommendedShards();
 		this.lastEvents = new AtomicLongArray(totalShards);
-		this.shards = new Bot[totalShards];
+		this.shards = new ClientShard[totalShards];
 		initShards();
 		getOwner();
 		this.playerManager = new MusicPlayerManager(this);
@@ -84,7 +84,7 @@ public class BotContainer {
 		ItemContainer.loadItems();
 	}
 	
-	public Bot[] getShards() {
+	public ClientShard[] getShards() {
 		return shards;
 	}
 	
@@ -105,8 +105,8 @@ public class BotContainer {
 		return totalShards;
 	}
 	
-	public Bot[] getOnlineShards() {
-		return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(Bot[]::new);
+	public ClientShard[] getOnlineShards() {
+		return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(ClientShard[]::new);
 	}
 	
 	public DiscordLog getDiscordLog() {
@@ -149,7 +149,7 @@ public class BotContainer {
 		return lastEvents;
 	}
 	
-	public synchronized boolean reboot(Bot shard) {
+	public synchronized boolean reboot(ClientShard shard) {
 		try {
 			Map<Long, ImmutablePair<Long, MusicManager>> shardPlayers = new HashMap<>();
 			Map<Long, MusicManager> copy = new HashMap<>(playerManager.getMusicManagers());
@@ -158,7 +158,7 @@ public class BotContainer {
 				if (guild != null) {
 					if (guild.getAudioManager().isConnected() || guild.getAudioManager().isAttemptingToConnect()) {
 						shardPlayers.put(guildId, new ImmutablePair<>(Long.parseLong(guild.getAudioManager().getConnectedChannel().getId()), musicManager));
-						TextChannel channel = musicManager.getTrackScheduler().getCurrentTrack().getContext(shard.getJDA());
+						TextChannel channel = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
 						if (channel != null && channel.canTalk())
 							channel.sendMessage("I'm going to reboot this shard (#" + shard.getId() + "), I'll be right back...").queue();
 						musicManager.getTrackScheduler().setPaused(true);
@@ -167,17 +167,17 @@ public class BotContainer {
 				}
 			});
 			shard.getJDA().shutdown(false);
-			Util.sleep(5000);
+			OtherUtils.sleep(5000);
 			shard.restartJDA();
 			shardPlayers.forEach((id, pair) -> {
 				VoiceChannel channel = shard.getJDA().getVoiceChannelById(String.valueOf(pair.left));
 				MusicManager musicManager = pair.right;
 				if (channel == null) return;
 				channel.getGuild().getAudioManager().setSendingHandler(musicManager.getSendHandler());
-				AudioUtils.connect(channel, musicManager.getTrackScheduler().getCurrentTrack().getContext(shard.getJDA()), this);
+				AudioUtils.connect(channel, musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext(), this);
 				playerManager.getMusicManagers().put(id, musicManager);
 				musicManager.getTrackScheduler().setPaused(false);
-				TextChannel context = musicManager.getTrackScheduler().getCurrentTrack().getContext(shard.getJDA());
+				TextChannel context = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
 				if (context != null && context.canTalk())
 					context.sendMessage("Rebooted Shard, resuming the player...").queue();
 				
@@ -205,18 +205,18 @@ public class BotContainer {
 	private void initShards() throws LoginException, InterruptedException, RateLimitedException {
 		for (int i = 0; i < shards.length; i++) {
 			LOG.info("Starting shard #" + i + " of " + shards.length);
-			shards[i] = new Bot(i, totalShards, this);
+			shards[i] = new ClientShard(i, totalShards, this);
 			LOG.info("Finished shard #" + i);
 			Thread.sleep(5_000L);
 		}
-		for (Bot shard : shards) {
+		for (ClientShard shard : shards) {
 			setLastEvent(shard.getId(), System.currentTimeMillis());
 		}
 	}
 	
 	public User getOwner() {
 		if (ownerId != 0) return getShards()[ownerShardId].getJDA().getUserById(String.valueOf(ownerId));
-		for (Bot shard : shards) {
+		for (ClientShard shard : shards) {
 			User u = shard.getJDA().getUserById(config.getOwnerId());
 			if (u != null) {
 				ownerId = Long.parseLong(u.getId());
@@ -234,8 +234,8 @@ public class BotContainer {
 	public void shutdownAll(int exitCode) {
 		
 		playerManager.getMusicManagers().forEach((guildId, musicManager) -> {
-			Bot shard = musicManager.getShard();
-			TextChannel channel = musicManager.getTrackScheduler().getCurrentTrack().getContext(shard.getJDA());
+			if (musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null) return;
+			TextChannel channel = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
 			if (channel == null) return;
 			channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, strong and better.").queue();
 		});
@@ -243,7 +243,7 @@ public class BotContainer {
 		
 		dataManager.saveData();
 		
-		Stream.of(shards).forEach(Bot::shutdown);
+		Stream.of(shards).forEach(ClientShard::shutdown);
 		
 		System.exit(exitCode);
 	}

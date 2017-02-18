@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio.timers;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,17 +10,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MusicRegisterTimeout {
 	
-	public final BotContainer container;
+	public final Client client;
 	private final Map<String, Long> TIMING_OUT;
 	private boolean timingOutUpdated = false;
 	
-	public MusicRegisterTimeout(BotContainer container) {
-		this(new ConcurrentHashMap<>(), container);
+	public MusicRegisterTimeout(Client client) {
+		this(new ConcurrentHashMap<>(), client);
 	}
 	
-	public MusicRegisterTimeout(Map<String, Long> timingOut, BotContainer container) {
+	public MusicRegisterTimeout(Map<String, Long> timingOut, Client client) {
 		this.TIMING_OUT = Collections.synchronizedMap(timingOut);
-		this.container = container;
+		this.client = client;
 		
 		Thread thread = new Thread(this::threadcode, "MusicRegisterTimeout");
 		thread.setDaemon(true);
@@ -74,7 +74,7 @@ public class MusicRegisterTimeout {
 			if (!timingOutUpdated) {
 				String id = closestEntry.getKey();
 				TIMING_OUT.remove(id);
-				container.playerManager.unregister(Long.parseLong(id));
+				client.playerManager.unregister(Long.parseLong(id));
 			} else timingOutUpdated = false; //and the loop will restart and resolve it
 		}
 	}

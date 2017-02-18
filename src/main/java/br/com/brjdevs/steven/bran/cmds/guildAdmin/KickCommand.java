@@ -7,7 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.PermissionException;
@@ -48,7 +48,7 @@ public class KickCommand {
 							continue;
 						}
 						event.getGuild().getController().kick(user.getId()).queue(s -> {
-									String out = "Kicked " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
+									String out = "Kicked " + users.stream().filter(Objects::nonNull).map(OtherUtils::getUser).collect(Collectors.joining(", ")) + "!";
 									event.sendMessage(Quotes.SUCCESS, out).queue();
 								},
 								throwable -> {

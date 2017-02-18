@@ -1,6 +1,8 @@
-package br.com.brjdevs.steven.bran.core.utils;
+package br.com.brjdevs.steven.bran.core.managers;
 
-public class EightBallUtils {
+import br.com.brjdevs.steven.bran.core.utils.MathUtils;
+
+public class EightBallManager {
 	public static final String[] ANSWERS = {
 			"It is certain",
 			"It is decidedly so",

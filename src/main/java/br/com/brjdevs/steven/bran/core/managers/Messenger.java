@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.managers;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import net.dv8tion.jda.core.entities.Message;
@@ -10,10 +10,10 @@ import net.dv8tion.jda.core.requests.RestAction;
 
 public class Messenger {
 	
-	public BotContainer container;
+	public Client client;
 	
-	public Messenger(BotContainer container) {
-		this.container = container;
+	public Messenger(Client client) {
+		this.client = client;
 	}
 	
 	public RestAction<Message> sendMessage(MessageChannel channel, String content) {

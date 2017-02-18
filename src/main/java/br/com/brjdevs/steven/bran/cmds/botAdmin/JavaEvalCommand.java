@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.botAdmin;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -68,7 +68,7 @@ public class JavaEvalCommand {
 		                stream.write(getBodyWithLines((String) event.getArgument("java code").get()).getBytes());
 		                stream.close();
                         try {
-	                        FutureTask<?> task = new FutureTask<>(() -> compile(event.getBotContainer()));
+	                        FutureTask<?> task = new FutureTask<>(() -> compile(event.getClient()));
 	                        task.run();
 	                        x = task.get(15, TimeUnit.SECONDS);
                         } catch (TimeoutException e) {
@@ -100,7 +100,7 @@ public class JavaEvalCommand {
                         }
                         if (o == null || o.toString().isEmpty())
                             o = "Executed without error and no objects returned!";
-		                o = o.toString().replace(event.getBotContainer().config.getToken(), "<BOT TOKEN>");
+		                o = o.toString().replace(event.getClient().config.getToken(), "<BOT TOKEN>");
 		                event.sendMessage(o.toString()).queue();
 	                } catch (Exception e) {
 	                    if (x == null) x = e;
@@ -116,7 +116,7 @@ public class JavaEvalCommand {
 				.build();
 	}
 	
-	private static String compile(BotContainer container) throws Exception {
+	private static String compile(Client client) throws Exception {
 		if (!f.exists())
 			throw new UnexpectedException("Unable to compile source file.");
 		ProcessBuilder builder = new ProcessBuilder();
@@ -129,7 +129,7 @@ public class JavaEvalCommand {
 		
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(p.getErrorStream(), writer, Charset.forName("UTF-8"));
-		String x = writer.toString().replace(container.workingDir.getPath(), "<ClassPath>").replace("\\classes", "");
+		String x = writer.toString().replace(client.workingDir.getPath(), "<ClassPath>").replace("\\classes", "");
 		
 		sc.close();
 		scErr.close();

@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.botAdmin;
 
-import br.com.brjdevs.steven.bran.Bot;
+import br.com.brjdevs.steven.bran.ClientShard;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -9,7 +9,7 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 
 import java.util.stream.Stream;
 
@@ -30,15 +30,15 @@ public class ShardCommand {
 						.setAction((event) -> {
 							String shard = ((String) event.getArgument("shard").get());
 							if (shard.charAt(0) == '*') {
-								Stream.of(event.getBotContainer().getShards()).forEach(s -> event.sendMessage(Util.createShardInfo(s)).queue());
+								Stream.of(event.getClient().getShards()).forEach(s -> event.sendMessage(OtherUtils.createShardInfo(s)).queue());
 							} else {
 								if (!MathUtils.isInteger(shard)) {
 									event.sendMessage("You have to tell me a Shard ID or use `*` to get info on all shards!").queue();
 									return;
 								}
 								int shardId = Integer.parseInt(shard);
-								Bot s = event.getBotContainer().getShards()[shardId];
-								event.sendMessage(Util.createShardInfo(s)).queue();
+								ClientShard s = event.getClient().getShards()[shardId];
+								event.sendMessage(OtherUtils.createShardInfo(s)).queue();
 							}
 						})
 						.build())
@@ -50,22 +50,22 @@ public class ShardCommand {
 						.setAction((event) -> {
 							String shard = ((String) event.getArgument("shard").get());
 							if (shard.charAt(0) == '*') {
-								Stream.of(event.getBotContainer().getShards()).forEach(s -> {
+								Stream.of(event.getClient().getShards()).forEach(s -> {
 									try {
-										event.getBotContainer().reboot(s);
+										event.getClient().reboot(s);
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
-									Util.sleep(5_000L);
+									OtherUtils.sleep(5_000L);
 								});
 							} else {
 								if (!MathUtils.isInteger(shard)) {
 									return;
 								}
 								int shardId = Integer.parseInt(shard);
-								Bot s = event.getBotContainer().getShards()[shardId];
+								ClientShard s = event.getClient().getShards()[shardId];
 								try {
-									event.getBotContainer().reboot(s);
+									event.getClient().reboot(s);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}

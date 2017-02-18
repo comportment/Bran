@@ -29,7 +29,7 @@ public class YodaCommand {
 					try {
 						String string = URLEncoder.encode((String) argument.get(), "UTF-8");
 						response = Unirest.get("https://yoda.p.mashape.com/yoda?sentence=" + string)
-								.header("X-Mashape-Key", event.getBotContainer().config.getMashapeKey())
+								.header("X-Mashape-Key", event.getClient().config.getMashapeKey())
 								.header("Accept", "text/plain")
 								.asString();
 					} catch (Exception e) {

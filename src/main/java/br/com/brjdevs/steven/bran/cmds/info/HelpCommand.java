@@ -26,7 +26,7 @@ public class HelpCommand {
 						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
 						return;
 					}
-					CommandManager commandManager = event.getBotContainer().commandManager;
+					CommandManager commandManager = event.getClient().commandManager;
 					commandManager.getCommands().sort(Comparator.comparing(ICommand::getCategory));
 					StringBuilder builder = new StringBuilder();
 					for (Category category : Category.values()) {

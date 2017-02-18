@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio.timers;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.audio.MusicManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
 import br.com.brjdevs.steven.bran.core.audio.TrackScheduler;
@@ -16,17 +16,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChannelLeaveTimer {
 	
-	public final BotContainer container;
+	public final Client client;
 	private final Map<String, ImmutablePair<Long, String>> TIMING_OUT;
 	private boolean timingOutUpdated = false;
 	
-	public ChannelLeaveTimer(BotContainer container) {
-		this(new ConcurrentHashMap<>(), container);
+	public ChannelLeaveTimer(Client client) {
+		this(new ConcurrentHashMap<>(), client);
 	}
 	
-	public ChannelLeaveTimer(Map<String, ImmutablePair<Long, String>> timingOut, BotContainer container) {
+	public ChannelLeaveTimer(Map<String, ImmutablePair<Long, String>> timingOut, Client client) {
 		this.TIMING_OUT = Collections.synchronizedMap(timingOut);
-		this.container = container;
+		this.client = client;
 		
 		Thread thread = new Thread(this::threadcode, "ChannelLeaveTimeout");
 		thread.setDaemon(true);
@@ -90,17 +90,16 @@ public class ChannelLeaveTimer {
 			if (!timingOutUpdated) {
 				String id = closestEntry.getKey();
 				TIMING_OUT.remove(id);
-				JDA jda = container.getShards()[container.calcShardId(Long.parseLong(id))].getJDA();
+				JDA jda = client.getShards()[client.calcShardId(Long.parseLong(id))].getJDA();
 				Guild guild = jda.getGuildById(id);
 				if (guild == null) return;
-				MusicManager musicManager = container.playerManager.get(guild);
+				MusicManager musicManager = client.playerManager.get(guild);
 				TrackScheduler scheduler = musicManager.getTrackScheduler();
-				TrackContext track = scheduler.getCurrentTrack();
-				if (track == null) track = scheduler.getPreviousTrack();
-				scheduler.getQueue().clear();
-				scheduler.play(musicManager.getTrackScheduler().provideNextTrack(true), false);
-				if (track.getContext(jda) != null && track.getContext(jda).canTalk())
-					track.getContext(jda).sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
+				TrackContext track = scheduler.getQueue().getCurrentTrack();
+				scheduler.getQueue().getRawQueue().clear();
+				scheduler.getQueue().next(true);
+				if (track.getContext() != null && track.getContext().canTalk())
+					track.getContext().sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
 				musicManager.getTrackScheduler().setPaused(false);
 				if (guild.getAudioManager().isConnected())
 					guild.getAudioManager().closeAudioConnection();

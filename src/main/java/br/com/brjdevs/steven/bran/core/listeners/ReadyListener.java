@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -10,10 +10,10 @@ public class ReadyListener implements EventListener {
 	
 	private static final SimpleLog LOG = SimpleLog.getLog("Ready Listener");
 	
-	public BotContainer container;
+	public Client client;
 	
-	public ReadyListener(BotContainer container) {
-		this.container = container;
+	public ReadyListener(Client client) {
+		this.client = client;
 	}
 	
 	@Override

@@ -1,11 +1,11 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
-import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.ClientShard;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
-import br.com.brjdevs.steven.bran.core.utils.Util;
 import br.com.brjdevs.steven.bran.features.hangman.events.*;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -40,8 +40,8 @@ public class HangManGame {
 	private int shard;
 	private int usedItems;
 	
-	public HangManGame(Profile profile, String word, TextChannel channel, BotContainer container) {
-		this.listener = new EventListener(container);
+	public HangManGame(Profile profile, String word, TextChannel channel, Client client) {
+		this.listener = new EventListener(client);
 		this.guesses = new LinkedHashMap<>();
 		this.creator = profile;
 		this.mistakes = new ArrayList<>();
@@ -50,12 +50,12 @@ public class HangManGame {
 		this.invitedUsers = new ArrayList<>();
 		this.lastGuess = System.currentTimeMillis();
 		this.channel = channel.getId();
-		this.shard = container.getShardId(channel.getJDA());
-		this.profileListener = new HMProfileListener(this, container);
+		this.shard = client.getShardId(channel.getJDA());
+		this.profileListener = new HMProfileListener(this, client);
 		this.usedItems = 0;
 		Arrays.stream(word.split(""))
 				.forEach(split ->
-						guesses.put(guesses.containsKey(split) ? split + Util.randomName(3) : split, false));
+						guesses.put(guesses.containsKey(split) ? split + StringUtils.randomName(3) : split, false));
 		if (word.contains(" ")) {
 			guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == ' ').forEach(entry -> guesses.replace(entry.getKey(), true));
 		}
@@ -75,12 +75,12 @@ public class HangManGame {
 		return lastGuess;
 	}
 	
-	public TextChannel getChannel(BotContainer container) {
-		return getShard(container).getJDA().getTextChannelById(channel);
+	public TextChannel getChannel(Client client) {
+		return getShard(client).getJDA().getTextChannelById(channel);
 	}
 	
-	public Bot getShard(BotContainer container) {
-		return container.getShards()[shard];
+	public ClientShard getShard(Client client) {
+		return client.getShards()[shard];
 	}
 	
 	public boolean isMultiplayer() {
@@ -112,27 +112,27 @@ public class HangManGame {
 		return 5 + (getInvitedUsers().size() * 3);
 	}
 	
-	public void guess(String string, Profile profile, BotContainer container) {
+	public void guess(String string, Profile profile, Client client) {
 		this.lastGuess = System.currentTimeMillis();
 		if (isGuessed(string)) {
-			getListener().onEvent(new AlreadyGuessedEvent(this, getShard(container).getJDA(), profile, StringUtils.containsEqualsIgnoreCase(getWord(), string), string));
+			getListener().onEvent(new AlreadyGuessedEvent(this, getShard(client).getJDA(), profile, StringUtils.containsEqualsIgnoreCase(getWord(), string), string));
 			return;
 		}
 		if (isInvalid(string)) {
 			mistakes.add(string);
 			if (mistakes.size() > getMaxErrors()) {
-				getListener().onEvent(new LooseEvent(this, getShard(container).getJDA(), false));
+				getListener().onEvent(new LooseEvent(this, getShard(client).getJDA(), false));
 				return;
 			}
-			getListener().onEvent(new GuessEvent(this, getShard(container).getJDA(), profile, false, string));
+			getListener().onEvent(new GuessEvent(this, getShard(client).getJDA(), profile, false, string));
 			return;
 		}
 		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == String.valueOf(string).toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
 		if (getGuessedLetters().equals(getWord())) {
-			getListener().onEvent(new WinEvent(this, getShard(container).getJDA()));
+			getListener().onEvent(new WinEvent(this, getShard(client).getJDA()));
 			return;
 		}
-		getListener().onEvent(new GuessEvent(this, getShard(container).getJDA(), profile, true, string));
+		getListener().onEvent(new GuessEvent(this, getShard(client).getJDA(), profile, true, string));
 	}
 
 	public String getGuessedLetters() {
@@ -152,7 +152,7 @@ public class HangManGame {
 	}
 
 	public boolean isGuessed(String c) {
-		return Util.containsEqualsIgnoreCase(getGuesses(), c) || Util.containsEqualsIgnoreCase(getMistakes(), c);
+		return OtherUtils.containsEqualsIgnoreCase(getGuesses(), c) || OtherUtils.containsEqualsIgnoreCase(getMistakes(), c);
 	}
 	
 	public boolean isInvalid(String c) {
@@ -180,8 +180,8 @@ public class HangManGame {
 		return new Field("_ _", "**These are your current guesses:** " + getGuessedLetters() + "\n**These are your current mistakes:** " + String.join(", ", getMistakes().stream().map(String::valueOf).collect(Collectors.toList())) + "         *Total Mistakes: " + getMistakes().size() + "/" + getMaxErrors() + "*", inline);
 	}
 	
-	public Field getInvitedUsersField(boolean inline, BotContainer container) {
-		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + container.config.getDefaultPrefixes().get(0) + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getShard(container).getJDA()).getName()).collect(Collectors.toList()))), inline);
+	public Field getInvitedUsersField(boolean inline, Client client) {
+		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + client.config.getDefaultPrefixes().get(0) + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getShard(client).getJDA()).getName()).collect(Collectors.toList()))), inline);
 	}
 	
 	public int getUsedItems() {
@@ -207,13 +207,13 @@ public class HangManGame {
 		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == string.toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
 	}
 	
-	public EmbedBuilder createEmbed(BotContainer container) {
+	public EmbedBuilder createEmbed(Client client) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Hang Man", null);
-		builder.setFooter("Session created by " + getCreator().getUser(getShard(container).getJDA()).getName(), Util.getAvatarUrl(getCreator().getUser(getShard(container).getJDA())));
+		builder.setFooter("Session created by " + getCreator().getUser(getShard(client).getJDA()).getName(), OtherUtils.getAvatarUrl(getCreator().getUser(getShard(client).getJDA())));
 		builder.setColor(getCreator().getEffectiveColor());
 		builder.addField(getCurrentGuessesField(false));
-		builder.addField(getInvitedUsersField(false, container));
+		builder.addField(getInvitedUsersField(false, client));
 		return builder;
 	}
 	public void end() {

@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.command;
 
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.managers.Expirator;
+import br.com.brjdevs.steven.bran.core.managers.ExpirationManager;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 
@@ -19,7 +19,7 @@ public class CommandStatsManager {
 			HOUR_CMDS = new HashMap<>(),
 			MINUTE_CMDS = new HashMap<>();
 	
-	private static final Expirator EXPIRATOR = new Expirator();
+	private static final ExpirationManager EXPIRATION_MANAGER = new ExpirationManager();
 	private static final int MINUTE = 60000, HOUR = 3600000, DAY = 86400000;
 	
 	public static void log(ICommand cmd) {
@@ -28,9 +28,9 @@ public class CommandStatsManager {
 		DAY_CMDS.computeIfAbsent(cmd, k -> new AtomicInteger(0)).incrementAndGet();
 		HOUR_CMDS.computeIfAbsent(cmd, k -> new AtomicInteger(0)).incrementAndGet();
 		MINUTE_CMDS.computeIfAbsent(cmd, k -> new AtomicInteger(0)).incrementAndGet();
-		EXPIRATOR.letExpire(millis + MINUTE, () -> MINUTE_CMDS.get(cmd).decrementAndGet());
-		EXPIRATOR.letExpire(millis + HOUR, () -> HOUR_CMDS.get(cmd).decrementAndGet());
-		EXPIRATOR.letExpire(millis + DAY, () -> DAY_CMDS.get(cmd).decrementAndGet());
+		EXPIRATION_MANAGER.letExpire(millis + MINUTE, () -> MINUTE_CMDS.get(cmd).decrementAndGet());
+		EXPIRATION_MANAGER.letExpire(millis + HOUR, () -> HOUR_CMDS.get(cmd).decrementAndGet());
+		EXPIRATION_MANAGER.letExpire(millis + DAY, () -> DAY_CMDS.get(cmd).decrementAndGet());
 	}
 	
 	public static EmbedBuilder fillEmbed(Map<ICommand, AtomicInteger> commands, EmbedBuilder builder) {

@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.managers.jenkins;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -19,10 +19,10 @@ import java.nio.channels.FileChannel;
 
 public class Jenkins {
 	
-	public BotContainer container;
+	public Client client;
 	
-	public Jenkins(BotContainer container) {
-		this.container = container;
+	public Jenkins(Client client) {
+		this.client = client;
 	}
 	
 	private void copyFile(File sourceFile, File destFile) throws IOException {
@@ -54,7 +54,7 @@ public class Jenkins {
 		
 		// Then provide the right credentials
 		client.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-				new UsernamePasswordCredentials(container.config.getJenkinsUser(), container.config.getJenkinsPass()));
+				new UsernamePasswordCredentials(this.client.config.getJenkinsUser(), this.client.config.getJenkinsPass()));
 		
 		// Generate BASIC scheme object and stick it to the execution context
 		BasicScheme basicAuth = new BasicScheme();
@@ -66,7 +66,7 @@ public class Jenkins {
 		client.addRequestInterceptor(new PreemptiveAuth(), 0);
 		
 		// You get request that will start the build
-		HttpGet get = new HttpGet(container.config.getJenkinsLatestBuild() + container.config.getJenkinsToken());
+		HttpGet get = new HttpGet(this.client.config.getJenkinsLatestBuild() + this.client.config.getJenkinsToken());
 		CloseableHttpResponse response = client.execute(get, context);
 		
 		if (response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK) {

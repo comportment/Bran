@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.poll;
 
-import br.com.brjdevs.steven.bran.BotContainer;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -25,16 +25,16 @@ public class PollPersistence {
 		LOG = SimpleLog.getLog("Poll Persistence");
 	}
 	
-	private BotContainer container;
+	private Client client;
 	
-	public PollPersistence(BotContainer container) {
-		this.container = container;
+	public PollPersistence(Client client) {
+		this.client = client;
 		new Thread(this::reloadPolls);
 	}
 	
 	@SneakyThrows(Exception.class)
 	public boolean savePolls() {
-		if (!container.config.isPollPersistenceEnabled()) {
+		if (!client.config.isPollPersistenceEnabled()) {
 			LOG.info("Poll Persistence is disabled in config.json.");
 			return true;
 		}
@@ -58,7 +58,7 @@ public class PollPersistence {
 	
 	@SneakyThrows(Exception.class)
 	public boolean reloadPolls() {
-		if (!container.config.isPollPersistenceEnabled()) {
+		if (!client.config.isPollPersistenceEnabled()) {
 			LOG.info("Poll Persistence is disabled in config.json.");
 			return true;
 		}
@@ -76,13 +76,13 @@ public class PollPersistence {
 		for (File file : files) {
 			try {
 				String guildId = file.getName();
-				int shardId = (int) (Long.parseLong(guildId) >> 22) % container.getShards().length;
+				int shardId = (int) (Long.parseLong(guildId) >> 22) % client.getShards().length;
 				BufferedReader reader = new BufferedReader(new FileReader(file));
 				Poll poll = GSON.fromJson(reader, Poll.class);
 				poll.setShardId(shardId);
 				EmbedBuilder builder = new EmbedBuilder();
 				builder.setTitle(poll.getPollName(), null);
-				builder.setFooter("This Poll was created by " + Util.getUser(poll.getCreator(container)), Util.getAvatarUrl(poll.getCreator(container)));
+				builder.setFooter("This Poll was created by " + OtherUtils.getUser(poll.getCreator(client)), OtherUtils.getAvatarUrl(poll.getCreator(client)));
 				StringBuilder stringBuilder = new StringBuilder();
 				stringBuilder.append("**Current Votes**\n");
 				poll.getOptions().forEach(option ->
@@ -92,7 +92,7 @@ public class PollPersistence {
 				Message message = new MessageBuilder().setEmbed(builder.build())
 						.append("I just restarted for a short time but the Poll is back!")
 						.build();
-				poll.getChannel(container).sendMessage(message).queue();
+				poll.getChannel(client).sendMessage(message).queue();
 				Poll.getRunningPolls().add(poll);
 				if (!file.delete()) {
 					LOG.fatal("Failed to delete File " + file.getPath());

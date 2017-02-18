@@ -1,19 +1,28 @@
 package br.com.brjdevs.steven.bran.core.data.guild.settings;
 
-import lombok.Getter;
-import lombok.Setter;
-
 public class MusicSettings {
 	
-	@Getter
-	@Setter
-	private boolean enabled;
-	@Getter
-	@Setter
 	private long maxSongsPerUser;
+	private int fairQueueLevel;
 	
 	public MusicSettings() {
 		this.maxSongsPerUser = -1L;
-		this.enabled = true;
+		this.fairQueueLevel = 0;
+	}
+	
+	public int getFairQueueLevel() {
+		return fairQueueLevel;
+	}
+	
+	public void setFairQueueLevel(int fairQueueLevel) {
+		this.fairQueueLevel = fairQueueLevel;
+	}
+	
+	public long getMaxSongsPerUser() {
+		return maxSongsPerUser;
+	}
+	
+	public void setMaxSongsPerUser(long maxSongsPerUser) {
+		this.maxSongsPerUser = maxSongsPerUser;
 	}
 }

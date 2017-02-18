@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.DiscordLog.Level;
 import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -14,29 +14,29 @@ public class ConnectionListener implements EventListener {
 		LOG = SimpleLog.getLog("Connection Listener");
 	}
 	
-	public BotContainer container;
+	public Client client;
 	
-	public ConnectionListener(BotContainer container) {
-		this.container = container;
+	public ConnectionListener(Client client) {
+		this.client = client;
 	}
 	
 	@Override
 	public void onEvent(Event event) {
 		if (event instanceof ReconnectedEvent) {
-			LOG.info("ReconnectedEvent on Shard " + container.getShardId(event.getJDA()));
-			container.getDiscordLog().logToDiscord("Connection Listener", "ReconnectedEvent on Shard " + container.getShardId(event.getJDA()), Level.INFO);
+			LOG.info("ReconnectedEvent on Shard " + client.getShardId(event.getJDA()));
+			client.getDiscordLog().logToDiscord("Connection Listener", "ReconnectedEvent on Shard " + client.getShardId(event.getJDA()), Level.INFO);
 		} else if (event instanceof DisconnectEvent) {
-			LOG.info("DisconnectEvent on Shard " + container.getShardId(event.getJDA()));
-			container.getDiscordLog().logToDiscord("Connection Listener", "DisconnectedEvent on Shard " + container.getShardId(event.getJDA()), Level.WARN);
+			LOG.info("DisconnectEvent on Shard " + client.getShardId(event.getJDA()));
+			client.getDiscordLog().logToDiscord("Connection Listener", "DisconnectedEvent on Shard " + client.getShardId(event.getJDA()), Level.WARN);
 		} else if (event instanceof ShutdownEvent) {
-			LOG.info("ShutdownEvent on Shard " + container.getShardId(event.getJDA()));
-			container.getDiscordLog().logToDiscord("Connection Listener", "ShutdownEvent on Shard " + container.getShardId(event.getJDA()), Level.INFO);
+			LOG.info("ShutdownEvent on Shard " + client.getShardId(event.getJDA()));
+			client.getDiscordLog().logToDiscord("Connection Listener", "ShutdownEvent on Shard " + client.getShardId(event.getJDA()), Level.INFO);
 		} else if (event instanceof ResumedEvent) {
-			LOG.info("ResumedEvent on Shard " + container.getShardId(event.getJDA()));
-			container.getDiscordLog().logToDiscord("Connection Listener", "ResumedEvent on Shard " + container.getShardId(event.getJDA()), Level.INFO);
+			LOG.info("ResumedEvent on Shard " + client.getShardId(event.getJDA()));
+			client.getDiscordLog().logToDiscord("Connection Listener", "ResumedEvent on Shard " + client.getShardId(event.getJDA()), Level.INFO);
 		} else if (event instanceof StatusChangeEvent) {
-			LOG.info("Status Changed from `" + ((StatusChangeEvent) event).getOldStatus() + "` to `" + ((StatusChangeEvent) event).getStatus() + "` on Shard " + container.getShardId(event.getJDA()));
-			container.getDiscordLog().logToDiscord("Connection Listener", "Status Changed from `" + ((StatusChangeEvent) event).getOldStatus() + "` to `" + ((StatusChangeEvent) event).getStatus() + "` on Shard " + container.getShardId(event.getJDA()), Level.INFO);
+			LOG.info("Status Changed from `" + ((StatusChangeEvent) event).getOldStatus() + "` to `" + ((StatusChangeEvent) event).getStatus() + "` on Shard " + client.getShardId(event.getJDA()));
+			client.getDiscordLog().logToDiscord("Connection Listener", "Status Changed from `" + ((StatusChangeEvent) event).getOldStatus() + "` to `" + ((StatusChangeEvent) event).getStatus() + "` on Shard " + client.getShardId(event.getJDA()), Level.INFO);
 		}
 	}
 }

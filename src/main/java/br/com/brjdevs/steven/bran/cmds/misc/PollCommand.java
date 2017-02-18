@@ -10,7 +10,7 @@ import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Option;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.awt.*;
@@ -66,7 +66,7 @@ public class PollCommand {
 								LinkedList<Option> options = new LinkedList<>();
 								for (String string : list)
 									options.add(new Option(list.indexOf(string), string));
-								new Poll(name, event.getMember(), options, event.getTextChannel(), event.getBotContainer());
+								new Poll(name, event.getMember(), options, event.getTextChannel(), event.getClient());
 								event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll add reactions to the message as the votes get added/removed.").queue();
 							}
 						})
@@ -83,7 +83,7 @@ public class PollCommand {
 							}
 							EmbedBuilder builder = new EmbedBuilder();
 							builder.setTitle(poll.getPollName(), null);
-							builder.setFooter("This Poll was created by " + Util.getUser(event.getJDA().getUserById(poll.getCreatorId())), Util.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
+							builder.setFooter("This Poll was created by " + OtherUtils.getUser(event.getJDA().getUserById(poll.getCreatorId())), OtherUtils.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
 							StringBuilder stringBuilder = new StringBuilder();
 							stringBuilder.append("**Current Votes**\n");
 							poll.getOptions().forEach(option ->
@@ -103,14 +103,14 @@ public class PollCommand {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
 							}
-							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getBotContainer())) {
+							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getClient())) {
 								event.sendMessage("You can't do this... You're not the creator of this poll nor a Guild Moderator to end this poll!").queue();
 								return;
 							}
 							boolean wasOwner = poll.getCreatorId().equals(event.getAuthor().getId());
 							EmbedBuilder builder = new EmbedBuilder();
 							builder.setTitle(poll.getPollName(), null);
-							builder.setFooter("This Poll was created by " + Util.getUser(event.getJDA().getUserById(poll.getCreatorId())), Util.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
+							builder.setFooter("This Poll was created by " + OtherUtils.getUser(event.getJDA().getUserById(poll.getCreatorId())), OtherUtils.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
 							StringBuilder stringBuilder = new StringBuilder();
 							if (!wasOwner) stringBuilder.append("**This Poll was forcibly ended by a moderator!**\n\n");
 							else stringBuilder.append("**The Poll creator has stopped it.**\n\n");

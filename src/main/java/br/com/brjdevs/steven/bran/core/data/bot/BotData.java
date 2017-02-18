@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.data.bot;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.Main;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Blacklist;
 import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
@@ -20,9 +20,9 @@ public class BotData {
 	private final Blacklist Blacklist = new Blacklist();
 	private final Map<String, Profile> profiles = new HashMap<>();
 	
-	public BotData(BotContainer botContainer) {
-		if (!botContainer.workingDir.exists())
-			botContainer.workingDir.mkdirs();
+	public BotData(Client client) {
+		if (!client.workingDir.exists())
+			client.workingDir.mkdirs();
 	}
 	
 	public Blacklist getBlacklist() {
@@ -41,9 +41,9 @@ public class BotData {
 		return HangManWords;
 	}
 	
-	public void save(BotContainer botContainer) {
+	public void save(Client client) {
 		try {
-			File file = new File(botContainer.workingDir, "botData.json");
+			File file = new File(client.workingDir, "botData.json");
 			if (!file.exists()) assert file.createNewFile();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			writer.write(Main.GSON.toJson(this));

@@ -5,7 +5,7 @@ import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.utils.EightBallUtils;
+import br.com.brjdevs.steven.bran.core.managers.EightBallManager;
 
 import java.util.regex.Pattern;
 
@@ -30,7 +30,7 @@ public class EightBallCommand {
 						event.sendMessage("\uD83C\uDFB1 *`This doesn't sound like a question...`*").queue();
 						return;
 					}
-					event.sendMessage("\uD83C\uDFB1 *`" + EightBallUtils.getRandomAnswer() + "`*").queue();
+					event.sendMessage("\uD83C\uDFB1 *`" + EightBallManager.getRandomAnswer() + "`*").queue();
 				})
 				.build();
 	}

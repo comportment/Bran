@@ -12,9 +12,9 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
-import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -51,7 +51,7 @@ public class MusicCommand {
 						.setArgs(new Argument<>("title/url", String.class, true))
 						.setAction((event, args) -> {
 							String trackUrl = event.getArgument("title/url").isPresent() ? ((String) event.getArgument("title/url").get()) : "";
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
+							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
 							
 							if (trackUrl.isEmpty()) {
 								if (musicManager.getTrackScheduler().isPaused()) {
@@ -67,7 +67,7 @@ public class MusicCommand {
 							}
 							VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
 							if (vchan == null && event.getMember().getVoiceState().inVoiceChannel()) {
-								vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel(), event.getBotContainer());
+								vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel(), event.getClient());
 								if (vchan == null) return;
 							} else if (vchan == null && !event.getMember().getVoiceState().inVoiceChannel()) {
 								event.sendMessage(Quotes.FAIL, "Before asking for songs you should join a Voice Channel ").queue();
@@ -83,7 +83,7 @@ public class MusicCommand {
 							}
 							if (event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE))
 								event.getMessage().delete().queue();
-							TrackScheduler scheduler = event.getBotContainer().playerManager.get(event.getGuild()).getTrackScheduler();
+							TrackScheduler scheduler = event.getClient().playerManager.get(event.getGuild()).getTrackScheduler();
 							List<TrackContext> tracksByUser = scheduler.getTracksBy(event.getAuthor());
 							if (event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser() > 0 && tracksByUser.size() >= event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser()) {
 								event.sendMessage("You can only have " + event.getDiscordGuild().getMusicSettings().getMaxSongsPerUser() + " songs in the queue.").queue();
@@ -94,7 +94,7 @@ public class MusicCommand {
 							} catch (MalformedURLException ignored) {
 								trackUrl = "ytsearch:" + trackUrl;
 							}
-							event.getBotContainer().playerManager.loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
+							event.getClient().playerManager.loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -102,26 +102,26 @@ public class MusicCommand {
 						.setName("Music NowPlaying Command")
 						.setDescription("Gives you information about the current song.")
 						.setAction((event) -> {
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
-							if (musicManager.getTrackScheduler().isStopped()) {
+							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
+							if (musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null) {
 								event.sendMessage("I'm not playing anything, use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
 								return;
 							}
 							AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
-							TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
+							TrackContext context = musicManager.getTrackScheduler().getQueue().getCurrentTrack();
 							TrackScheduler scheduler = musicManager.getTrackScheduler();
-							Iterator<TrackContext> it = scheduler.getQueue().iterator();
+							Iterator<TrackContext> it = scheduler.getQueue().getRawQueue().iterator();
 							TrackContext next = it.hasNext() ? it.next() : null;
 							VoiceChannel channel = event.getGuild().getAudioManager().isAttemptingToConnect() ? event.getGuild().getAudioManager().getQueuedAudioConnection() : event.getGuild().getAudioManager().getConnectedChannel();
 							String out = "[Current song information for `" + channel.getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
-							out += "\uD83D\uDC49 DJ » `" + Util.getUser(context.getDJ(event.getJDA())) + "`\n\n";
-							out += (scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : scheduler.isShuffle() ? SHUFFLE : PLAYING) + " ";
+							out += "\uD83D\uDC49 DJ » `" + OtherUtils.getUser(context.getDJ()) + "`\n\n";
+							out += (scheduler.isPaused() ? PAUSED : scheduler.getQueue().isRepeat() ? REPEAT : PLAYING) + " ";
 							out += AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length) + " [" + AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "]";
 							if (next != null) {
 								info = next.getTrack().getInfo();
 								out += "\n\n";
 								out += "[Next up in ` " + channel.getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
-								out += "\uD83D\uDC49 DJ » `" + Util.getUser(next.getDJ(event.getJDA())) + "`\n";
+								out += "\uD83D\uDC49 DJ » `" + OtherUtils.getUser(next.getDJ()) + "`\n";
 								out += "\uD83D\uDC49 Duration » " + " `" + AudioUtils.format(info.length) + "`";
 							}
 							event.sendMessage(out).queue();
@@ -135,31 +135,31 @@ public class MusicCommand {
 						.setAction((event, args) -> {
 							Argument argument = event.getArgument("page");
 							int page = argument.isPresent() && (int) argument.get() > 0 ? (int) argument.get() : 1;
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
+							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
 							StringBuilder builder = new StringBuilder();
-							if (musicManager.getTrackScheduler().getQueue().isEmpty()) {
-								event.sendMessage("The queue is empty, use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
-								return;
-							}
-							List<String> list = musicManager.getTrackScheduler().getQueue().stream().map(track -> {
+							List<String> list = musicManager.getTrackScheduler().getQueue().getRawQueue().stream().map(track -> {
 								AudioTrackInfo i = track.getTrack().getInfo();
-								return "**" + (musicManager.getTrackScheduler().getPosition(track) + 1) + "**) " + i.title + " » (`" + AudioUtils.format(i.length) + "`)" + " (DJ: `" + Util.getUser(track.getDJ(event.getJDA())) + "`)";
+								return "**" + (musicManager.getTrackScheduler().getPosition(track) + 1) + "**) " + i.title + " » (`" + AudioUtils.format(i.length) + "`)" + " (DJ: `" + OtherUtils.getUser(track.getDJ()) + "`)";
 							}).collect(Collectors.toList());
 							TrackScheduler scheduler = musicManager.getTrackScheduler();
 							VoiceChannel channel = event.getGuild().getAudioManager().isAttemptingToConnect() ? event.getGuild().getAudioManager().getQueuedAudioConnection() : event.getGuild().getAudioManager().getConnectedChannel();
 							if (musicManager.getPlayer().getPlayingTrack() != null) {
 								AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
-								TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
+								TrackContext context = musicManager.getTrackScheduler().getQueue().getCurrentTrack();
 								builder.append("[Current song information for `").append(channel.getName()).append("`] \uD83C\uDFB6 ").append(info.title).append("\n\n");
-								builder.append("\uD83D\uDC49 DJ » `").append(Util.getUser(context.getDJ(event.getJDA()))).append("`\n\n");
-								builder.append(scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : scheduler.isShuffle() ? SHUFFLE : PLAYING).append(" ");
+								builder.append("\uD83D\uDC49 DJ » `").append(OtherUtils.getUser(context.getDJ())).append("`\n\n");
+								builder.append(scheduler.isPaused() ? PAUSED : scheduler.getQueue().isRepeat() ? REPEAT : PLAYING).append(" ");
 								builder.append(AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length)).append(" [").append(AudioUtils.format(context.getTrack().getPosition())).append("/").append(AudioUtils.format(info.length)).append("]");
 								builder.append("\n");
 							}
-							ListBuilder listBuilder = new ListBuilder(list, page, 10);
+							StringListBuilder listBuilder = new StringListBuilder(list, page, 10);
 							builder.append("\n[Queue information for `").append(event.getGuild().getName()).append("`] (").append(scheduler.getQueue().size()).append(" entries) - Page ").append(page).append("/").append(listBuilder.getMaxPages()).append("\n\n");
-							builder.append(listBuilder.format(Format.NONE));
-							builder.append("\n\n__Total Queue Duration__: ").append(scheduler.getQueueDuration());
+							if (!scheduler.getQueue().isEmpty()) {
+								builder.append(listBuilder.format(Format.NONE));
+								builder.append("\n\n__Total Queue Duration__: ").append(scheduler.getQueueDuration());
+							} else {
+								builder.append("The queue is empty.");
+							}
 							event.sendMessage(builder.toString()).queue();
 						})
 						.build())
@@ -169,9 +169,9 @@ public class MusicCommand {
 						.setDescription("Toggles the Repeat.")
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
-							musicManager.getTrackScheduler().setRepeat(!musicManager.getTrackScheduler().isRepeat());
-							event.sendMessage(musicManager.getTrackScheduler().isRepeat() ? "The player is now on repeat." : "The player is no longer on repeat.").queue();
+							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
+							musicManager.getTrackScheduler().getQueue().setRepeat(!musicManager.getTrackScheduler().getQueue().isRepeat());
+							event.sendMessage(musicManager.getTrackScheduler().getQueue().isRepeat() ? "The player is now on repeat." : "The player is no longer on repeat.").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -180,7 +180,7 @@ public class MusicCommand {
 						.setDescription("Pauses/Resumes the player.")
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
+							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
 							if (musicManager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I can't pause if I'm not playing anything.").queue();
 								return;
@@ -195,7 +195,7 @@ public class MusicCommand {
 						.setDescription("Completely stops the Music Player.")
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
+							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
 							if (musicManager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I can't stop if I'm not playing anything.").queue();
 								return;
@@ -210,9 +210,9 @@ public class MusicCommand {
 						.setDescription("Set the Queue to Shuffle.")
 						.setRequiredPermission(DJ)
 						.setAction((event) -> {
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
-							musicManager.getTrackScheduler().setShuffle(!musicManager.getTrackScheduler().isShuffle());
-							event.sendMessage(musicManager.getTrackScheduler().isShuffle() ? "The player is now set to shuffle." : "The player is no longer set to shuffle.").queue();
+							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
+							musicManager.getTrackScheduler().getQueue().shuffle();
+							event.sendMessage("Shuffled the Queue!").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -223,7 +223,7 @@ public class MusicCommand {
 						.setAction((event) -> {
 							VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
 							if (vchan == null && event.getMember().getVoiceState().inVoiceChannel()) {
-								vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel(), event.getBotContainer());
+								vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel(), event.getClient());
 								if (vchan == null) return;
 							} else if (vchan == null && !event.getMember().getVoiceState().inVoiceChannel()) {
 								event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to track you. Are you even in a voice channel?").queue();
@@ -237,18 +237,9 @@ public class MusicCommand {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
-							MusicManager musicManager = event.getBotContainer().playerManager.get(event.getGuild());
+							MusicManager musicManager = event.getClient().playerManager.get(event.getGuild());
 							TrackScheduler scheduler = musicManager.getTrackScheduler();
-							if (scheduler.getCurrentTrack() != null)
-								event.sendMessage("Restarting the current song...").queue();
-							else if (scheduler.getPreviousTrack() != null)
-								event.sendMessage("Restarting the previous song...").queue();
-							else {
-								event.sendMessage("The player has never played a song in the last 30 minutes, so it cannot restart a song.").queue();
-								event.getGuild().getAudioManager().closeAudioConnection();
-								return;
-							}
-							musicManager.getTrackScheduler().restartSong();
+							musicManager.getTrackScheduler().getQueue().restartSong(event.getTextChannel());
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -256,7 +247,7 @@ public class MusicCommand {
 						.setName("Music Vote Skip Command")
 						.setDescription("Voting for skipping song.")
 						.setAction((event) -> {
-							MusicManager manager = event.getBotContainer().playerManager.get(event.getGuild());
+							MusicManager manager = event.getClient().playerManager.get(event.getGuild());
 							TrackScheduler scheduler = manager.getTrackScheduler();
 							VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
 							if (vchan == null) {
@@ -267,11 +258,11 @@ public class MusicCommand {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
-							if (manager.getPlayer().getPlayingTrack() == null) {
+							if (manager.getTrackScheduler().getQueue().getCurrentTrack() == null) {
 								event.sendMessage("I'm not playing anything! Use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
 								return;
 							}
-							TrackContext context = scheduler.getCurrentTrack();
+							TrackContext context = scheduler.getQueue().getCurrentTrack();
 							if (AudioUtils.isAllowed(event.getAuthor(), context)) {
 								event.sendMessage("The DJ has decided to skip!").queue();
 								scheduler.skip();
@@ -281,12 +272,12 @@ public class MusicCommand {
 								scheduler.getVoteSkips().remove(event.getAuthor().getId());
 							else
 								scheduler.getVoteSkips().add(event.getAuthor().getId());
-							if (scheduler.getVoteSkips().size() >= scheduler.getRequiredVotes()) {
+							if (scheduler.getVoteSkips().size() >= scheduler.getRequiredSkipVotes()) {
 								event.sendMessage("Reached the required amount of votes, skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`...").queue();
 								scheduler.skip();
 								return;
 							}
-							event.sendMessage(scheduler.getVoteSkips().size() + " users voted for skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`. More `" + (scheduler.getRequiredVotes() - scheduler.getVoteSkips().size()) + "` votes are required.").queue();
+							event.sendMessage(scheduler.getVoteSkips().size() + " users voted for skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`. More `" + (scheduler.getRequiredSkipVotes() - scheduler.getVoteSkips().size()) + "` votes are required.").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -304,7 +295,7 @@ public class MusicCommand {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
-							MusicManager manager = event.getBotContainer().playerManager.get(event.getGuild());
+							MusicManager manager = event.getClient().playerManager.get(event.getGuild());
 							TrackScheduler scheduler = manager.getTrackScheduler();
 							if (manager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I'm not playing anything, so I can't skip!").queue();
@@ -335,7 +326,7 @@ public class MusicCommand {
 								event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
 								return;
 							}
-							MusicManager manager = event.getBotContainer().playerManager.get(event.getGuild());
+							MusicManager manager = event.getClient().playerManager.get(event.getGuild());
 							TrackScheduler scheduler = manager.getTrackScheduler();
 							if (scheduler.getQueue().isEmpty()) {
 								event.sendMessage("The queue is empty, so you can't remove any songs.").queue();
@@ -346,12 +337,32 @@ public class MusicCommand {
 								event.sendMessage("Could not remove from the queue. Reason: `Index is bigger than queue size`").queue();
 								return;
 							}
-							if (!toRemove.getDJId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.DJ, event.getJDA(), event.getBotContainer())) {
+							if (!toRemove.getDJId().equals(event.getAuthor().getId()) && !event.getGuildMember().hasPermission(Permissions.DJ, event.getJDA(), event.getClient())) {
 								event.sendMessage("You can't do this because you're not this song's DJ!").queue();
 								return;
 							}
-							scheduler.getQueue().remove(toRemove);
+							scheduler.getQueue().getRawQueue().remove(toRemove);
 							event.sendMessage(Quotes.SUCCESS, "Removed `" + toRemove.getTrack().getInfo().title + "` from the queue.").queue();
+						})
+						.build())
+				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
+						.setAliases("fairqueue")
+						.setName("FairQueue Command")
+						.setDescription("Change the FairQueue configs for the Guild.")
+						.setArgs(new Argument<>("level", Integer.class, true))
+						.setRequiredPermission(Permissions.GUILD_MOD)
+						.setAction((event) -> {
+							Argument<Integer> argument = event.getArgument("level");
+							if (!argument.isPresent()) {
+								event.sendMessage("The current FairQueue Level for this Guild is `" + event.getDiscordGuild().getMusicSettings().getFairQueueLevel() + "`.").queue();
+							} else if (argument.get() > 2) {
+								event.sendMessage("The biggest FairQueue Level is 2!").queue();
+							} else if (argument.get() < 0) {
+								event.sendMessage("The FairQueue Level has to be bigger or equal 0!").queue();
+							} else {
+								event.getDiscordGuild().getMusicSettings().setFairQueueLevel(argument.get());
+								event.sendMessage("Done, now the FairQueue Level for this Guild is `" + argument.get() + "`.").queue();
+							}
 						})
 						.build())
 				.build();

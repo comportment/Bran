@@ -2,7 +2,7 @@ package br.com.brjdevs.steven.bran.core.data.bot.settings;
 
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -140,7 +140,7 @@ public class Profile {
 	
 	public MessageEmbed createEmbed(JDA jda) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setAuthor(getUser(jda).getName() + "'s profile information", null, Util.getAvatarUrl(getUser(jda)));
+		builder.setAuthor(getUser(jda).getName() + "'s profile information", null, OtherUtils.getAvatarUrl(getUser(jda)));
 		builder.setDescription(EMPTY + "\n" + EMPTY);
 		builder.addField("\u2694 Level", String.valueOf(getLevel()), true);
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);

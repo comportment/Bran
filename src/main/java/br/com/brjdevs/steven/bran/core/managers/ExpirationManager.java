@@ -7,7 +7,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class Expirator {
+public class ExpirationManager {
 	
 	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, 25,
 			60L, TimeUnit.SECONDS,
@@ -16,11 +16,11 @@ public class Expirator {
 	private final Map<Long, List<Runnable>> EXPIRATIONS;
 	private boolean updated = false;
 	
-	public Expirator() {
+	public ExpirationManager() {
 		this(new ConcurrentHashMap<>());
 	}
 	
-	public Expirator(Map<Long, List<Runnable>> expirations) {
+	public ExpirationManager(Map<Long, List<Runnable>> expirations) {
 		EXPIRATIONS = Collections.synchronizedMap(expirations);
 		
 		Thread thread = new Thread(this::threadcode, "ExpirationManager Thread");

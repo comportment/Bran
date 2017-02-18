@@ -9,7 +9,7 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.AnnouncesSettings;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 public class AnnounceCommands {
@@ -106,7 +106,7 @@ public class AnnounceCommands {
 								.setName("Join Announce Preview Command")
 								.setPrivateAvailable(false)
 								.setAction((event) -> {
-									if (Util.isEmpty(event.getDiscordGuild().getAnnounces().getJoinAnnounce())) {
+									if (OtherUtils.isEmpty(event.getDiscordGuild().getAnnounces().getJoinAnnounce())) {
 										event.sendMessage(Quotes.FAIL, "The Join Announce is not set! Please use `" + event.getPrefix() + "ann set join [MESSAGE]` to set it.").queue();
 										return;
 									}
@@ -121,7 +121,7 @@ public class AnnounceCommands {
 								.setName("Leave Announce Preview Command")
 								.setPrivateAvailable(false)
 								.setAction((event) -> {
-									if (Util.isEmpty(event.getDiscordGuild().getAnnounces().getLeaveAnnounce())) {
+									if (OtherUtils.isEmpty(event.getDiscordGuild().getAnnounces().getLeaveAnnounce())) {
 										event.sendMessage(Quotes.FAIL, "The Leave Announce is not set! Please use `" + event.getPrefix() + "ann set leave [MESSAGE]` to set it.").queue();
 										return;
 									}
@@ -136,7 +136,7 @@ public class AnnounceCommands {
 								.setName("JoinDM Announce Preview Command")
 								.setPrivateAvailable(false)
 								.setAction((event) -> {
-									if (Util.isEmpty(event.getDiscordGuild().getAnnounces().getJoinDMAnnounce())) {
+									if (OtherUtils.isEmpty(event.getDiscordGuild().getAnnounces().getJoinDMAnnounce())) {
 										event.sendMessage(Quotes.FAIL, "The Join DM Announce is not set! Please use `" + event.getPrefix() + "ann set joindm [MESSAGE]` to set it.").queue();
 										return;
 									}

@@ -6,7 +6,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.WeatherSearch;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -69,8 +69,8 @@ public class WeatherCommand {
 						JsonObject conditionObject = item.get("condition").getAsJsonObject();
 						String lastUpdate = conditionObject.get("date").getAsString();
 						double f = Double.parseDouble(conditionObject.get("temp").getAsString());
-						String c = Util.DECIMAL_FORMAT.format((5./9.) * (f - 32.));
-						String temp = Util.DECIMAL_FORMAT.format(f) + "ºF/" + c + "ºC";
+						String c = OtherUtils.DECIMAL_FORMAT.format((5. / 9.) * (f - 32.));
+						String temp = OtherUtils.DECIMAL_FORMAT.format(f) + "ºF/" + c + "ºC";
 						String text = conditionObject.get("text").getAsString();
 						
 						EmbedBuilder embedBuilder = new EmbedBuilder();

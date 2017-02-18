@@ -11,8 +11,8 @@ import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
-import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
-import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -36,14 +36,14 @@ public class ShopCommand {
 						.setAction((event) -> {
 							Argument arg = event.getArgument("page");
 							int page = arg.isPresent() && (int) arg.get() > 0 ? (int) arg.get() : 1;
-							Profile profile = event.getBotContainer().getProfile(event.getAuthor());
+							Profile profile = event.getClient().getProfile(event.getAuthor());
 							List<String> items = ItemContainer.map()
 									.entrySet().stream()
 									.map(entry -> {
 										Item item = entry.getValue();
 										return item.getName() + " - Price: " + item.getPrice() + (item.getMinimumRank().getLevel() > profile.getRank().getLevel() ? " You must be at least rank " + item.getMinimumRank() + " to buy this item!" : "");
 									}).collect(Collectors.toList());
-							ListBuilder listBuilder = new ListBuilder(items, page, 15);
+							StringListBuilder listBuilder = new StringListBuilder(items, page, 15);
 							listBuilder.setName("Available Items");
 							listBuilder.setFooter("Total Items: " + ItemContainer.map().size());
 							event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
@@ -62,7 +62,7 @@ public class ShopCommand {
 								event.sendMessage("No items named \"" + name + "\".").queue();
 								return;
 							}
-							Profile profile = event.getBotContainer().getProfile(event.getAuthor());
+							Profile profile = event.getClient().getProfile(event.getAuthor());
 							Item item = result.getValue();
 							if (item.getMinimumRank().getLevel() > profile.getRank().getLevel()) {
 								event.sendMessage("You must be at least rank " + item.getMinimumRank() + " to buy this item!").queue();

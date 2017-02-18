@@ -14,20 +14,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class BotEventManager implements IEventManager {
+public class ClientEventManager implements IEventManager {
 	
 	private final CopyOnWriteArrayList<EventListener> listeners = new CopyOnWriteArrayList<>();
 	public ExecutorService executor;
-	private Bot shard;
+	private ClientShard shard;
 	
-	public BotEventManager(Bot shard) {
+	public ClientEventManager(ClientShard shard) {
 		this.shard = shard;
 		this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("Event Manager [" + shard.getId() + "]-%d").build());
 		register(new Reflections("br.com.brjdevs.steven.bran")
 				.getSubTypesOf(EventListener.class).stream()
 				.map(clazz -> {
 					try {
-						return clazz.getConstructor(BotContainer.class).newInstance(shard.container);
+						return clazz.getConstructor(Client.class).newInstance(shard.client);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -57,16 +57,16 @@ public class BotEventManager implements IEventManager {
 	@Override
 	public void handle(Event event) {
 		if (executor.isShutdown()) {
-			shard.container.getDiscordLog().logToDiscord(new Exception("Event Manager Executor for Shard " + shard.getId() + " has already been shutdown!"), event.getClass().getSimpleName());
+			shard.client.getDiscordLog().logToDiscord(new Exception("Event Manager Executor for Shard " + shard.getId() + " has already been shutdown!"), event.getClass().getSimpleName());
 			return;
 		}
 		final List<Object> listeners = getRegisteredListeners();
 		executor.submit(() -> listeners.forEach(listener -> {
 			try {
-				shard.container.setLastEvent(shard.getId(), System.currentTimeMillis());
+				shard.client.setLastEvent(shard.getId(), System.currentTimeMillis());
 				((EventListener) listener).onEvent(event);
 			} catch (Exception e) {
-				shard.container.getDiscordLog().logToDiscord(e, "Unexpected error at event `" + event.getClass().getSimpleName() + "`");
+				shard.client.getDiscordLog().logToDiscord(e, "Unexpected error at event `" + event.getClass().getSimpleName() + "`");
 				e.printStackTrace();
 			}
 		}));

@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.data.guild;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.Main;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.*;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
@@ -29,14 +29,12 @@ public class DiscordGuild {
 	private Giveaway giveaway = null;
 	private long defaultPermission = Permissions.BASE_USR;
 	
-	public DiscordGuild(BotContainer container) {
-		this.prefixes = new ArrayList<>(container.config.getDefaultPrefixes());
+	public DiscordGuild(Client client) {
+		this.prefixes = new ArrayList<>(client.config.getDefaultPrefixes());
 	}
 	
-	public static DiscordGuild getInstance(Guild guild, BotContainer botContainer) {
-		if (!instances.containsKey(guild))
-			instances.put(guild, new DiscordGuild(botContainer));
-		return instances.get(guild);
+	public static DiscordGuild getInstance(Guild guild, Client client) {
+		return instances.computeIfAbsent(guild, g -> new DiscordGuild(client));
 	}
 	
 	public static DiscordGuild load(Guild guild, DiscordGuild discordGuild) {
@@ -62,19 +60,19 @@ public class DiscordGuild {
 		return members;
 	}
 	
-	public GuildMember getMember(Member r, BotContainer container) {
+	public GuildMember getMember(Member r, Client client) {
 		User user = r.getUser();
 		GuildMember member = members.stream().filter(m -> m.getUserId().equals(user.getId())).findFirst().orElse(null);
 		if (member == null) {
-			member = new GuildMember(user, r.getGuild().getId(), container);
+			member = new GuildMember(user, r.getGuild().getId(), client);
 			if (!user.isBot() && !user.isFake())
 				members.add(member);
 		}
 		return member;
 	}
 	
-	public boolean isMember(Member member, BotContainer container) {
-		return getMember(member, container) != null;
+	public boolean isMember(Member member, Client client) {
+		return getMember(member, client) != null;
 	}
 	
 	public CustomCmdsSettings getCustomCommands() {
@@ -105,10 +103,10 @@ public class DiscordGuild {
 		this.giveaway = giveaway;
 	}
 	
-	public void save(BotContainer container) {
+	public void save(Client client) {
 		if (getOrigin() == null) return;
 		try {
-			File file = new File(container.workingDir, getOrigin().getId() + ".json");
+			File file = new File(client.workingDir, getOrigin().getId() + ".json");
 			if (!file.exists()) assert file.createNewFile();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			writer.write(Main.GSON.toJson(this));

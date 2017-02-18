@@ -1,11 +1,11 @@
 package br.com.brjdevs.steven.bran.core.managers;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.audio.timers.ChannelLeaveTimer;
 import br.com.brjdevs.steven.bran.core.audio.timers.MusicRegisterTimeout;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.sun.management.OperatingSystemMXBean;
@@ -17,15 +17,15 @@ import java.util.concurrent.TimeUnit;
 
 public class TaskManager {
 	
-	public BotContainer container;
+	public Client client;
 	private MusicRegisterTimeout musicRegisterTimeout;
 	private ChannelLeaveTimer channelLeaveTimer;
 	
-	public TaskManager(BotContainer container) {
-		this.container = container;
-		this.musicRegisterTimeout = new MusicRegisterTimeout(container);
-		this.channelLeaveTimer = new ChannelLeaveTimer(container);
-		startAsyncTasks();
+	public TaskManager(Client client) {
+		this.client = client;
+		this.musicRegisterTimeout = new MusicRegisterTimeout(client);
+		this.channelLeaveTimer = new ChannelLeaveTimer(client);
+		//startAsyncTasks();
 	}
 	
 	public ChannelLeaveTimer getChannelLeaveTimer() {
@@ -45,17 +45,17 @@ public class TaskManager {
 	    final OperatingSystemMXBean os =
 			    ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
 	    startAsyncTask(
-			    () -> container.getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100), 5);
-		startAsyncTask(() -> Arrays.stream(container.getShards()).forEach(shard -> {
+			    () -> client.getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100), 5);
+		startAsyncTask(() -> Arrays.stream(client.getShards()).forEach(shard -> {
 			if (shard.getCurrentGuildCount() < shard.getJDA().getGuilds().size()) return;
 			try {
 				shard.updateStats();
 				shard.updateCurrentGuildCount();
-				container.getDiscordLog().logToDiscord("Updated server_count in DiscordBots (Shard[" + shard.getId() + "])", "Successfully updated server_count at [Discord Bots](https://bots.discord.pw/bots/" + shard.getJDA().getSelfUser().getId() + ")", Level.INFO);
+				client.getDiscordLog().logToDiscord("Updated server_count in DiscordBots (Shard[" + shard.getId() + "])", "Successfully updated server_count at [Discord Bots](https://bots.discord.pw/bots/" + shard.getJDA().getSelfUser().getId() + ")", Level.INFO);
 			} catch (UnirestException e) {
-				container.getDiscordLog()
+				client.getDiscordLog()
 						.logToDiscord("Failed to update Shard Stats at DiscordBots",
-								"Unexpected exception occurred while updating Shard " + shard.getId() + " server count!\n" + Hastebin.post(Util.getStackTrace(e)),
+								"Unexpected exception occurred while updating Shard " + shard.getId() + " server count!\n" + Hastebin.post(OtherUtils.getStackTrace(e)),
 								Level.WARN);
 			}
 		}), 216000);

@@ -11,7 +11,7 @@ import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.operations.ResultType;
 import br.com.brjdevs.steven.bran.core.operations.ResultType.OperationResult;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -78,20 +78,20 @@ public class PermissionCommand {
 							List<Member> members = event.getGuild().getMembers().stream().filter(member -> member.getUser() != event.getAuthor() && !member.getUser().isBot() && !member.getUser().isFake()).collect(Collectors.toList());
 							OperationResult operationResult = null;
 	                        if (!isEveryone) {
-		                        operationResult = event.getDiscordGuild().getMember(event.getGuild().getMember(user), event.getBotContainer()).setPermission(event, toBeSet, toBeUnset);
+		                        operationResult = event.getDiscordGuild().getMember(event.getGuild().getMember(user), event.getClient()).setPermission(event, toBeSet, toBeUnset);
 	                        }
 	                        else {
 		                        long fToBeSet = toBeSet;
 		                        long fToBeUnset = toBeUnset;
 		                        members.forEach(member -> {
-			                        if (event.getDiscordGuild().getMember(member, event.getBotContainer()).setPermission(event, fToBeSet, fToBeUnset).getResult() == ResultType.SUCCESS)
+			                        if (event.getDiscordGuild().getMember(member, event.getClient()).setPermission(event, fToBeSet, fToBeUnset).getResult() == ResultType.SUCCESS)
 				                        holder.value++;
 		                        });
 	                        }
 	                        String s;
 	                        if (!isEveryone) {
 	                        	if (operationResult.getResult() == ResultType.SUCCESS)
-			                        s = "Updated " + Util.getUser(user) + " permissions!";
+			                        s = "Updated " + OtherUtils.getUser(user) + " permissions!";
 		                        else if (operationResult.getResult() == ResultType.INVALID) {
 			                        s = "How the hell did you manage to update a Fake Member permission?";
 		                        } else {
@@ -116,13 +116,13 @@ public class PermissionCommand {
 	                        }
 	                        User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getJDA().getUserById((String) event.getArgument("user").get()) : event.getMessage().getMentionedUsers().get(0);
 	                        if (user == null) user = event.getAuthor();
-	                        GuildMember member = event.getDiscordGuild().getMember(event.getGuild().getMember(user), event.getBotContainer());
+	                        GuildMember member = event.getDiscordGuild().getMember(event.getGuild().getMember(user), event.getClient());
 	                        EmbedBuilder builder = new EmbedBuilder();
-	                        builder.setTitle("Permissions for " + Util.getUser(user), null);
-	                        builder.setDescription((String.join(", ", member.getPermissions(event.getJDA(), event.getBotContainer()))) + "\n\nRaw: " + member.getRawPermissions(event.getJDA(), event.getBotContainer()));
-	                        builder.setThumbnail(Util.getAvatarUrl(user));
-                            builder.setFooter("Requested by " + Util.getUser(event.getAuthor()), Util.getAvatarUrl(event.getAuthor()));
-                            builder.setColor(Color.decode("#9318E6"));
+	                        builder.setTitle("Permissions for " + OtherUtils.getUser(user), null);
+	                        builder.setDescription((String.join(", ", member.getPermissions(event.getJDA(), event.getClient()))) + "\n\nRaw: " + member.getRawPermissions(event.getJDA(), event.getClient()));
+	                        builder.setThumbnail(OtherUtils.getAvatarUrl(user));
+	                        builder.setFooter("Requested by " + OtherUtils.getUser(event.getAuthor()), OtherUtils.getAvatarUrl(event.getAuthor()));
+	                        builder.setColor(Color.decode("#9318E6"));
                             event.sendMessage(builder.build()).queue();
 
                         })
@@ -139,7 +139,7 @@ public class PermissionCommand {
 							EmbedBuilder embedBuilder = new EmbedBuilder();
 							embedBuilder.setTitle("All of my permissions", null);
 							embedBuilder.setDescription(Permissions.toCollection(Permissions.BOT_OWNER).stream().collect(Collectors.joining(", ")));
-							embedBuilder.setFooter("Requested by " + Util.getUser(event.getAuthor()), Util.getAvatarUrl(event.getAuthor()));
+							embedBuilder.setFooter("Requested by " + OtherUtils.getUser(event.getAuthor()), OtherUtils.getAvatarUrl(event.getAuthor()));
 							embedBuilder.setColor(Color.decode("#9318E6"));
 							event.sendMessage(embedBuilder.build()).queue();
 						})
@@ -182,7 +182,7 @@ public class PermissionCommand {
 							long defaultPerm = event.getDiscordGuild().getDefaultPermission();
 							int fset = toBeSet, funset = toBeUnset;
 							long newPerm = defaultPerm ^ (defaultPerm & toBeUnset) | toBeSet;
-							if (!event.getGuildMember().hasPermission(newPerm, event.getJDA(), event.getBotContainer())) {
+							if (!event.getGuildMember().hasPermission(newPerm, event.getJDA(), event.getClient())) {
 								event.sendMessage("You don't have enough permissions!").queue();
 								return;
 							}

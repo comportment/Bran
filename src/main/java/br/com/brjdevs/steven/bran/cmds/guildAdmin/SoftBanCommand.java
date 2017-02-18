@@ -7,7 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.PermissionException;
@@ -50,7 +50,7 @@ public class SoftBanCommand {
 						event.getGuild().getController().ban(user, 7)
 								.queue(success -> {
 											event.getGuild().getController().unban(user).queue(s -> {
-												String out = "SoftBanned " + users.stream().filter(Objects::nonNull).map(Util::getUser).collect(Collectors.joining(", ")) + "!";
+												String out = "SoftBanned " + users.stream().filter(Objects::nonNull).map(OtherUtils::getUser).collect(Collectors.joining(", ")) + "!";
 												event.sendMessage(Quotes.SUCCESS, out).queue();
 											}, throwable -> {
 												event.sendMessage("Failed to unban user!").queue();

@@ -28,7 +28,7 @@ public class EvalCommand {
 				.setArgs(new Argument<>("js code", String.class))
 				.setAction((event, args) -> {
 					eval.put("shard", event.getShard());
-					eval.put("container", event.getBotContainer());
+					eval.put("container", event.getClient());
 					eval.put("jda", event.getJDA());
                     eval.put("event", event);
                     eval.put("args", args);

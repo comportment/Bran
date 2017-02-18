@@ -5,7 +5,7 @@ import lombok.NonNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListBuilder {
+public class StringListBuilder {
 	
 	private List<String> list;
 	private int page;
@@ -13,18 +13,20 @@ public class ListBuilder {
 	private String listName;
 	private String footer;
 	
-	public ListBuilder(List<String> list, int page, int itemsShown) {
+	public StringListBuilder(List<String> list, int page, int itemsShown) {
 		this.list = list;
 		if (page != 0) this.page = page; else this.page = 1;
 		this.itemsShown = itemsShown;
 		this.listName = "";
 		this.footer = "";
 	}
-	public ListBuilder setName(String name) {
+	
+	public StringListBuilder setName(String name) {
 		this.listName = name;
 		return this;
 	}
-	public ListBuilder setFooter(String footer) {
+	
+	public StringListBuilder setFooter(String footer) {
 		this.footer = footer;
 		return this;
 	}

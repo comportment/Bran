@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DateUtils {
+public class TimeUtils {
 	
 	private static final Pattern pattern = Pattern.compile("\\d+?[a-zA-Z]");
 	

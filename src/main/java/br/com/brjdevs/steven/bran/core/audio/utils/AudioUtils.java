@@ -1,9 +1,9 @@
 package br.com.brjdevs.steven.bran.core.audio.utils;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.audio.ConnectionListenerImpl;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.Permission;
@@ -15,6 +15,9 @@ import net.dv8tion.jda.core.managers.AudioManager;
 
 public class AudioUtils {
 	
+	public static final long MAX_SONG_LENGTH = 10800000;
+	public static final long MAX_PLAYLIST_LENGTH = 108000000;
+	public static final int MAX_QUEUE_SIZE = 600;
 	private final static String BLOCK_INACTIVE = "\u25AC";
 	private final static String BLOCK_ACTIVE = "\uD83D\uDD18";
 	private static final int TOTAL_BLOCKS = 10;
@@ -47,7 +50,7 @@ public class AudioUtils {
 		return "0" + num;
 	}
 	
-	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan, BotContainer container) {
+	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan, Client client) {
 		if (!vchan.getGuild().getSelfMember().hasPermission(vchan, Permission.VOICE_CONNECT)) {
 			tchan.sendMessage("I can't connect to `" + vchan.getName() + "` due to a lack of permission!").queue();
 			return null;
@@ -67,14 +70,14 @@ public class AudioUtils {
 		if (audioManager.isConnected()) return audioManager.getConnectedChannel();
 		try {
 			audioManager.setSelfDeafened(true);
-			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild(), container));
+			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild(), client));
 			audioManager.openAudioConnection(vchan);
 		} catch (Exception e) {
 			tchan.sendMessage("I couldn't connect to the voice channel! ").queue();
 			return null;
 		}
 		while (audioManager.isAttemptingToConnect())
-			Util.sleep(100);
+			OtherUtils.sleep(100);
 		return audioManager.getConnectedChannel();
 	}
 	public static boolean isAlone(VoiceChannel channel) {
@@ -83,6 +86,6 @@ public class AudioUtils {
 		return true;
 	}
 	public static boolean isAllowed(User user, TrackContext context) {
-		return context.getDJ(user.getJDA()) != null && context.getDJId().equals(user.getId());
+		return context.getDJ() != null && context.getDJId().equals(user.getId());
 	}
 }

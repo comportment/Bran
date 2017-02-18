@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.data;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.Main;
 import br.com.brjdevs.steven.bran.core.data.bot.BotData;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
@@ -12,19 +12,19 @@ import java.util.Map.Entry;
 
 public class DataManager {
 	
-	private BotContainer botContainer;
+	private Client client;
 	
-	public DataManager(BotContainer botContainer) {
-		this.botContainer = botContainer;
+	public DataManager(Client client) {
+		this.client = client;
 		loadData();
 	}
 	
 	public void saveGuildData() {
-		DiscordGuild.instances.entrySet().stream().map(Entry::getValue).forEach(discordGuild -> discordGuild.save(botContainer));
+		DiscordGuild.instances.entrySet().stream().map(Entry::getValue).forEach(discordGuild -> discordGuild.save(client));
 	}
 	
 	public void saveBotData() {
-		botContainer.data.save(botContainer);
+		client.data.save(client);
 	}
 	
 	public void saveData() {
@@ -39,13 +39,13 @@ public class DataManager {
 	
 	public void loadGuildData() {
 		BufferedReader r;
-		for (Guild guild : botContainer.getGuilds()) {
+		for (Guild guild : client.getGuilds()) {
 			try {
-				r = new BufferedReader(new FileReader(new File(botContainer.workingDir, guild.getId() + ".json")));
+				r = new BufferedReader(new FileReader(new File(client.workingDir, guild.getId() + ".json")));
 				DiscordGuild.load(guild, Main.GSON.fromJson(r, DiscordGuild.class));
 				r.close();
 			} catch (FileNotFoundException e) {
-				DiscordGuild.getInstance(guild, botContainer);
+				DiscordGuild.getInstance(guild, client);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -54,17 +54,17 @@ public class DataManager {
 	}
 	
 	public void updateConfigs() {
-		botContainer.config.save(botContainer);
+		client.config.save(client);
 	}
 	
 	public void loadBotData() {
 		try {
-			File file = new File(botContainer.workingDir, "botData.json");
+			File file = new File(client.workingDir, "botData.json");
 			if (!file.exists()) return;
 			BufferedReader reader = new BufferedReader(new FileReader(file));
-			botContainer.data = Main.GSON.fromJson(reader, BotData.class);
+			client.data = Main.GSON.fromJson(reader, BotData.class);
 			reader.close();
-			botContainer.getProfiles().forEach((id, profile) -> profile.setListeners(new ArrayList<>()));
+			client.getProfiles().forEach((id, profile) -> profile.setListeners(new ArrayList<>()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

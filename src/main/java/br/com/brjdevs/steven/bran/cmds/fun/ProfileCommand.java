@@ -12,8 +12,8 @@ import br.com.brjdevs.steven.bran.core.data.bot.settings.Profile.Rank;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
-import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
-import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
@@ -45,7 +45,7 @@ public class ProfileCommand {
 								return;
 							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getAuthor() : event.getMessage().getMentionedUsers().get(0);
-							event.sendMessage(event.getBotContainer().getProfile(user).createEmbed(event.getJDA())).queue();
+							event.sendMessage(event.getClient().getProfile(user).createEmbed(event.getJDA())).queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -53,7 +53,7 @@ public class ProfileCommand {
 						.setDescription("Shows you your inventory.")
 						.setArgs(new Argument<>("page", Integer.class, true))
 						.setAction((event) -> {
-							Inventory inventory = event.getBotContainer().getProfile(event.getAuthor()).getInventory();
+							Inventory inventory = event.getClient().getProfile(event.getAuthor()).getInventory();
 							if (inventory.isEmpty()) {
 								event.sendMessage("Your inventory is empty!").queue();
 								return;
@@ -65,7 +65,7 @@ public class ProfileCommand {
 										Item item = ItemContainer.getItemById(entry.getKey());
 										return item.getName() + "  x" + entry.getValue();
 									}).collect(Collectors.toList());
-							ListBuilder listBuilder = new ListBuilder(items, page, 15);
+							StringListBuilder listBuilder = new StringListBuilder(items, page, 15);
 							listBuilder.setName("Your inventory");
 							listBuilder.setFooter("Total Items (UNIQUE/TOTAL): " + inventory.size(true) + "/" + inventory.size(false));
 							event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
@@ -81,7 +81,7 @@ public class ProfileCommand {
 								.setArgs(new Argument<>("hex", String.class, true))
 								.setDescription("Set or update your custom color!")
 								.setAction((event, rawArgs) -> {
-									Profile profile = event.getBotContainer().getProfile(event.getAuthor());
+									Profile profile = event.getClient().getProfile(event.getAuthor());
 									Argument argument = event.getArgument("hex");
 									if (!argument.isPresent()) {
 										if (profile.getCustomHex() != null) {

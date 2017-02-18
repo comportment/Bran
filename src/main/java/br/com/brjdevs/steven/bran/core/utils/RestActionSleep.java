@@ -17,7 +17,7 @@ public class RestActionSleep {
 	}
 	public void sleepAndThen(long millis, Consumer<RestAction> callback) {
 		pool.submit(() -> {
-			Util.sleep(millis);
+			OtherUtils.sleep(millis);
 			callback.accept(restAction);
 		});
 	}

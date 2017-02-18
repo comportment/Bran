@@ -1,60 +1,51 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.BotContainer;
-import br.com.brjdevs.steven.bran.core.action.Action;
-import br.com.brjdevs.steven.bran.core.action.Action.onInvalidResponse;
-import br.com.brjdevs.steven.bran.core.action.ActionType;
-import br.com.brjdevs.steven.bran.core.utils.StringUtils;
-import net.dv8tion.jda.core.entities.ChannelType;
+import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.responsewaiter.ExpectedResponseType;
+import br.com.brjdevs.steven.bran.core.responsewaiter.ResponseWaiter;
+import br.com.brjdevs.steven.bran.core.responsewaiter.events.UnexpectedResponseEvent;
+import br.com.brjdevs.steven.bran.core.responsewaiter.events.ValidResponseEvent;
+import br.com.brjdevs.steven.bran.core.utils.ArrayUtils;
 import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 
-import java.util.stream.Collectors;
-
-import static br.com.brjdevs.steven.bran.core.utils.Util.containsEqualsIgnoreCase;
-
 public class ActionListener implements EventListener {
 	
-	private BotContainer container;
+	private Client client;
 	
-	public ActionListener(BotContainer container) {
-		this.container = container;
+	public ActionListener(Client client) {
+		this.client = client;
 	}
 	
 	
 	@Override
 	public void onEvent(Event e) {
+		ResponseWaiter responseWaiter = null;
+		String response = null;
+		Object obj = null;
 		if (e instanceof MessageReactionAddEvent) {
-			MessageReactionAddEvent event = (MessageReactionAddEvent) e;
-			Action action = Action.getAction(event.getUser().getId());
-			String reaction = event.getReaction().getEmote().getName();
-			if (action == null || action.getActionType() != ActionType.REACTION || !action.getMessageId().equals(event.getMessageId()))
+			responseWaiter = ResponseWaiter.responseWaiters.get(Long.parseLong(((MessageReactionAddEvent) e).getUser().getId()));
+			if (responseWaiter != null && responseWaiter.getExpectedResponseType() != ExpectedResponseType.REACTION)
 				return;
-			Action.remove(action);
-			if (!containsEqualsIgnoreCase(action.getExpectedInput(), reaction) && action.getOnInvalidResponse() == onInvalidResponse.IGNORE) {
+			response = ((MessageReactionAddEvent) e).getReaction().getEmote().getName();
+			obj = ((MessageReactionAddEvent) e).getReaction();
+		} else if (e instanceof GuildMessageReceivedEvent) {
+			responseWaiter = ResponseWaiter.responseWaiters.get(Long.parseLong(((GuildMessageReceivedEvent) e).getAuthor().getId()));
+			if (responseWaiter != null && responseWaiter.getExpectedResponseType() != ExpectedResponseType.MESSAGE)
 				return;
-			} else if (!containsEqualsIgnoreCase(action.getExpectedInput(), reaction) && action.getOnInvalidResponse() == onInvalidResponse.CANCEL) {
-				container.getMessenger().sendMessage(event.getChannel(), "You didn't reacted " + StringUtils.replaceLast((String.join(", ", action.getExpectedInput().stream().map(s -> "`" + s + "`").collect(Collectors.toList()))), ", ", " or ") + ", query canceled!").queue();
-			} else {
-				action.getListener().onRespond(event.getChannel().getMessageById(event.getMessageId()).complete(), event.getReaction().getEmote().getName());
-			}
-		} else if (e instanceof MessageReceivedEvent) {
-			MessageReceivedEvent event = (MessageReceivedEvent) e;
-			if (event.isFromType(ChannelType.PRIVATE)) return;
-			Action action = Action.getAction(event.getAuthor().getId());
-			String message = event.getMessage().getRawContent();
-			if (action == null || action.getActionType() != ActionType.MESSAGE || !action.getChannelId().equals(event.getTextChannel().getId()))
-				return;
-			Action.remove(action);
-			if (!containsEqualsIgnoreCase(action.getExpectedInput(), message) && action.getOnInvalidResponse() == onInvalidResponse.IGNORE) {
-				return;
-			} else if (!containsEqualsIgnoreCase(action.getExpectedInput(), message) && action.getOnInvalidResponse() == onInvalidResponse.CANCEL) {
-				container.getMessenger().sendMessage(event.getChannel(), "You didn't type " + StringUtils.replaceLast((String.join(", ", action.getExpectedInput().stream().map(s -> "`" + s + "`").collect(Collectors.toList()))), ", ", " or ") + ", query canceled!").queue();
-			} else {
-				action.getListener().onRespond(event.getMessage());
-			}
+			response = ((GuildMessageReceivedEvent) e).getMessage().getRawContent();
+			obj = ((GuildMessageReceivedEvent) e).getMessage();
+		}
+		if (responseWaiter != null) {
+			ResponseWaiter.responseWaiters.remove(Long.parseLong(responseWaiter.getUser().getId()));
+			ResponseWaiter.EXPIRATION.removeResponseWaiter(responseWaiter);
+			if (ArrayUtils.contains(responseWaiter.getValidInputs(), response))
+				responseWaiter.getResponseListener().onEvent(new ValidResponseEvent(responseWaiter, obj));
+			else
+				responseWaiter.getResponseListener().onEvent(new UnexpectedResponseEvent(responseWaiter, obj));
+			
 		}
 	}
 }

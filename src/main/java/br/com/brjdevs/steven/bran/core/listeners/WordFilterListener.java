@@ -1,10 +1,10 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.data.guild.DiscordGuild;
 import br.com.brjdevs.steven.bran.core.data.guild.settings.WordFilterSettings;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.RestActionSleep;
-import br.com.brjdevs.steven.bran.core.utils.Util;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
@@ -16,10 +16,10 @@ import java.util.concurrent.TimeUnit;
 
 public class WordFilterListener implements EventListener {
 	
-	public BotContainer container;
+	public Client client;
 	
-	public WordFilterListener(BotContainer container) {
-		this.container = container;
+	public WordFilterListener(Client client) {
+		this.client = client;
 	}
 	
 	private static boolean canManageMessages(TextChannel channel) {
@@ -32,7 +32,7 @@ public class WordFilterListener implements EventListener {
 		GenericGuildMessageEvent event = (GenericGuildMessageEvent) e;
 		if (event.getMessage() == null) return;
 		if (!canManageMessages(event.getChannel())) return;
-		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), container);
+		DiscordGuild discordGuild = DiscordGuild.getInstance(event.getGuild(), client);
 		WordFilterSettings wordFilter = discordGuild.getWordFilter();
 		if (!wordFilter.isEnabled()) return;
 		boolean bool = false;
@@ -42,7 +42,7 @@ public class WordFilterListener implements EventListener {
 		}
 		if (bool) {
 			event.getMessage().delete().queue();
-			container.getMessenger().sendMessage(event.getChannel(), "**" + Util.getUser(event.getAuthor()) + "** you can't say that!!").queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(TimeUnit.SECONDS.toMillis(1), RestAction::queue));
+			client.getMessenger().sendMessage(event.getChannel(), "**" + OtherUtils.getUser(event.getAuthor()) + "** you can't say that!!").queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(TimeUnit.SECONDS.toMillis(1), RestAction::queue));
 		}
 	}
 }

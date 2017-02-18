@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class StringUtils {
 	
@@ -69,7 +70,7 @@ public class StringUtils {
     }
 	
 	public static boolean containsEqualsIgnoreCase(String toCheck, String s) {
-		return Util.containsEqualsIgnoreCase(Arrays.asList(toCheck.split("")), s);
+		return OtherUtils.containsEqualsIgnoreCase(Arrays.asList(toCheck.split("")), s);
 	}
 	
 	public static String getProgressBar(long percent, long total) {
@@ -81,5 +82,19 @@ public class StringUtils {
 		StringBuilder builder = new StringBuilder().append(EMPTY_BLOCK);
 		for (int i = 0; i < total; i++) builder.append(activeBlocks >= i ? ACTIVE_BLOCK : ' ');
 		return builder.append(EMPTY_BLOCK).toString();
+	}
+	
+	public static String randomName(int randomLength) {
+		char[] characters = new char[]
+				{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+						'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+						'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
+		
+		Random rand = new Random();
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < randomLength; i++) {
+			builder.append(characters[rand.nextInt(characters.length)]);
+		}
+		return builder.toString();
 	}
 }

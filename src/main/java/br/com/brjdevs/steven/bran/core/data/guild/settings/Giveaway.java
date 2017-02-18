@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.core.data.guild.settings;
 
-import br.com.brjdevs.steven.bran.Bot;
-import br.com.brjdevs.steven.bran.BotContainer;
-import br.com.brjdevs.steven.bran.core.managers.Expirator;
+import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.ClientShard;
+import br.com.brjdevs.steven.bran.core.managers.ExpirationManager;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class Giveaway {
 	
-	public static Expirator EXPIRATOR = new Expirator();
+	public static ExpirationManager ExpirationManager = new ExpirationManager();
 	
 	private int maxUsers;
 	private long creator;
@@ -36,7 +36,7 @@ public class Giveaway {
 		this.guildId = Long.parseLong(guild.getId());
 		this.participating = new ArrayList<>();
 		this.timedOut = false;
-		if (expiresIn > 0) EXPIRATOR.letExpire(this.expiresIn, () -> {
+		if (expiresIn > 0) ExpirationManager.letExpire(this.expiresIn, () -> {
 			member.getUser().openPrivateChannel().queue(c -> c.sendMessage("Hey, the Giveaway you created in " + guild.getName() + " has expired, you should end it!").queue());
 			this.timedOut = true;
 		});
@@ -57,12 +57,12 @@ public class Giveaway {
 		return roleId == -1L;
 	}
 	
-	public Guild getGuild(BotContainer container) {
-		return getShard(container).getJDA().getGuildById(String.valueOf(guildId));
+	public Guild getGuild(Client client) {
+		return getShard(client).getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
-	public Role getRole(BotContainer container) {
-		return getGuild(container).getRoleById(String.valueOf(roleId));
+	public Role getRole(Client client) {
+		return getGuild(client).getRoleById(String.valueOf(roleId));
 	}
 	
 	public long getExpiresIn() {
@@ -83,12 +83,12 @@ public class Giveaway {
 		return expiresIn == Long.MIN_VALUE;
 	}
 	
-	public Member getCreator(BotContainer container) {
-		return getGuild(container).getMemberById(String.valueOf(creator));
+	public Member getCreator(Client client) {
+		return getGuild(client).getMemberById(String.valueOf(creator));
 	}
 	
-	public List<Member> getParticipants(BotContainer container) {
-		return Collections.unmodifiableList(participating.stream().filter(l -> getGuild(container).getMemberById(String.valueOf(creator)) != null).map(l -> getGuild(container).getMemberById(String.valueOf(l))).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+	public List<Member> getParticipants(Client client) {
+		return Collections.unmodifiableList(participating.stream().filter(l -> getGuild(client).getMemberById(String.valueOf(creator)) != null).map(l -> getGuild(client).getMemberById(String.valueOf(l))).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 	}
 	
 	public List<Long> getParticipants() {
@@ -99,7 +99,7 @@ public class Giveaway {
 		return participating.size();
 	}
 	
-	public Bot getShard(BotContainer container) {
-		return container.getShards()[container.calcShardId(guildId)];
+	public ClientShard getShard(Client client) {
+		return client.getShards()[client.calcShardId(guildId)];
 	}
 }

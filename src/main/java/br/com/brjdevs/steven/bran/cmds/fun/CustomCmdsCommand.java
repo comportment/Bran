@@ -10,9 +10,9 @@ import br.com.brjdevs.steven.bran.core.data.guild.settings.CustomCmdsSettings;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.ListBuilder;
-import br.com.brjdevs.steven.bran.core.utils.ListBuilder.Format;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,7 +71,7 @@ public class CustomCmdsCommand {
 							}
 							CustomCommand command = event.getDiscordGuild().getCustomCommands().getCustomCommand(cmdName);
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getBotContainer())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getClient())) {
 								event.sendMessage("You can't add responses to this command because you're not its creator or has GUILD_MOD permission.").queue();
 								return;
 							}
@@ -102,7 +102,7 @@ public class CustomCmdsCommand {
 								return;
 							}
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getBotContainer())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getClient())) {
 								event.sendMessage("You can't delete responses from this command because you're not its owner or has GUILD_MOD permission!").queue();
 								return;
 							}
@@ -136,7 +136,7 @@ public class CustomCmdsCommand {
 								return;
 							}
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
-									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getBotContainer())) {
+									&& !event.getGuildMember().hasPermission(Permissions.GUILD_MOD, event.getJDA(), event.getClient())) {
 								event.sendMessage("You can't delete this command because you're not its owner or has GUILD_MOD permission!").queue();
 								return;
 							}
@@ -189,9 +189,9 @@ public class CustomCmdsCommand {
 							}
 							int page = event.getArgument("page").isPresent() && (int) event.getArgument("page").get() > 0 ? (int) event.getArgument("page").get() : 1;
 							List<String> cmds = settings.asMap().entrySet().stream()
-									.map(entry -> entry.getKey() + " - Created by " + (entry.getValue().getCreator(event.getJDA()) != null ? Util.getUser(entry.getValue().getCreator(event.getJDA())) : "Unknown (ID:" + entry.getValue().getCreatorId() + ")"))
+									.map(entry -> entry.getKey() + " - Created by " + (entry.getValue().getCreator(event.getJDA()) != null ? OtherUtils.getUser(entry.getValue().getCreator(event.getJDA())) : "Unknown (ID:" + entry.getValue().getCreatorId() + ")"))
 									.collect(Collectors.toList());
-							ListBuilder listBuilder = new ListBuilder(cmds, page, 15);
+							StringListBuilder listBuilder = new StringListBuilder(cmds, page, 15);
 							listBuilder.setName("Custom Commands For " + event.getGuild().getName())
 									.setFooter("Total Custom Commands: " + cmds.size());
 							event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();

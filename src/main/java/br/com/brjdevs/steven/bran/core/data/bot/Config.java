@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.core.data.bot;
 
-import br.com.brjdevs.steven.bran.BotContainer;
+import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.Main;
-import br.com.brjdevs.steven.bran.core.utils.Util;
+import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
 import java.io.*;
@@ -28,10 +28,10 @@ public class Config {
 	private boolean MUSIC_PERSISTENCE = true;
 	private boolean POLL_PERSISTENCE = true;
 	
-	public static Config newConfig(BotContainer botContainer) {
+	public static Config newConfig(Client client) {
 		Config config = null;
 		try {
-			File configFile = new File(botContainer.workingDir, "config.json");
+			File configFile = new File(client.workingDir, "config.json");
 			if (!configFile.exists()) {
 				LOG.warn("No config.json file was found, creating example config.json...");
 				if (configFile.createNewFile()) {
@@ -47,15 +47,15 @@ public class Config {
 				BufferedReader reader = new BufferedReader(new FileReader(configFile));
 				config = Main.GSON.fromJson(reader, Config.class);
 				reader.close();
-				if (Util.isEmpty(config.getToken())) {
+				if (OtherUtils.isEmpty(config.getToken())) {
 					LOG.fatal("The set Token is invalid, please insert a valid token!");
 					System.exit(0);
 				}
-				if (Util.isEmpty(config.getOwnerId())) {
+				if (OtherUtils.isEmpty(config.getOwnerId())) {
 					LOG.fatal("The set Owner ID is invalid.");
 					System.exit(0);
 				}
-				if (Util.isEmpty(config.getDiscordBotsToken())) {
+				if (OtherUtils.isEmpty(config.getDiscordBotsToken())) {
 					LOG.info("Discord Bots Token was not provided, disabled command bot.updateStats.");
 				}
 				LOG.info("Loaded config.json!");
@@ -122,9 +122,9 @@ public class Config {
 		return POLL_PERSISTENCE;
 	}
 	
-	public void save(BotContainer botContainer) {
+	public void save(Client client) {
 		try {
-			File file = new File(botContainer.workingDir, "config.json");
+			File file = new File(client.workingDir, "config.json");
 			if (!file.exists()) file.createNewFile();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			writer.write(Main.GSON.toJson(this));

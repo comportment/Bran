@@ -23,6 +23,7 @@ public class MathUtils {
 		if (min > max) throw new IndexOutOfBoundsException("min > max (" + min + ">" + max + ")");
 		return check > min && check < max;
 	}
+	
 	public static int parseIntOrDefault(String str, int d) {
 		try {
 			return Integer.parseInt(str);
@@ -33,5 +34,9 @@ public class MathUtils {
 	
 	public static int random(int min, int max) {
 		return random.nextInt(max - min) + min;
+	}
+	
+	public float getPercentage(float total, float p) {
+		return (100f / total) * p;
 	}
 }
