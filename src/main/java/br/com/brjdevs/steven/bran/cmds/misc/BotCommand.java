@@ -95,7 +95,8 @@ public class BotCommand {
 									try {
 										event.sendMessage("Downloading JAR from Jenkins...").queue();
 										jenkins.downloadFile(System.getProperty("user.dir") + File.separator + "cache");
-										event.sendMessage("Downloaded and switched Jars, I'll be back soon! *I hope*").complete();
+										event.sendMessage("Downloaded Jar, switching it...").complete();
+										jenkins.copyFile(new File(System.getProperty("user.dir") + File.separator + "cache", "DiscordBot-1.0-SNAPSHOT.jar"), new File(System.getProperty("user.dir"), "DiscordBot.jar"));
 										event.getClient().shutdownAll(ExitCodes.RESTART);
 									} catch (IOException e) {
 										event.sendMessage("Something went wrong while downloading the JAR. " + Hastebin.post(OtherUtils.getStackTrace(e))).queue();

@@ -25,7 +25,7 @@ public class Jenkins {
 		this.client = client;
 	}
 	
-	private void copyFile(File sourceFile, File destFile) throws IOException {
+	public void copyFile(File sourceFile, File destFile) throws IOException {
 		if (!destFile.exists()) {
 			destFile.createNewFile();
 		}
@@ -82,7 +82,6 @@ public class Jenkins {
 			
 		}
 		response.close();
-		copyFile(new File(saveDir, "DiscordBot-1.0-SNAPSHOT.jar"), new File(System.getProperty("user.dir"), "DiscordBot.jar"));
 	}
 	
 }
