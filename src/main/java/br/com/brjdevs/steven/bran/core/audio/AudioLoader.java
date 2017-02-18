@@ -117,6 +117,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 				if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null)
 					channel.getGuild().getAudioManager().closeAudioConnection();
 				channel.sendMessage("This playlist is too long! The maximum supported length is 30 hours. *" + AudioUtils.format(duration) + "/" + AudioUtils.format(MAX_PLAYLIST_LENGTH) + "*").queue();
+				if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null)
+					channel.getGuild().getAudioManager().closeAudioConnection();
 				return;
 			}
 			playlistTracks.forEach(trackContext -> musicManager.getTrackScheduler().getQueue().request(trackContext, true));

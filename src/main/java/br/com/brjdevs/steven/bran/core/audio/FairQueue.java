@@ -157,6 +157,7 @@ public class FairQueue<T extends TrackContext> {
 	public boolean request(T track, boolean silent) {
 		if (track.getInfo().length > AudioUtils.MAX_SONG_LENGTH) {
 			track.getContext().sendMessage("Could not add `" + track.getInfo().title + "` to the queue. Reason: `This song it's too long, the maximum supported length is 3 hours!").queue();
+			if (isEmpty() && getCurrentTrack() == null) getGuild().getAudioManager().closeAudioConnection();
 			return false;
 		}
 		if (!canRequest(track)) {
