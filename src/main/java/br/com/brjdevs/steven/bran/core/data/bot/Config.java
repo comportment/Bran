@@ -16,7 +16,7 @@ public class Config {
 	private String JENKINS_USER = "";
 	private String JENKINS_PASS = "";
 	private String JENKINS_TOKEN = "";
-	private String JENKINS_LATEST_BUILD = "http://144.217.94.249:8080/job/Bran/lastSuccessfulBuild/artifact/target/DiscordBot-1.0-SNAPSHOT.jar";
+	private String JENKINS_LATEST_BUILD = "";
 	private String BOT_TOKEN = "";
 	private String OWNER_ID = "";
 	private String DBOTS_TOKEN = "";
