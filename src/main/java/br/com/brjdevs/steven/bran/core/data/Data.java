@@ -9,14 +9,14 @@ import java.util.Map;
 
 public class Data {
 	
-	private GsonDataFileManager<DataHolder> userDataManager;
+	private GsonDataFileManager<DataHolder> dataHolderManager;
 	private GsonDataFileManager<Config> configDataManager;
 	private GsonDataFileManager<Map<String, List<String>>> hangmanWordsManager;
 	
 	public GsonDataFileManager<DataHolder> getDataHolderManager() {
-		if (userDataManager == null)
-			userDataManager = new GsonDataFileManager<>(DataHolder.class, "dataholder.json", DataHolder::new);
-		return userDataManager;
+		if (dataHolderManager == null)
+			dataHolderManager = new GsonDataFileManager<>(DataHolder.class, "dataholder.json", DataHolder::new);
+		return dataHolderManager;
 	}
 	
 	public GsonDataFileManager<Config> getConfigDataManager() {

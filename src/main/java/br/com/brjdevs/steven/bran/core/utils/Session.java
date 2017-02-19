@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
 import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.listeners.OptimizedListener;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
@@ -8,14 +9,12 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.lang.management.ManagementFactory;
 import java.util.List;
 
-public class Session implements EventListener {
+public class Session extends OptimizedListener<GuildMessageReceivedEvent> {
 	
 	private final Runtime instance = Runtime.getRuntime();
 	public double cpuUsage;
@@ -25,6 +24,7 @@ public class Session implements EventListener {
 	public Client client;
 	
 	public Session(Client client) {
+		super(GuildMessageReceivedEvent.class);
 		this.cpuUsage = 0;
 		this.cmds = 0;
 		this.msgsReceived = 0;
@@ -92,11 +92,7 @@ public class Session implements EventListener {
 		return sb.toString();
 	}
 	
-	@Override
-	public void onEvent(Event e) {
-		if (e instanceof MessageReceivedEvent) {
-			MessageReceivedEvent event = ((MessageReceivedEvent) e);
-			client.getSession().readMessage(event.getAuthor().getId().equals(event.getJDA().getSelfUser().getId()));
-		}
+	public void event(GuildMessageReceivedEvent event) {
+		client.getSession().readMessage(event.getAuthor().getId().equals(event.getJDA().getSelfUser().getId()));
 	}
 }

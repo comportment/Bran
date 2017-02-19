@@ -2,26 +2,23 @@ package br.com.brjdevs.steven.bran.features.hangman;
 
 import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.core.data.Profile;
+import br.com.brjdevs.steven.bran.core.listeners.OptimizedListener;
 import br.com.brjdevs.steven.bran.features.hangman.events.LeaveGameEvent;
 import br.com.brjdevs.steven.bran.features.hangman.events.LooseEvent;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 
-public class GuessListener implements EventListener {
+public class GuessListener extends OptimizedListener<GuildMessageReceivedEvent> {
 	
 	public Client client;
 	
 	public GuessListener(Client client) {
+		super(GuildMessageReceivedEvent.class);
 		this.client = client;
 	}
-	
 	@Override
-	public void onEvent(Event e) {
-		if (!(e instanceof GuildMessageReceivedEvent)) return;
-		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
+	public void event(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		Profile profile = client.getProfile(event.getAuthor());
 		HangManGame game = HangManGame.getSession(profile);
@@ -42,7 +39,7 @@ public class GuessListener implements EventListener {
 			channel.sendMessage(game.createEmbed(client).setDescription("Information on the current Game.").build()).queue();
 			return;
 		}
-		if (!msg.matches("^([A-Za-z]{1})$")) return;
+		if (!msg.matches("^([A-Za-z])$")) return;
 		game.guess(msg, profile, client);
 		if (event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
 			event.getMessage().delete().queue();

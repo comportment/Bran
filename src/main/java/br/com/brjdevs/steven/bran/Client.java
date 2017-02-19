@@ -55,12 +55,15 @@ public class Client {
 	private Messenger messenger;
 	
 	public Client() throws LoginException, InterruptedException, RateLimitedException {
+		this.data = new Data();
+		this.data.getHangmanWordsManager();
+		this.data.getConfigDataManager();
+		this.data.getDataHolderManager();
 		this.ownerId = 0;
 		this.ownerShardId = 0;
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
 		if (!workingDir.exists() && !workingDir.mkdirs())
 			throw new NullPointerException("Could not create config.json");
-		this.data = new Data();
 		this.totalShards = getRecommendedShards();
 		this.lastEvents = new AtomicLongArray(totalShards);
 		this.shards = new ClientShard[totalShards];

@@ -24,9 +24,6 @@ public class Main {
 			
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 				try {
-					client.getData().getDataHolderManager().update();
-					client.getData().getConfigDataManager().update();
-					client.getData().getHangmanWordsManager().update();
 					Arrays.stream(client.getShards()).forEach(ClientShard::shutdown);
 				} catch (Exception e) {
 				}

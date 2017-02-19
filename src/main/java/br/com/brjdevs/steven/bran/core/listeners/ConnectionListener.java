@@ -3,10 +3,9 @@ package br.com.brjdevs.steven.bran.core.listeners;
 import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.DiscordLog.Level;
 import net.dv8tion.jda.core.events.*;
-import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
-public class ConnectionListener implements EventListener {
+public class ConnectionListener extends OptimizedListener<Event> {
 	
 	private static SimpleLog LOG;
 	
@@ -17,11 +16,11 @@ public class ConnectionListener implements EventListener {
 	public Client client;
 	
 	public ConnectionListener(Client client) {
+		super(Event.class);
 		this.client = client;
 	}
 	
-	@Override
-	public void onEvent(Event event) {
+	public void event(Event event) {
 		if (event instanceof ReconnectedEvent) {
 			LOG.info("ReconnectedEvent on Shard " + client.getShardId(event.getJDA()));
 			client.getDiscordLog().logToDiscord("Connection Listener", "ReconnectedEvent on Shard " + client.getShardId(event.getJDA()), Level.INFO);
