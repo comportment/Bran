@@ -26,9 +26,10 @@ public class Jenkins {
 	}
 	
 	public void copyFile(File sourceFile, File destFile) throws IOException {
-		if (!destFile.exists()) {
-			destFile.createNewFile();
+		if (destFile.exists()) {
+			destFile.delete();
 		}
+		destFile.createNewFile();
 		
 		FileChannel source = null;
 		FileChannel destination = null;

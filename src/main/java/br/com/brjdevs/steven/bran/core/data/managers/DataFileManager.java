@@ -3,6 +3,7 @@ package br.com.brjdevs.steven.bran.core.data.managers;
 import br.com.brjdevs.steven.bran.core.utils.IOUtils;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,6 +48,8 @@ public class DataFileManager implements Supplier<List<String>> {
 	
 	public void update() {
 		try {
+			File f = path.toFile();
+			if (f.exists()) f.delete();
 			IOUtils.write(path, this.data.stream().collect(Collectors.joining()));
 		} catch (IOException e) {
 			throw new RuntimeException(e);

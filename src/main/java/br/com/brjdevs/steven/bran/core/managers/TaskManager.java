@@ -55,7 +55,7 @@ public class TaskManager {
 	    startAsyncTask(
 			    () -> client.getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100), 5);
 		startAsyncTask(() -> Arrays.stream(client.getShards()).forEach(shard -> {
-			if (shard.getCurrentGuildCount() < shard.getJDA().getGuilds().size()) return;
+			if (shard.getCurrentGuildCount() > shard.getJDA().getGuilds().size()) return;
 			try {
 				shard.updateStats();
 				shard.updateCurrentGuildCount();
