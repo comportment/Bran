@@ -9,8 +9,8 @@ import java.util.Map;
 
 public class DataHolder {
 	
-	public Map<Long, GuildData> guilds = new HashMap<>();
-	public Map<Long, UserData> users = new HashMap<>();
+	private Map<Long, GuildData> guilds = new HashMap<>();
+	private Map<Long, UserData> users = new HashMap<>();
 	
 	public GuildData getGuild(Guild guild, Config config) {
 		return guilds.computeIfAbsent(Long.parseLong(guild.getId()), id -> new GuildData(guild, config));
