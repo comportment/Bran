@@ -9,19 +9,18 @@ import br.com.brjdevs.steven.bran.core.utils.ArrayUtils;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 
-public class ActionListener implements EventListener {
+public class ActionListener extends OptimizedListener<Event> {
 	
 	private Client client;
 	
 	public ActionListener(Client client) {
+		super(Event.class);
 		this.client = client;
 	}
 	
-	
 	@Override
-	public void onEvent(Event e) {
+	public void event(Event e) {
 		ResponseWaiter responseWaiter = null;
 		String response = null;
 		Object obj = null;
@@ -47,5 +46,6 @@ public class ActionListener implements EventListener {
 				responseWaiter.getResponseListener().onEvent(new UnexpectedResponseEvent(responseWaiter, obj));
 			
 		}
+		
 	}
 }

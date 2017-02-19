@@ -16,6 +16,7 @@ import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
@@ -262,6 +263,10 @@ public class MusicCommand {
 								event.sendMessage("I'm not playing anything! Use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
 								return;
 							}
+							if (manager.getPlayer().getPlayingTrack().getState() != AudioTrackState.PLAYING) {
+								event.sendMessage("This track is still loading, please wait!").queue();
+								return;
+							}
 							TrackContext context = scheduler.getQueue().getCurrentTrack();
 							if (AudioUtils.isAllowed(event.getAuthor(), context)) {
 								event.sendMessage("The DJ has decided to skip!").queue();
@@ -299,6 +304,10 @@ public class MusicCommand {
 							TrackScheduler scheduler = manager.getTrackScheduler();
 							if (manager.getPlayer().getPlayingTrack() == null) {
 								event.sendMessage("I'm not playing anything, so I can't skip!").queue();
+								return;
+							}
+							if (manager.getPlayer().getPlayingTrack().getState() != AudioTrackState.PLAYING) {
+								event.sendMessage("This track is still loading, please wait!").queue();
 								return;
 							}
 							event.sendMessage("Skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`...").queue();

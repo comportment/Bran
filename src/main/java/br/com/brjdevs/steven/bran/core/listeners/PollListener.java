@@ -6,25 +6,22 @@ import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 
 import java.util.regex.Pattern;
 
-public class PollListener implements EventListener {
+public class PollListener extends OptimizedListener<GuildMessageReceivedEvent> {
 	private static final Pattern OPTION_INDEX = Pattern.compile("^([0-9]{1,2})$");
 	
 	public Client client;
 	
 	public PollListener(Client client) {
+		super(GuildMessageReceivedEvent.class);
 		this.client = client;
 	}
 	
 	@Override
-	public void onEvent(Event e) {
-		if (!(e instanceof GuildMessageReceivedEvent)) return;
-		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
+	public void event(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		//TODO fix dis
 		//Action action = Action.getAction(event.getAuthor().getId());

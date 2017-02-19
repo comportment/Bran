@@ -32,8 +32,16 @@ public class TaskManager {
 		return channelLeaveTimer;
 	}
 	
+	public void setChannelLeaveTimer(ChannelLeaveTimer channelLeaveTimer) {
+		this.channelLeaveTimer = channelLeaveTimer;
+	}
+	
 	public MusicRegisterTimeout getMusicRegisterTimeout() {
 		return musicRegisterTimeout;
+	}
+	
+	public void setMusicRegisterTimeout(MusicRegisterTimeout musicRegisterTimeout) {
+		this.musicRegisterTimeout = musicRegisterTimeout;
 	}
 	
 	public void startAsyncTask(Runnable run, int seconds) {

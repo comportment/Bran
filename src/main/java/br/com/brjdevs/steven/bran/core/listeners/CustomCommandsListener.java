@@ -10,19 +10,18 @@ import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomCommandsListener implements EventListener {
+public class CustomCommandsListener extends OptimizedListener<GuildMessageReceivedEvent> {
 	
 	private static Pattern RANDOM_PATTERN = Pattern.compile("(\\$random\\{.+?;+.+?})", Pattern.CASE_INSENSITIVE);
 	public Client client;
 	
 	public CustomCommandsListener(Client client) {
+		super(GuildMessageReceivedEvent.class);
 		this.client = client;
 	}
 	
@@ -45,9 +44,7 @@ public class CustomCommandsListener implements EventListener {
 	}
 	
 	@Override
-	public void onEvent(Event e) {
-		if (!(e instanceof GuildMessageReceivedEvent)) return;
-		GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
+	public void event(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
 		if (!guildData.customCommands.isEmpty()) return;

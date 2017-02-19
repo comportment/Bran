@@ -5,21 +5,20 @@ import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.member.GenericGuildMemberEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 
 import javax.xml.ws.Holder;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AnnouncesListener implements EventListener {
+public class AnnouncesListener extends OptimizedListener<GenericGuildMemberEvent> {
 	
 	public Client client;
 	
 	public AnnouncesListener(Client client) {
+		super(GenericGuildMemberEvent.class);
 		this.client = client;
 	}
 	
@@ -36,9 +35,8 @@ public class AnnouncesListener implements EventListener {
 		return out.value;
 	}
 	
-	public void onEvent(Event e) {
-		if (!(e instanceof GenericGuildMemberEvent)) return;
-		GenericGuildMemberEvent event = (GenericGuildMemberEvent) e;
+	@Override
+	public void event(GenericGuildMemberEvent event) {
 		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
 		if (guildData.getAnnounceTextChannel(event.getJDA()) == null) return;
 		Member member = event.getMember();
