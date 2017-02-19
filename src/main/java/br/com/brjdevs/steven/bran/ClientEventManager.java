@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran;
 
+import br.com.brjdevs.steven.bran.core.listeners.OptimizedListener;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -24,7 +25,7 @@ public class ClientEventManager implements IEventManager {
 		this.shard = shard;
 		this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("Event Manager [" + shard.getId() + "]-%d").build());
 		register(new Reflections("br.com.brjdevs.steven.bran")
-				.getSubTypesOf(EventListener.class).stream()
+				.getSubTypesOf(OptimizedListener.class).stream()
 				.map(clazz -> {
 					try {
 						return clazz.getConstructor(Client.class).newInstance(shard.client);

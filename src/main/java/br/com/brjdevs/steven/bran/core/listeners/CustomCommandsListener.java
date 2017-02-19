@@ -47,7 +47,7 @@ public class CustomCommandsListener extends OptimizedListener<GuildMessageReceiv
 	public void event(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
-		if (!guildData.customCommands.isEmpty()) return;
+		if (guildData.customCommands.isEmpty()) return;
 		String msg = event.getMessage().getRawContent().trim().toLowerCase().split("\\s+")[0];
 		String prefix = PrefixManager.getPrefix0(msg, guildData);
 		if (prefix == null) return;
