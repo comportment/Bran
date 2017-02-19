@@ -50,6 +50,7 @@ public class DataFileManager implements Supplier<List<String>> {
 		try {
 			File f = path.toFile();
 			if (f.exists()) f.delete();
+			f.createNewFile();
 			IOUtils.write(path, this.data.stream().collect(Collectors.joining()));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
