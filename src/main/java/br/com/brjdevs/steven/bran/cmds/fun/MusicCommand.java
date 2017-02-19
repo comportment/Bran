@@ -20,8 +20,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +27,8 @@ import java.util.stream.Collectors;
 import static br.com.brjdevs.steven.bran.core.managers.Permissions.DJ;
 
 public class MusicCommand {
+	
+	private static final String URL_REGEX = "^((ht|f)tp(s?)://)(\\w+(:\\w+)?@)?((((((25[0-5])|(2[0-4][0-9])|([01]?[0-9]?[0-9]))\\.){3}((25[0-4])|(2[0-4][0-9])|((1?[1-9]?[1-9])|([1-9]0))))|(0\\.){3}0)|([0-9a-z_!~*'()-]+\\.)*([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\.[a-z]{2,6}|([a-zA-Z][-a-zA-Z0-9]+))(:[0-9]{1,5})?((/?)|(/[0-9a-zA-Z_!~*'().;?:@&=+$,%#-]+)+/?)$";
 	private static final String PLAYING = "\u25b6";
 	private static final String PAUSED = "\u23f8";
 	private static final String REPEAT = "\uD83D\uDD01";
@@ -89,11 +89,8 @@ public class MusicCommand {
 								event.sendMessage("You can only have " + event.getGuildData().maxSongsPerUser + " songs in the queue.").queue();
 								return;
 							}
-							try {
-								new URL(trackUrl);
-							} catch (MalformedURLException ignored) {
+							if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:"))
 								trackUrl = "ytsearch:" + trackUrl;
-							}
 							event.getClient().playerManager.loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
 						})
 						.build())
