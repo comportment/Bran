@@ -32,7 +32,6 @@ public class MusicCommand {
 	private static final String PLAYING = "\u25b6";
 	private static final String PAUSED = "\u23f8";
 	private static final String REPEAT = "\uD83D\uDD01";
-	private static final String SHUFFLE = "\uD83D\uDD00";
 	
 	@Command
 	private static ICommand music() {

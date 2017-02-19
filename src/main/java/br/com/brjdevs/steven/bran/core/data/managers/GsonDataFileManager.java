@@ -57,9 +57,6 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 	
 	public void update() {
 		try {
-			File f = path.toFile();
-			if (f.exists()) f.delete();
-			f.createNewFile();
 			IOUtils.write(path, GSON.toJson(data));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
