@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
 
 public class Session extends OptimizedListener<GuildMessageReceivedEvent> {
@@ -22,6 +23,9 @@ public class Session extends OptimizedListener<GuildMessageReceivedEvent> {
 	public long msgsReceived;
 	public long msgsSent;
 	public Client client;
+	private int availableProcessors = Runtime.getRuntime().availableProcessors();
+	private double lastProcessCpuTime = 0;
+	private long lastSystemTime = 0;
 	
 	public Session(Client client) {
 		super(GuildMessageReceivedEvent.class);
@@ -31,7 +35,11 @@ public class Session extends OptimizedListener<GuildMessageReceivedEvent> {
 		this.msgsSent = 0;
 		this.client = client;
 	}
-
+	
+	private static double calculateProcessCpuTime(OperatingSystemMXBean os) {
+		return ((com.sun.management.OperatingSystemMXBean) os).getProcessCpuTime();
+	}
+	
 	public void readMessage(boolean isSelf) {
 		if (isSelf) msgsSent++; else msgsReceived++;
 	}
@@ -51,6 +59,18 @@ public class Session extends OptimizedListener<GuildMessageReceivedEvent> {
 		
 		uptime = StringUtils.replaceLast(uptime, ", ", "");
 		return StringUtils.replaceLast(uptime, ",", " and");
+	}
+	
+	public double calculateCpuUsage(OperatingSystemMXBean os) {
+		long systemTime = System.nanoTime();
+		double processCpuTime = calculateProcessCpuTime(os);
+		
+		double cpuUsage = (processCpuTime - lastProcessCpuTime) / ((double) (systemTime - lastSystemTime));
+		
+		lastSystemTime = systemTime;
+		lastProcessCpuTime = processCpuTime;
+		
+		return cpuUsage / availableProcessors;
 	}
 	
 	public String toString(JDA jda) {

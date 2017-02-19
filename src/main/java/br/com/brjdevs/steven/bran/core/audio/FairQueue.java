@@ -140,10 +140,16 @@ public class FairQueue<T extends TrackContext> {
 	
 	public void next(boolean skip) {
 		if (isRepeat() && !skip && getCurrentTrack() != null) {
-			start(getCurrentTrack(), false);
+			start(getCurrentTrack().makeClone(), false);
 			return;
 		}
 		start(queue.poll(), false);
+	}
+	
+	public void stop() {
+		queue.clear();
+		next(true);
+		getGuild().getAudioManager().closeAudioConnection();
 	}
 	
 	private void start(T track, boolean noInterrupt) {

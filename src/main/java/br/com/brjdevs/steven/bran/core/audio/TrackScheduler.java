@@ -46,8 +46,7 @@ public class TrackScheduler {
 	}
 	
 	public void stop() {
-		getQueue().getRawQueue().clear();
-		getQueue().next(true);
+		getQueue().stop();
 	}
 	
 	public AudioPlayer getAudioPlayer() {

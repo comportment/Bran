@@ -12,6 +12,7 @@ import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
@@ -31,7 +32,7 @@ public class CommandListener extends OptimizedListener<MessageReceivedEvent> {
 			return;
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
-		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
+		GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
 		String prefix = PrefixManager.getPrefix(args[0], guildData, client);
 		if (prefix == null) return;
 		String baseCmd = args[0].substring(prefix.length());

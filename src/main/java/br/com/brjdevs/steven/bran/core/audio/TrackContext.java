@@ -34,7 +34,7 @@ public interface TrackContext {
 	
 	AudioTrack getTrack();
 	
-	TrackContext makeClone();
+	<T extends TrackContext> T makeClone();
 	
 	TrackScheduler getTrackScheduler();
 }

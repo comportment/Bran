@@ -53,7 +53,7 @@ public class TaskManager {
 	    final OperatingSystemMXBean os =
 			    ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
 	    startAsyncTask(
-			    () -> client.getSession().cpuUsage = (Math.floor(os.getProcessCpuLoad() * 10000) / 100), 5);
+			    () -> client.getSession().cpuUsage = client.getSession().calculateCpuUsage(os), 5);
 		startAsyncTask(() -> Arrays.stream(client.getShards()).forEach(shard -> {
 			if (shard.getCurrentGuildCount() > shard.getJDA().getGuilds().size()) return;
 			try {
@@ -66,6 +66,6 @@ public class TaskManager {
 								"Unexpected exception occurred while updating Shard " + shard.getId() + " server count!\n" + Hastebin.post(OtherUtils.getStackTrace(e)),
 								Level.WARN);
 			}
-		}), 216000);
+		}), 3600);
 	}
 }

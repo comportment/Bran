@@ -59,9 +59,9 @@ public class TrackContextImpl implements TrackContext {
 	}
 	
 	@Override
-	public TrackContext makeClone() {
+	public <T extends TrackContext> T makeClone() {
 		this.track = track.makeClone();
-		return this;
+		return (T) this;
 	}
 	
 	@Override

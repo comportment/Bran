@@ -1,8 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
 import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.audio.utils.VoiceChannelListener;
 import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -40,8 +38,6 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			if (!(scheduler.getQueue().isEmpty() && scheduler.getQueue().isEmpty()) && scheduler.isPaused())
 				scheduler.setPaused(false);
 			attempts = 0;
-			if (AudioUtils.isAlone(getGuild().getAudioManager().getConnectedChannel()) && !client.taskManager.getChannelLeaveTimer().has(getGuild().getId()))
-				VoiceChannelListener.onLeave(getGuild(), getGuild().getAudioManager().getConnectedChannel());
 		} else if (connectionStatus == ConnectionStatus.AUDIO_REGION_CHANGE) {
 			scheduler.setPaused(true);
 			send("I detected a Region Change in this Guild, just give me a second to create a new connection, okay?");
@@ -49,7 +45,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			attempts += 1;
 			if (attempts > 3) {
 				send("I failed to reconnect 3 times, have you tried changing the server region?");
-				getGuild().getAudioManager().closeAudioConnection();
+				getMusicManager().getTrackScheduler().getQueue().stop();
 				this.attempts = 0;
 				return;
 			}
