@@ -78,6 +78,7 @@ public class ClientShard {
 	}
 	
 	public void shutdown() {
+		jda.getGuilds().forEach(g -> g.getAudioManager().closeAudioConnection());
 		jda.shutdown();
 		eventManager.executor.shutdown();
 	}
