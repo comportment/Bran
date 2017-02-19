@@ -7,7 +7,6 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.managers.jenkins.Jenkins;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
@@ -20,7 +19,6 @@ import net.dv8tion.jda.core.entities.Icon;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -86,24 +84,6 @@ public class BotCommand {
 						.setName("Bot Admin Command")
 						.setHelp("bot admin ?")
 						.setRequiredPermission(BOT_ADMIN)
-						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
-								.setAliases("update")
-								.setName("Bot Update Command")
-								.setDescription("Downloads and switch the Jars.")
-								.setAction((event) -> {
-									Jenkins jenkins = event.getClient().jenkins;
-									try {
-										event.sendMessage("Downloading JAR from Jenkins...").queue();
-										jenkins.downloadFile(System.getProperty("user.dir") + File.separator + "cache");
-										event.sendMessage("Downloaded Jar, switching it...").complete();
-										jenkins.copyFile(new File(System.getProperty("user.dir") + File.separator + "cache", "DiscordBot-1.0-SNAPSHOT.jar"), new File(System.getProperty("user.dir"), "DiscordBot.jar"));
-										event.getClient().shutdownAll(ExitCodes.RESTART);
-									} catch (IOException e) {
-										event.sendMessage("Something went wrong while downloading the JAR. " + Hastebin.post(OtherUtils.getStackTrace(e))).queue();
-										return;
-									}
-								})
-								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 								.setAliases("save")
 								.setName("Save Command")
