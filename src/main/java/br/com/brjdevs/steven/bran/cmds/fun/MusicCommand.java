@@ -143,7 +143,7 @@ public class MusicCommand {
 							if (musicManager.getPlayer().getPlayingTrack() != null) {
 								AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
 								TrackContext context = musicManager.getTrackScheduler().getQueue().getCurrentTrack();
-								builder.append("[Current song information for `").append(channel.getName()).append("`] \uD83C\uDFB6 ").append(info.title).append("\n\n");
+								builder.append("[Current song information for `").append(channel == null ? "Not connected." : channel.getName()).append("`] \uD83C\uDFB6 ").append(info.title).append("\n\n");
 								builder.append("\uD83D\uDC49 DJ » `").append(OtherUtils.getUser(context.getDJ())).append("`\n\n");
 								builder.append(scheduler.isPaused() ? PAUSED : scheduler.getQueue().isRepeat() ? REPEAT : PLAYING).append(" ");
 								builder.append(AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length)).append(" [").append(AudioUtils.format(context.getTrack().getPosition())).append("/").append(AudioUtils.format(info.length)).append("]");

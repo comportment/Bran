@@ -61,6 +61,10 @@ public class Permissions {
 		senderPerm = MathHelper.previousPowerOfTwo(MathHelper.roundToPowerOf2(senderPerm)); //Get the biggest
 		return targetPerm <= senderPerm;
     }
+	
+	public static boolean hasPermission(long userPerm, long perm) {
+		return (userPerm & perm) == perm;
+	}
 
 
     private static long bits(long... bits) {

@@ -13,6 +13,12 @@ public class Data {
 	private GsonDataFileManager<Config> configDataManager;
 	private GsonDataFileManager<Map<String, List<String>>> hangmanWordsManager;
 	
+	public Data() {
+		getDataHolderManager();
+		getConfigDataManager();
+		getHangmanWordsManager();
+	}
+	
 	public GsonDataFileManager<DataHolder> getDataHolderManager() {
 		if (dataHolderManager == null)
 			dataHolderManager = new GsonDataFileManager<>(DataHolder.class, "dataholder.json", DataHolder::new);

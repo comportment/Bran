@@ -27,14 +27,12 @@ public class DataFileManager implements Supplier<List<String>> {
 				LOG.info("Could not find config file at " + this.path.toFile().getAbsolutePath() + ", creating a new one...");
 				if (this.path.toFile().createNewFile()) {
 					LOG.info("Generated new config file at " + this.path.toFile().getAbsolutePath() + ".");
-					IOUtils.write(this.path, this.data.stream().collect(Collectors.joining()));
-					LOG.info("Please, fill the file with valid properties.");
 				} else {
 					LOG.warn("Could not create config file at " + path);
 				}
+			} else {
+				Collections.addAll(this.data, IOUtils.read(this.path).split("\\r\\n|\\n|\\r"));
 			}
-			
-			Collections.addAll(this.data, IOUtils.read(this.path).split("\\r\\n|\\n|\\r"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

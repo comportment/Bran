@@ -20,17 +20,8 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 	private T data;
 	
 	public GsonDataFileManager(Class<T> clazz, String path, Supplier<T> constructor) {
-		this.path = Paths.get(System.getProperty("user.dir") + File.separator + "data" + File.separator + path);
+		this.path = Paths.get("./data" + File.separator + path);
 		try {
-			if (!this.path.getParent().toFile().exists()) {
-				LOG.info("Could not find parent file, creating a new one...");
-				if (this.path.getParent().toFile().mkdirs()) {
-					LOG.info("Generated new parent!");
-				} else {
-					LOG.info("Failed to generate parent!");
-					System.exit(0);
-				}
-			}
 			if (!this.path.toFile().exists()) {
 				LOG.info("Could not find config file at " + this.path.toFile().getAbsolutePath() + ", creating a new one...");
 				if (this.path.toFile().createNewFile()) {
@@ -40,10 +31,9 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 				} else {
 					LOG.warn("Could not create config file at " + path);
 				}
-				System.exit(0);
+			} else {
+				this.data = GSON.fromJson(IOUtils.read(this.path), clazz);
 			}
-			
-			this.data = GSON.fromJson(IOUtils.read(this.path), clazz);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);

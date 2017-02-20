@@ -91,7 +91,7 @@ public class CommandBuilder {
 				if (event.isPrivate() && !isPrivateAvailable()) {
 					event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
 					return;
-				} else if (!event.getGuildData().hasPermission(event.getAuthor(), perm)) {
+				} else if (event.isPrivate() ? !event.getUserData().hasPermission(getRequiredPermission()) : !event.getGuildData().hasPermission(event.getAuthor(), getRequiredPermission())) {
 					event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
 					return;
 				}

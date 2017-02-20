@@ -4,6 +4,7 @@ import br.com.brjdevs.steven.bran.Client;
 import br.com.brjdevs.steven.bran.ClientShard;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
+import br.com.brjdevs.steven.bran.core.data.UserData;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
@@ -118,6 +119,10 @@ public class CommandEvent {
 	
 	public GuildData getGuildData() {
 		return guildData;
+	}
+	
+	public UserData getUserData() {
+		return getClient().getData().getDataHolderManager().get().getUser(event.getAuthor());
 	}
 	
 	public Guild getGuild() {

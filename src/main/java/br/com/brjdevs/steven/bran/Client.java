@@ -56,9 +56,6 @@ public class Client {
 	
 	public Client() throws LoginException, InterruptedException, RateLimitedException {
 		this.data = new Data();
-		this.data.getHangmanWordsManager();
-		this.data.getConfigDataManager();
-		this.data.getDataHolderManager();
 		this.ownerId = 0;
 		this.ownerShardId = 0;
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
@@ -237,7 +234,7 @@ public class Client {
 				if (musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null) return;
 				TextChannel channel = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
 				if (channel != null && channel.canTalk())
-					channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, strong and better.").queue();
+					channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, strong and better.").complete();
 			} catch (Exception ignored) {
 			}
 		});
