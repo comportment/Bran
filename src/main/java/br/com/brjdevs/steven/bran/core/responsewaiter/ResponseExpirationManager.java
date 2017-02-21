@@ -20,7 +20,7 @@ public class ResponseExpirationManager {
 	public ResponseExpirationManager(Map<ResponseWaiter, Long> timingOut) {
 		this.TIMING_OUT = Collections.synchronizedMap(timingOut);
 		
-		Thread thread = new Thread(this::threadcode, "MusicRegisterTimeout");
+		Thread thread = new Thread(this::threadcode, "ResponseExpirationManager");
 		thread.setDaemon(true);
 		thread.start();
 	}
@@ -73,7 +73,7 @@ public class ResponseExpirationManager {
 				ResponseWaiter responseWaiter = closestEntry.getKey();
 				TIMING_OUT.remove(responseWaiter);
 				ResponseWaiter.responseWaiters.remove(responseWaiter.getUserId());
-				closestEntry.getKey().getResponseListener().onEvent(new ResponseTimeoutEvent(responseWaiter));
+				responseWaiter.getResponseListener().onEvent(new ResponseTimeoutEvent(responseWaiter));
 			} else timingOutUpdated = false; //and the loop will restart and resolve it
 		}
 	}

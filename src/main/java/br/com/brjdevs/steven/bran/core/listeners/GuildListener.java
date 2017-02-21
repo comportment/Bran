@@ -19,6 +19,7 @@ public class GuildListener extends OptimizedListener<GenericGuildEvent> {
 		if (event instanceof GuildJoinEvent) {
 			client.getDiscordLog().logToDiscord((GuildJoinEvent) event);
 		} else if (event instanceof GuildLeaveEvent) {
+			client.getData().getDataHolderManager().get().guilds.remove(Long.parseLong(event.getGuild().getId()));
 			client.getDiscordLog().logToDiscord((GuildLeaveEvent) event);
 		}
 	}

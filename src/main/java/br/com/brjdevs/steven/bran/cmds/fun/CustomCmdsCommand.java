@@ -24,7 +24,7 @@ public class CustomCmdsCommand {
 				.setRequiredPermission(Permissions.CUSTOM_CMDS)
 				.setAliases("cmds", "com")
 				.setName("Custom Commands")
-				.setExample("cmds create hello Hello $user")
+				.setExample("cmds create hello Hello %user%")
 				.setHelp("cmds ?")
 				.setDescription("Create Simple or Advanced custom commands, you choose!")
 				.setDefault("list")
@@ -34,7 +34,7 @@ public class CustomCmdsCommand {
 						.setName("Custom Command Create")
 						.setDescription("Creates Custom Commands!")
 						.setArgs(new Argument<>("name", String.class), new Argument<>("answer", String.class))
-						.setExample("cmds create hello Hello $user")
+						.setExample("cmds create hello Hello %user%")
 						.setAction((event) -> {
 							String cmdName = ((String) event.getArgument("name").get()).toLowerCase();
 							if (event.getGuildData().customCommands.containsKey(cmdName)) {
@@ -52,7 +52,7 @@ public class CustomCmdsCommand {
 						.setName("Custom Command Add Answer")
 						.setDescription("Add answers to existent commands")
 						.setArgs(new Argument<>("name", String.class), new Argument<>("answer", String.class))
-						.setExample("cmds addanswer hello Good Morning $user.")
+						.setExample("cmds addanswer hello Good Morning %user%.")
 						.setAction((event) -> {
 							String cmdName = (String) event.getArgument("name").get();
 							String newAnswer = (String) event.getArgument("answer").get();

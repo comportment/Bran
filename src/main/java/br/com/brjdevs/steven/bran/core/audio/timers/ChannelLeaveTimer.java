@@ -92,18 +92,15 @@ public class ChannelLeaveTimer {
 				TIMING_OUT.remove(id);
 				JDA jda = client.getShards()[client.calcShardId(Long.parseLong(id))].getJDA();
 				Guild guild = jda.getGuildById(id);
-				if (guild == null) return;
-				MusicManager musicManager = client.playerManager.get(guild);
-				TrackScheduler scheduler = musicManager.getTrackScheduler();
-				TrackContext track = scheduler.getQueue().getCurrentTrack();
-				if (track == null) track = scheduler.getQueue().getPreviousTrack();
-				scheduler.getQueue().getRawQueue().clear();
-				scheduler.getQueue().next(true);
-				if (track != null && track.getContext() != null && track.getContext().canTalk())
-					track.getContext().sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
-				musicManager.getTrackScheduler().setPaused(false);
-				if (guild.getAudioManager().isConnected())
-					guild.getAudioManager().closeAudioConnection();
+				if (guild != null) {
+					MusicManager musicManager = client.playerManager.get(guild);
+					TrackScheduler scheduler = musicManager.getTrackScheduler();
+					TrackContext track = scheduler.getQueue().getCurrentTrack() == null ? scheduler.getQueue().getPreviousTrack() : scheduler.getQueue().getCurrentTrack();
+					if (track != null && track.getContext() != null && track.getContext().canTalk())
+						track.getContext().sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
+					scheduler.getQueue().stop();
+					musicManager.getTrackScheduler().setPaused(false);
+				}
 			} else timingOutUpdated = false; //and the loop will restart and resolve it
 		}
 	}
