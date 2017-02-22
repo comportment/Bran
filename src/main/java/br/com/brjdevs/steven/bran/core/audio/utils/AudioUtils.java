@@ -38,9 +38,7 @@ public class AudioUtils {
 	}
 	
 	public static long getLength(AudioPlaylist audioPlaylist) {
-		long[] total = {0};
-		audioPlaylist.getTracks().forEach(track -> total[0] += track.getInfo().length);
-		return total[0];
+		return audioPlaylist.getTracks().stream().mapToLong(track -> track.getInfo().length).sum();
 	}
 	public static String format(AudioTrack track) {
 		return format(track.getInfo().length);

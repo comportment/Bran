@@ -33,7 +33,8 @@ public class VoiceChannelListener extends OptimizedListener<GenericGuildVoiceEve
 		MusicManager player = client.playerManager.get(guild);
 		TrackContext track = player.getTrackScheduler().getQueue().getCurrentTrack();
 		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.get(guild.getId()).right);
-		if (voiceChannel != channel && !member.equals(guild.getSelfMember())) return;
+		if (voiceChannel != channel && !member.equals(guild.getSelfMember()))
+			return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
 			AudioUtils.connect(channel, track.getContext(), client);
 		player.getTrackScheduler().setPaused(false);

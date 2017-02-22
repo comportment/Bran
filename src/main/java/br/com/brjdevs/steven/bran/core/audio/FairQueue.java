@@ -146,6 +146,10 @@ public class FairQueue<T extends TrackContext> {
 		start(queue.poll(), false);
 	}
 	
+	public boolean isStopped() {
+		return isEmpty() && getCurrentTrack() == null;
+	}
+	
 	public void stop() {
 		queue.clear();
 		next(true);

@@ -95,11 +95,14 @@ public class ChannelLeaveTimer {
 				if (guild != null) {
 					MusicManager musicManager = client.playerManager.get(guild);
 					TrackScheduler scheduler = musicManager.getTrackScheduler();
-					TrackContext track = scheduler.getQueue().getCurrentTrack() == null ? scheduler.getQueue().getPreviousTrack() : scheduler.getQueue().getCurrentTrack();
-					if (track != null && track.getContext() != null && track.getContext().canTalk())
-						track.getContext().sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
-					scheduler.getQueue().stop();
-					musicManager.getTrackScheduler().setPaused(false);
+					if (scheduler.getQueue().getAudioPlayer().isPaused()) {
+						TrackContext track = scheduler.getQueue().getCurrentTrack() == null ? scheduler.getQueue().getPreviousTrack()
+								: scheduler.getQueue().getCurrentTrack();
+						if (track != null && track.getContext() != null && track.getContext().canTalk())
+							track.getContext().sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
+						scheduler.getQueue().stop();
+						musicManager.getTrackScheduler().setPaused(false);
+					}
 				}
 			} else timingOutUpdated = false; //and the loop will restart and resolve it
 		}

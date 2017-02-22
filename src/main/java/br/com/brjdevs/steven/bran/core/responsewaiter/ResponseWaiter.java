@@ -33,6 +33,9 @@ public class ResponseWaiter {
 		this.clientShard = clientShard;
 		this.responseListener = responseListener;
 		this.expectedResponseType = expectedResponseType;
+		if (responseWaiters.containsKey(userId)) {
+			EXPIRATION.removeResponseWaiter(responseWaiters.get(userId));
+		}
 		responseWaiters.put(userId, this);
 		EXPIRATION.addResponseWaiter(this, System.currentTimeMillis() + expiresIn);
 	}
