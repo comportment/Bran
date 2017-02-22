@@ -47,6 +47,10 @@ public class BanCommand {
 							event.sendMessage("Cannot remove myself from the Guild with Moderation Commands, please remove me own your own.").queue();
 							continue;
 						}
+						if (!event.getSelfMember().canInteract(event.getGuild().getMember(user))) {
+							event.sendMessage("I can't ban " + OtherUtils.getUser(user) + "!").queue();
+							continue;
+						}
 						event.getGuild().getController().ban(user.getId(), 7).queue(b -> {
 									String out = "Banned " + users.stream().filter(Objects::nonNull).map(OtherUtils::getUser).collect(Collectors.joining(", ")) + "!";
 									event.sendMessage(Quotes.SUCCESS, out).queue();

@@ -47,6 +47,10 @@ public class KickCommand {
 							event.sendMessage("Cannot remove myself from the Guild with Moderation Commands, please remove me own your own.").queue();
 							continue;
 						}
+						if (!event.getSelfMember().canInteract(event.getGuild().getMember(user))) {
+							event.sendMessage("I can't kick " + OtherUtils.getUser(user) + "!").queue();
+							continue;
+						}
 						event.getGuild().getController().kick(user.getId()).queue(s -> {
 									String out = "Kicked " + users.stream().filter(Objects::nonNull).map(OtherUtils::getUser).collect(Collectors.joining(", ")) + "!";
 									event.sendMessage(Quotes.SUCCESS, out).queue();

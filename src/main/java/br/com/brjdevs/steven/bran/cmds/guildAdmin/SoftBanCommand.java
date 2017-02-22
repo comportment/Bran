@@ -47,6 +47,10 @@ public class SoftBanCommand {
 							event.sendMessage("Cannot remove myself from the Guild with Moderation Commands, please remove me own your own.").queue();
 							continue;
 						}
+						if (!event.getSelfMember().canInteract(event.getGuild().getMember(user))) {
+							event.sendMessage("I can't softban " + OtherUtils.getUser(user) + "!").queue();
+							continue;
+						}
 						event.getGuild().getController().ban(user, 7)
 								.queue(success -> {
 											event.getGuild().getController().unban(user).queue(s -> {
