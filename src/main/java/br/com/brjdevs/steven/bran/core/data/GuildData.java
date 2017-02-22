@@ -9,13 +9,12 @@ import br.com.brjdevs.steven.bran.core.operations.ResultType;
 import br.com.brjdevs.steven.bran.core.operations.ResultType.OperationResult;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GuildData {
 	
@@ -35,6 +34,7 @@ public class GuildData {
 	private long guildId;
 	private Map<Long, Long> permissions = new HashMap<>();
 	private long announceChannelId;
+	private List<Long> publicRoles = new ArrayList<>();
 	
 	public GuildData(Guild guild, Config config) {
 		this.guildId = Long.parseLong(guild.getId());
@@ -78,5 +78,31 @@ public class GuildData {
 	
 	public void setAnnounceTextChannel(TextChannel textChannel) {
 		this.announceChannelId = Long.parseLong(textChannel.getId());
+	}
+	
+	public List<Long> getPublicRoles() {
+		if (publicRoles == null) publicRoles = new ArrayList<>();
+		return publicRoles;
+	}
+	
+	public List<Role> getPublicRoles(JDA jda) {
+		if (publicRoles == null) publicRoles = new ArrayList<>();
+		Guild guild = getGuild(jda);
+		return Collections.unmodifiableList(publicRoles.stream().map(id -> guild.getRoleById(String.valueOf(id))).filter(Objects::nonNull).collect(Collectors.toList()));
+	}
+	
+	public boolean isPublic(Role role) {
+		if (publicRoles == null) publicRoles = new ArrayList<>();
+		return publicRoles.contains(Long.parseLong(role.getId()));
+	}
+	
+	public void addPublicRole(Role role) {
+		if (publicRoles == null) publicRoles = new ArrayList<>();
+		publicRoles.add(Long.valueOf(role.getId()));
+	}
+	
+	public void removePublicRole(Role role) {
+		if (publicRoles == null) publicRoles = new ArrayList<>();
+		publicRoles.remove(Long.valueOf(role.getId()));
 	}
 }
