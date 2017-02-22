@@ -115,15 +115,20 @@ public class FairQueue<T extends TrackContext> {
 	}
 	
 	public boolean restartSong(TextChannel textChannel) {
-		if (getCurrentTrack() == null && getPreviousTrack() == null) {
-			textChannel.sendMessage("The player has never played a song in the last 30 minutes so it cannot restart a song!").queue();
+		try {
+			if (getCurrentTrack() == null && getPreviousTrack() == null) {
+				textChannel.sendMessage("The player has never played a song in the last 30 minutes so it cannot restart a song!").queue();
+				return false;
+			} else if (getCurrentTrack() == null) {
+				textChannel.sendMessage("Restarting the previous track...").queue();
+				start(getPreviousTrack(), false);
+			} else {
+				textChannel.sendMessage("Restarting the current track...").queue();
+				getAudioPlayer().getPlayingTrack().setPosition(0);
+			}
+		} catch (Exception e) {
+			textChannel.sendMessage("Could not restart track!").queue();
 			return false;
-		} else if (getCurrentTrack() == null) {
-			textChannel.sendMessage("Restarting the previous track...").queue();
-			start(getPreviousTrack(), false);
-		} else {
-			textChannel.sendMessage("Restarting the current track...").queue();
-			getAudioPlayer().getPlayingTrack().setPosition(0);
 		}
 		return true;
 	}
