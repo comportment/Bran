@@ -23,7 +23,7 @@ public class EventListener implements IEventListener {
 			if (event.isGuessRight()) {
 				event.getGame().getChannel(client).sendMessage(event.getGame().createEmbed(client).setDescription("Oh yeah, the character '" + event.getGuess() + "' is in the word! Keep the good job, " + OtherUtils.getUser(event.getProfile().getUser(event.getJDA()))).build()).queue(event.getGame()::setLastMessage);
 				event.getProfile().addExperience(1);
-				event.getProfile().addCoins(5);
+				event.getProfile().getBankAccount().addCoins(5, "HangMan Game", event.getProfile().getUser(event.getJDA()).getId(), "You got this coins for guessing a letter.");
 			} else {
 				event.getGame().getChannel(client).sendMessage(event.getGame().createEmbed(client).setDescription("Too bad, the character '" + event.getGuess() + "' is not in the word! Better luck next time, " + OtherUtils.getUser(event.getProfile().getUser(event.getJDA()))).build()).queue(event.getGame()::setLastMessage);
 			}
@@ -46,7 +46,7 @@ public class EventListener implements IEventListener {
 			event.getGame().getProfiles().forEach(p -> {
 				p.getHMStats().addVictory();
 				p.addExperience(4);
-				p.addCoins(5);
+				p.getBankAccount().addCoins(5, "HangMan Game", p.getUser(event.getJDA()).getId(), "You got this coins for winning a HangMan game.");
 			});
 		} else if (hangManEvent instanceof LeaveGameEvent) {
 			LeaveGameEvent event = (LeaveGameEvent) hangManEvent;

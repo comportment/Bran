@@ -73,12 +73,12 @@ public class ShopCommand {
 								event.sendMessage("You have too much of this item! (" + inventory.getAmountOf(item) + "/" + item.getMaxStack() + ")").queue();
 								return;
 							}
-							if (!profile.takeCoins(item.getPrice())) {
+							if (!profile.getBankAccount().takeCoins(item.getPrice(), event.getAuthor().getId(), "Shop", "You used this coins to buy a " + item.getName())) {
 								event.sendMessage("You don't have enough coins to buy this item! " +
-										"(" + profile.getCoins() + "/" + item.getPrice() + ")").queue();
+										"(" + profile.getBankAccount().getCoins() + "/" + item.getPrice() + ")").queue();
 							} else {
 								inventory.put(item);
-								event.sendMessage("\uD83D\uDECD You've bought a " + item.getName() + "! Remaining coins: " + profile.getCoins()).queue();
+								event.sendMessage("\uD83D\uDECD You've bought a " + item.getName() + "! Remaining coins: " + profile.getBankAccount().getCoins()).queue();
 							}
 						})
 						.build())
