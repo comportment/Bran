@@ -6,14 +6,15 @@ import br.com.brjdevs.steven.bran.core.audio.timers.ChannelLeaveTimer;
 import br.com.brjdevs.steven.bran.core.audio.timers.MusicRegisterTimeout;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.sun.management.OperatingSystemMXBean;
 
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class TaskManager {
 	
@@ -26,6 +27,11 @@ public class TaskManager {
 		this.musicRegisterTimeout = new MusicRegisterTimeout(client);
 		this.channelLeaveTimer = new ChannelLeaveTimer(client);
 		startAsyncTasks();
+	}
+	
+	public static void startAsyncTask(String task, Consumer<ScheduledExecutorService> scheduled, int everySeconds) {
+		ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, task + " [Executor]"));
+		scheduledExecutorService.scheduleAtFixedRate(() -> scheduled.accept(scheduledExecutorService), 0, everySeconds, TimeUnit.SECONDS);
 	}
 	
 	public ChannelLeaveTimer getChannelLeaveTimer() {
@@ -44,17 +50,12 @@ public class TaskManager {
 		this.musicRegisterTimeout = musicRegisterTimeout;
 	}
 	
-	public void startAsyncTask(Runnable run, int seconds) {
-		Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Async Task-%d").build()).scheduleAtFixedRate(
-				run, 0, seconds, TimeUnit.SECONDS);
-	}
-	
 	private void startAsyncTasks() {
 	    final OperatingSystemMXBean os =
 			    ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
-	    startAsyncTask(
-			    () -> client.getSession().cpuUsage = client.getSession().calculateCpuUsage(os), 5);
-		startAsyncTask(() -> Arrays.stream(client.getShards()).forEach(shard -> {
+		startAsyncTask("CPU Thread",
+				(service) -> client.getSession().cpuUsage = client.getSession().calculateCpuUsage(os), 5);
+		startAsyncTask("DiscordBots Thread", (service) -> Arrays.stream(client.getShards()).forEach(shard -> {
 			if (shard.getCurrentGuildCount() > shard.getJDA().getGuilds().size()) return;
 			try {
 				shard.updateStats();

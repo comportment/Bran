@@ -85,7 +85,6 @@ public class AudioPlayerListener extends AudioEventAdapter {
 				msg.editMessage(string).queue();
 			else
 				getQueue().getCurrentTrack().getContext().sendMessage(string).queue();
-			getQueue().next(true);
 		}
 	}
 	
@@ -93,11 +92,5 @@ public class AudioPlayerListener extends AudioEventAdapter {
 		if (getQueue().getCurrentTrack().getContext() != null && getQueue().getCurrentTrack().getContext().canTalk())
 			getQueue().getCurrentTrack().getContext().sendMessage("Track got stuck, skipping...").queue();
 		getQueue().next(true);
-	}
-	
-	public void onPlayerPause(AudioPlayer player) {
-	}
-	
-	public void onPlayerResume(AudioPlayer player) {
 	}
 }

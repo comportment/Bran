@@ -9,10 +9,14 @@ import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
+import java.util.List;
 
 public class ClientShard {
 	
@@ -33,6 +37,7 @@ public class ClientShard {
 		this.lastReboot = 0;
 		this.eventManager = new ClientEventManager(this);
 		restartJDA();
+		//pruneGuilds(30);
 	}
 	
 	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
@@ -48,7 +53,6 @@ public class ClientShard {
 		jdaBuilder.setGame(game);
 		jdaBuilder.setEventManager(eventManager);
 		jdaBuilder.setBulkDeleteSplittingEnabled(false);
-		jdaBuilder.setEnableShutdownHook(false);
 		jdaBuilder.setAutoReconnect(true);
 		jda = jdaBuilder.buildBlocking();
 		if (startup == 0)
@@ -93,6 +97,26 @@ public class ClientShard {
 	
 	public int getCurrentGuildCount() {
 		return currentGuildCount;
+	}
+	
+	public int pruneGuilds(int lastMessage) {
+		int leftGuilds = 0;
+		for (Guild guild : jda.getGuilds()) {
+			int i = 0;
+			for (TextChannel channel : guild.getTextChannels()) {
+				List<Message> messages = channel.getHistory().retrievePast(2).complete();
+				if (!messages.isEmpty() && messages.get(0).getCreationTime().minusDays(lastMessage).getDayOfMonth() > 0
+						|| messages.isEmpty() && channel.getCreationTime().minusDays(1).getDayOfMonth() > 0) {
+					i++;
+				}
+			}
+			if (i == guild.getTextChannels().size()) {
+				//guild.leave().queue();
+				jda.getTextChannelById("243337584057647104").sendMessage(guild.getName() + " - " + i).queue();
+				leftGuilds++;
+			}
+		}
+		return leftGuilds;
 	}
 	
 	public HttpResponse<JsonNode> updateStats() throws UnirestException {

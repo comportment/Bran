@@ -162,10 +162,20 @@ public class FairQueue<T extends TrackContext> {
 	}
 	
 	private void start(T track, boolean noInterrupt) {
-		if (getCurrentTrack() != null) previousTrack = currentTrack;
-		currentTrack = track;
-		getAudioPlayer().startTrack(track == null ? null : track.getTrack().getState() == AudioTrackState.FINISHED ? track.getTrack().makeClone() : track.getTrack(), noInterrupt);
-		if (track == null) onQueueStop();
+		try {
+			if (getCurrentTrack() != null) previousTrack = currentTrack;
+			currentTrack = track;
+			if (track == null) {
+				getAudioPlayer().startTrack(null, noInterrupt);
+			} else if (track.getTrack().getState() != AudioTrackState.INACTIVE) {
+				getAudioPlayer().startTrack(track.getTrack().makeClone(), noInterrupt);
+			} else {
+				getAudioPlayer().startTrack(track.getTrack(), noInterrupt);
+			}
+			if (track == null) onQueueStop();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean request(T track, boolean silent) {

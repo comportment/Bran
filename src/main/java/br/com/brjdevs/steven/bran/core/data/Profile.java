@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.core.data;
 
-import br.com.brjdevs.steven.bran.core.currency.BankAccount;
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
 import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
@@ -29,8 +28,7 @@ public class Profile {
 	private Rank rank;
 	@Setter
 	@Getter
-	private long level, experience;
-	private BankAccount bankAccount;
+	private long level, experience, coins;
 	private Inventory inventory;
 	private transient List<IProfileListener> listeners;
 	
@@ -40,7 +38,7 @@ public class Profile {
 		this.rank = Rank.ROOKIE;
 		this.level = 0;
 		this.experience = 0;
-		this.bankAccount = new BankAccount();
+		this.coins = 10;
 		this.customHex = null;
 		this.inventory = new Inventory();
 		this.listeners = new ArrayList<>();
@@ -93,6 +91,16 @@ public class Profile {
 		this.inventory = new Inventory();
 	}
 	
+	public boolean takeCoins(long coinsToTake) {
+		if (coinsToTake > getCoins()) return false;
+		setCoins(getCoins() - coinsToTake);
+		return true;
+	}
+	
+	public void addCoins(long coins) {
+		setCoins(getCoins() + coins);
+	}
+	
 	public boolean setCustomColor(String hex) {
 		this.customHex = hex;
 		try {
@@ -130,10 +138,6 @@ public class Profile {
 		this.listeners.remove(listener);
 	}
 	
-	public BankAccount getBankAccount() {
-		return bankAccount;
-	}
-	
 	public MessageEmbed createEmbed(JDA jda) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setAuthor(getUser(jda).getName() + "'s profile information", null, OtherUtils.getAvatarUrl(getUser(jda)));
@@ -141,7 +145,7 @@ public class Profile {
 		builder.addField("\u2694 Level", String.valueOf(getLevel()), true);
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);
 		builder.addField("\u2b50 Experience to Next Level", String.valueOf(expForNextLevel(getLevel())), true);
-		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(getBankAccount().getCoins()), true);
+		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(getCoins()), true);
 		builder.addField("\uD83D\uDCBC Inventory", String.valueOf(inventory.size(false)), true);
 		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
 		builder.addField("\uD83D\uDD79 Game", "HangMan", true).addField("\uD83C\uDFC6 Victories", String.valueOf(getHMStats().getVictories()), true).addField("☠ Defeats", String.valueOf(getHMStats().getDefeats()), true);

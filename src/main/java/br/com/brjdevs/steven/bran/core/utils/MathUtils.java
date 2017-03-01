@@ -3,7 +3,8 @@ package br.com.brjdevs.steven.bran.core.utils;
 import java.util.Random;
 
 public class MathUtils {
-	private static final Random random = new Random();
+	
+	public static final Random random = new Random();
 	public static int random(int max) {
 		return random.nextInt(max);
 	}

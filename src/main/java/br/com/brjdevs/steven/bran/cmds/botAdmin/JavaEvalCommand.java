@@ -60,8 +60,8 @@ public class JavaEvalCommand {
 				.setName("Java Eval Command")
                 .setDescription("Evaluates in Java!")
                 .setExample("eval return \"This is Java!\";")
-                .setRequiredPermission(Permissions.EVAL)
-                .setAction((event) -> {
+				.setRequiredPermission(Permissions.EVAL)
+				.setAction((event) -> {
 	                Object x = null;
 	                try {
                         OutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
