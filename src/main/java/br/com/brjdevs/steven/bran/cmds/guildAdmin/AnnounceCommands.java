@@ -16,7 +16,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 public class AnnounceCommands {
 	
-	@Command
+	//@Command
 	private static ICommand greeting() {
 		return new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 				.setAliases("greeting")
