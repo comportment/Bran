@@ -29,7 +29,7 @@ public class VoiceChannelListener extends EventListener<GenericGuildVoiceEvent> 
 		if (!timer.has(guild.getId())) return;
 		GuildMusicManager player = client.getMusicManager().get(guild);
 		TrackContext track = player.getTrackScheduler().getCurrentTrack();
-		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.get(guild.getId()).right);
+		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.get(guild.getId()).getRight());
 		if (voiceChannel != channel && !member.equals(guild.getSelfMember()))
 			return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
