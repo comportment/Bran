@@ -7,19 +7,16 @@ import br.com.brjdevs.steven.bran.core.command.HelpContainer;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public class CommandBuilder {
 	
 	protected BiConsumer<CommandEvent, Argument[]> action = null;
-	protected List<String> aliases = new ArrayList<>();
+	protected String[] aliases;
 	protected String name = null;
 	protected String desc = null;
 	protected Argument[] args = {};
@@ -44,7 +41,7 @@ public class CommandBuilder {
 	}
 	
 	public CommandBuilder setAliases(String... aliases) {
-		Stream.of(aliases).forEach(this.aliases::add);
+		this.aliases = aliases;
 		return this;
 	}
 	
@@ -103,7 +100,7 @@ public class CommandBuilder {
 				split[1] = split[1].trim();
 				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\' && split[1].matches("^(\\?|help)$"))
 					split[1] = split[1].substring(1);
-				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length - 1)).filter(a -> !OtherUtils.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
+				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length - 1)).filter(a -> !Utils.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
 				Argument[] args = event.getArguments();
 				if (args != null) {
 					for (int i = 0; i < args.length; i++) {
@@ -126,7 +123,7 @@ public class CommandBuilder {
 			}
 			
 			@Override
-			public List<String> getAliases() {
+			public String[] getAliases() {
 				return aliases;
 			}
 			

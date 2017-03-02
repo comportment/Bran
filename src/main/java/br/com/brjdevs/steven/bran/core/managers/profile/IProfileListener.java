@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.managers.profile;
 
-import br.com.brjdevs.steven.bran.core.data.Profile;
+import br.com.brjdevs.steven.bran.core.currency.Profile;
 
 public interface IProfileListener {
 	

@@ -1,9 +1,10 @@
 package br.com.brjdevs.steven.bran.core.managers;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PrefixManager {
@@ -12,10 +13,10 @@ public class PrefixManager {
 		List<String> prefixes = guildData != null ? guildData.prefixes : new ArrayList<>(client.getConfig().defaultPrefixes);
 		return prefixes.stream()
 			    .filter(prefix -> string.length() > prefix.length() && string.startsWith(prefix)
-					    && client.commandManager.getCommands().stream()
+					    && client.getCommandManager().getCommands().stream()
 					    .filter(cmd ->
-                                cmd.getAliases().contains(string.substring(prefix.length())))
-                        .findFirst().orElse(null) != null)
+							    Arrays.stream(cmd.getAliases()).anyMatch(s -> s.equals(string.substring(prefix.length()))))
+					    .findFirst().orElse(null) != null)
                 .findFirst().orElse(null);
     }
 	

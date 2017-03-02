@@ -1,36 +1,24 @@
 package br.com.brjdevs.steven.bran.core.managers;
 
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class ExpirationManager {
-	
-	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, 25,
-			60L, TimeUnit.SECONDS,
-			new SynchronousQueue<>());
 	
 	private final Map<Long, List<Runnable>> EXPIRATIONS;
 	private boolean updated = false;
 	
 	public ExpirationManager() {
-		this(new ConcurrentHashMap<>());
-	}
-	
-	public ExpirationManager(Map<Long, List<Runnable>> expirations) {
-		EXPIRATIONS = Collections.synchronizedMap(expirations);
+		EXPIRATIONS = new ConcurrentHashMap<>();
 		
 		Thread thread = new Thread(this::threadcode, "ExpirationManager Thread");
 		thread.setDaemon(true);
 		thread.start();
 	}
 	
-	public void letExpire(Long milis, Runnable onExpire) {
+	public void letExpire(long millis, Runnable onExpire) {
 		Objects.requireNonNull(onExpire);
-		EXPIRATIONS.computeIfAbsent(milis, k -> new ArrayList<>()).add(onExpire);
+		EXPIRATIONS.computeIfAbsent(millis, k -> new ArrayList<>()).add(onExpire);
 		updated = true;
 		synchronized (this) {
 			notify();
@@ -51,25 +39,24 @@ public class ExpirationManager {
 			}
 			
 			//noinspection OptionalGetWithoutIsPresent
-			Entry<Long, List<Runnable>> firstEntry = EXPIRATIONS.entrySet().stream().sorted(Comparator.comparingLong(Entry::getKey)).findFirst().get();
+			Map.Entry<Long, List<Runnable>> firstEntry = EXPIRATIONS.entrySet().stream().sorted(Comparator.comparingLong(Map.Entry::getKey)).findFirst().get();
 			
-			try {
-				long timeout = firstEntry.getKey() - System.currentTimeMillis();
-				if (timeout > 0) {
-					synchronized (this) {
+			long timeout = firstEntry.getKey() - System.currentTimeMillis();
+			if (timeout > 0) {
+				synchronized (this) {
+					try {
 						wait(timeout);
+					} catch (InterruptedException ignored) {
 					}
 				}
-			} catch (InterruptedException ignored) {
 			}
 			
 			if (!updated) {
 				EXPIRATIONS.remove(firstEntry.getKey());
 				List<Runnable> runnables = firstEntry.getValue();
 				runnables.remove(null);
-				runnables.forEach(executor::execute);
+				runnables.forEach(r -> ThreadPoolHelper.getDefaultThreadPool().startThread("Expiration Executable", r));
 			} else updated = false; //and the loop will restart and resolve it
 		}
 	}
-	
 }

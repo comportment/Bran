@@ -6,7 +6,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.WeatherSearch;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -22,7 +22,7 @@ public class WeatherCommand {
 				.setAliases("weather")
 				.setName("Weather Command")
 				.setDescription("Gives you weather information on a place.")
-				.setArgs(new Argument<>("query", String.class))
+				.setArgs(new Argument("query", String.class))
 				.setAction((event) -> {
 					if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
@@ -34,7 +34,7 @@ public class WeatherCommand {
 						element = WeatherSearch.search(query);
 					} catch (RuntimeException e) {
 						if (e.getMessage().equals("Yahoo API didn't respond."))
-							event.sendMessage("The API took too long to respond, maybe it's offline?").queue();
+							event.sendMessage("The API took too long to respond, maybe it'currentArgs offline?").queue();
 						else
 							event.sendMessage("Could not connect, try again later please.").queue();
 						return;
@@ -69,8 +69,8 @@ public class WeatherCommand {
 						JsonObject conditionObject = item.get("condition").getAsJsonObject();
 						String lastUpdate = conditionObject.get("date").getAsString();
 						double f = Double.parseDouble(conditionObject.get("temp").getAsString());
-						String c = OtherUtils.DECIMAL_FORMAT.format((5. / 9.) * (f - 32.));
-						String temp = OtherUtils.DECIMAL_FORMAT.format(f) + "ºF/" + c + "ºC";
+						String c = Utils.DECIMAL_FORMAT.format((5. / 9.) * (f - 32.));
+						String temp = Utils.DECIMAL_FORMAT.format(f) + "ºF/" + c + "ºC";
 						String text = conditionObject.get("text").getAsString();
 						
 						EmbedBuilder embedBuilder = new EmbedBuilder();

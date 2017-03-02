@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.responsewaiter;
 
-import br.com.brjdevs.steven.bran.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.ClientShard;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseListener;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;

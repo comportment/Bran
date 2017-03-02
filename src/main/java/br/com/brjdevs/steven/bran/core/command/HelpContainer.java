@@ -35,7 +35,7 @@ public class HelpContainer {
 				if (commands.isEmpty()) continue;
 				desc += category.getEmoji() + " **| " + category.getKey() + "**\n";
 				for (ICommand cmd : commands)
-					desc += "          **" + cmd.getAliases().get(0) + "** " + (cmd.getArguments() != null ? (String.join(" ", Arrays.stream(cmd.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "") + " - " + (cmd instanceof ITreeCommand ? "Use `" + cmd.getHelp() + "` to get help on this command!" : cmd.getDescription()) + "\n";
+					desc += "          **" + cmd.getAliases()[0] + "** " + (cmd.getArguments() != null ? (String.join(" ", Arrays.stream(cmd.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "") + " - " + (cmd instanceof ITreeCommand ? "Use `" + cmd.getHelp() + "` to get help on this command!" : cmd.getDescription()) + "\n";
 				desc += '\n';
 			}
 		}

@@ -29,7 +29,7 @@ public class ConfigCommand {
 								.setAliases("max_songs_per_user")
 								.setName("Config Music Command")
 								.setDescription("Configures the maximum amount of songs per user in the queue.")
-								.setArgs(new Argument<>("value", String.class, true))
+								.setArgs(new Argument("value", String.class, true))
 								.setAction((event) -> {
 									Argument argument = event.getArgument("value");
 									if (!argument.isPresent()) {
@@ -50,9 +50,10 @@ public class ConfigCommand {
 									if (i < -1) i = -1;
 									event.getGuildData().maxSongsPerUser = i;
 									if (i > 0)
-										event.sendMessage("Got it! Now each user can only have " + i + " song(s) in the queue at once.").queue();
+										event.sendMessage("Got it! Now each user can only have " + i + " song(currentArgs) in the queue at once.").queue();
 									else
 										event.sendMessage("Got it! Now each user can have unlimited songs in the queue at once.").queue();
+									event.getClient().getDiscordBotData().getDataHolderManager().update();
 								})
 								.build())
 						.build())

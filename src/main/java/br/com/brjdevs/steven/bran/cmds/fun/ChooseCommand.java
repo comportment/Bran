@@ -22,7 +22,7 @@ public class ChooseCommand {
 				.setAliases("choose", "decide")
 				.setName("Choose Command")
 				.setDescription("Chooses between options!")
-				.setArgs(new Argument<>("options", String.class))
+				.setArgs(new Argument("options", String.class))
 				.setAction((event, rawArgs) -> {
 					String rawOptions = (String) event.getArgument("options").get();
 					String[] options;

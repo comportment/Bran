@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -29,7 +29,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	@Override
 	public void onStatusChange(ConnectionStatus connectionStatus) {
 		TrackScheduler scheduler = getMusicManager().getTrackScheduler();
-		if (scheduler.getQueue().isEmpty() && scheduler.getQueue().getCurrentTrack() == null) return;
+		if (scheduler.getQueue().isEmpty() && scheduler.getCurrentTrack() == null) return;
 		if (connectionStatus == ConnectionStatus.CONNECTING_AWAITING_ENDPOINT) {
 			send("Connecting to " + getGuild().getAudioManager().getQueuedAudioConnection().getName() + "... *(Attempt " + attempts + ")*");
 		} else if (connectionStatus == ConnectionStatus.CONNECTED) {
@@ -45,7 +45,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			attempts += 1;
 			if (attempts > 3) {
 				send("I failed to reconnect 3 times, have you tried changing the server region?");
-				getMusicManager().getTrackScheduler().getQueue().stop();
+				getMusicManager().getTrackScheduler().stop();
 				this.attempts = 0;
 				return;
 			}
@@ -54,7 +54,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			send("The channel I was connected to got deleted, stopped the queue.");
 			scheduler.stop();
 		} else if (connectionStatus == ConnectionStatus.DISCONNECTED_REMOVED_FROM_GUILD) {
-			client.playerManager.unregister(guildId);
+			client.getMusicManager().unregister(guildId);
 		}
 	}
 	
@@ -62,8 +62,8 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	public void onUserSpeaking(User user, boolean b) {
 	}
 	
-	public MusicManager getMusicManager() {
-		return client.playerManager.get(getGuild());
+	public GuildMusicManager getMusicManager() {
+		return client.getMusicManager().get(getGuild());
 	}
 	
 	public Guild getGuild() {
@@ -73,8 +73,8 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	public void send(String content) {
 		if (message != null) message.delete().queue();
 		TrackScheduler scheduler = getMusicManager().getTrackScheduler();
-		if (scheduler.getQueue().getCurrentTrack() != null) {
-			TextChannel textChannel = scheduler.getQueue().getCurrentTrack().getContext();
+		if (scheduler.getCurrentTrack() != null) {
+			TextChannel textChannel = scheduler.getCurrentTrack().getContext();
 			textChannel.sendMessage(content).queue(this::setMessage);
 		}
 	}

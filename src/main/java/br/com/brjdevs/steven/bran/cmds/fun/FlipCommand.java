@@ -21,7 +21,7 @@ public class FlipCommand {
 				.setAliases("flip")
 				.setName("Flip Command")
 				.setDescription("Flips a text upside down!")
-				.setArgs(new Argument<>("text", String.class))
+				.setArgs(new Argument("text", String.class))
 				.setAction((event) -> {
 					String[] text = {(String) event.getArgument("text").get()};
 					getMentions(event.getMessage()).forEach(mentionable -> text[0] = text[0].replace(getAsMention(mentionable, event.getGuild()), mentionable instanceof User ? event.getGuild().getMember((User) mentionable).getEffectiveName() : mentionable instanceof TextChannel ? ((TextChannel) mentionable).getName() : ((Role) mentionable).getName()));

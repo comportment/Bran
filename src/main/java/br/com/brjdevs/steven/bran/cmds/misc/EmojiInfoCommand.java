@@ -15,7 +15,7 @@ public class EmojiInfoCommand {
 				.setAliases("emoji", "character")
 				.setName("Emoji/Character Info Command")
 				.setDescription("Returns emoji or character info.")
-				.setArgs(new Argument<>("emoji/character", String.class))
+				.setArgs(new Argument("emoji/character", String.class))
 				.setAction((event, rawArgs) -> {
 					String unicode = EmojiConverter.toUnicode((String) event.getArgument("emoji/character").get());
 					event.sendMessage("Emoji/Character information:\n" + unicode).queue();

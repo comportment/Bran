@@ -1,47 +1,39 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.data.Profile;
-import br.com.brjdevs.steven.bran.core.listeners.OptimizedListener;
-import br.com.brjdevs.steven.bran.features.hangman.events.LeaveGameEvent;
-import br.com.brjdevs.steven.bran.features.hangman.events.LooseEvent;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.listeners.EventListener;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
-public class GuessListener extends OptimizedListener<GuildMessageReceivedEvent> {
-	
-	public Client client;
+public class GuessListener extends EventListener<MessageReceivedEvent> {
 	
 	public GuessListener(Client client) {
-		super(GuildMessageReceivedEvent.class);
-		this.client = client;
+		super(MessageReceivedEvent.class, client);
 	}
+	
 	@Override
-	public void event(GuildMessageReceivedEvent event) {
-		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
-		Profile profile = client.getProfile(event.getAuthor());
-		HangManGame game = HangManGame.getSession(profile);
-		if (game == null) return;
-		String msg = event.getMessage().getRawContent();
-		TextChannel channel = event.getChannel();
-		if ("giveup".equals(msg)) {
-			if (game.getCreator() != profile)
-				game.getListener().onEvent(new LeaveGameEvent(game, event.getJDA(), profile));
-			else if (game.getCreator() == profile && !game.getInvitedUsers().isEmpty())
-				channel.sendMessage("You can't give up this session because there are other players playing with you, you can just let them finish if you don't want to continue or use `" + client.getConfig().defaultPrefixes.get(0) + "hm setCreator [MENTION]` to set a new owner to the session.").queue();
-			else
-				game.getListener().onEvent(new LooseEvent(game, event.getJDA(), true));
+	public void event(MessageReceivedEvent event) {
+		HangManGame game = HangManGame.getGame(event.getAuthor());
+		String guess = event.getMessage().getRawContent();
+		if (guess.isEmpty()) return;
+		if (guess.charAt(0) != '=')
+			return;
+		if (guess.equals("=giveup")) {
+			if (game.isMuliplayer()) {
+				event.getChannel().sendMessage("You cannot giveup to a Multiplayer session.").queue();
+			} else {
+				game.giveup();
+			}
+			return;
+		} else if (guess.equals("=leave")) {
+			if (!game.isMuliplayer()) {
+				event.getChannel().sendMessage("You cannot leave a Singleplayer session.").queue();
+			} else {
+				game.leave(event.getAuthor());
+			}
 			return;
 		}
-		if (game.getChannel(client) != event.getChannel()) return;
-		if ("info".equals(msg)) {
-			channel.sendMessage(game.createEmbed(client).setDescription("Information on the current Game.").build()).queue();
+		if (guess.length() != 2)
 			return;
-		}
-		if (!msg.matches("^([A-Za-z])$")) return;
-		game.guess(msg, profile, client);
-		if (event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
-			event.getMessage().delete().queue();
+		game.guess(guess.charAt(1), client.getDiscordBotData().getDataHolderManager().get().getUser(event.getAuthor()));
 	}
 }

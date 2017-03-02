@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.listeners.OptimizedListener;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.listeners.EventListener;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
@@ -15,25 +15,23 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
 
-public class Session extends OptimizedListener<GuildMessageReceivedEvent> {
+public class Session extends EventListener<GuildMessageReceivedEvent> {
 	
 	private final Runtime instance = Runtime.getRuntime();
 	public double cpuUsage;
 	public long cmds;
 	public long msgsReceived;
 	public long msgsSent;
-	public Client client;
 	private int availableProcessors = Runtime.getRuntime().availableProcessors();
 	private double lastProcessCpuTime = 0;
 	private long lastSystemTime = 0;
 	
 	public Session(Client client) {
-		super(GuildMessageReceivedEvent.class);
+		super(GuildMessageReceivedEvent.class, client);
 		this.cpuUsage = 0;
 		this.cmds = 0;
 		this.msgsReceived = 0;
 		this.msgsSent = 0;
-		this.client = client;
 	}
 	
 	private static double calculateProcessCpuTime(OperatingSystemMXBean os) {
@@ -79,10 +77,10 @@ public class Session extends OptimizedListener<GuildMessageReceivedEvent> {
 		List<VoiceChannel> voiceChannels = client.getVoiceChannels();
 		List<User> users = client.getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
-		long queueSize = client.playerManager.getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
+		long queueSize = client.getMusicManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
-		long nowPlaying = client.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
-		long paused = client.playerManager.getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
+		long nowPlaying = client.getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
+		long paused = client.getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
 		StringBuilder sb = new StringBuilder();
 		sb.append("```prolog\n");
 		sb.append("--Bot Stats--\n");
@@ -102,7 +100,7 @@ public class Session extends OptimizedListener<GuildMessageReceivedEvent> {
 		sb.append("Sent Messages: ").append(msgsSent).append("\n");
 		sb.append("Received Messages: ").append(msgsReceived).append("\n");
 		sb.append("Executed Commands: ").append(cmds).append("\n");
-		sb.append("Running Polls: ").append(Poll.getRunningPolls().size()).append("\n\n");
+		sb.append("Running Polls: ").append(Poll.getRunningPolls(client).size()).append("\n\n");
 		sb.append("--Music--\n");
 		sb.append("Connections: ").append(audioConnections).append("\n");
 		sb.append("Queue Size: ").append(queueSize).append("\n");

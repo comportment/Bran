@@ -17,12 +17,12 @@ public class Base64Command {
 				.setName("Base64 Command")
 				.setHelp("base64 ?")
 				.setAliases("base64")
-				.setDescription("Let's speak in Base64!")
+				.setDescription("Let'currentArgs speak in Base64!")
 				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("encode")
 						.setName("Base64 Encode Command")
 						.setDescription("Encodes a String to Base64.")
-						.setArgs(new Argument<>("string", String.class))
+						.setArgs(new Argument("string", String.class))
 						.setAction((event) -> {
 							String string = (String) event.getArgument("string").get();
 							String out;
@@ -43,7 +43,7 @@ public class Base64Command {
 						.setAliases("decode")
 						.setName("Base64 Decode Command")
 						.setDescription("Decodes a Base64 to String!")
-						.setArgs(new Argument<>("base64", String.class))
+						.setArgs(new Argument("base64", String.class))
 						.setAction((event) -> {
 							String string = (String) event.getArgument("base64").get();
 							String out;

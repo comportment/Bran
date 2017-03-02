@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio.timers;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -74,7 +74,7 @@ public class MusicRegisterTimeout {
 			if (!timingOutUpdated) {
 				String id = closestEntry.getKey();
 				TIMING_OUT.remove(id);
-				client.playerManager.unregister(Long.parseLong(id));
+				client.getMusicManager().unregister(Long.parseLong(id));
 			} else timingOutUpdated = false; //and the loop will restart and resolve it
 		}
 	}

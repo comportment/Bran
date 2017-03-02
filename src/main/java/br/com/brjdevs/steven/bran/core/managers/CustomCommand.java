@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.core.managers;
 
-import lombok.Getter;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
 
@@ -12,7 +11,6 @@ import java.util.Random;
 public class CustomCommand {
 	
 	private static final Random rand = new Random();
-	@Getter
 	private List<String> answers;
 	private String ownerId;
 	
@@ -46,5 +44,9 @@ public class CustomCommand {
 	
 	public String getAnswer() {
 		return getAnswer(rand.nextInt(answers.size()));
+	}
+	
+	public List<String> getAnswers() {
+		return answers;
 	}
 }

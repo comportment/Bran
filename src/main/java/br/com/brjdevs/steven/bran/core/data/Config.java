@@ -1,4 +1,4 @@
-package br.com.brjdevs.steven.bran.core.data.bot;
+package br.com.brjdevs.steven.bran.core.data;
 
 import java.util.ArrayList;
 import java.util.List;

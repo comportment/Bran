@@ -6,8 +6,8 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game.GameType;
@@ -28,7 +28,7 @@ public class UserInfoCommand {
 				.setAliases("user", "userinfo", "uinfo")
 				.setName("User Info Command")
 				.setDescription("Gives you info on the mentioned user")
-				.setArgs(new Argument<>("mention", String.class, true))
+				.setArgs(new Argument("mention", String.class, true))
 				.setExample("user 219186621008838669")
 				.setPrivateAvailable(false)
 				.setAction((event, args) -> {
@@ -43,7 +43,7 @@ public class UserInfoCommand {
 					String createdAt = StringUtils.neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + StringUtils.neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + MathUtils.toOctalInteger(creation.getHour()) + ":" + MathUtils.toOctalInteger(creation.getMinute()) + ":" + MathUtils.toOctalInteger(creation.getSecond()) + " GMT";
 					User user = member.getUser();
 					EmbedBuilder embed = new EmbedBuilder();
-					embed.setTitle("\uD83D\uDC65 User information on " + OtherUtils.getUser(user), null);
+					embed.setTitle("\uD83D\uDC65 User information on " + Utils.getUser(user), null);
 					embed.addField("ID", user.getId(), true);
 					if (member.getNickname() != null)
 						embed.addField("Nickname", member.getNickname(), true);
@@ -84,8 +84,8 @@ public class UserInfoCommand {
 					Color color = member.getColor() == null ? Color.decode("#FFA300") : member.getColor();
 					embed.setColor(color);
 					embed.addField("Join Order", str, false);
-					embed.setThumbnail(OtherUtils.getAvatarUrl(user));
-					embed.setFooter("Requested by " + OtherUtils.getUser(event.getAuthor()), OtherUtils.getAvatarUrl(event.getAuthor()));
+					embed.setThumbnail(Utils.getAvatarUrl(user));
+					embed.setFooter("Requested by " + Utils.getUser(event.getAuthor()), Utils.getAvatarUrl(event.getAuthor()));
 					event.sendMessage(embed.build()).queue();
 				})
 				.build();

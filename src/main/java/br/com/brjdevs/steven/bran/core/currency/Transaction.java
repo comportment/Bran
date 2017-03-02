@@ -1,48 +1,24 @@
 package br.com.brjdevs.steven.bran.core.currency;
 
+import br.com.brjdevs.steven.bran.core.data.DataHolder;
+import br.com.brjdevs.steven.bran.core.snowflakes.SnowflakeGenerator;
+
 public class Transaction {
 	
-	private TransactionType transactionType;
-	private long amount;
-	private String sender;
-	private String receiver;
-	private String description;
-	private long time;
+	public final long receiverId, senderId, amount, id;
 	
-	public Transaction(TransactionType transactionType, String sender, String receiver, String description, long amount) {
-		this.transactionType = transactionType;
-		this.sender = sender;
-		this.receiver = receiver;
-		this.description = description;
+	public Transaction(BankAccount sender, BankAccount receiver, long amount) {
+		this.senderId = sender.userId;
+		this.receiverId = receiver.userId;
 		this.amount = amount;
-		this.time = System.currentTimeMillis();
+		this.id = SnowflakeGenerator.getDefaultGenerator().nextId();
 	}
 	
-	public TransactionType getTransactionType() {
-		return transactionType;
+	public BankAccount getSender(DataHolder data) {
+		return data.getUserById(senderId).getProfile().bankAccount;
 	}
 	
-	public String getSender() {
-		return sender;
-	}
-	
-	public String getReceiver() {
-		return receiver;
-	}
-	
-	public String getDescription() {
-		return description;
-	}
-	
-	public long getAmount() {
-		return amount;
-	}
-	
-	public long getTime() {
-		return time;
-	}
-	
-	public enum TransactionType {
-		RECEIVE, GIVE, UKNOWN
+	public BankAccount getReceiver(DataHolder data) {
+		return data.getUserById(receiverId).getProfile().bankAccount;
 	}
 }

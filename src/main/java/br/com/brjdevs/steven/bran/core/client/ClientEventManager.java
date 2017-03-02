@@ -1,9 +1,8 @@
-package br.com.brjdevs.steven.bran;
+package br.com.brjdevs.steven.bran.core.client;
 
-import br.com.brjdevs.steven.bran.core.listeners.OptimizedListener;
+import br.com.brjdevs.steven.bran.core.listeners.EventListener;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.hooks.IEventManager;
 import org.reflections.Reflections;
 
@@ -17,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class ClientEventManager implements IEventManager {
 	
-	private final CopyOnWriteArrayList<EventListener> listeners = new CopyOnWriteArrayList<>();
+	private final CopyOnWriteArrayList<net.dv8tion.jda.core.hooks.EventListener> listeners = new CopyOnWriteArrayList<>();
 	public ExecutorService executor;
 	private ClientShard shard;
 	
@@ -25,32 +24,32 @@ public class ClientEventManager implements IEventManager {
 		this.shard = shard;
 		this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("Event Manager [" + shard.getId() + "]-%d").build());
 		register(new Reflections("br.com.brjdevs.steven.bran")
-				.getSubTypesOf(OptimizedListener.class).stream()
+				.getSubTypesOf(EventListener.class).stream()
 				.map(clazz -> {
 					try {
-						return clazz.getConstructor(Client.class).newInstance(shard.client);
+						return clazz.getConstructor(Client.class).newInstance(shard.getClient());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					return null;
-				}).filter(Objects::nonNull).toArray(EventListener[]::new));
+				}).filter(Objects::nonNull).toArray(net.dv8tion.jda.core.hooks.EventListener[]::new));
 	}
 	
-	private void register(EventListener... o) {
+	private void register(net.dv8tion.jda.core.hooks.EventListener... o) {
 		this.listeners.addAll(Arrays.asList(o));
 	}
 	
 	@Override
 	public void register(Object o) {
-		if (!(o instanceof EventListener)) {
+		if (!(o instanceof net.dv8tion.jda.core.hooks.EventListener)) {
 			throw new IllegalArgumentException("Listener must implement EventListener");
 		}
-		this.listeners.add((EventListener) o);
+		this.listeners.add((net.dv8tion.jda.core.hooks.EventListener) o);
 	}
 	
 	@Override
 	public void unregister(Object o) {
-		if (o instanceof EventListener) {
+		if (o instanceof net.dv8tion.jda.core.hooks.EventListener) {
 			listeners.remove(o);
 		}
 	}
@@ -58,16 +57,16 @@ public class ClientEventManager implements IEventManager {
 	@Override
 	public void handle(Event event) {
 		if (executor.isShutdown()) {
-			shard.client.getDiscordLog().logToDiscord(new Exception("Event Manager Executor for Shard " + shard.getId() + " has already been shutdown!"), event.getClass().getSimpleName());
+			shard.getClient().getDiscordLog().logToDiscord(new Exception("Event Manager Executor for Shard " + shard.getId() + " has already been shutdown!"), event.getClass().getSimpleName());
 			return;
 		}
 		final List<Object> listeners = getRegisteredListeners();
 		executor.submit(() -> listeners.forEach(listener -> {
 			try {
-				shard.client.setLastEvent(shard.getId(), System.currentTimeMillis());
-				((EventListener) listener).onEvent(event);
+				((net.dv8tion.jda.core.hooks.EventListener) listener).onEvent(event);
+				shard.getClient().setLastEvent(shard.getId(), System.currentTimeMillis());
 			} catch (Exception e) {
-				shard.client.getDiscordLog().logToDiscord(e, "Unexpected error at event `" + event.getClass().getSimpleName() + "`");
+				shard.getClient().getDiscordLog().logToDiscord(e, "Unexpected error at event `" + event.getClass().getSimpleName() + "`");
 				e.printStackTrace();
 			}
 		}));

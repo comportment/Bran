@@ -1,7 +1,5 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
-import lombok.NonNull;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +33,7 @@ public class StringListBuilder {
 		return (list.size() / itemsShown) + 1;
 	}
 	
-	public String format(@NonNull Format format) {
+	public String format(Format format) {
 		int min = (page * itemsShown) - itemsShown;
 		int max = page * itemsShown;
 		switch (format) {
@@ -49,9 +47,9 @@ public class StringListBuilder {
 	}
 	
 	public enum Format {
-		NONE("%s"),
-		SIMPLE("%s - Page %d/%dn\n%s"),
-		CODE_BLOCK("```md\n[%s](Page %d/%d)\n%s\n# %s\n```");
+		NONE("%currentArgs"),
+		SIMPLE("%currentArgs - Page %d/%dn\n%currentArgs"),
+		CODE_BLOCK("```md\n[%currentArgs](Page %d/%d)\n%currentArgs\n# %currentArgs\n```");
 		private String str;
 		Format(String str) {
 			this.str = str;

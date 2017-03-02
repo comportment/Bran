@@ -1,223 +1,164 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.ClientShard;
-import br.com.brjdevs.steven.bran.core.data.Profile;
-import br.com.brjdevs.steven.bran.core.utils.MathUtils;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.currency.BankAccount;
+import br.com.brjdevs.steven.bran.core.data.UserData;
+import br.com.brjdevs.steven.bran.core.utils.Emojis;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
-import br.com.brjdevs.steven.bran.features.hangman.events.*;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageEmbed.Field;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.PrivateChannel;
+import net.dv8tion.jda.core.entities.User;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HangManGame {
 	
-	private static final List<HangManGame> sessions;
+	public static List<HangManGame> games = new ArrayList<>();
 	
-	static {
-		sessions = new ArrayList<>();
-	}
-
-	private final LinkedHashMap<String, Boolean> guesses;
-	private final List<Profile> invitedUsers;
-	private final String word;
-	private final String channel;
-	private final List<String> mistakes;
-	private final IEventListener listener;
-	public HMProfileListener profileListener;
-	private AtomicReference<Message> lastMessage;
-	private long lastGuess;
-	private Profile creator;
-	private int shard;
-	private int usedItems;
+	public ClientShard clientShard;
+	private long creatorId;
+	private List<Long> invitedUsers;
+	private Map<String, Boolean> word;
+	private List<Character> mistakes;
+	private List<String> givenTips;
+	private long channelId;
+	private boolean isPrivate;
 	
-	public HangManGame(Profile profile, String word, TextChannel channel, Client client) {
-		this.listener = new EventListener(client);
-		this.guesses = new LinkedHashMap<>();
-		this.creator = profile;
-		this.mistakes = new ArrayList<>();
-		this.lastMessage = new AtomicReference<>();
-		this.word = word;
+	public HangManGame(ClientShard clientShard, MessageChannel channel, User creator, String word) {
+		this.clientShard = clientShard;
+		this.creatorId = Long.parseLong(creator.getId());
 		this.invitedUsers = new ArrayList<>();
-		this.lastGuess = System.currentTimeMillis();
-		this.channel = channel.getId();
-		this.shard = client.getShardId(channel.getJDA());
-		this.profileListener = new HMProfileListener(this, client);
-		this.usedItems = 0;
-		Arrays.stream(word.split(""))
-				.forEach(split ->
-						guesses.put(guesses.containsKey(split) ? split + StringUtils.randomName(3) : split, false));
-		if (word.contains(" ")) {
-			guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == ' ').forEach(entry -> guesses.replace(entry.getKey(), true));
-		}
-		sessions.add(this);
-		profile.registerListener(profileListener);
+		this.word = new HashMap<>();
+		this.channelId = Long.parseLong(channel.getId());
+		this.isPrivate = channel instanceof PrivateChannel;
+		this.mistakes = new ArrayList<>();
+		this.givenTips = new ArrayList<>();
+		
+		Arrays.stream(word.split("")).forEach(c -> this.word.put(this.word.containsKey(c) ? c + StringUtils.randomName(3) : c, !c.equals(" ")));
+		games.add(this);
 	}
 	
-	public static HangManGame getSession(Profile profile) {
-		return sessions.stream().filter(session -> session.getCreator().equals(profile) || session.getInvitedUsers().contains(profile)).findAny().orElse(null);
+	public static HangManGame getGame(User user) {
+		return games.stream().filter(game -> game.getInvitedUsers().contains(user) || game.getCreator().equals(user)).findFirst().orElse(null);
 	}
 	
-	public IEventListener getListener() {
-		return listener;
+	public List<String> getGivenTips() {
+		return givenTips;
 	}
 	
-	public long getLastGuess() {
-		return lastGuess;
+	public User getCreator() {
+		return clientShard.getJDA().getUserById(String.valueOf(creatorId));
 	}
 	
-	public TextChannel getChannel(Client client) {
-		return getShard(client).getJDA().getTextChannelById(channel);
+	public UserData getCreatorData() {
+		return clientShard.getClient().getDiscordBotData().getDataHolderManager().get().getUser(getCreator());
 	}
 	
-	public ClientShard getShard(Client client) {
-		return client.getShards()[shard];
+	public boolean isMuliplayer() {
+		return !invitedUsers.isEmpty();
 	}
 	
-	public boolean isMultiplayer() {
-		return !getInvitedUsers().isEmpty();
+	public List<User> getInvitedUsers() {
+		return invitedUsers.stream().map(id -> clientShard.getJDA().getUserById(String.valueOf(id))).collect(Collectors.toList());
 	}
 	
-	public void remove(Profile profile) {
-		invitedUsers.remove(profile);
-	}
-
-	public void invite(Profile profile) {
-		profile.registerListener(profileListener);
-		this.invitedUsers.add(profile);
+	public List<UserData> getInvitedUserDatas() {
+		return invitedUsers.stream().map(id -> clientShard.getClient().getDiscordBotData().getDataHolderManager().get().getUser(clientShard.getJDA().getUserById(String.valueOf(id)))).collect(Collectors.toList());
 	}
 	
-	public AtomicReference<Message> getLastMessage() {
-		return lastMessage;
+	public int getMaximumMistakes() {
+		return 5 + (invitedUsers.size() * 3);
 	}
 	
-	public void setLastMessage(Message message) {
-		this.lastMessage.set(message);
+	public String getFullWord() {
+		return word.keySet().stream().collect(Collectors.joining());
 	}
 	
-	public List<Profile> getInvitedUsers() {
-		return invitedUsers;
-	}
-
-	public int getMaxErrors() {
-		return 5 + (getInvitedUsers().size() * 3);
+	public MessageChannel getChannel() {
+		return isPrivate ? clientShard.getJDA().getPrivateChannelById(String.valueOf(channelId)) : clientShard.getJDA().getTextChannelById(String.valueOf(channelId));
 	}
 	
-	public void guess(String string, Profile profile, Client client) {
-		this.lastGuess = System.currentTimeMillis();
-		if (isGuessed(string)) {
-			getListener().onEvent(new AlreadyGuessedEvent(this, getShard(client).getJDA(), profile, StringUtils.containsEqualsIgnoreCase(getWord(), string), string));
-			return;
-		}
-		if (isInvalid(string)) {
-			mistakes.add(string);
-			if (mistakes.size() > getMaxErrors()) {
-				getListener().onEvent(new LooseEvent(this, getShard(client).getJDA(), false));
-				return;
-			}
-			getListener().onEvent(new GuessEvent(this, getShard(client).getJDA(), profile, false, string));
-			return;
-		}
-		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == String.valueOf(string).toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
-		if (getGuessedLetters().equals(getWord())) {
-			getListener().onEvent(new WinEvent(this, getShard(client).getJDA()));
-			return;
-		}
-		getListener().onEvent(new GuessEvent(this, getShard(client).getJDA(), profile, true, string));
+	public EmbedBuilder baseEmbed() {
+		User creator = getCreator();
+		return new EmbedBuilder().setColor(Color.decode("#3C4044")).setTitle("Hang Man Game", null).setFooter("Game session started by " + creator.getName() + "#" + creator.getDiscriminator(), creator.getEffectiveAvatarUrl());
 	}
-
+	
 	public String getGuessedLetters() {
-		return String.join("", guesses.entrySet().stream().map(entry -> (entry.getValue() ? entry.getKey().charAt(0) : "\\_") + "").collect(Collectors.toList()));
+		return word.entrySet().stream().map(entry -> entry.getValue() ? String.valueOf(entry.getKey().charAt(0)) : "_").collect(Collectors.joining());
 	}
 	
-	public String getWord() {
-		return word;
-	}
-	
-	public List<String> getGuesses() {
-		return guesses.entrySet().stream().map(entry -> entry.getValue() ? entry.getKey() : "_").collect(Collectors.toList());
-	}
-
-	public List<String> getMistakes() {
+	public List<Character> getMistakes() {
 		return mistakes;
 	}
-
-	public boolean isGuessed(String c) {
-		return OtherUtils.containsEqualsIgnoreCase(getGuesses(), c) || OtherUtils.containsEqualsIgnoreCase(getMistakes(), c);
+	
+	public boolean isPrivate() {
+		return isPrivate;
 	}
 	
-	public boolean isInvalid(String c) {
-		return !StringUtils.containsEqualsIgnoreCase(getWord(), c);
-	}
-	
-	public Profile getCreator() {
-		return creator;
-	}
-	
-	public void setCreator(Profile profile) {
-		getInvitedUsers().remove(profile);
-		getInvitedUsers().add(creator);
-		this.creator = profile;
-	}
-	
-	public List<Profile> getProfiles() {
-		List<Profile> profiles = new ArrayList<>();
-		profiles.add(getCreator());
-		profiles.addAll(getInvitedUsers());
-		return profiles;
-	}
-	
-	public Field getCurrentGuessesField(boolean inline) {
-		return new Field("_ _", "**These are your current guesses:** " + getGuessedLetters() + "\n**These are your current mistakes:** " + String.join(", ", getMistakes().stream().map(String::valueOf).collect(Collectors.toList())) + "         *Total Mistakes: " + getMistakes().size() + "/" + getMaxErrors() + "*", inline);
-	}
-	
-	public Field getInvitedUsersField(boolean inline, Client client) {
-		return new Field("Invited Users", getInvitedUsers().isEmpty() ? "There are no invited users in this session, use `" + client.getConfig().defaultPrefixes.get(0) + "hm invite [mention]` to invite someone to play with you!" : "There are " + getInvitedUsers().size() + " users playing in this session.\n" + (String.join(", ", getInvitedUsers().stream().map(profile -> profile.getUser(getShard(client).getJDA()).getName()).collect(Collectors.toList()))), inline);
-	}
-	
-	public int getUsedItems() {
-		return usedItems;
-	}
-	
-	public void addUseItem() {
-		this.usedItems++;
-	}
-	
-	public String getRandomLetter() {
-		int random = MathUtils.random(word.length());
-		char c = getGuessedLetters().charAt(random);
-		while (c != '_') {
-			if (random <= 0) random++;
-			else random--;
-			c = getGuessedLetters().charAt(random);
+	public void guess(char c, UserData userData) {
+		String s = String.valueOf(c);
+		if (!getFullWord().contains(s) && !mistakes.contains(c)) {
+			reward(userData, 0, -4);
+			getChannel().sendMessage(baseEmbed().setDescription(Emojis.DISAPPOINTED + " Nope, that is not in the word. Keep trying!\n\n\n**Guesses:** " + getGuessedLetters() + "\nYou've made " + mistakes.size() + " out of " + getMaximumMistakes() + "." + (mistakes.isEmpty() ? "" : " (" + mistakes.stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")") + "\n\n" + (givenTips.isEmpty() ? "You didn't ask for any tips." : "These are the current given tips:\n" + (String.join("\n", givenTips))) + "\nMultiplayer: " + (invitedUsers.isEmpty()) + (invitedUsers.isEmpty() ? "" : "\n" + getInvitedUsers().stream().map(Utils::getUser).collect(Collectors.joining(", ")))).build()).queue();
+			mistakes.add(c);
+			if (mistakes.size() > getMaximumMistakes())
+				loose();
+			return;
 		}
-		return String.valueOf(getWord().charAt(random));
+		Stream<Map.Entry<String, Boolean>> stream = word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().charAt(0) == c);
+		if (stream.findFirst() == null) {
+			getChannel().sendMessage("You already Guessed this Letter!").queue();
+		} else {
+			stream.forEach(entry -> word.replace(entry.getKey(), true));
+			if (getFullWord().equals(getGuessedLetters())) {
+				win();
+				return;
+			}
+			getChannel().sendMessage(baseEmbed().setDescription(Emojis.THUMBS_UP + " Alright you guessed a letter! Keep the good job!\n\n\n**Guesses:** " + getGuessedLetters() + "\nYou've made " + mistakes.size() + " out of " + getMaximumMistakes() + "." + (mistakes.isEmpty() ? "" : " (" + mistakes.stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")") + "\n\n" + (givenTips.isEmpty() ? "You didn't ask for any tips." : "These are the current given tips:\n" + (String.join("\n", givenTips))) + "\nMultiplayer: " + (invitedUsers.isEmpty()) + (invitedUsers.isEmpty() ? "" : "\n" + getInvitedUsers().stream().map(Utils::getUser).collect(Collectors.joining(", ")))).build()).queue();
+			reward(userData, 5, 1);
+		}
 	}
 	
-	public void guess(String string) {
-		guesses.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().charAt(0) == string.toLowerCase().charAt(0)).forEach(entry -> guesses.replace(entry.getKey(), true));
+	private void win() {
+		getChannel().sendMessage(Emojis.PARTY_POPPER + " Yay you won! The word was `" + getFullWord() + "`! " + (invitedUsers.isEmpty() ? "You" : "Everyone") + " won 20 coins and 10 experience.").queue();
+		games.remove(this);
 	}
 	
-	public EmbedBuilder createEmbed(Client client) {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("Hang Man", null);
-		builder.setFooter("Session created by " + getCreator().getUser(getShard(client).getJDA()).getName(), OtherUtils.getAvatarUrl(getCreator().getUser(getShard(client).getJDA())));
-		builder.setColor(getCreator().getEffectiveColor());
-		builder.addField(getCurrentGuessesField(false));
-		builder.addField(getInvitedUsersField(false, client));
-		return builder;
+	private void loose() {
+		getChannel().sendMessage(Emojis.CRY + " Too bad, you lost! The word was `" + getFullWord() + "`! " + (invitedUsers.isEmpty() ? "You" : "Everyone") + " lost 15 coins and 5 experience.").queue();
+		games.remove(this);
 	}
-	public void end() {
-		getProfiles().forEach(p -> p.unregisterListener(profileListener));
-		sessions.remove(this);
+	
+	public void giveup() {
+		getChannel().sendMessage(Emojis.FROWNING + " Aww, why did you give up? The word was `" + getFullWord() + "`.").queue();
+		games.remove(this);
+	}
+	
+	public void leave(User user) {
+		getChannel().sendMessage(Utils.getUser(user) + " left the game!").queue();
+		this.invitedUsers.remove(Long.parseLong(user.getId()));
+	}
+	
+	public void invite(User user) {
+		getChannel().sendMessage(Utils.getUser(user) + " joined the game!").queue();
+		invitedUsers.add(Long.parseLong(user.getId()));
+	}
+	
+	public void pass(User user) {
+		getChannel().sendMessage(Utils.getUser(getCreator()) + " passed game ownership to " + Utils.getUser(user) + ".").queue();
+		invitedUsers.add(creatorId);
+		creatorId = Long.parseLong(user.getId());
+		invitedUsers.remove(creatorId);
+	}
+	
+	private void reward(UserData userData, long coins, long exp) {
+		userData.getProfile().bankAccount.addCoins(coins, BankAccount.MAIN_BANK);
+		userData.getProfile().addExperience(exp);
 	}
 }

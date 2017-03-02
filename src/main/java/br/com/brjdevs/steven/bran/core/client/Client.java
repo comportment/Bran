@@ -1,18 +1,17 @@
-package br.com.brjdevs.steven.bran;
+package br.com.brjdevs.steven.bran.core.client;
 
-import br.com.brjdevs.steven.bran.core.audio.MusicManager;
-import br.com.brjdevs.steven.bran.core.audio.MusicPlayerManager;
-import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
+import br.com.brjdevs.steven.bran.core.audio.AudioUtils;
+import br.com.brjdevs.steven.bran.core.audio.ClientMusicManager;
+import br.com.brjdevs.steven.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.steven.bran.core.command.CommandManager;
-import br.com.brjdevs.steven.bran.core.data.Data;
-import br.com.brjdevs.steven.bran.core.data.Profile;
-import br.com.brjdevs.steven.bran.core.data.bot.Config;
+import br.com.brjdevs.steven.bran.core.currency.Profile;
+import br.com.brjdevs.steven.bran.core.data.Config;
+import br.com.brjdevs.steven.bran.core.data.DiscordBotData;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
-import br.com.brjdevs.steven.bran.core.poll.PollPersistence;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.Session;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -25,6 +24,7 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import redis.clients.jedis.JedisPool;
 
 import javax.security.auth.login.LoginException;
 import java.io.File;
@@ -38,13 +38,13 @@ import java.util.stream.Stream;
 
 public class Client {
 	
+	private static JedisPool jedisPool = new JedisPool("localhost", 6379);
 	private static SimpleLog LOG = SimpleLog.getLog("BotContainer");
 	public File workingDir;
-	public PollPersistence pollPersistence;
-	public TaskManager taskManager;
-	public CommandManager commandManager;
-	public MusicPlayerManager playerManager;
-	private Data data;
+	private TaskManager taskManager;
+	private CommandManager commandManager;
+	private ClientMusicManager playerManager;
+	private DiscordBotData discordBotData;
 	private ClientShard[] shards;
 	private DiscordLog discordLog;
 	private int totalShards;
@@ -55,7 +55,7 @@ public class Client {
 	private Messenger messenger;
 	
 	public Client() throws LoginException, InterruptedException, RateLimitedException {
-		this.data = new Data();
+		this.discordBotData = new DiscordBotData();
 		this.ownerId = 0;
 		this.ownerShardId = 0;
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
@@ -66,8 +66,7 @@ public class Client {
 		this.shards = new ClientShard[totalShards];
 		initShards();
 		getOwner();
-		this.playerManager = new MusicPlayerManager(this);
-		this.pollPersistence = new PollPersistence(this);
+		this.playerManager = new ClientMusicManager(this);
 		this.commandManager = new CommandManager(this);
 		this.discordLog = new DiscordLog(this);
 		this.session = new Session(this);
@@ -76,12 +75,16 @@ public class Client {
 		ItemContainer.loadItems();
 	}
 	
+	public static JedisPool getJedisPool() {
+		return jedisPool;
+	}
+	
 	public ClientShard[] getShards() {
 		return shards;
 	}
 	
-	public Data getData() {
-		return data;
+	public DiscordBotData getDiscordBotData() {
+		return discordBotData;
 	}
 	
 	public int getShardId(JDA jda) {
@@ -90,7 +93,7 @@ public class Client {
 	}
 	
 	public Profile getProfile(User user) {
-		return data.getDataHolderManager().get().getUser(user).getProfile();
+		return discordBotData.getDataHolderManager().get().getUser(user).getProfile();
 	}
 	
 	public int getTotalShards() {
@@ -118,7 +121,7 @@ public class Client {
 	}
 	
 	public Config getConfig() {
-		return getData().getConfigDataManager().get();
+		return getDiscordBotData().getConfigDataManager().get();
 	}
 	
 	public List<Guild> getGuilds() {
@@ -145,16 +148,20 @@ public class Client {
 		return lastEvents;
 	}
 	
+	public TaskManager getTaskManager() {
+		return taskManager;
+	}
+	
 	public synchronized boolean reboot(ClientShard shard) {
 		try {
-			Map<Long, ImmutablePair<Long, MusicManager>> shardPlayers = new HashMap<>();
-			Map<Long, MusicManager> copy = new HashMap<>(playerManager.getMusicManagers());
+			Map<Long, ImmutablePair<Long, GuildMusicManager>> shardPlayers = new HashMap<>();
+			Map<Long, GuildMusicManager> copy = new HashMap<>(playerManager.getMusicManagers());
 			copy.forEach((guildId, musicManager) -> {
 				Guild guild = shard.getJDA().getGuildById(String.valueOf(guildId));
 				if (guild != null) {
 					if (guild.getAudioManager().isConnected() || guild.getAudioManager().isAttemptingToConnect()) {
 						shardPlayers.put(guildId, new ImmutablePair<>(Long.parseLong(guild.getAudioManager().getConnectedChannel().getId()), musicManager));
-						TextChannel channel = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
+						TextChannel channel = musicManager.getTrackScheduler().getCurrentTrack().getContext();
 						if (channel != null && channel.canTalk())
 							channel.sendMessage("I'm going to reboot this shard (#" + shard.getId() + "), I'll be right back...").queue();
 						musicManager.getTrackScheduler().setPaused(true);
@@ -163,17 +170,17 @@ public class Client {
 				}
 			});
 			shard.getJDA().shutdown(false);
-			OtherUtils.sleep(5000);
+			Utils.sleep(5000);
 			shard.restartJDA();
 			shardPlayers.forEach((id, pair) -> {
 				VoiceChannel channel = shard.getJDA().getVoiceChannelById(String.valueOf(pair.left));
-				MusicManager musicManager = pair.right;
+				GuildMusicManager musicManager = pair.right;
 				if (channel == null) return;
 				channel.getGuild().getAudioManager().setSendingHandler(musicManager.getSendHandler());
-				AudioUtils.connect(channel, musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext(), this);
+				AudioUtils.connect(channel, musicManager.getTrackScheduler().getCurrentTrack().getContext(), this);
 				playerManager.getMusicManagers().put(id, musicManager);
 				musicManager.getTrackScheduler().setPaused(false);
-				TextChannel context = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
+				TextChannel context = musicManager.getTrackScheduler().getCurrentTrack().getContext();
 				if (context != null && context.canTalk())
 					context.sendMessage("Rebooted Shard, resuming the player...").queue();
 				
@@ -183,6 +190,14 @@ public class Client {
 			return false;
 		}
 		return true;
+	}
+	
+	public CommandManager getCommandManager() {
+		return commandManager;
+	}
+	
+	public ClientMusicManager getMusicManager() {
+		return playerManager;
 	}
 	
 	private int getRecommendedShards() {
@@ -231,18 +246,18 @@ public class Client {
 		
 		playerManager.getMusicManagers().forEach((guildId, musicManager) -> {
 			try {
-				if (musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null) return;
-				TextChannel channel = musicManager.getTrackScheduler().getQueue().getCurrentTrack().getContext();
+				if (musicManager.getTrackScheduler().getCurrentTrack() == null) return;
+				TextChannel channel = musicManager.getTrackScheduler().getCurrentTrack().getContext();
 				if (channel != null && channel.canTalk())
 					channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, strong and better.").complete();
 			} catch (Exception ignored) {
 			}
 		});
-		if (!pollPersistence.savePolls()) LOG.info("Could not complete PollPersistence savePolls.");
 		
-		getData().getDataHolderManager().update();
-		getData().getConfigDataManager().update();
-		getData().getHangmanWordsManager().update();
+		//getDiscordBotData().getPollPersistence().update();
+		getDiscordBotData().getDataHolderManager().update();
+		getDiscordBotData().getConfigDataManager().update();
+		getDiscordBotData().getHangmanWordsManager().update();
 		
 		Stream.of(shards).forEach(ClientShard::shutdown);
 		

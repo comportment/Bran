@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.responsewaiter.ExpectedResponseType;
 import br.com.brjdevs.steven.bran.core.responsewaiter.ResponseWaiter;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.UnexpectedResponseEvent;
@@ -10,13 +10,10 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 
-public class ActionListener extends OptimizedListener<Event> {
-	
-	private Client client;
+public class ActionListener extends EventListener<Event> {
 	
 	public ActionListener(Client client) {
-		super(Event.class);
-		this.client = client;
+		super(Event.class, client);
 	}
 	
 	@Override

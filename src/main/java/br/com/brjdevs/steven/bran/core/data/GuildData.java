@@ -1,8 +1,7 @@
 package br.com.brjdevs.steven.bran.core.data;
 
-import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
+import br.com.brjdevs.steven.bran.core.audio.AudioUtils;
 import br.com.brjdevs.steven.bran.core.command.CommandEvent;
-import br.com.brjdevs.steven.bran.core.data.bot.Config;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.operations.ResultType;
@@ -36,9 +35,9 @@ public class GuildData {
 	private long announceChannelId;
 	private List<Long> publicRoles = new ArrayList<>();
 	
-	public GuildData(Guild guild, Config config) {
+	public GuildData(Guild guild) {
 		this.guildId = Long.parseLong(guild.getId());
-		this.prefixes.addAll(config.defaultPrefixes);
+		this.prefixes.addAll(Arrays.asList("!!", "."));
 	}
 	
 	public Guild getGuild(JDA jda) {

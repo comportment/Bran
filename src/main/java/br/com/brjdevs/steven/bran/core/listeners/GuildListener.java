@@ -1,17 +1,14 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import net.dv8tion.jda.core.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 
-public class GuildListener extends OptimizedListener<GenericGuildEvent> {
-	
-	public Client client;
+public class GuildListener extends EventListener<GenericGuildEvent> {
 	
 	public GuildListener(Client client) {
-		super(GenericGuildEvent.class);
-		this.client = client;
+		super(GenericGuildEvent.class, client);
 	}
 	
 	@Override
@@ -19,7 +16,7 @@ public class GuildListener extends OptimizedListener<GenericGuildEvent> {
 		if (event instanceof GuildJoinEvent) {
 			client.getDiscordLog().logToDiscord((GuildJoinEvent) event);
 		} else if (event instanceof GuildLeaveEvent) {
-			client.getData().getDataHolderManager().get().guilds.remove(Long.parseLong(event.getGuild().getId()));
+			client.getDiscordBotData().getDataHolderManager().get().guilds.remove(Long.parseLong(event.getGuild().getId()));
 			client.getDiscordLog().logToDiscord((GuildLeaveEvent) event);
 		}
 	}

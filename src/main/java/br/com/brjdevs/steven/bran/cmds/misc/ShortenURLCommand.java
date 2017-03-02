@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 
 public class ShortenURLCommand {
 	
-	private static String baseURL = "https://is.gd/create.php?format=simple&url=%s";
+	private static String baseURL = "https://is.gd/create.php?format=simple&url=%currentArgs";
 	
 	@Command
 	private static ICommand shortenUrl() {
@@ -20,7 +20,7 @@ public class ShortenURLCommand {
 				.setAliases("shorten")
 				.setName("Shorten URL Command")
 				.setDescription("Shortens URLs for you!")
-				.setArgs(new Argument<>("url", String.class))
+				.setArgs(new Argument("url", String.class))
 				.setAction((event) -> {
 					String url = ((String) event.getArgument("url").get());
 					if (url.isEmpty()) {

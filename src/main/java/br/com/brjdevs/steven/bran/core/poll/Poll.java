@@ -1,30 +1,24 @@
 package br.com.brjdevs.steven.bran.core.poll;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.ClientShard;
-import lombok.Getter;
-import lombok.Setter;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.ClientShard;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Poll {
-	private static final List<Poll> polls = new ArrayList<>();
 	private final String pollName;
 	private final String creatorId;
 	private final LinkedList<Option> options;
 	private final String channelId;
 	private final String guildId;
-	@Getter
-	@Setter
 	private int shardId;
 	
 	public Poll(String pollName, Member creator, LinkedList<Option> options, TextChannel channel, Client client) {
@@ -34,15 +28,23 @@ public class Poll {
 		this.channelId = channel.getId();
 		this.guildId = channel.getGuild().getId();
 		setShardId(client.getShardId(channel.getJDA()));
-		polls.add(this);
+		getRunningPolls(client).add(this);
 	}
 	
-	public static List<Poll> getRunningPolls() {
-		return polls;
+	public static List<Poll> getRunningPolls(Client client) {
+		return client.getDiscordBotData().getPollPersistence().get();
 	}
 	
-	public static Poll getPoll(TextChannel channel) {
-		return polls.stream().filter(poll -> poll.getChannelId().equals(channel.getId())).findFirst().orElse(null);
+	public static Poll getPoll(TextChannel channel, Client client) {
+		return getRunningPolls(client).stream().filter(poll -> poll.getChannelId().equals(channel.getId())).findFirst().orElse(null);
+	}
+	
+	public int getShardId() {
+		return shardId;
+	}
+	
+	public void setShardId(int shardId) {
+		this.shardId = shardId;
 	}
 	
 	public ClientShard getShard(Client client) {
@@ -113,8 +115,8 @@ public class Poll {
 		return options.stream().filter(option -> option.getVotes().size() == Collections.max(options.stream().map(o -> o.getVotes().size()).collect(Collectors.toList())) && option.getVotes().size() != 0).collect(Collectors.toList());
 	}
 	
-	public void remove() {
-		polls.remove(this);
+	public void remove(Client client) {
+		getRunningPolls(client).remove(this);
 	}
 	
 	public Option getOption(String userId) {

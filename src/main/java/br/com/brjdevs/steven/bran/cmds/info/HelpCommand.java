@@ -26,7 +26,7 @@ public class HelpCommand {
 						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
 						return;
 					}
-					CommandManager commandManager = event.getClient().commandManager;
+					CommandManager commandManager = event.getClient().getCommandManager();
 					commandManager.getCommands().sort(Comparator.comparing(ICommand::getCategory));
 					StringBuilder builder = new StringBuilder();
 					for (Category category : Category.values()) {
@@ -35,7 +35,7 @@ public class HelpCommand {
 								.append(" **| ").append(category.getKey())
 								.append("** - ");
 						for (ICommand command : commandManager.getCommands(category))
-							builder.append("`").append(command.getAliases().get(0)).append("`").append(", ");
+							builder.append("`").append(command.getAliases()[0]).append("`").append(", ");
 						builder = new StringBuilder(StringUtils.replaceLast(builder.toString(), ", ", ""));
 						builder.append('\n');
 					}

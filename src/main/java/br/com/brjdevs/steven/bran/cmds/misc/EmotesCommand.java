@@ -7,8 +7,8 @@ import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
@@ -34,7 +34,7 @@ public class EmotesCommand {
 				.setPrivateAvailable(false)
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setDescription("Returns you info about a certain emote.")
-						.setArgs(new Argument<>("emote", String.class))
+						.setArgs(new Argument("emote", String.class))
 						.setName("Emote Info Command")
 						.setAliases("info")
 						.setAction((event, args) -> {
@@ -50,7 +50,7 @@ public class EmotesCommand {
 							OffsetDateTime creation = emote.getCreationTime();
 							String createdAt = StringUtils.neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + StringUtils.neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + creation.getHour() + ":" + creation.getMinute() + ":" + creation.getSecond() + " GMT";
 							MessageEmbed embed = new EmbedBuilder()
-									.setFooter("Requested by " + event.getAuthor().getName(), OtherUtils.getAvatarUrl(event.getAuthor()))
+									.setFooter("Requested by " + event.getAuthor().getName(), Utils.getAvatarUrl(event.getAuthor()))
 									.setTimestamp(event.getMessage().getCreationTime())
 									.addField("Name: ", emote.getName(), true)
 									.addField("ID: ", emote.getId(), true)

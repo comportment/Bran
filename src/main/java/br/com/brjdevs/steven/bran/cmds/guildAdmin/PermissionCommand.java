@@ -10,7 +10,7 @@ import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.operations.ResultType;
 import br.com.brjdevs.steven.bran.core.operations.ResultType.OperationResult;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -39,7 +39,7 @@ public class PermissionCommand {
 						.setAliases("set")
                         .setName("Permission Set Command")
                         .setDescription("Sets the Permission of an User")
-						.setArgs(new Argument<>("perm", String.class), new Argument<>("user", String.class))
+						.setArgs(new Argument("perm", String.class), new Argument("user", String.class))
 						.setExample("perms set -MUSIC <@219186621008838669>")
                         .setRequiredPermission(Permissions.PERMSYS_GM)
 						.setAction((event) -> {
@@ -90,7 +90,7 @@ public class PermissionCommand {
 	                        String s;
 	                        if (!isEveryone) {
 	                        	if (operationResult.getResult() == ResultType.SUCCESS)
-			                        s = "Updated " + OtherUtils.getUser(user) + " permissions!";
+			                        s = "Updated " + Utils.getUser(user) + " permissions!";
 		                        else if (operationResult.getResult() == ResultType.INVALID) {
 			                        s = "How the hell did you manage to update a Fake Member permission?";
 		                        } else {
@@ -100,13 +100,14 @@ public class PermissionCommand {
 	                        else
 		                        s = "Updated " + holder.value + " members permissions! Could not update " + (members.size() - holder.value) + " members permissions.";
 							event.sendMessage(s).queue();
+							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})
                         .build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("get")
                         .setName("Permission Get Command")
                         .setDescription("Returns you the Permission of an User.")
-						.setArgs(new Argument<>("user", String.class, true))
+						.setArgs(new Argument("user", String.class, true))
 						.setExample("perms get <@219186621008838669>")
                         .setAction((event, a) -> {
 	                        if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
@@ -116,10 +117,10 @@ public class PermissionCommand {
 	                        User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getJDA().getUserById((String) event.getArgument("user").get()) : event.getMessage().getMentionedUsers().get(0);
 	                        if (user == null) user = event.getAuthor();
 	                        EmbedBuilder builder = new EmbedBuilder();
-	                        builder.setTitle("Permissions for " + OtherUtils.getUser(user), null);
+	                        builder.setTitle("Permissions for " + Utils.getUser(user), null);
 	                        builder.setDescription((String.join(", ", Permissions.toCollection(event.getGuildData().getPermissionForUser(user)))) + "\n\nRaw: " + event.getGuildData().getPermissionForUser(user));
-	                        builder.setThumbnail(OtherUtils.getAvatarUrl(user));
-	                        builder.setFooter("Requested by " + OtherUtils.getUser(event.getAuthor()), OtherUtils.getAvatarUrl(event.getAuthor()));
+	                        builder.setThumbnail(Utils.getAvatarUrl(user));
+	                        builder.setFooter("Requested by " + Utils.getUser(event.getAuthor()), Utils.getAvatarUrl(event.getAuthor()));
 	                        builder.setColor(Color.decode("#9318E6"));
                             event.sendMessage(builder.build()).queue();
 
@@ -137,7 +138,7 @@ public class PermissionCommand {
 							EmbedBuilder embedBuilder = new EmbedBuilder();
 							embedBuilder.setTitle("All of my permissions", null);
 							embedBuilder.setDescription(Permissions.toCollection(Permissions.BOT_OWNER).stream().collect(Collectors.joining(", ")));
-							embedBuilder.setFooter("Requested by " + OtherUtils.getUser(event.getAuthor()), OtherUtils.getAvatarUrl(event.getAuthor()));
+							embedBuilder.setFooter("Requested by " + Utils.getUser(event.getAuthor()), Utils.getAvatarUrl(event.getAuthor()));
 							embedBuilder.setColor(Color.decode("#9318E6"));
 							event.sendMessage(embedBuilder.build()).queue();
 						})
@@ -146,7 +147,7 @@ public class PermissionCommand {
 						.setAliases("setdefault")
 						.setName("Permission SetDefault Command")
 						.setDescription("Sets the default permissions for new users")
-						.setArgs(new Argument<>("permissions", String.class))
+						.setArgs(new Argument("permissions", String.class))
 						.setRequiredPermission(Permissions.PERMSYS_GO)
 						.setAction((event) -> {
 							if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
@@ -191,7 +192,7 @@ public class PermissionCommand {
 									.append("Now these are the default permissions:")
 									.setEmbed(new EmbedBuilder()
 											.setDescription((String.join(", ", Permissions.toCollection(event.getGuildData().defaultPermission))) + "\n\nRaw: " + event.getGuildData().defaultPermission)
-											.setTitle("Default Permission(s)", null)
+											.setTitle("Default Permission(currentArgs)", null)
 											.build())
 									.build();
 							event.sendMessage(m).queue();

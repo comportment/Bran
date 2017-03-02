@@ -17,7 +17,7 @@ public class LoveCommand {
 				.setName("Love Command")
 				.setAliases("love")
 				.setDescription("Gives you the love percentage between to names!")
-				.setArgs(new Argument<>("firstName", String.class), new Argument<>("secondName", String.class))
+				.setArgs(new Argument("firstName", String.class), new Argument("secondName", String.class))
 				.setAction((event) -> {
 					String firstName = ((String) event.getArgument("firstName").get());
 					String secondName = ((String) event.getArgument("secondName").get());

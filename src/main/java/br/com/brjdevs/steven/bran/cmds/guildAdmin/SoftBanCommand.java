@@ -7,7 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.PermissionException;
@@ -25,7 +25,7 @@ public class SoftBanCommand {
 				.setName("SoftBan Command")
 				.setDescription("Does this really need a Description?")
 				.setExample("softban <@219186621008838669>")
-				.setArgs(new Argument<>("mention", String.class))
+				.setArgs(new Argument("mention", String.class))
 				.setRequiredPermission(Permissions.BAN_USER)
 				.setPrivateAvailable(false)
 				.setAction((event) -> {
@@ -48,13 +48,13 @@ public class SoftBanCommand {
 							continue;
 						}
 						if (!event.getSelfMember().canInteract(event.getGuild().getMember(user))) {
-							event.sendMessage("I can't softban " + OtherUtils.getUser(user) + "!").queue();
+							event.sendMessage("I can't softban " + Utils.getUser(user) + "!").queue();
 							continue;
 						}
 						event.getGuild().getController().ban(user, 7)
 								.queue(success -> {
 											event.getGuild().getController().unban(user).queue(s -> {
-												String out = "SoftBanned " + users.stream().filter(Objects::nonNull).map(OtherUtils::getUser).collect(Collectors.joining(", ")) + "!";
+												String out = "SoftBanned " + users.stream().filter(Objects::nonNull).map(Utils::getUser).collect(Collectors.joining(", ")) + "!";
 												event.sendMessage(Quotes.SUCCESS, out).queue();
 											}, throwable -> {
 												event.sendMessage("Failed to unban user!").queue();

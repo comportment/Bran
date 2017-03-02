@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.data;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.ClientShard;
 import br.com.brjdevs.steven.bran.core.managers.ExpirationManager;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;

@@ -5,7 +5,6 @@ import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
-import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
@@ -30,13 +29,12 @@ public class PruneCommand {
 				.setPrivateAvailable(false)
 				.setDefault("all")
 				.setDescription("Delete multiple messages instantly with this command!")
-				.onNotFound(CommandAction.REDIRECT)
 				.setRequiredPermission(Permissions.PRUNE_CLEANUP)
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 						.setAliases("bot")
 						.setName("Prune Bot Command")
 						.setDescription("Deletes bot messages in the latest given amount messages.")
-						.setArgs(new Argument<>("amount", Integer.class, true))
+						.setArgs(new Argument("amount", Integer.class, true))
 						.setExample("prune bot 100")
 						.setAction((event) -> {
 							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE)) {
@@ -72,7 +70,7 @@ public class PruneCommand {
 						.setAliases("user")
 						.setName("Prune User Command")
 						.setDescription("Deletes the given user messages in the latest given amount messages")
-						.setArgs(new Argument<>("user", String.class), new Argument<>("amount", Integer.class, true))
+						.setArgs(new Argument("user", String.class), new Argument("amount", Integer.class, true))
 						.setExample("prune user 100 <@219186621008838669>")
 						.setAction((event) -> {
 							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE)) {
@@ -120,7 +118,7 @@ public class PruneCommand {
 						.setAliases("msg", "content")
 						.setName("Prune Content Command")
 						.setDescription("Deletes messages with the given content in the latest given amount messages.")
-						.setArgs(new Argument<>("content", String.class), new Argument<>("amount", Integer.class, true))
+						.setArgs(new Argument("content", String.class), new Argument("amount", Integer.class, true))
 						.setExample("prune content 100 hello")
 						.setAction((event) -> {
 							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE)) {
@@ -157,7 +155,7 @@ public class PruneCommand {
 						.setAliases("all")
 						.setName("Prune All Command")
 						.setDescription("Deletes all messages in the latest given amount messages.")
-						.setArgs(new Argument<>("amount", Integer.class, true))
+						.setArgs(new Argument("amount", Integer.class, true))
 						.setAction((event) -> {
 							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE)) {
 								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE).queue();

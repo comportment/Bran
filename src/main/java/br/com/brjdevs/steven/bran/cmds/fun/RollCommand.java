@@ -18,12 +18,12 @@ public class RollCommand {
 				.setName("Roll Command")
 				.setDescription("Rolls a dice!")
 				.setExample("roll 1d20")
-				.setArgs(new Argument<>("range", String.class, true))
+				.setArgs(new Argument("range", String.class, true))
 				.setAction((event) -> {
 					try {
 						@SuppressWarnings("unchecked")
-						Argument<String> rangeArg = event.getArgument("range");
-						String s = !rangeArg.isPresent() ? "1d20" : rangeArg.get();
+						Argument rangeArg = event.getArgument("range");
+						String s = !rangeArg.isPresent() ? "1d20" : ((String) rangeArg.get());
 						if (!s.matches(ROLL_MATCH)) {
 							event.sendMessage("Hey, `" + s + "` is not a valid argument! You should use for example `1d20`.").queue();
 							return;
@@ -40,7 +40,7 @@ public class RollCommand {
 						
 					} catch (NumberFormatException ex) {
 						String input = ex.getMessage().substring(ex.getMessage().indexOf("\"") + 1).replace("\"", "");
-						event.sendMessage("Wew, that's a big number, so big that I can't even process that please use a smaller number. *(Input: " + input + "/Maximum: " + Integer.MAX_VALUE + ")*").queue();
+						event.sendMessage("Wew, that'currentArgs a big number, so big that I can't even process that please use a smaller number. *(Input: " + input + "/Maximum: " + Integer.MAX_VALUE + ")*").queue();
 					}
 				})
 				.build();

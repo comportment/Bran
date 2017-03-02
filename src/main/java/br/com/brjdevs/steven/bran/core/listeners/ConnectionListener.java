@@ -1,11 +1,11 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.DiscordLog.Level;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
-public class ConnectionListener extends OptimizedListener<Event> {
+public class ConnectionListener extends EventListener<Event> {
 	
 	private static SimpleLog LOG;
 	
@@ -13,11 +13,9 @@ public class ConnectionListener extends OptimizedListener<Event> {
 		LOG = SimpleLog.getLog("Connection Listener");
 	}
 	
-	public Client client;
 	
 	public ConnectionListener(Client client) {
-		super(Event.class);
-		this.client = client;
+		super(Event.class, client);
 	}
 	
 	public void event(Event event) {

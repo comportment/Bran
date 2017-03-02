@@ -53,7 +53,7 @@ public class RegionalCommand {
 		regional.put("p", "");
 		regional.put("q", "");
 		regional.put("r", "");
-		regional.put("s", "");
+		regional.put("currentArgs", "");
 		regional.put("t", "");
 		regional.put("u", "");
 		regional.put("v", "");
@@ -68,7 +68,7 @@ public class RegionalCommand {
 		return new CommandBuilder(Category.FUN)
 				.setAliases("reg", "regional")
 				.setName("Regional Character Command")
-				.setArgs(new Argument<>("phrase", String.class))
+				.setArgs(new Argument("phrase", String.class))
 				.setDescription("Makes a phrase cool.")
 				.setExample("reg This phrase is cool")
 				.setAction((event, rawArgs) -> {

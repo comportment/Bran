@@ -1,11 +1,11 @@
-package br.com.brjdevs.steven.bran.core.audio.utils;
+package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.audio.MusicManager;
+import br.com.brjdevs.steven.bran.core.audio.AudioUtils;
+import br.com.brjdevs.steven.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
 import br.com.brjdevs.steven.bran.core.audio.timers.ChannelLeaveTimer;
-import br.com.brjdevs.steven.bran.core.listeners.OptimizedListener;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -16,22 +16,19 @@ import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
 
 import java.util.concurrent.TimeUnit;
 
-import static br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils.isAlone;
+import static br.com.brjdevs.steven.bran.core.audio.AudioUtils.isAlone;
 
-public class VoiceChannelListener extends OptimizedListener<GenericGuildVoiceEvent> {
-	
-	public static Client client;
+public class VoiceChannelListener extends EventListener<GenericGuildVoiceEvent> {
 	
 	public VoiceChannelListener(Client client) {
-		super(GenericGuildVoiceEvent.class);
-		VoiceChannelListener.client = client;
+		super(GenericGuildVoiceEvent.class, client);
 	}
 	
-	private static void onJoin(Guild guild, VoiceChannel voiceChannel, Member member) {
-		ChannelLeaveTimer timer = client.taskManager.getChannelLeaveTimer();
+	private void onJoin(Guild guild, VoiceChannel voiceChannel, Member member) {
+		ChannelLeaveTimer timer = client.getTaskManager().getChannelLeaveTimer();
 		if (!timer.has(guild.getId())) return;
-		MusicManager player = client.playerManager.get(guild);
-		TrackContext track = player.getTrackScheduler().getQueue().getCurrentTrack();
+		GuildMusicManager player = client.getMusicManager().get(guild);
+		TrackContext track = player.getTrackScheduler().getCurrentTrack();
 		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.get(guild.getId()).right);
 		if (voiceChannel != channel && !member.equals(guild.getSelfMember()))
 			return;
@@ -39,22 +36,22 @@ public class VoiceChannelListener extends OptimizedListener<GenericGuildVoiceEve
 			AudioUtils.connect(channel, track.getContext(), client);
 		player.getTrackScheduler().setPaused(false);
 		if (track != null && track.getContext() != null && track.getContext().canTalk())
-			track.getContext().sendMessage(member.equals(guild.getSelfMember()) ? "Resumed the player!" : OtherUtils.getUser(member.getUser()) + " joined the channel, resumed the player!").queue();
+			track.getContext().sendMessage(member.equals(guild.getSelfMember()) ? "Resumed the player!" : Utils.getUser(member.getUser()) + " joined the channel, resumed the player!").queue();
 		timer.removeMusicPlayer(guild.getId());
 	}
 	
-	public static void onLeave(Guild guild, VoiceChannel voiceChannel) {
+	public void onLeave(Guild guild, VoiceChannel voiceChannel) {
 		if (guild == null || guild.getSelfMember() == null) return;
-		ChannelLeaveTimer timer = client.taskManager.getChannelLeaveTimer();
+		ChannelLeaveTimer timer = client.getTaskManager().getChannelLeaveTimer();
 		if (!AudioUtils.isAlone(voiceChannel)) return;
-		MusicManager musicManager = client.playerManager.get(guild);
-		TrackContext track = musicManager.getTrackScheduler().getQueue().getCurrentTrack();
-		if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getQueue().getCurrentTrack() == null) {
+		GuildMusicManager musicManager = client.getMusicManager().get(guild);
+		TrackContext track = musicManager.getTrackScheduler().getCurrentTrack();
+		if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null) {
 			guild.getAudioManager().closeAudioConnection();
 			return;
 		}
 		musicManager.getTrackScheduler().setPaused(true);
-		if (track == null) track = musicManager.getTrackScheduler().getQueue().getCurrentTrack();
+		if (track == null) track = musicManager.getTrackScheduler().getCurrentTrack();
 		if (track != null && track.getContext() != null && track.getContext().canTalk())
 			track.getContext().sendMessage("I was left alone in `" + voiceChannel.getName() + "`, so I paused the player. If nobody reenter in this channel I'll stop que player, clean the queue and leave the channel.").queue();
 		timer.addMusicPlayer(guild.getId(), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(2), voiceChannel.getId());

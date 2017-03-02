@@ -19,12 +19,12 @@ public class CommandStatsCommand {
 		return new CommandBuilder(Category.INFORMATIVE)
 				.setAliases("cmdstats")
 				.setDescription("Shows you the most used commands in this session!")
-				.setArgs(new Argument<>("what", String.class, true))
+				.setArgs(new Argument("what", String.class, true))
 				.setName("Command Stats Command")
 				.setAction((event) -> {
-					Argument<String> whatArg = (Argument<String>) event.getArgument("what");
+					Argument whatArg = event.getArgument("what");
 					if (whatArg.isPresent()) {
-						String what = whatArg.get();
+						String what = ((String) whatArg.get());
 						if (what.equals("total")) {
 							event.sendMessage(fillEmbed(TOTAL_CMDS, baseEmbed(event, "Command Stats | Total")).build()).queue();
 							return;

@@ -1,10 +1,8 @@
-package br.com.brjdevs.steven.bran.core.data;
+package br.com.brjdevs.steven.bran.core.currency;
 
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
-import lombok.Getter;
-import lombok.Setter;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -18,17 +16,12 @@ public class Profile {
 	
 	private static String EMPTY = "\u00AD";
 	
-	@Getter
 	public String customHex;
+	public BankAccount bankAccount;
 	private String userId;
-	@Getter
 	private HMStats HMStats;
-	@Getter
-	@Setter
 	private Rank rank;
-	@Setter
-	@Getter
-	private long level, experience, coins;
+	private long level, experience;
 	private Inventory inventory;
 	private transient List<IProfileListener> listeners;
 	
@@ -38,7 +31,7 @@ public class Profile {
 		this.rank = Rank.ROOKIE;
 		this.level = 0;
 		this.experience = 0;
-		this.coins = 10;
+		this.bankAccount = new BankAccount(user);
 		this.customHex = null;
 		this.inventory = new Inventory();
 		this.listeners = new ArrayList<>();
@@ -53,6 +46,38 @@ public class Profile {
 		long expRequired = Math.round(expCalculate);
 		if (expCalculate - expRequired > 0) expRequired++;
 		return expRequired;
+	}
+	
+	public String getCustomHex() {
+		return customHex;
+	}
+	
+	public Profile.HMStats getHMStats() {
+		return HMStats;
+	}
+	
+	public Rank getRank() {
+		return rank;
+	}
+	
+	public void setRank(Rank rank) {
+		this.rank = rank;
+	}
+	
+	public long getLevel() {
+		return level;
+	}
+	
+	private void setLevel(long level) {
+		this.level = level;
+	}
+	
+	public long getExperience() {
+		return experience;
+	}
+	
+	private void setExperience(long experience) {
+		this.experience = experience;
 	}
 	
 	public Inventory getInventory() {
@@ -89,16 +114,6 @@ public class Profile {
 		this.level = 0;
 		this.level = 0;
 		this.inventory = new Inventory();
-	}
-	
-	public boolean takeCoins(long coinsToTake) {
-		if (coinsToTake > getCoins()) return false;
-		setCoins(getCoins() - coinsToTake);
-		return true;
-	}
-	
-	public void addCoins(long coins) {
-		setCoins(getCoins() + coins);
 	}
 	
 	public boolean setCustomColor(String hex) {
@@ -140,12 +155,12 @@ public class Profile {
 	
 	public MessageEmbed createEmbed(JDA jda) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setAuthor(getUser(jda).getName() + "'s profile information", null, OtherUtils.getAvatarUrl(getUser(jda)));
+		builder.setAuthor(getUser(jda).getName() + "'currentArgs profile information", null, Utils.getAvatarUrl(getUser(jda)));
 		builder.setDescription(EMPTY + "\n" + EMPTY);
 		builder.addField("\u2694 Level", String.valueOf(getLevel()), true);
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);
 		builder.addField("\u2b50 Experience to Next Level", String.valueOf(expForNextLevel(getLevel())), true);
-		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(getCoins()), true);
+		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(bankAccount.getCoins()), true);
 		builder.addField("\uD83D\uDCBC Inventory", String.valueOf(inventory.size(false)), true);
 		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
 		builder.addField("\uD83D\uDD79 Game", "HangMan", true).addField("\uD83C\uDFC6 Victories", String.valueOf(getHMStats().getVictories()), true).addField("☠ Defeats", String.valueOf(getHMStats().getDefeats()), true);

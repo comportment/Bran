@@ -1,18 +1,15 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
-public class ReadyListener extends OptimizedListener<ReadyEvent> {
+public class ReadyListener extends EventListener<ReadyEvent> {
 	
 	private static final SimpleLog LOG = SimpleLog.getLog("Ready Listener");
 	
-	public Client client;
-	
 	public ReadyListener(Client client) {
-		super(ReadyEvent.class);
-		this.client = client;
+		super(ReadyEvent.class, client);
 	}
 	
 	@Override

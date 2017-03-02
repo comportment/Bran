@@ -1,6 +1,6 @@
-package br.com.brjdevs.steven.bran;
+package br.com.brjdevs.steven.bran.core.client;
 
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -20,7 +20,7 @@ import java.util.List;
 
 public class ClientShard {
 	
-	public final Client client;
+	private final Client client;
 	private final ClientEventManager eventManager;
 	private int shardId;
 	private int totalShards;
@@ -37,13 +37,16 @@ public class ClientShard {
 		this.lastReboot = 0;
 		this.eventManager = new ClientEventManager(this);
 		restartJDA();
-		//pruneGuilds(30);
+	}
+	
+	public Client getClient() {
+		return client;
 	}
 	
 	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
 		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(client.getConfig().botToken);
 		Game game = null;
-		if (!OtherUtils.isEmpty(client.getConfig().defaultGame))
+		if (!Utils.isEmpty(client.getConfig().defaultGame))
 			game = client.getConfig().gameStream ? Game.of(client.getConfig().defaultGame, "https://twitch.tv/ ") : Game.of(client.getConfig().defaultGame);
 		if (totalShards > 1) {
 			jdaBuilder.useSharding(shardId, totalShards);
@@ -88,7 +91,7 @@ public class ClientShard {
 	}
 	
 	public String getInfo() {
-		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + OtherUtils.getUser(client.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + client.getConfig().defaultPrefixes.get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + client.getConfig().defaultPrefixes.get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
+		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + Utils.getUser(client.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + client.getConfig().defaultPrefixes.get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + client.getConfig().defaultPrefixes.get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
 	}
 	
 	public void updateCurrentGuildCount() {

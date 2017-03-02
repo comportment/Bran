@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
@@ -10,14 +10,11 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.regex.Pattern;
 
-public class PollListener extends OptimizedListener<GuildMessageReceivedEvent> {
+public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 	private static final Pattern OPTION_INDEX = Pattern.compile("^([0-9]{1,2})$");
 	
-	public Client client;
-	
 	public PollListener(Client client) {
-		super(GuildMessageReceivedEvent.class);
-		this.client = client;
+		super(GuildMessageReceivedEvent.class, client);
 	}
 	
 	@Override
@@ -29,9 +26,9 @@ public class PollListener extends OptimizedListener<GuildMessageReceivedEvent> {
 		String msg = event.getMessage().getRawContent();
 		if (!MathUtils.isInteger(msg)) return;
 		if (!OPTION_INDEX.matcher(msg).matches()) return;
-		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
+		GuildData guildData = client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild());
 		if (!guildData.hasPermission(event.getAuthor(), Permissions.POLL)) return;
-		Poll poll = Poll.getPoll(event.getChannel());
+		Poll poll = Poll.getPoll(event.getChannel(), client);
 		if (poll == null) return;
 		int i = Integer.parseInt(msg) - 1;
 		try {

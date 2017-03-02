@@ -1,14 +1,14 @@
 package br.com.brjdevs.steven.bran.core.command;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.ClientShard;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.data.UserData;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -44,7 +44,7 @@ public class CommandEvent {
 		this.client = client;
 		this.arguments = CommandUtils.copy(command);
 		Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
-		if (!OtherUtils.isPrivate(event)) {
+		if (!Utils.isPrivate(event)) {
 			this.guildData = guildData;
 			this.member = event.getMember();
             this.guild = event.getGuild();
@@ -122,7 +122,7 @@ public class CommandEvent {
 	}
 	
 	public UserData getUserData() {
-		return getClient().getData().getDataHolderManager().get().getUser(event.getAuthor());
+		return getClient().getDiscordBotData().getDataHolderManager().get().getUser(event.getAuthor());
 	}
 	
 	public Guild getGuild() {
@@ -157,7 +157,7 @@ public class CommandEvent {
 	public CommandEvent createChild(ICommand command, boolean b) {
         String newArgs = b ? args : args.replaceFirst(" ", "");
 		CommandEvent event = new CommandEvent(this.event, command, guildData, newArgs, prefix, client);
-		Thread.currentThread().setName(command.getName() + ">" + OtherUtils.getUser(event.getAuthor()));
+		Thread.currentThread().setName(command.getName() + ">" + Utils.getUser(event.getAuthor()));
 		command.execute(event);
 		return event;
     }

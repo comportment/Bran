@@ -7,8 +7,8 @@ import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.Profile;
-import br.com.brjdevs.steven.bran.core.data.Profile.Rank;
+import br.com.brjdevs.steven.bran.core.currency.Profile;
+import br.com.brjdevs.steven.bran.core.currency.Profile.Rank;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
@@ -37,7 +37,7 @@ public class ProfileCommand {
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("view")
 						.setDescription("Gives you information on the requested profile.")
-						.setArgs(new Argument<>("mention", String.class, true))
+						.setArgs(new Argument("mention", String.class, true))
 						.setName("Profile View Command")
 						.setAction((event) -> {
 							if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
@@ -51,7 +51,7 @@ public class ProfileCommand {
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("inventory")
 						.setDescription("Shows you your inventory.")
-						.setArgs(new Argument<>("page", Integer.class, true))
+						.setArgs(new Argument("page", Integer.class, true))
 						.setAction((event) -> {
 							Inventory inventory = event.getClient().getProfile(event.getAuthor()).getInventory();
 							if (inventory.isEmpty()) {
@@ -78,7 +78,7 @@ public class ProfileCommand {
 						.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 								.setAliases("customcolor", "color")
 								.setName("Profile Edit Color Command")
-								.setArgs(new Argument<>("hex", String.class, true))
+								.setArgs(new Argument("hex", String.class, true))
 								.setDescription("Set or update your custom color!")
 								.setAction((event, rawArgs) -> {
 									Profile profile = event.getClient().getProfile(event.getAuthor());
@@ -109,6 +109,7 @@ public class ProfileCommand {
 									if (isHex) {
 										boolean success = profile.setCustomColor(hex);
 										event.sendMessage(success ? "Updated your profile Color!" : "Failed to update your profile color!").queue();
+										event.getClient().getDiscordBotData().getDataHolderManager().update();
 									} else {
 										event.sendMessage("This does not look like a known hex...").queue();
 									}

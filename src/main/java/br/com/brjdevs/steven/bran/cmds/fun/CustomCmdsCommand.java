@@ -9,9 +9,9 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +33,7 @@ public class CustomCmdsCommand {
 						.setAliases("create")
 						.setName("Custom Command Create")
 						.setDescription("Creates Custom Commands!")
-						.setArgs(new Argument<>("name", String.class), new Argument<>("answer", String.class))
+						.setArgs(new Argument("name", String.class), new Argument("answer", String.class))
 						.setExample("cmds create hello Hello %user%")
 						.setAction((event) -> {
 							String cmdName = ((String) event.getArgument("name").get()).toLowerCase();
@@ -45,13 +45,14 @@ public class CustomCmdsCommand {
 							CustomCommand command = new CustomCommand(answer, event.getAuthor());
 							event.getGuildData().customCommands.put(cmdName, command);
 							event.sendMessage("Created Custom Command **" + cmdName + "**!").queue();
+							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
 						.setAliases("addanswer")
 						.setName("Custom Command Add Answer")
 						.setDescription("Add answers to existent commands")
-						.setArgs(new Argument<>("name", String.class), new Argument<>("answer", String.class))
+						.setArgs(new Argument("name", String.class), new Argument("answer", String.class))
 						.setExample("cmds addanswer hello Good Morning %user%.")
 						.setAction((event) -> {
 							String cmdName = (String) event.getArgument("name").get();
@@ -72,13 +73,14 @@ public class CustomCmdsCommand {
 							}
 							command.getAnswers().add(newAnswer);
 							event.sendMessage(Quotes.SUCCESS, "Added a new answer for **" + cmdName + "**! This Command currently has " + command.getAnswers().size() + " answers.").queue();
+							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
 						.setAliases("removeanswer", "rmanswer")
 						.setName("Custom Command Remove Answer")
 						.setDescription("Removes answers from existent commands")
-						.setArgs(new Argument<>("name", String.class), new Argument<>("answer index", Integer.class, true))
+						.setArgs(new Argument("name", String.class), new Argument("answer index", Integer.class, true))
 						.setExample("cmds rmanswer hello 0")
 						.setAction((event, rawArgs) -> {
 							String cmdName = (String) event.getArgument("name").get();
@@ -101,13 +103,14 @@ public class CustomCmdsCommand {
 								index = (int) argument.get();
 							command.getAnswers().remove(index);
 							event.sendMessage(Quotes.SUCCESS, "Removed answer index `" + index + "` from " + cmdName + ".\n").queue();
+							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
 						.setAliases("delete", "del")
 						.setName("Custom Command Delete")
 						.setDescription("Deletes Custom Commands from your guild.")
-						.setArgs(new Argument<>("name", String.class))
+						.setArgs(new Argument("name", String.class))
 						.setExample("cmds del hello")
 						.setAction((event) -> {
 							String cmdName = (String) event.getArgument("name").get();
@@ -123,13 +126,14 @@ public class CustomCmdsCommand {
 							}
 							event.getGuildData().customCommands.remove(cmdName);
 							event.sendMessage(Quotes.SUCCESS, "Deleted Custom Command `" + cmdName + "`.").queue();
+							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("list")
 						.setName("Custom Commands List")
 						.setDescription("Gives you all the custom commands in the current guild.")
-						.setArgs(new Argument<>("page", Integer.class, true))
+						.setArgs(new Argument("page", Integer.class, true))
 						.setAction((event) -> {
 							if (event.getGuildData().customCommands.isEmpty()) {
 								event.sendMessage("No Custom Commands in this Guild.").queue();
@@ -137,7 +141,7 @@ public class CustomCmdsCommand {
 							}
 							int page = event.getArgument("page").isPresent() && (int) event.getArgument("page").get() > 0 ? (int) event.getArgument("page").get() : 1;
 							List<String> cmds = event.getGuildData().customCommands.entrySet().stream()
-									.map(entry -> entry.getKey() + " - Created by " + (entry.getValue().getCreator(event.getJDA()) != null ? OtherUtils.getUser(entry.getValue().getCreator(event.getJDA())) : "Unknown (ID:" + entry.getValue().getCreatorId() + ")"))
+									.map(entry -> entry.getKey() + " - Created by " + (entry.getValue().getCreator(event.getJDA()) != null ? Utils.getUser(entry.getValue().getCreator(event.getJDA())) : "Unknown (ID:" + entry.getValue().getCreatorId() + ")"))
 									.collect(Collectors.toList());
 							StringListBuilder listBuilder = new StringListBuilder(cmds, page, 15);
 							listBuilder.setName("Custom Commands For " + event.getGuild().getName())
@@ -149,7 +153,7 @@ public class CustomCmdsCommand {
 						.setAliases("rename")
 						.setName("Custom Command Rename")
 						.setDescription("Renames Custom Commands.")
-						.setArgs(new Argument<>("old name", String.class), new Argument<>("new name", String.class))
+						.setArgs(new Argument("old name", String.class), new Argument("new name", String.class))
 						.setAction((event) -> {
 							String oldName = ((String) event.getArgument("old name").get()).toLowerCase();
 							CustomCommand command = event.getGuildData().customCommands.get(oldName);
@@ -168,7 +172,8 @@ public class CustomCmdsCommand {
 							}
 							event.getGuildData().customCommands.remove(oldName);
 							event.getGuildData().customCommands.put(newName, command);
-							event.sendMessage(String.format(":ok_hand: Renamed `%s` to `%s`", oldName, newName)).queue();
+							event.sendMessage(String.format(":ok_hand: Renamed `%s` to `%s", oldName, newName)).queue();
+							event.getClient().getDiscordBotData().getDataHolderManager().update();
 							
 						}).build())
 				.build();

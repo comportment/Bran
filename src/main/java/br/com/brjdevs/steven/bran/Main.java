@@ -1,8 +1,10 @@
 package br.com.brjdevs.steven.bran;
 
-import br.com.brjdevs.steven.bran.DiscordLog.Level;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -18,7 +20,7 @@ public class Main {
 			client = new Client();
 			Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
 				throwable.printStackTrace();
-				String url = Hastebin.post(OtherUtils.getStackTrace(throwable));
+				String url = Hastebin.post(Utils.getStackTrace(throwable));
 				client.getDiscordLog().logToDiscord("Uncaught exception in Thread " + thread.getName(), "An unexpected `" + throwable.getClass().getSimpleName() + "` occurred.\nMessage: " + throwable.getMessage() + "\nStackTrace: " + url, Level.FATAL);
 			});
 			

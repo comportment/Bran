@@ -5,7 +5,7 @@ import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
@@ -29,7 +29,7 @@ public class GuildInfoCommand {
 				.setAliases("guildinfo", "guild", "serverinfo", "server")
 				.setName("Guild Info Command")
 				.setDescription("Gives you info about the given guild id.")
-				.setArgs(new Argument<>("guildId", String.class, true))
+				.setArgs(new Argument("guildId", String.class, true))
 				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
@@ -45,13 +45,13 @@ public class GuildInfoCommand {
 					boolean hasEmotes = !guild.getEmotes().isEmpty();
 					EmbedBuilder embedBuilder = new EmbedBuilder();
 					embedBuilder.setThumbnail(guild.getIconUrl());
-					embedBuilder.setFooter("Requested by " + OtherUtils.getUser(event.getAuthor()),
-							OtherUtils.getAvatarUrl(event.getAuthor()));
+					embedBuilder.setFooter("Requested by " + Utils.getUser(event.getAuthor()),
+							Utils.getAvatarUrl(event.getAuthor()));
 					embedBuilder.setColor(
 							guildOwner.getColor() == null ? Color.decode("#F38630") : guildOwner.getColor());
 					embedBuilder.setTitle("\uD83C\uDFE0 Guild information on " + guild.getName(), null);
 					embedBuilder.addField("ID", guild.getId(), true);
-					embedBuilder.addField("Owner", OtherUtils.getUser(guildOwner.getUser()) + "\n(ID: " + guildOwner.getUser().getId() + ")", true);
+					embedBuilder.addField("Owner", Utils.getUser(guildOwner.getUser()) + "\n(ID: " + guildOwner.getUser().getId() + ")", true);
 					embedBuilder.addField("Region", guild.getRegion().toString(), true);
 					embedBuilder.addField("Created at", creationDate, true);
 					List<Member> online = guild.getMembers().stream().filter(m -> m.getOnlineStatus() == OnlineStatus.ONLINE).collect(Collectors.toList());

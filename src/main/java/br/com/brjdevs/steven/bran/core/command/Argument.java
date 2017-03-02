@@ -5,22 +5,22 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Argument<T> {
+public class Argument {
 	
 	private static final Pattern ARG_PATTERN = Pattern.compile("\"([^\"]*)\"|'([^']*)'|[^\\s]+");
 	private final String name;
-	private final Class<T> type;
-	private T result;
+	private final Class<?> type;
+	private Object result;
 	private boolean isOptional;
 	
-	public Argument(String name, Class<T> type, boolean isOptional) {
+	public Argument(String name, Class<?> type, boolean isOptional) {
 		this.name = name;
 		this.type = type;
 		this.isOptional = isOptional;
 		this.result = null;
 	}
 	
-	public Argument(String name, Class<T> type) {
+	public Argument(String name, Class<?> type) {
 		this(name, type, false);
 	}
 	
@@ -54,7 +54,7 @@ public class Argument<T> {
 		return name;
 	}
 	
-	public Class<T> getType() {
+	public Class<?> getType() {
 		return type;
 	}
 	
@@ -84,12 +84,12 @@ public class Argument<T> {
 		result = type.cast(obj);
 	}
 	
-	public T get() {
+	public Object get() {
 		return result;
 	}
 	
 	Argument copy() {
-		return new Argument<>(name, type, isOptional);
+		return new Argument(name, type, isOptional);
 	}
 	
 	public boolean isPresent() {

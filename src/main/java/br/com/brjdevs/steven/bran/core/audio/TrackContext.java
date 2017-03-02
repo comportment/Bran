@@ -6,35 +6,68 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
-public interface TrackContext {
+public class TrackContext {
 	
-	String getSourceName();
+	private TrackScheduler scheduler;
+	private AudioTrack track;
+	private String url;
+	private String djId;
+	private String contextId;
 	
-	String getURL();
-	
-	String getDJId();
-	
-	String getContextId();
-	
-	JDA getJDA();
-	
-	default User getDJ() {
-		return getJDA().getUserById(getDJId());
+	public TrackContext(AudioTrack track, String url, User dj, TextChannel context, TrackScheduler scheduler) {
+		this.scheduler = scheduler;
+		this.track = track;
+		this.url = url;
+		this.djId = dj.getId();
+		this.contextId = context.getId();
 	}
 	
-	default TextChannel getContext() {
+	public String getSourceName() {
+		return track.getSourceManager().getSourceName();
+	}
+	
+	public String getURL() {
+		return url;
+	}
+	
+	public String getDJId() {
+		return djId;
+	}
+	
+	public String getContextId() {
+		return contextId;
+	}
+	
+	public JDA getJDA() {
+		return scheduler.getShard().getJDA();
+	}
+	
+	public void setPosition(long position) {
+		getTrack().setPosition(position);
+	}
+	
+	public AudioTrack getTrack() {
+		return track;
+	}
+	
+	public TrackContext makeClone() {
+		this.track = track.makeClone();
+		return this;
+	}
+	
+	public TextChannel getContext() {
 		return getJDA().getTextChannelById(getContextId());
 	}
 	
-	default AudioTrackInfo getInfo() {
-		return getTrack().getInfo();
+	public User getDJ() {
+		return getJDA().getUserById(getDJId());
 	}
 	
-	void setPosition(long position);
+	public TrackScheduler getTrackScheduler() {
+		return scheduler;
+	}
 	
-	AudioTrack getTrack();
-	
-	<T extends TrackContext> T makeClone();
-	
-	TrackScheduler getTrackScheduler();
+	public AudioTrackInfo getInfo() {
+		return getTrack().getInfo();
+	}
 }

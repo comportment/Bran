@@ -1,9 +1,8 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.audio.utils.AudioUtils;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -15,9 +14,11 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
+import java.util.concurrent.BlockingQueue;
+
 public class AudioPlayerListener extends AudioEventAdapter {
 	
-	private static final String announce = "\uD83D\uDD0A Now Playing in **%s**: `%s` (`%s`) added by %s.";
+	private static final String announce = "\uD83D\uDD0A Now Playing in **%currentArgs**: `%currentArgs` (`%currentArgs`) added by %currentArgs.";
 	private static final SimpleLog LOG = SimpleLog.getLog("AudioPlayerListener");
 	private TrackScheduler scheduler;
 	private Client client;
@@ -29,7 +30,7 @@ public class AudioPlayerListener extends AudioEventAdapter {
 		this.client = scheduler.client;
 	}
 	
-	public FairQueue<TrackContext> getQueue() {
+	public BlockingQueue<TrackContext> getQueue() {
 		return scheduler.getQueue();
 	}
 	
@@ -55,13 +56,13 @@ public class AudioPlayerListener extends AudioEventAdapter {
 	}
 	
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		client.taskManager.getMusicRegisterTimeout().removeMusicPlayer(scheduler.getGuild().getId());
-		if (getQueue().getCurrentTrack() == null) {
+		client.getTaskManager().getMusicRegisterTimeout().removeMusicPlayer(scheduler.getGuild().getId());
+		if (scheduler.getCurrentTrack() == null) {
 			LOG.fatal("Got TrackStartEvent with null CachedAudioTrack!");
 			return;
 		}
-		if (getQueue().getCurrentTrack().getContext() != null && getQueue().getCurrentTrack().getContext().canTalk()) {
-			getQueue().getCurrentTrack().getContext().sendMessage(String.format(announce, getVoiceChannel() == null ? "Not Connected." : getVoiceChannel().getName(), track.getInfo().title, AudioUtils.format(track.getInfo().length), OtherUtils.getUser(getQueue().getCurrentTrack().getDJ()))).queue(message -> {
+		if (scheduler.getCurrentTrack().getContext() != null && scheduler.getCurrentTrack().getContext().canTalk()) {
+			scheduler.getCurrentTrack().getContext().sendMessage(String.format(announce, getVoiceChannel() == null ? "Not Connected." : getVoiceChannel().getName(), track.getInfo().title, AudioUtils.format(track.getInfo().length), Utils.getUser(scheduler.getCurrentTrack().getDJ()))).queue(message -> {
 				Message m = getMessage();
 				if (m != null && !m.isEdited()) m.delete().queue();
 				setMessage(message);
@@ -72,25 +73,25 @@ public class AudioPlayerListener extends AudioEventAdapter {
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 		scheduler.getVoteSkips().clear();
 		if (endReason.mayStartNext) {
-			getQueue().next(false);
+			scheduler.next(false);
 		}
 	}
 	
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-		if (getQueue().getCurrentTrack().getContext() != null && getQueue().getCurrentTrack().getContext().canTalk()) {
+		if (scheduler.getCurrentTrack().getContext() != null && scheduler.getCurrentTrack().getContext().canTalk()) {
 			String string = "\u274c Failed to play `" + track.getInfo().title + "`!\n" +
 					(exception.severity.equals(Severity.COMMON) ? StringUtils.neat(track.getSourceManager().getSourceName()) + " said: " : exception.severity.equals(Severity.SUSPICIOUS) ? "I don't know what exactly caused it, but I've got this: " : "This error might be caused by the library (Lavaplayer) or an external unidentified factor: ") + "`" + exception.getMessage() + "`";
 			Message msg = getMessage();
 			if (msg != null)
 				msg.editMessage(string).queue();
 			else
-				getQueue().getCurrentTrack().getContext().sendMessage(string).queue();
+				scheduler.getCurrentTrack().getContext().sendMessage(string).queue();
 		}
 	}
 	
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-		if (getQueue().getCurrentTrack().getContext() != null && getQueue().getCurrentTrack().getContext().canTalk())
-			getQueue().getCurrentTrack().getContext().sendMessage("Track got stuck, skipping...").queue();
-		getQueue().next(true);
+		if (scheduler.getCurrentTrack().getContext() != null && scheduler.getCurrentTrack().getContext().canTalk())
+			scheduler.getCurrentTrack().getContext().sendMessage("Track got stuck, skipping...").queue();
+		scheduler.next(true);
 	}
 }

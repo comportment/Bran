@@ -25,7 +25,7 @@ public class WordFilterCommand {
 						.setAliases("add")
 						.setName("WordFilter Add Command")
 						.setDescription("Adds a Word to the WordFilter")
-						.setArgs(new Argument<>("word", String.class))
+						.setArgs(new Argument("word", String.class))
 						.setRequiredPermission(Permissions.GUILD_MANAGE)
 						.setAction((event, rawArgs) -> {
 							if (!event.getGuildData().isWordFilterEnabled) {
@@ -35,6 +35,7 @@ public class WordFilterCommand {
 							String word = ((String) event.getArgument("word").get());
 							event.getGuildData().filteredWords.add(word);
 							event.sendMessage("\uD83D\uDC4C Added word to the filter! *(Total: " + event.getGuildData().filteredWords.size() + ")*").queue();
+							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -70,7 +71,7 @@ public class WordFilterCommand {
 						.setAliases("remove")
 						.setName("WordFilter Remove Command")
 						.setDescription("Removes a word from the WordFilter.")
-						.setArgs(new Argument<>("word", String.class))
+						.setArgs(new Argument("word", String.class))
 						.setAction((event, rawArgs) -> {
 							if (!event.getGuildData().isWordFilterEnabled) {
 								event.sendMessage("The WordFilter is disabled in this Guild.").queue();

@@ -2,7 +2,6 @@ package br.com.brjdevs.steven.bran.core.command.builders;
 
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.CommandEvent;
-import br.com.brjdevs.steven.bran.core.command.CommandUtils;
 import br.com.brjdevs.steven.bran.core.command.HelpContainer;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
@@ -13,12 +12,11 @@ import net.dv8tion.jda.core.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class TreeCommandBuilder {
 	
 	private List<ICommand> subCommands = new ArrayList<>();
-	private List<String> aliases = new ArrayList<>();
+	private String[] aliases;
 	private String name = null;
 	private String desc = null;
 	private boolean isPrivate = true;
@@ -35,7 +33,7 @@ public class TreeCommandBuilder {
 	}
 	
 	public TreeCommandBuilder setAliases(String... aliases) {
-		Stream.of(aliases).forEach(this.aliases::add);
+		this.aliases = aliases;
 		return this;
 	}
 	
@@ -136,14 +134,14 @@ public class TreeCommandBuilder {
 						return;
 					}
 				}
-				ICommand subCommand = CommandUtils.getCommand(this, alias);
+				ICommand subCommand = event.getClient().getCommandManager().getCommand(this, alias);
 				if (subCommand == null) {
 					switch (onNotFound) {
 						case SHOW_ERROR:
 							event.sendMessage("No such SubCommand `" + alias + "` in " + getName() + ".").queue();
 							break;
 						case REDIRECT:
-							event.createChild(CommandUtils.getCommand(this, defaultCmd), true);
+							event.createChild(event.getClient().getCommandManager().getCommand(this, defaultCmd), true);
 							break;
 						case SHOW_HELP:
 							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
@@ -160,7 +158,7 @@ public class TreeCommandBuilder {
 							event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(subCommand.getRequiredPermission())) + "*").queue();
 							break;
 						case REDIRECT:
-							event.createChild(CommandUtils.getCommand(this, defaultCmd), true);
+							event.createChild(event.getClient().getCommandManager().getCommand(this, defaultCmd), true);
 							break;
 						case SHOW_HELP:
 							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
@@ -176,7 +174,7 @@ public class TreeCommandBuilder {
 			}
 			
 			@Override
-			public List<String> getAliases() {
+			public String[] getAliases() {
 				return aliases;
 			}
 			

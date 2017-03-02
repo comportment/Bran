@@ -1,9 +1,7 @@
-package br.com.brjdevs.steven.bran.core.audio.utils;
+package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.audio.ConnectionListenerImpl;
-import br.com.brjdevs.steven.bran.core.audio.TrackContext;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.Permission;
@@ -75,7 +73,7 @@ public class AudioUtils {
 			return null;
 		}
 		while (audioManager.isAttemptingToConnect())
-			OtherUtils.sleep(100);
+			Utils.sleep(100);
 		return audioManager.getConnectedChannel();
 	}
 	public static boolean isAlone(VoiceChannel channel) {

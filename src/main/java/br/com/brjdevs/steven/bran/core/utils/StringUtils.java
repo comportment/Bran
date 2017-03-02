@@ -70,7 +70,7 @@ public class StringUtils {
     }
 	
 	public static boolean containsEqualsIgnoreCase(String toCheck, String s) {
-		return OtherUtils.containsEqualsIgnoreCase(Arrays.asList(toCheck.split("")), s);
+		return Utils.containsEqualsIgnoreCase(Arrays.asList(toCheck.split("")), s);
 	}
 	
 	public static String getProgressBar(long percent, long total) {

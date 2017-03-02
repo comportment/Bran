@@ -19,16 +19,16 @@ public class TransactionCommands {
 						event.sendMessage("No transactions found in your bank account!").queue();
 						return;
 					}
-					String s = "Your transactions: \n\n";
+					String currentArgs = "Your transactions: \n\n";
 					LinkedList<Transaction> transactions = event.getUserData().getProfile().getTransactions();
 					for (Transaction transaction : transactions) {
-						s += String.format("%s`\u200B%+4d` %s `\u200B%18s` - %s\n",
+						currentArgs += String.format("%currentArgs`\u200B%+4d` %currentArgs `\u200B%18s` - %currentArgs\n",
 								transaction.getTransactionType() == TransactionType.RECEIVE ? RECEIVE : GIVE,
 								transaction.getTransactionType() == TransactionType.GIVE ? -transaction.getAmount() : transaction.getAmount(),
 								(transaction.getSender().matches("[0-9]{17,18}") ? OtherUtils.getUser(event.getJDA().getUserById(transaction.getSender())) : transaction.getSender()) + " > " + (transaction.getReceiver().matches("[0-9]{17,18}") ? OtherUtils.getUser(event.getJDA().getUserById(transaction.getReceiver())) : transaction.getReceiver()), transaction.getDescription(),
 								TimeUtils.neat(System.currentTimeMillis() - transaction.getTime()) + " ago");
 					}
-					event.sendMessage(s).queue();
+					event.sendMessage(currentArgs).queue();
 				})
 				.build();
 	}*/

@@ -9,9 +9,9 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
@@ -53,7 +53,7 @@ public class BotCommand {
 								return;
 							}
 							MessageEmbed embed = new EmbedBuilder()
-									.setAuthor("Bran's OAuth URL", null, OtherUtils.getAvatarUrl(event.getJDA().getSelfUser()))
+									.setAuthor("Bran'currentArgs OAuth URL", null, Utils.getAvatarUrl(event.getJDA().getSelfUser()))
 									.setDescription("You can invite me to your server by [clicking here](https://discordapp.com/oauth2/authorize?client_id=219186621008838669&scope=bot&permissions=0)\n" +
 											"If you need any support join [this guild](https://discord.gg/8vXwwEQ) and ask your question in #support!")
 									.setColor(Color.decode("#2759DB"))
@@ -90,12 +90,12 @@ public class BotCommand {
 								.setDescription("Saves Guild and Bot Data.")
 								.setAction((event) -> {
 									try {
-										event.getClient().getData().getDataHolderManager().update();
-										event.getClient().getData().getConfigDataManager().update();
-										event.getClient().getData().getHangmanWordsManager().update();
+										event.getClient().getDiscordBotData().getDataHolderManager().update();
+										event.getClient().getDiscordBotData().getConfigDataManager().update();
+										event.getClient().getDiscordBotData().getHangmanWordsManager().update();
 										event.sendMessage(Quotes.SUCCESS, "Successfully saved Bot and Guild data.").queue();
 									} catch (Exception e) {
-										event.sendMessage(Quotes.FAIL, "There was an error while saving the data: " + Hastebin.post(OtherUtils.getStackTrace(e))).queue();
+										event.sendMessage(Quotes.FAIL, "There was an error while saving the data: " + Hastebin.post(Utils.getStackTrace(e))).queue();
 									}
 								})
 								.build())
@@ -125,7 +125,7 @@ public class BotCommand {
 										.setAliases("avatar")
 										.setName("Account Avatar Command")
 										.setDescription("Updates my Avatar.")
-										.setArgs(new Argument<>("avatar", String.class))
+										.setArgs(new Argument("avatar", String.class))
 										.setAction((event, args) -> {
 											URL url;
 											try {
@@ -138,7 +138,7 @@ public class BotCommand {
 												event.getJDA().getSelfUser().getManager().setAvatar(Icon.from(url.openStream())).queue(success ->
 																event.sendMessage(Quotes.SUCCESS, "Updated my Avatar! Yay, I've got a new avatar! :smile:").queue(),
 														fail -> {
-															String hastebin = Hastebin.post(OtherUtils.getStackTrace(fail));
+															String hastebin = Hastebin.post(Utils.getStackTrace(fail));
 															event.sendMessage(Quotes.FAIL, "Something went wrong while updating my avatar. (`" + hastebin + "`)").queue();
 														});
 											} catch (IOException e) {
@@ -150,7 +150,7 @@ public class BotCommand {
 										.setAliases("name")
 										.setName("Account Name Command")
 										.setDescription("Updates my name.")
-										.setArgs(new Argument<>("name", String.class))
+										.setArgs(new Argument("name", String.class))
 										.setAction((event, args) -> {
 											String name = (String) event.getArgument("name").get();
 											Stream.of(event.getClient().getShards()).forEach((shard) -> shard.getJDA().getSelfUser().getManager().setName(name).queue());
@@ -167,11 +167,11 @@ public class BotCommand {
 										.setAliases("list")
 										.setName("Guilds List Command")
 										.setDescription("Lists you all my guilds.")
-										.setArgs(new Argument<>("page", Integer.class, true))
+										.setArgs(new Argument("page", Integer.class, true))
 										.setAction((event, args) -> {
 											Argument pageArg = event.getArgument("page");
 											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
-											StringListBuilder listBuilder = new StringListBuilder(event.getClient().getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + event.getClient().getShardId(g.getJDA()) + "]) | Owner: " + OtherUtils.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
+											StringListBuilder listBuilder = new StringListBuilder(event.getClient().getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + event.getClient().getShardId(g.getJDA()) + "]) | Owner: " + Utils.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
 											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + event.getClient().getGuilds().size());
 											event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 										})
@@ -180,12 +180,12 @@ public class BotCommand {
 										.setAliases("leave")
 										.setName("Leave Guild Command")
 										.setDescription("Leaves a Guild.")
-										.setArgs(new Argument<>("guildId", String.class))
+										.setArgs(new Argument("guildId", String.class))
 										.setAction((event, args) -> {
 											String guildId = (String) event.getArgument("guildId").get();
 											Guild guild = event.getJDA().getGuildById(guildId);
 											if (guild == null) {
-												event.sendMessage("`" + guildId + "` is not a valid Guild ID or it's unknown for me...").queue();
+												event.sendMessage("`" + guildId + "` is not a valid Guild ID or it'currentArgs unknown for me...").queue();
 												return;
 											}
 											guild.leave().queue();

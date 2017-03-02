@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.core.data;
 
+import br.com.brjdevs.steven.bran.core.currency.Profile;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;

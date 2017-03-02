@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.command;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
@@ -15,11 +15,12 @@ import org.reflections.util.FilterBuilder;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static br.com.brjdevs.steven.bran.core.utils.OtherUtils.isEmpty;
+import static br.com.brjdevs.steven.bran.core.utils.Utils.isEmpty;
 
 public class CommandManager {
 	
@@ -45,6 +46,14 @@ public class CommandManager {
 		return getCommands().stream().filter(cmd -> cmd.getCategory() == category).collect(Collectors.toList());
     }
 	
+	public ICommand getCommand(ITreeCommand tree, String alias) {
+		return tree.getSubCommands().stream().filter(sub -> Arrays.stream(sub.getAliases()).anyMatch(s -> s.equals(alias))).findFirst().orElse(null);
+	}
+	
+	public ICommand getCommand(String alias) {
+		return getCommands().stream().filter(cmd -> Arrays.stream(cmd.getAliases()).anyMatch(s -> s.equals(alias))).findFirst().orElse(null);
+	}
+	
 	private void load() {
 	    String url = "br.com.brjdevs.steven.bran.cmds";
 	    Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage(url)).setScanners(new SubTypesScanner(),
@@ -59,7 +68,7 @@ public class CommandManager {
 		    }
 	    	try {
 			    ICommand command = (ICommand) method.invoke(null);
-			    if (command.getAliases().isEmpty()) {
+			    if (command.getAliases().length == 0) {
 				    LOG.fatal("Attempted to register ICommand without aliases. (" + clazz.getSimpleName() + ")");
 				    return;
 			    }

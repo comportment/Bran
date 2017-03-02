@@ -1,8 +1,8 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.guild.member.GenericGuildMemberEvent;
@@ -13,13 +13,10 @@ import javax.xml.ws.Holder;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AnnouncesListener extends OptimizedListener<GenericGuildMemberEvent> {
-	
-	public Client client;
+public class AnnouncesListener extends EventListener<GenericGuildMemberEvent> {
 	
 	public AnnouncesListener(Client client) {
-		super(GenericGuildMemberEvent.class);
-		this.client = client;
+		super(GenericGuildMemberEvent.class, client);
 	}
 	
 	public static String parse(String msg, Member member) {
@@ -37,16 +34,16 @@ public class AnnouncesListener extends OptimizedListener<GenericGuildMemberEvent
 	
 	@Override
 	public void event(GenericGuildMemberEvent event) {
-		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
+		GuildData guildData = client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild());
 		if (guildData.getAnnounceTextChannel(event.getJDA()) == null) return;
 		Member member = event.getMember();
 		if (event instanceof GuildMemberJoinEvent) {
-			if (!OtherUtils.isEmpty(guildData.joinMsg))
+			if (!Utils.isEmpty(guildData.joinMsg))
 				guildData.getAnnounceTextChannel(event.getJDA()).sendMessage(parse(guildData.joinMsg, member)).queue();
-			if (!OtherUtils.isEmpty(guildData.joinMsgDM))
+			if (!Utils.isEmpty(guildData.joinMsgDM))
 				event.getMember().getUser().openPrivateChannel().queue(chan -> chan.sendMessage(parse(guildData.joinMsgDM, member)).queue());
 		} else if (event instanceof GuildMemberLeaveEvent) {
-			if (!OtherUtils.isEmpty(guildData.leaveMsg))
+			if (!Utils.isEmpty(guildData.leaveMsg))
 				guildData.getAnnounceTextChannel(event.getJDA()).sendMessage(parse(guildData.leaveMsg, member)).queue();
 		}
 	}

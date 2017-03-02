@@ -18,7 +18,7 @@ public class RandomComicGenerator {
 		return new CommandBuilder(Category.FUN)
 				.setName("Random Comic Generator")
 				.setDescription("Shit-post")
-				.setArgs(new Argument<>("amount", Integer.class, true))
+				.setArgs(new Argument("amount", Integer.class, true))
 				.setAliases("rcg", "randomcomicgenerator")
 				.setAction((event) -> {
 					if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {

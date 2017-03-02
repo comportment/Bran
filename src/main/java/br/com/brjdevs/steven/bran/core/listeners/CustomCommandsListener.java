@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.Client;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
@@ -15,14 +15,12 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomCommandsListener extends OptimizedListener<GuildMessageReceivedEvent> {
+public class CustomCommandsListener extends EventListener<GuildMessageReceivedEvent> {
 	
 	private static Pattern RANDOM_PATTERN = Pattern.compile("(\\$random\\{.+?;+.+?})", Pattern.CASE_INSENSITIVE);
-	public Client client;
 	
 	public CustomCommandsListener(Client client) {
-		super(GuildMessageReceivedEvent.class);
-		this.client = client;
+		super(GuildMessageReceivedEvent.class, client);
 	}
 	
 	private static String parseTag(String answer, Member member, TextChannel textChannel, Guild guild, String args) {
@@ -46,7 +44,7 @@ public class CustomCommandsListener extends OptimizedListener<GuildMessageReceiv
 	@Override
 	public void event(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
-		GuildData guildData = client.getData().getDataHolderManager().get().getGuild(event.getGuild(), client.getConfig());
+		GuildData guildData = client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild());
 		if (guildData.customCommands.isEmpty()) return;
 		String msg = event.getMessage().getRawContent().trim().toLowerCase().split("\\s+")[0];
 		String prefix = PrefixManager.getPrefix0(msg, guildData);

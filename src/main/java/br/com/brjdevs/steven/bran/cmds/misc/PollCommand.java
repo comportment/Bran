@@ -10,7 +10,7 @@ import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.poll.Option;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.OtherUtils;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.awt.*;
@@ -36,10 +36,10 @@ public class PollCommand {
 						.setName("Poll Create Command")
 						.setDescription("Creates polls in the current channel!")
 						.setExample("poll create What should I play? ;Game 1;Game 2;Game 3;Game 4;")
-						.setArgs(new Argument<>("argument", String.class))
+						.setArgs(new Argument("argument", String.class))
 						.setAction((event) -> {
-							if (Poll.getPoll(event.getTextChannel()) != null) {
-								event.sendMessage("There's already a Poll running in this Channel!").queue();
+							if (Poll.getPoll(event.getTextChannel(), event.getClient()) != null) {
+								event.sendMessage("There'currentArgs already a Poll running in this Channel!").queue();
 								return;
 							}
 							String name = ((String) event.getArgument("argument").get());
@@ -68,6 +68,7 @@ public class PollCommand {
 									options.add(new Option(list.indexOf(string), string));
 								new Poll(name, event.getMember(), options, event.getTextChannel(), event.getClient());
 								event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll add reactions to the message as the votes get added/removed.").queue();
+								event.getClient().getDiscordBotData().getPollPersistence().update();
 							}
 						})
 						.build())
@@ -76,14 +77,14 @@ public class PollCommand {
 						.setName("Poll Information Command")
 						.setDescription("Gives you information about a poll running in the current channel.")
 						.setAction((event) -> {
-							Poll poll = Poll.getPoll(event.getTextChannel());
+							Poll poll = Poll.getPoll(event.getTextChannel(), event.getClient());
 							if (poll == null) {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
 							}
 							EmbedBuilder builder = new EmbedBuilder();
 							builder.setTitle(poll.getPollName(), null);
-							builder.setFooter("This Poll was created by " + OtherUtils.getUser(event.getJDA().getUserById(poll.getCreatorId())), OtherUtils.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
+							builder.setFooter("This Poll was created by " + Utils.getUser(event.getJDA().getUserById(poll.getCreatorId())), Utils.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
 							StringBuilder stringBuilder = new StringBuilder();
 							stringBuilder.append("**Current Votes**\n");
 							poll.getOptions().forEach(option ->
@@ -98,7 +99,7 @@ public class PollCommand {
 						.setName("Poll End Command")
 						.setDescription("Ends a Poll running in the current channel.")
 						.setAction((event) -> {
-							Poll poll = Poll.getPoll(event.getTextChannel());
+							Poll poll = Poll.getPoll(event.getTextChannel(), event.getClient());
 							if (poll == null) {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
@@ -110,7 +111,7 @@ public class PollCommand {
 							boolean wasOwner = poll.getCreatorId().equals(event.getAuthor().getId());
 							EmbedBuilder builder = new EmbedBuilder();
 							builder.setTitle(poll.getPollName(), null);
-							builder.setFooter("This Poll was created by " + OtherUtils.getUser(event.getJDA().getUserById(poll.getCreatorId())), OtherUtils.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
+							builder.setFooter("This Poll was created by " + Utils.getUser(event.getJDA().getUserById(poll.getCreatorId())), Utils.getAvatarUrl(event.getJDA().getUserById(poll.getCreatorId())));
 							StringBuilder stringBuilder = new StringBuilder();
 							if (!wasOwner) stringBuilder.append("**This Poll was forcibly ended by a moderator!**\n\n");
 							else stringBuilder.append("**The Poll creator has stopped it.**\n\n");
@@ -119,12 +120,13 @@ public class PollCommand {
 								poll.getOptions().forEach(option ->
 										stringBuilder.append("**").append(option.getIndex() + 1).append(".** ").append(option.getContent()).append("    *(Votes: ").append(option.getVotes().size()).append(")*\n"));
 							} else {
-								stringBuilder.append("**That's kinda sad I guess, no one voted to the Poll!**");
+								stringBuilder.append("**That'currentArgs kinda sad I guess, no one voted to the Poll!**");
 							}
 							builder.setDescription(stringBuilder.toString());
 							builder.setColor(Color.decode("#F89F3F"));
-							poll.remove();
+							poll.remove(event.getClient());
 							event.sendMessage(builder.build()).queue();
+							event.getClient().getDiscordBotData().getPollPersistence().update();
 						})
 						.build())
 				.build();

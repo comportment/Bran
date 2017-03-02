@@ -1,12 +1,12 @@
 package br.com.brjdevs.steven.bran.core.audio.timers;
 
-import br.com.brjdevs.steven.bran.Client;
-import br.com.brjdevs.steven.bran.core.audio.MusicManager;
+import br.com.brjdevs.steven.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
 import br.com.brjdevs.steven.bran.core.audio.TrackScheduler;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,14 +17,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelLeaveTimer {
 	
 	public final Client client;
-	private final Map<String, ImmutablePair<Long, String>> TIMING_OUT;
+	private final Map<String, Pair<Long, String>> TIMING_OUT;
 	private boolean timingOutUpdated = false;
 	
 	public ChannelLeaveTimer(Client client) {
 		this(new ConcurrentHashMap<>(), client);
 	}
 	
-	public ChannelLeaveTimer(Map<String, ImmutablePair<Long, String>> timingOut, Client client) {
+	public ChannelLeaveTimer(Map<String, Pair<Long, String>> timingOut, Client client) {
 		this.TIMING_OUT = Collections.synchronizedMap(timingOut);
 		this.client = client;
 		
@@ -33,12 +33,12 @@ public class ChannelLeaveTimer {
 		thread.start();
 	}
 	
-	public ImmutablePair<Long, String> get(String key) {
+	public Pair<Long, String> get(String key) {
 		return TIMING_OUT.get(key);
 	}
 	
 	public void addMusicPlayer(String id, Long milis, String voiceChannel) {
-		TIMING_OUT.put(id, new ImmutablePair<>(milis, voiceChannel));
+		TIMING_OUT.put(id, Pair.of(milis, voiceChannel));
 		timingOutUpdated = true;
 		synchronized (this) {
 			notify();
@@ -75,10 +75,10 @@ public class ChannelLeaveTimer {
 			}
 			
 			//noinspection OptionalGetWithoutIsPresent
-			Entry<String, ImmutablePair<Long, String>> closestEntry = TIMING_OUT.entrySet().stream().sorted(Comparator.comparingLong(entry -> entry.getValue().left)).findFirst().get();
+			Entry<String, Pair<Long, String>> closestEntry = TIMING_OUT.entrySet().stream().sorted(Comparator.comparingLong(entry -> entry.getValue().getLeft())).findFirst().get();
 			
 			try {
-				long timeout = closestEntry.getValue().left - System.currentTimeMillis();
+				long timeout = closestEntry.getValue().getLeft() - System.currentTimeMillis();
 				if (timeout > 0) {
 					synchronized (this) {
 						wait(timeout);
@@ -93,14 +93,14 @@ public class ChannelLeaveTimer {
 				JDA jda = client.getShards()[client.calcShardId(Long.parseLong(id))].getJDA();
 				Guild guild = jda.getGuildById(id);
 				if (guild != null) {
-					MusicManager musicManager = client.playerManager.get(guild);
+					GuildMusicManager musicManager = client.getMusicManager().get(guild);
 					TrackScheduler scheduler = musicManager.getTrackScheduler();
-					if (scheduler.getQueue().getAudioPlayer().isPaused()) {
-						TrackContext track = scheduler.getQueue().getCurrentTrack() == null ? scheduler.getQueue().getPreviousTrack()
-								: scheduler.getQueue().getCurrentTrack();
+					if (scheduler.getAudioPlayer().isPaused()) {
+						TrackContext track = scheduler.getCurrentTrack() == null ? scheduler.getPreviousTrack()
+								: scheduler.getCurrentTrack();
 						if (track != null && track.getContext() != null && track.getContext().canTalk())
-							track.getContext().sendMessage("Nobody joined in 2 minutes, so I cleaned the queue and stopped the player.").queue();
-						scheduler.getQueue().stop();
+							track.getContext().sendMessage("Nobody").queue();
+						scheduler.stop();
 						musicManager.getTrackScheduler().setPaused(false);
 					}
 				}

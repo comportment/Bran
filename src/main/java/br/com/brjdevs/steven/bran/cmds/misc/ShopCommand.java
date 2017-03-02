@@ -1,13 +1,13 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
 import br.com.brjdevs.steven.bran.core.command.Argument;
-import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.data.Profile;
+import br.com.brjdevs.steven.bran.core.currency.BankAccount;
+import br.com.brjdevs.steven.bran.core.currency.Profile;
 import br.com.brjdevs.steven.bran.core.itemManager.Item;
 import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class ShopCommand {
 	
-	@Command
+	//@Command
 	private static ICommand shop() {
 		return new TreeCommandBuilder(Category.MISCELLANEOUS)
 				.setAliases("shop")
@@ -32,7 +32,7 @@ public class ShopCommand {
 						.setAliases("list")
 						.setName("Shop List Command")
 						.setDescription("Gives you a full list of the available items do Buy!")
-						.setArgs(new Argument<>("page", Integer.class, true))
+						.setArgs(new Argument("page", Integer.class, true))
 						.setAction((event) -> {
 							Argument arg = event.getArgument("page");
 							int page = arg.isPresent() && (int) arg.get() > 0 ? (int) arg.get() : 1;
@@ -53,7 +53,7 @@ public class ShopCommand {
 						.setAliases("buy")
 						.setName("Buy Command")
 						.setDescription("Buys an item from the store.")
-						.setArgs(new Argument<>("item", String.class))
+						.setArgs(new Argument("item", String.class))
 						.setAction((event) -> {
 							String name = ((String) event.getArgument("item").get());
 							Entry<String, Item> result = ItemContainer.map().entrySet().stream()
@@ -73,12 +73,12 @@ public class ShopCommand {
 								event.sendMessage("You have too much of this item! (" + inventory.getAmountOf(item) + "/" + item.getMaxStack() + ")").queue();
 								return;
 							}
-							if (!profile.takeCoins(item.getPrice())) {
+							if (!profile.bankAccount.takeCoins(item.getPrice(), BankAccount.MAIN_BANK)) {
 								event.sendMessage("You don't have enough coins to buy this item! " +
-										"(" + profile.getCoins() + "/" + item.getPrice() + ")").queue();
+										"(" + profile.bankAccount.getCoins() + "/" + item.getPrice() + ")").queue();
 							} else {
 								inventory.put(item);
-								event.sendMessage("\uD83D\uDECD You've bought a " + item.getName() + "! Remaining coins: " + profile.getCoins()).queue();
+								event.sendMessage("\uD83D\uDECD You've bought a " + item.getName() + "! Remaining coins: " + profile.bankAccount.getCoins()).queue();
 							}
 						})
 						.build())

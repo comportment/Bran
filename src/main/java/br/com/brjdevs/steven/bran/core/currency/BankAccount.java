@@ -1,17 +1,24 @@
 package br.com.brjdevs.steven.bran.core.currency;
 
-import br.com.brjdevs.steven.bran.core.currency.Transaction.TransactionType;
+import net.dv8tion.jda.core.entities.User;
 
 import java.util.LinkedList;
 
 public class BankAccount {
 	
+	public static final BankAccount MAIN_BANK = new BankAccount(219186621008838669L);
+	public final long userId;
 	private LinkedList<Transaction> transactions;
 	private long coins;
 	
-	public BankAccount() {
+	public BankAccount(User user) {
+		this(Long.parseLong(user.getId()));
+	}
+	
+	public BankAccount(long id) {
 		this.transactions = new LinkedList<>();
 		this.coins = 0;
+		this.userId = id;
 	}
 	
 	private void setLastTransaction(Transaction transaction) {
@@ -31,17 +38,17 @@ public class BankAccount {
 		this.coins = coins;
 	}
 	
-	public void addCoins(long coins, String sender, String receiver, String description) {
+	public void addCoins(long coins, BankAccount sender) {
 		setCoins(getCoins() + coins);
-		setLastTransaction(new Transaction(TransactionType.RECEIVE, sender, receiver, description, coins));
+		setLastTransaction(new Transaction(sender, this, coins));
 	}
 	
-	public boolean takeCoins(long coinsToTake, String sender, String receiver, String description) {
+	public boolean takeCoins(long coinsToTake, BankAccount receiver) {
 		if (coinsToTake > getCoins()) {
 			return false;
 		}
 		setCoins(getCoins() - coinsToTake);
-		setLastTransaction(new Transaction(TransactionType.GIVE, sender, receiver, description, coins));
+		setLastTransaction(new Transaction(this, receiver, coins));
 		return true;
 	}
 }

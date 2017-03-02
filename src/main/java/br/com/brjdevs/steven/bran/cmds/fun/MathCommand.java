@@ -16,7 +16,7 @@ public class MathCommand {
 				.setAliases("math", "calc")
 				.setName("Math Command")
 				.setDescription("Resolves a Mathematical Expression!")
-				.setArgs(new Argument<>("expression", String.class))
+				.setArgs(new Argument("expression", String.class))
 				.setAction((event) -> {
 					String expression = ((String) event.getArgument("expression").get()).toLowerCase();
 					double result;

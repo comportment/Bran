@@ -17,7 +17,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 public class LookupCommand {
-	private static final String LOOKUP_URL = "http://ip-api.com/json/%s";
+	
+	private static final String LOOKUP_URL = "http://ip-api.com/json/%currentArgs";
 	private static final String MAP_URL = "https://www.google.com/maps/@%f,%f,15z";
 	
 	@Command
@@ -26,7 +27,7 @@ public class LookupCommand {
 				.setAliases("lookup")
 				.setName("Lookup Command")
 				.setDescription("Gives you information on a website")
-				.setArgs(new Argument<>("site", String.class))
+				.setArgs(new Argument("site", String.class))
 				.setAction((event, rawArgs) -> {
 					if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();

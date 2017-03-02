@@ -18,7 +18,7 @@ public class YodaCommand {
 				.setAliases("yoda")
 				.setName("Yoda Command")
 				.setDescription("Turn your sentences into Yoda-speak!")
-				.setArgs(new Argument<>("sentence", String.class, true))
+				.setArgs(new Argument("sentence", String.class, true))
 				.setAction((event) -> {
 					HttpResponse<String> response = null;
 					Argument argument = event.getArgument("sentence");
