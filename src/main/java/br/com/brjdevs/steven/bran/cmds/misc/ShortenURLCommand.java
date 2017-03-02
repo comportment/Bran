@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 
 public class ShortenURLCommand {
 	
-	private static String baseURL = "https://is.gd/create.php?format=simple&url=%currentArgs";
+	private static String baseURL = "https://is.gd/create.php?format=simple&url=%s";
 	
 	@Command
 	private static ICommand shortenUrl() {

@@ -18,7 +18,7 @@ import java.net.URLEncoder;
 
 public class LookupCommand {
 	
-	private static final String LOOKUP_URL = "http://ip-api.com/json/%currentArgs";
+	private static final String LOOKUP_URL = "http://ip-api.com/json/%s";
 	private static final String MAP_URL = "https://www.google.com/maps/@%f,%f,15z";
 	
 	@Command

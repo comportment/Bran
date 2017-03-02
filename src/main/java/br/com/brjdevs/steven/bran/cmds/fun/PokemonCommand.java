@@ -29,7 +29,7 @@ public class PokemonCommand {
 				.setAction((event) -> {
 					try {
 						String pokemon = (String) event.getArgument("id/name").get(), content;
-						pokemon = String.format("http://pokeapi.co/api/v2/pokemon/%currentArgs/", URLEncoder.encode(pokemon, "UTF-8"));
+						pokemon = String.format("http://pokeapi.co/api/v2/pokemon/%s/", URLEncoder.encode(pokemon, "UTF-8"));
 						try {
 							content = HttpUtils.read(pokemon);
 						} catch (Exception e) {

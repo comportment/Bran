@@ -18,7 +18,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class AudioPlayerListener extends AudioEventAdapter {
 	
-	private static final String announce = "\uD83D\uDD0A Now Playing in **%currentArgs**: `%currentArgs` (`%currentArgs`) added by %currentArgs.";
+	private static final String announce = "\uD83D\uDD0A Now Playing in **%s**: `%s` (`%s`) added by %s.";
 	private static final SimpleLog LOG = SimpleLog.getLog("AudioPlayerListener");
 	private TrackScheduler scheduler;
 	private Client client;

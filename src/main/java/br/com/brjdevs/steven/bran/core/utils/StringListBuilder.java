@@ -47,9 +47,9 @@ public class StringListBuilder {
 	}
 	
 	public enum Format {
-		NONE("%currentArgs"),
-		SIMPLE("%currentArgs - Page %d/%dn\n%currentArgs"),
-		CODE_BLOCK("```md\n[%currentArgs](Page %d/%d)\n%currentArgs\n# %currentArgs\n```");
+		NONE("%s"),
+		SIMPLE("%s - Page %d/%dn\n%s"),
+		CODE_BLOCK("```md\n[%s](Page %d/%d)\n%s\n# %s\n```");
 		private String str;
 		Format(String str) {
 			this.str = str;
