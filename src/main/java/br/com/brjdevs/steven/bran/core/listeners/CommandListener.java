@@ -53,7 +53,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 						cmd.execute(e);
 					} catch (Exception ex) {
 						LOG.log(ex);
-						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.\nException message: `" + e.getMessage() + "`").queue();
+						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.\nException message: `" + ex.getMessage() + "`").queue();
 						String url = Hastebin.post(Utils.getStackTrace(ex));
 						client.getDiscordLog().logToDiscord("Uncaught exception in Thread " + Thread.currentThread().getName(), "An unexpected `" + ex.getClass().getSimpleName() + "` occurred.\nMessage: " + ex.getMessage() + "\nStackTrace: " + url, Level.FATAL);
 					}

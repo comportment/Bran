@@ -15,7 +15,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class HangManGame {
 	
@@ -90,7 +89,7 @@ public class HangManGame {
 	}
 	
 	public String getGuessedLetters() {
-		return word.entrySet().stream().map(entry -> entry.getValue() ? String.valueOf(entry.getKey().charAt(0)) : "_").collect(Collectors.joining());
+		return word.entrySet().stream().map(entry -> entry.getValue() ? String.valueOf(entry.getKey().charAt(0)) : "\\_").collect(Collectors.joining());
 	}
 	
 	public List<Character> getMistakes() {
@@ -111,11 +110,10 @@ public class HangManGame {
 				loose();
 			return;
 		}
-		Stream<Map.Entry<String, Boolean>> stream = word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().charAt(0) == c);
-		if (stream.findFirst() == null) {
+		if (word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().charAt(0) == c).findFirst() == null) {
 			getChannel().sendMessage("You already Guessed this Letter!").queue();
 		} else {
-			stream.forEach(entry -> word.replace(entry.getKey(), true));
+			word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().charAt(0) == c).forEach(entry -> word.replace(entry.getKey(), true));
 			if (getFullWord().equals(getGuessedLetters())) {
 				win();
 				return;
