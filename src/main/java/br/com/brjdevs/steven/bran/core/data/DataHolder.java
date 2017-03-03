@@ -3,13 +3,12 @@ package br.com.brjdevs.steven.bran.core.data;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DataHolder {
 	
-	public Map<String, GuildData> guilds = new HashMap<>();
-	public Map<String, UserData> users = new HashMap<>();
+	public ConcurrentHashMap<String, GuildData> guilds = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<String, UserData> users = new ConcurrentHashMap<>();
 	
 	public GuildData getGuild(Guild guild) {
 		return guilds.computeIfAbsent(guild.getId(), id -> new GuildData(guild));
