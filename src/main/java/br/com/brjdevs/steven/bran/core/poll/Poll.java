@@ -32,7 +32,7 @@ public class Poll {
 	}
 	
 	public static List<Poll> getRunningPolls(Client client) {
-		return client.getDiscordBotData().getPollPersistence().get();
+		return client.getDiscordBotData().getPollPersistence().get().polls;
 	}
 	
 	public static Poll getPoll(TextChannel channel, Client client) {

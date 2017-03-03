@@ -12,7 +12,9 @@ import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,7 @@ public class HangManGame {
 	public ClientShard clientShard;
 	private long creatorId;
 	private List<Long> invitedUsers;
-	private Map<String, Boolean> word;
+	private LinkedHashMap<String, Boolean> word;
 	private List<Character> mistakes;
 	private List<String> givenTips;
 	private long channelId;
@@ -33,7 +35,7 @@ public class HangManGame {
 		this.clientShard = clientShard;
 		this.creatorId = Long.parseLong(creator.getId());
 		this.invitedUsers = new ArrayList<>();
-		this.word = new HashMap<>();
+		this.word = new LinkedHashMap<>();
 		this.channelId = Long.parseLong(channel.getId());
 		this.isPrivate = channel instanceof PrivateChannel;
 		this.mistakes = new ArrayList<>();
@@ -110,10 +112,10 @@ public class HangManGame {
 				loose();
 			return;
 		}
-		if (word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().charAt(0) == c).findFirst() == null) {
+		if (word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().equalsIgnoreCase(s)).findFirst() == null) {
 			getChannel().sendMessage("You already Guessed this Letter!").queue();
 		} else {
-			word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().charAt(0) == c).forEach(entry -> word.replace(entry.getKey(), true));
+			word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().equalsIgnoreCase(s)).forEach(entry -> word.replace(entry.getKey(), true));
 			if (getFullWord().equals(getGuessedLetters())) {
 				win();
 				return;

@@ -70,7 +70,7 @@ public class GiveawayCommand {
 									return;
 								}
 							}
-							event.getGuildData().giveaway = new Giveaway(event.getMember(), event.getGuild(), role, numOfWinners, e);
+							event.getGuildData().giveaway = new Giveaway(event.getMember(), event.getGuild(), role, event.getTextChannel(), numOfWinners, e);
 							event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who's participating by typing `.giveaway info`.").queue();
 							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})
@@ -136,10 +136,6 @@ public class GiveawayCommand {
 								event.sendMessage(Quotes.FAIL, "No giveaways running in the current Guild!").queue();
 								return;
 							}
-							if (giveaway.isTimingOut()) {
-								event.sendMessage("You **cannot** end Giveaways that are timing out!").queue();
-								return;
-							}
 							if (giveaway.getParticipants().isEmpty()) {
 								event.sendMessage("No users were participating in this Giveaway :cry:").queue();
 								event.getGuildData().giveaway = null;
@@ -167,6 +163,7 @@ public class GiveawayCommand {
 							event.sendMessage(embedBuilder.build()).queue();
 							event.sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)! :smile:").queue();
 							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(client).getName() + ", contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)!").queue()));
+							Giveaway.expiration.remove(giveaway);
 							event.getGuildData().giveaway = null;
 							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})

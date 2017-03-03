@@ -2,11 +2,17 @@ package br.com.brjdevs.steven.bran.core.data;
 
 import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.client.ClientShard;
-import br.com.brjdevs.steven.bran.core.managers.ExpirationManager;
+import br.com.brjdevs.steven.bran.core.managers.CustomExpirationManager;
+import br.com.brjdevs.steven.bran.core.utils.CollectionUtils;
+import br.com.brjdevs.steven.bran.core.utils.Hastebin;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.TextChannel;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,17 +21,44 @@ import java.util.stream.Collectors;
 
 public class Giveaway {
 	
-	public static ExpirationManager ExpirationManager = new ExpirationManager();
+	public static CustomExpirationManager<Giveaway> expiration = new CustomExpirationManager<>((giveaway) -> {
+		Client client = Client.getInstance();
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		embedBuilder.setColor(Color.decode("#43474B"));
+		embedBuilder.setAuthor("Information on the Giveaway for Guild " + giveaway.getGuild(client).getName(), null, giveaway.getGuild(client).getIconUrl());
+		embedBuilder.setFooter("Giveaway created by " + Utils.getUser(giveaway.getCreator(client).getUser()), giveaway.getCreator(client).getUser().getEffectiveAvatarUrl());
+		String desc = "This giveaway was available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(client).getName()) + ".\n";
+		String participating = giveaway.getParticipants(client).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
+		if (participating.length() > EmbedBuilder.TEXT_MAX_LENGTH - desc.length())
+			participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
+		List<Long> p = new ArrayList<>(giveaway.getParticipants());
+		List<Member> winners = new ArrayList<>();
+		for (int i = 0; i < giveaway.getMaxWinners() && !p.isEmpty(); i++) {
+			long l = CollectionUtils.random(p);
+			p.remove(l);
+			Member m = giveaway.getGuild(client).getMemberById(String.valueOf(l));
+			if (m == null) continue;
+			winners.add(m);
+		}
+		desc += participating + "\n\nThere was " + giveaway.getTotalParticipants() + " users participating on this Giveaway!\n\nAnd the " + (giveaway.getMaxWinners() > 1 ? "winners are" : "winner is") + "... " + winners.stream().map(m -> Utils.getUser(m.getUser())).collect(Collectors.joining("\n"));
+		embedBuilder.setDescription(desc);
+		giveaway.getChannel(client).sendMessage(embedBuilder.build()).queue();
+		giveaway.getChannel(client).sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)! :smile:").queue();
+		winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(client).getName() + ", contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)!").queue()));
+		client.getDiscordBotData().getDataHolderManager().get().getGuild(giveaway.getGuild(client)).giveaway = null;
+		client.getDiscordBotData().getDataHolderManager().update();
+	});
 	
 	private int maxUsers;
 	private long creator;
 	private long expiresIn;
 	private long roleId;
 	private long guildId;
+	private long channel;
 	private List<Long> participating;
 	private boolean timedOut;
 	
-	public Giveaway(Member member, Guild guild, Role role, int maxUsers, long expiresIn) {
+	public Giveaway(Member member, Guild guild, Role role, TextChannel channel, int maxUsers, long expiresIn) {
 		this.maxUsers = maxUsers;
 		this.creator = Long.parseLong(member.getUser().getId());
 		this.expiresIn = expiresIn + System.currentTimeMillis();
@@ -36,10 +69,9 @@ public class Giveaway {
 		this.guildId = Long.parseLong(guild.getId());
 		this.participating = new ArrayList<>();
 		this.timedOut = false;
-		if (expiresIn > 0) ExpirationManager.letExpire(this.expiresIn, () -> {
-			member.getUser().openPrivateChannel().queue(c -> c.sendMessage("Hey, the Giveaway you created in " + guild.getName() + " has expired, you should end it!").queue());
-			this.timedOut = true;
-		});
+		this.channel = Long.parseLong(channel.getId());
+		
+		if (expiresIn > 0) expiration.letExpire(this, expiresIn);
 	}
 	
 	public boolean isExpired() {
@@ -97,6 +129,11 @@ public class Giveaway {
 	
 	public int getTotalParticipants() {
 		return participating.size();
+	}
+	
+	public TextChannel getChannel(Client client) {
+		String id = String.valueOf(channel);
+		return getGuild(client).getTextChannelById(id) == null ? getGuild(client).getPublicChannel() : getGuild(client).getTextChannelById(id);
 	}
 	
 	public ClientShard getShard(Client client) {

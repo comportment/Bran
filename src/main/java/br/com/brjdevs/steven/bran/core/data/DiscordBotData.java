@@ -1,9 +1,8 @@
 package br.com.brjdevs.steven.bran.core.data;
 
 import br.com.brjdevs.steven.bran.core.data.managers.GsonDataFileManager;
-import br.com.brjdevs.steven.bran.core.poll.Poll;
+import br.com.brjdevs.steven.bran.core.poll.Polls;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +12,13 @@ public class DiscordBotData {
 	private GsonDataFileManager<DataHolder> dataHolderManager;
 	private GsonDataFileManager<Config> configDataManager;
 	private GsonDataFileManager<Map<String, List<String>>> hangmanWordsManager;
-	private GsonDataFileManager<List<Poll>> pollPersistence;
+	private GsonDataFileManager<Polls> pollPersistence;
 	
 	public DiscordBotData() {
 		getDataHolderManager();
 		getConfigDataManager();
 		getHangmanWordsManager();
+		getPollPersistence();
 	}
 	
 	public GsonDataFileManager<DataHolder> getDataHolderManager() {
@@ -39,9 +39,9 @@ public class DiscordBotData {
 		return hangmanWordsManager;
 	}
 	
-	public GsonDataFileManager<List<Poll>> getPollPersistence() {
+	public GsonDataFileManager<Polls> getPollPersistence() {
 		if (pollPersistence == null)
-			pollPersistence = (GsonDataFileManager<List<Poll>>) new GsonDataFileManager(ArrayList.class, "pollpersistence.json", ArrayList::new);
+			pollPersistence = new GsonDataFileManager<>(Polls.class, "pollpersistence", Polls::new);
 		return pollPersistence;
 	}
 }

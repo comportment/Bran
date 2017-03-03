@@ -11,7 +11,7 @@ public class ExpirationManager {
 	public ExpirationManager() {
 		EXPIRATIONS = new ConcurrentHashMap<>();
 		
-		Thread thread = new Thread(this::threadcode, "ExpirationManager Thread");
+		Thread thread = new Thread(this::threadcode, "expiration Thread");
 		thread.setDaemon(true);
 		thread.start();
 	}

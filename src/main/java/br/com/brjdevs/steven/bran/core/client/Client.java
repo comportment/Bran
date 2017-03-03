@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 public class Client {
 	
+	private static Client instance;
 	private static JedisPool jedisPool = new JedisPool("localhost", 6379);
 	private static SimpleLog LOG = SimpleLog.getLog("BotContainer");
 	public File workingDir;
@@ -55,6 +56,7 @@ public class Client {
 	private Messenger messenger;
 	
 	public Client() throws LoginException, InterruptedException, RateLimitedException {
+		instance = this;
 		this.discordBotData = new DiscordBotData();
 		this.ownerId = 0;
 		this.ownerShardId = 0;
@@ -77,6 +79,10 @@ public class Client {
 	
 	public static JedisPool getJedisPool() {
 		return jedisPool;
+	}
+	
+	public static Client getInstance() {
+		return instance;
 	}
 	
 	public ClientShard[] getShards() {
