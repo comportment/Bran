@@ -158,7 +158,7 @@ public class HangManGame {
 	}
 	
 	private void reward(UserData userData, long coins, long exp) {
-		userData.getProfile().bankAccount.addCoins(coins, BankAccount.MAIN_BANK);
+		userData.getProfile().getBankAccount().addCoins(coins, BankAccount.MAIN_BANK);
 		userData.getProfile().addExperience(exp);
 	}
 }

@@ -34,13 +34,16 @@ public class BankAccount {
 		return coins;
 	}
 	
-	private void setCoins(long coins) {
+	public void setCoins(long coins) {
 		this.coins = coins;
 	}
 	
-	public void addCoins(long coins, BankAccount sender) {
+	public boolean addCoins(long coins, BankAccount sender) {
+		if (getCoins() + coins < 0)
+			return false;
 		setCoins(getCoins() + coins);
 		setLastTransaction(new Transaction(sender, this, coins));
+		return true;
 	}
 	
 	public boolean takeCoins(long coinsToTake, BankAccount receiver) {

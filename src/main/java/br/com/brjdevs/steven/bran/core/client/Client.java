@@ -7,7 +7,6 @@ import br.com.brjdevs.steven.bran.core.command.CommandManager;
 import br.com.brjdevs.steven.bran.core.currency.Profile;
 import br.com.brjdevs.steven.bran.core.data.Config;
 import br.com.brjdevs.steven.bran.core.data.DiscordBotData;
-import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.utils.Session;
@@ -74,7 +73,6 @@ public class Client {
 		this.session = new Session(this);
 		this.messenger = new Messenger(this);
 		this.taskManager = new TaskManager(this);
-		ItemContainer.loadItems();
 	}
 	
 	public static JedisPool getJedisPool() {

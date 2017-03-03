@@ -17,7 +17,7 @@ public class Profile {
 	private static String EMPTY = "\u00AD";
 	
 	public String customHex;
-	public BankAccount bankAccount;
+	private BankAccount bankAccount;
 	private String userId;
 	private HMStats HMStats;
 	private Rank rank;
@@ -46,6 +46,11 @@ public class Profile {
 		long expRequired = Math.round(expCalculate);
 		if (expCalculate - expRequired > 0) expRequired++;
 		return expRequired;
+	}
+	
+	public BankAccount getBankAccount() {
+		if (bankAccount == null) bankAccount = new BankAccount(userId);
+		return bankAccount;
 	}
 	
 	public String getCustomHex() {

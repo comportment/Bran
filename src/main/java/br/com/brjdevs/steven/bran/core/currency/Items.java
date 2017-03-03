@@ -3,6 +3,8 @@ package br.com.brjdevs.steven.bran.core.currency;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class Items {
@@ -20,5 +22,17 @@ public class Items {
 	
 	static {
 		TaskManager.startAsyncTask("Market Thread", (service) -> Stream.of(ALL).forEach(item -> item.changePrices(MathUtils.random)), 3600);
+	}
+	
+	public static Optional<Item> fromEmoji(String emoji) {
+		return Stream.of(ALL).filter(item -> item.getEmoji().equals(emoji)).findFirst();
+	}
+	
+	public static Item fromId(int id) {
+		return ALL[id];
+	}
+	
+	public static int idOf(Item item) {
+		return Arrays.asList(ALL).indexOf(item);
 	}
 }

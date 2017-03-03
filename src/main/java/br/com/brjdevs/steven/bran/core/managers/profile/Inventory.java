@@ -1,57 +1,53 @@
 package br.com.brjdevs.steven.bran.core.managers.profile;
 
-import br.com.brjdevs.steven.bran.core.itemManager.Item;
+import br.com.brjdevs.steven.bran.core.currency.Item;
+import br.com.brjdevs.steven.bran.core.currency.Items;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Inventory {
 	
-	private Map<String, Integer> items;
-	private int maxSize;
+	private Map<Integer, AtomicInteger> items;
 	
 	public Inventory() {
 		this.items = new HashMap<>();
-		this.maxSize = 10;
 	}
 	
 	public boolean put(Item item) {
-		if (!items.containsKey(item.getId()))
-			items.put(item.getId(), 0);
-		if (getAmountOf(item) >= item.getMaxStack()) return false;
-		items.put(item.getId(), getAmountOf(item) + 1);
+		int id = Items.idOf(item);
+		if (getAmountOf(item) + 1 < 0)
+			return false;
+		items.computeIfAbsent(id, i -> new AtomicInteger(0)).incrementAndGet();
 		return true;
 	}
 	
-	public void remove(Item item) {
-		if (getAmountOf(item) > 1)
-			items.put(item.getId(), getAmountOf(item) - 1);
+	public boolean remove(Item item) {
+		int id = Items.idOf(item);
+		if (!items.containsKey(id))
+			return false;
+		if (getAmountOf(item) > 0)
+			items.get(id).decrementAndGet();
 		else
-			items.remove(item.getId());
+			items.remove(id);
+		return true;
 	}
 	
 	public int getAmountOf(Item item) {
-		return items.getOrDefault(item.getId(), 0);
+		return items.getOrDefault(Items.idOf(item), new AtomicInteger(0)).get();
 	}
 	
 	public boolean isEmpty() {
 		return items.isEmpty();
 	}
 	
-	public Map<String, Integer> getItems() {
+	public Map<Integer, AtomicInteger> getItems() {
 		return Collections.unmodifiableMap(items);
 	}
 	
 	public int size(boolean unique) {
-		return !unique ? items.values().stream().mapToInt(Integer::intValue).sum() : items.size();
-	}
-	
-	public int getMaxSize() {
-		return maxSize;
-	}
-	
-	public void setMaxSize(int maxSize) {
-		this.maxSize = maxSize;
+		return !unique ? items.values().stream().mapToInt(AtomicInteger::get).sum() : items.size();
 	}
 }

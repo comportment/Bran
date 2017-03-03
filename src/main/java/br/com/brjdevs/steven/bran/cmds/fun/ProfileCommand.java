@@ -7,13 +7,12 @@ import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.currency.Item;
+import br.com.brjdevs.steven.bran.core.currency.Items;
 import br.com.brjdevs.steven.bran.core.currency.Profile;
 import br.com.brjdevs.steven.bran.core.currency.Profile.Rank;
-import br.com.brjdevs.steven.bran.core.itemManager.Item;
-import br.com.brjdevs.steven.bran.core.itemManager.ItemContainer;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
-import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
-import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
@@ -51,24 +50,21 @@ public class ProfileCommand {
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("inventory")
 						.setDescription("Shows you your inventory.")
-						.setArgs(new Argument("page", Integer.class, true))
 						.setAction((event) -> {
 							Inventory inventory = event.getClient().getProfile(event.getAuthor()).getInventory();
 							if (inventory.isEmpty()) {
 								event.sendMessage("Your inventory is empty!").queue();
 								return;
 							}
-							Argument arg = event.getArgument("page");
-							int page = arg.isPresent() && (int) arg.get() > 0 ? (int) arg.get() : 1;
 							List<String> items = inventory.getItems().entrySet()
 									.stream().map(entry -> {
-										Item item = ItemContainer.getItemById(entry.getKey());
-										return item.getName() + "  x" + entry.getValue();
+										Item item = Items.fromId(entry.getKey());
+										return item.getEmoji() + " " + item.getName() + "  x" + entry.getValue();
 									}).collect(Collectors.toList());
-							StringListBuilder listBuilder = new StringListBuilder(items, page, 15);
-							listBuilder.setName("Your inventory");
-							listBuilder.setFooter("Total Items (UNIQUE/TOTAL): " + inventory.size(true) + "/" + inventory.size(false));
-							event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
+							EmbedBuilder embedBuilder = new EmbedBuilder();
+							embedBuilder.setAuthor("Your inventory", null, event.getAuthor().getEffectiveAvatarUrl());
+							embedBuilder.setDescription(String.join("\n", items));
+							event.sendMessage(embedBuilder.build()).queue();
 						})
 						.build())
 				.addSubCommand(new TreeCommandBuilder(Category.MISCELLANEOUS)

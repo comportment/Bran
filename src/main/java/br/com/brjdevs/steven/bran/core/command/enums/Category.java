@@ -6,6 +6,7 @@ public enum Category {
 	GUILD_ADMINISTRATOR("Guild Administrator", "\uD83D\uDDA5"),
 	BOT_ADMINISTRATOR("Bot Administrator", "\u2699"),
 	INFORMATIVE("Informative", "\uD83C\uDF10"),
+	CURRENCY("Currency", "\uD83D\uDCB0"),
 	UNKNOWN("Unknown", "\u2049");
 	private String key;
 	private String emoji;

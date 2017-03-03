@@ -65,6 +65,10 @@ public class SnowflakeGenerator {
 		return timestamp;
 	}
 	
+	public long getCreationTime(long snowflake) {
+		return (snowflake >> 22) + 1420070400000L;
+	}
+	
 	private long timeGen() {
 		return System.currentTimeMillis();
 	}
