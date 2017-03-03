@@ -12,7 +12,10 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
 	
 	@Override
 	public void event(MessageReceivedEvent event) {
+		if (event.getAuthor().isBot() || event.getAuthor().isFake())
+			return;
 		HangManGame game = HangManGame.getGame(event.getAuthor());
+		if (game == null) return;
 		String guess = event.getMessage().getRawContent();
 		if (guess.isEmpty()) return;
 		if (guess.charAt(0) != '=')

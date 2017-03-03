@@ -6,6 +6,7 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -60,18 +61,22 @@ public class EvalCommand /*implements ICommand*/ {
 	
 	@Command
 	private static ICommand eval() {
+		folder.mkdirs();
+		f = new File(folder + "/DontUse.java");
+		out = new File(folder + "/DontUse.class");
 		return new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
 				.setAliases("eval")
 				.setName("Eval Command")
 				.setDescription("Evaluates in Java and Javascript")
 				.setDefault("java")
+				.setRequiredPermission(Permissions.EVAL)
 				.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 						.setAliases("js", "javascript")
 						.setName("JS Eval Command")
 						.setDescription("Evaluates in JavaScript")
 						.setAction((event) -> {
 							eval.put("shard", event.getShard());
-							eval.put("container", event.getClient());
+							eval.put("client", event.getClient());
 							eval.put("jda", event.getJDA());
 							eval.put("event", event);
 							eval.put("author", event.getAuthor());

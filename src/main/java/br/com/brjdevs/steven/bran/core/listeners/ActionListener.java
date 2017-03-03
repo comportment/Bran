@@ -28,6 +28,8 @@ public class ActionListener extends EventListener<Event> {
 			response = ((MessageReactionAddEvent) e).getReaction().getEmote().getName();
 			obj = ((MessageReactionAddEvent) e).getReaction();
 		} else if (e instanceof GuildMessageReceivedEvent) {
+			if (((GuildMessageReceivedEvent) e).getAuthor().isBot() || ((GuildMessageReceivedEvent) e).getAuthor().isFake())
+				return;
 			responseWaiter = ResponseWaiter.responseWaiters.get(Long.parseLong(((GuildMessageReceivedEvent) e).getAuthor().getId()));
 			if (responseWaiter != null && responseWaiter.getExpectedResponseType() != ExpectedResponseType.MESSAGE)
 				return;
