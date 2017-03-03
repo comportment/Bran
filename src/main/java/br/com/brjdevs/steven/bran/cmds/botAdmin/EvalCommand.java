@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.cmds.botAdmin;
 
 import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
@@ -74,6 +75,7 @@ public class EvalCommand /*implements ICommand*/ {
 						.setAliases("js", "javascript")
 						.setName("JS Eval Command")
 						.setDescription("Evaluates in JavaScript")
+						.setArgs(new Argument("js code", String.class))
 						.setAction((event) -> {
 							eval.put("shard", event.getShard());
 							eval.put("client", event.getClient());
@@ -102,6 +104,7 @@ public class EvalCommand /*implements ICommand*/ {
 						.setAliases("java")
 						.setName("Java Eval Command")
 						.setDescription("Evaluates in Java!")
+						.setArgs(new Argument("java code", String.class))
 						.setAction((event) -> {
 							Object x = null;
 							try {

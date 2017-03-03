@@ -27,7 +27,6 @@ public class PruneCommand {
 				.setName("Prune Command")
 				.setHelp("prune ?")
 				.setPrivateAvailable(false)
-				.setDefault("all")
 				.setDescription("Delete multiple messages instantly with this command!")
 				.setRequiredPermission(Permissions.PRUNE_CLEANUP)
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -37,8 +36,8 @@ public class PruneCommand {
 						.setArgs(new Argument("amount", Integer.class, true))
 						.setExample("prune bot 100")
 						.setAction((event) -> {
-							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE)) {
-								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE).queue();
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY)) {
+								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE + ", " + Permission.MESSAGE_HISTORY).queue();
 								return;
 							}
 							Argument argument = event.getArgument("amount");
@@ -73,8 +72,8 @@ public class PruneCommand {
 						.setArgs(new Argument("user", String.class), new Argument("amount", Integer.class, true))
 						.setExample("prune user 100 <@219186621008838669>")
 						.setAction((event) -> {
-							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE)) {
-								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE).queue();
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY)) {
+								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE + ", " + Permission.MESSAGE_HISTORY).queue();
 								return;
 							}
 							Argument amountArg = event.getArgument("amount");
@@ -121,8 +120,8 @@ public class PruneCommand {
 						.setArgs(new Argument("content", String.class), new Argument("amount", Integer.class, true))
 						.setExample("prune content 100 hello")
 						.setAction((event) -> {
-							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE)) {
-								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE).queue();
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY)) {
+								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE + ", " + Permission.MESSAGE_HISTORY).queue();
 								return;
 							}
 							Argument amountArg = event.getArgument("amount");
@@ -157,8 +156,8 @@ public class PruneCommand {
 						.setDescription("Deletes all messages in the latest given amount messages.")
 						.setArgs(new Argument("amount", Integer.class, true))
 						.setAction((event) -> {
-							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE)) {
-								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE).queue();
+							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY)) {
+								event.sendMessage("I can't delete the messages due to a lack of permission. Missing Permission: " + Permission.MESSAGE_MANAGE + ", " + Permission.MESSAGE_HISTORY).queue();
 								return;
 							}
 							Argument amountArg = event.getArgument("amount");

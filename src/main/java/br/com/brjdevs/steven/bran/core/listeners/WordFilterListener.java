@@ -5,7 +5,6 @@ import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.utils.RestActionSleep;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.requests.RestAction;
 
@@ -17,14 +16,11 @@ public class WordFilterListener extends EventListener<GuildMessageReceivedEvent>
 		super(GuildMessageReceivedEvent.class, client);
 	}
 	
-	private static boolean canManageMessages(TextChannel channel) {
-		return channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE);
-	}
-	
 	@Override
 	public void event(GuildMessageReceivedEvent event) {
 		if (event.getMessage() == null) return;
-		if (!canManageMessages(event.getChannel())) return;
+		if (!event.getChannel().getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
+			return;
 		GuildData guildData = client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild());
 		if (!guildData.isWordFilterEnabled) return;
 		boolean hasFilteredWord = false;
