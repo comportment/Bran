@@ -8,18 +8,18 @@ import java.util.Map;
 
 public class DataHolder {
 	
-	public Map<Long, GuildData> guilds = new HashMap<>();
-	public Map<Long, UserData> users = new HashMap<>();
+	public Map<String, GuildData> guilds = new HashMap<>();
+	public Map<String, UserData> users = new HashMap<>();
 	
 	public GuildData getGuild(Guild guild) {
-		return guilds.computeIfAbsent(Long.parseLong(guild.getId()), id -> new GuildData(guild));
+		return guilds.computeIfAbsent(guild.getId(), id -> new GuildData(guild));
 	}
 	
 	public UserData getUser(User user) {
-		return users.computeIfAbsent(Long.parseLong(user.getId()), id -> new UserData(user));
+		return users.computeIfAbsent(user.getId(), id -> new UserData(user));
 	}
 	
-	public UserData getUserById(long id) {
+	public UserData getUserById(String id) {
 		return users.get(id);
 	}
 }

@@ -5,7 +5,8 @@ import br.com.brjdevs.steven.bran.core.snowflakes.SnowflakeGenerator;
 
 public class Transaction {
 	
-	public final long receiverId, senderId, amount, id;
+	public final long amount, id;
+	public final String receiverId, senderId;
 	
 	public Transaction(BankAccount sender, BankAccount receiver, long amount) {
 		this.senderId = sender.userId;

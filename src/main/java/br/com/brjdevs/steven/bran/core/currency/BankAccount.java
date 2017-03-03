@@ -6,16 +6,16 @@ import java.util.LinkedList;
 
 public class BankAccount {
 	
-	public static final BankAccount MAIN_BANK = new BankAccount(219186621008838669L);
-	public final long userId;
+	public static final BankAccount MAIN_BANK = new BankAccount("219186621008838669");
+	public final String userId;
 	private LinkedList<Transaction> transactions;
 	private long coins;
 	
 	public BankAccount(User user) {
-		this(Long.parseLong(user.getId()));
+		this(user.getId());
 	}
 	
-	public BankAccount(long id) {
+	public BankAccount(String id) {
 		this.transactions = new LinkedList<>();
 		this.coins = 0;
 		this.userId = id;
