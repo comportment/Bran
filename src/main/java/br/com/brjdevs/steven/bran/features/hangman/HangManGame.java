@@ -40,7 +40,7 @@ public class HangManGame {
 		this.mistakes = new ArrayList<>();
 		this.givenTips = new ArrayList<>();
 		
-		Arrays.stream(word.split("")).forEach(c -> this.word.put(this.word.containsKey(c) ? c + StringUtils.randomName(3) : c, !c.equals(" ")));
+		Arrays.stream(word.split("")).forEach(c -> this.word.put(this.word.containsKey(c) ? c + StringUtils.randomName(3) : c, c.equals(" ")));
 		games.add(this);
 	}
 	

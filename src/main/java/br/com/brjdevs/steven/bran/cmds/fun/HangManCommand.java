@@ -65,6 +65,7 @@ public class HangManCommand {
 							}
 							session = new HangManGame(event.getShard(), event.getChannel(), event.getAuthor(), CollectionUtils.getEntryByIndex(event.getClient().getDiscordBotData().getHangmanWordsManager().get(), MathUtils.random(event.getClient().getDiscordBotData().getHangmanWordsManager().get().size())).getKey());
 							event.sendMessage(session.baseEmbed().setDescription("Started game!\n\n\n**Guesses:** " + session.getGuessedLetters() + "\nYou've made " + session.getMistakes().size() + " out of " + session.getMaximumMistakes() + "." + (session.getMistakes().isEmpty() ? "" : " (" + session.getMistakes().stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")") + "\n\n" + (session.getGivenTips().isEmpty() ? "You didn't ask for any tips." : "These are the current given tips:\n" + (String.join("\n", session.getGivenTips()))) + "\nMultiplayer: " + (session.getInvitedUsers().isEmpty()) + (session.getInvitedUsers().isEmpty() ? "" : "\n" + session.getInvitedUsers().stream().map(Utils::getUser).collect(Collectors.joining(", ")))).build()).queue();
+							event.sendMessage("**Note:** Prefix your messages with `^` to do guesses!").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)

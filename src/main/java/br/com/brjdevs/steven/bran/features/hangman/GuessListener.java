@@ -18,16 +18,16 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
 		if (game == null) return;
 		String guess = event.getMessage().getRawContent();
 		if (guess.isEmpty()) return;
-		if (guess.charAt(0) != '=')
+		if (guess.charAt(0) != '^')
 			return;
-		if (guess.equals("=giveup")) {
+		if (guess.equals("^giveup")) {
 			if (game.isMuliplayer()) {
 				event.getChannel().sendMessage("You cannot giveup to a Multiplayer session.").queue();
 			} else {
 				game.giveup();
 			}
 			return;
-		} else if (guess.equals("=leave")) {
+		} else if (guess.equals("^leave")) {
 			if (!game.isMuliplayer()) {
 				event.getChannel().sendMessage("You cannot leave a Singleplayer session.").queue();
 			} else {
