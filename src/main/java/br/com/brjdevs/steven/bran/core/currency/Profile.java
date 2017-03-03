@@ -155,7 +155,7 @@ public class Profile {
 	
 	public MessageEmbed createEmbed(JDA jda) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setAuthor(getUser(jda).getName() + "'currentArgs profile information", null, Utils.getAvatarUrl(getUser(jda)));
+		builder.setAuthor(getUser(jda).getName() + "'s profile information", null, Utils.getAvatarUrl(getUser(jda)));
 		builder.setDescription(EMPTY + "\n" + EMPTY);
 		builder.addField("\u2694 Level", String.valueOf(getLevel()), true);
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);

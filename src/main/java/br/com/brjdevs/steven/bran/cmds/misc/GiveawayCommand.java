@@ -71,7 +71,7 @@ public class GiveawayCommand {
 								}
 							}
 							event.getGuildData().giveaway = new Giveaway(event.getMember(), event.getGuild(), role, numOfWinners, e);
-							event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who'currentArgs participating by typing `.giveaway info`.").queue();
+							event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who's participating by typing `.giveaway info`.").queue();
 							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})
 						.build())
@@ -165,8 +165,8 @@ public class GiveawayCommand {
 							desc += participating + "\n\nThere was " + giveaway.getTotalParticipants() + " users participating on this Giveaway!\n\nAnd the " + (giveaway.getMaxWinners() > 1 ? "winners are" : "winner is") + "... " + winners.stream().map(m -> Utils.getUser(m.getUser())).collect(Collectors.joining("\n"));
 							embedBuilder.setDescription(desc);
 							event.sendMessage(embedBuilder.build()).queue();
-							event.sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(currentArgs)! :smile:").queue();
-							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(client).getName() + ", contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(currentArgs)!").queue()));
+							event.sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)! :smile:").queue();
+							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(client).getName() + ", contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)!").queue()));
 							event.getGuildData().giveaway = null;
 							event.getClient().getDiscordBotData().getDataHolderManager().update();
 						})

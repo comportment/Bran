@@ -41,7 +41,7 @@ public class ItemStack {
 	}
 	
 	public static String toString(List<ItemStack> list) {
-		if (list.isEmpty()) return "There'currentArgs only dust.";
+		if (list.isEmpty()) return "There's only dust.";
 		return list.stream().map(Object::toString).sorted(randomOrder()).collect(Collectors.joining(", "));
 	}
 	

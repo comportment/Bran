@@ -239,7 +239,7 @@ public class MusicCommand {
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
-						.setAliases("skip", "currentArgs")
+						.setAliases("skip", "s")
 						.setName("Music Vote Skip Command")
 						.setDescription("Voting for skipping song.")
 						.setAction((event) -> {
@@ -342,7 +342,7 @@ public class MusicCommand {
 								return;
 							}
 							if (!toRemove.getDJId().equals(event.getAuthor().getId()) && !event.getGuildData().hasPermission(event.getAuthor(), Permissions.DJ)) {
-								event.sendMessage("You can't do this because you're not this song'currentArgs DJ!").queue();
+								event.sendMessage("You can't do this because you're not this song's DJ!").queue();
 								return;
 							}
 							scheduler.getQueue().remove(toRemove);

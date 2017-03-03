@@ -86,7 +86,7 @@ public class HangManCommand {
 								event.sendMessage(Quotes.FAIL, "You cannot invite users to a private game!").queue();
 								return;
 							} else if (session.getChannel() != event.getTextChannel()) {
-								event.sendMessage(Quotes.FAIL, "You can only invite users in " + ((TextChannel) session.getChannel()).getAsMention() + " because that'currentArgs where the Game is running...").queue();
+								event.sendMessage(Quotes.FAIL, "You can only invite users in " + ((TextChannel) session.getChannel()).getAsMention() + " because that's where the Game is running...").queue();
 								return;
 							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? null : event.getMessage().getMentionedUsers().get(0);
@@ -143,7 +143,7 @@ public class HangManCommand {
 								event.sendMessage(Quotes.FAIL, "You cannot invite users in a private session!").queue();
 								return;
 							} else if (session.getChannel() != event.getTextChannel()) {
-								event.sendMessage(Quotes.FAIL, "You can only do this in " + ((TextChannel) session.getChannel()).getAsMention() + " because that'currentArgs where the Game is running...").queue();
+								event.sendMessage(Quotes.FAIL, "You can only do this in " + ((TextChannel) session.getChannel()).getAsMention() + " because that's where the Game is running...").queue();
 								return;
 							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? null : event.getMessage().getMentionedUsers().get(0);

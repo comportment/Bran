@@ -50,7 +50,7 @@ public class ConfigCommand {
 									if (i < -1) i = -1;
 									event.getGuildData().maxSongsPerUser = i;
 									if (i > 0)
-										event.sendMessage("Got it! Now each user can only have " + i + " song(currentArgs) in the queue at once.").queue();
+										event.sendMessage("Got it! Now each user can only have " + i + " song(s) in the queue at once.").queue();
 									else
 										event.sendMessage("Got it! Now each user can have unlimited songs in the queue at once.").queue();
 									event.getClient().getDiscordBotData().getDataHolderManager().update();

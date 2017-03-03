@@ -17,7 +17,7 @@ public class Base64Command {
 				.setName("Base64 Command")
 				.setHelp("base64 ?")
 				.setAliases("base64")
-				.setDescription("Let'currentArgs speak in Base64!")
+				.setDescription("Let's speak in Base64!")
 				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("encode")
 						.setName("Base64 Encode Command")

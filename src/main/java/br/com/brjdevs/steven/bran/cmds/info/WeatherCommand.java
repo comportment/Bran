@@ -34,7 +34,7 @@ public class WeatherCommand {
 						element = WeatherSearch.search(query);
 					} catch (RuntimeException e) {
 						if (e.getMessage().equals("Yahoo API didn't respond."))
-							event.sendMessage("The API took too long to respond, maybe it'currentArgs offline?").queue();
+							event.sendMessage("The API took too long to respond, maybe it's offline?").queue();
 						else
 							event.sendMessage("Could not connect, try again later please.").queue();
 						return;

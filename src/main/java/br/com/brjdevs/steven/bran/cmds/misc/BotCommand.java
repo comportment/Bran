@@ -53,7 +53,7 @@ public class BotCommand {
 								return;
 							}
 							MessageEmbed embed = new EmbedBuilder()
-									.setAuthor("Bran'currentArgs OAuth URL", null, Utils.getAvatarUrl(event.getJDA().getSelfUser()))
+									.setAuthor("Bran's OAuth URL", null, Utils.getAvatarUrl(event.getJDA().getSelfUser()))
 									.setDescription("You can invite me to your server by [clicking here](https://discordapp.com/oauth2/authorize?client_id=219186621008838669&scope=bot&permissions=0)\n" +
 											"If you need any support join [this guild](https://discord.gg/8vXwwEQ) and ask your question in #support!")
 									.setColor(Color.decode("#2759DB"))
@@ -185,7 +185,7 @@ public class BotCommand {
 											String guildId = (String) event.getArgument("guildId").get();
 											Guild guild = event.getJDA().getGuildById(guildId);
 											if (guild == null) {
-												event.sendMessage("`" + guildId + "` is not a valid Guild ID or it'currentArgs unknown for me...").queue();
+												event.sendMessage("`" + guildId + "` is not a valid Guild ID or it's unknown for me...").queue();
 												return;
 											}
 											guild.leave().queue();

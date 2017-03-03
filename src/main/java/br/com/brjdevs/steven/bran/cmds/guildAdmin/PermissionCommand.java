@@ -192,7 +192,7 @@ public class PermissionCommand {
 									.append("Now these are the default permissions:")
 									.setEmbed(new EmbedBuilder()
 											.setDescription((String.join(", ", Permissions.toCollection(event.getGuildData().defaultPermission))) + "\n\nRaw: " + event.getGuildData().defaultPermission)
-											.setTitle("Default Permission(currentArgs)", null)
+											.setTitle("Default Permission(s)", null)
 											.build())
 									.build();
 							event.sendMessage(m).queue();

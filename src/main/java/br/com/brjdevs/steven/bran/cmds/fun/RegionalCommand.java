@@ -53,7 +53,7 @@ public class RegionalCommand {
 		regional.put("p", "");
 		regional.put("q", "");
 		regional.put("r", "");
-		regional.put("currentArgs", "");
+		regional.put("s", "");
 		regional.put("t", "");
 		regional.put("u", "");
 		regional.put("v", "");

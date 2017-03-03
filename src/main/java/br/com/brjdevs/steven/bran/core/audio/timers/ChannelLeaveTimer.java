@@ -99,7 +99,7 @@ public class ChannelLeaveTimer {
 						TrackContext track = scheduler.getCurrentTrack() == null ? scheduler.getPreviousTrack()
 								: scheduler.getCurrentTrack();
 						if (track != null && track.getContext() != null && track.getContext().canTalk())
-							track.getContext().sendMessage("Nobody").queue();
+							track.getContext().sendMessage("Nobody joined the channel, stopping the player...").queue();
 						scheduler.stop();
 						musicManager.getTrackScheduler().setPaused(false);
 					}

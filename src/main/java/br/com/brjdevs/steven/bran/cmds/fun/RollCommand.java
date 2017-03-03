@@ -40,7 +40,7 @@ public class RollCommand {
 						
 					} catch (NumberFormatException ex) {
 						String input = ex.getMessage().substring(ex.getMessage().indexOf("\"") + 1).replace("\"", "");
-						event.sendMessage("Wew, that'currentArgs a big number, so big that I can't even process that please use a smaller number. *(Input: " + input + "/Maximum: " + Integer.MAX_VALUE + ")*").queue();
+						event.sendMessage("Wew, that's a big number, so big that I can't even process that please use a smaller number. *(Input: " + input + "/Maximum: " + Integer.MAX_VALUE + ")*").queue();
 					}
 				})
 				.build();

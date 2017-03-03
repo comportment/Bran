@@ -41,7 +41,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 			event.getChannel().sendTyping().queue(success -> event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue());
 			
 		} else if (event.isFromType(ChannelType.PRIVATE) ? !client.getDiscordBotData().getDataHolderManager().get().getUser(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild()).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
-			event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(currentArgs): " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + "*").queue());
+			event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + "*").queue());
 			return;
 		}
 		CommandEvent e = new CommandEvent(event, cmd, guildData, event.getMessage().getRawContent(), prefix, client);

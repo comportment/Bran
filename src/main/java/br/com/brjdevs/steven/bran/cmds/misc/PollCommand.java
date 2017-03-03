@@ -39,7 +39,7 @@ public class PollCommand {
 						.setArgs(new Argument("argument", String.class))
 						.setAction((event) -> {
 							if (Poll.getPoll(event.getTextChannel(), event.getClient()) != null) {
-								event.sendMessage("There'currentArgs already a Poll running in this Channel!").queue();
+								event.sendMessage("There's already a Poll running in this Channel!").queue();
 								return;
 							}
 							String name = ((String) event.getArgument("argument").get());
@@ -120,7 +120,7 @@ public class PollCommand {
 								poll.getOptions().forEach(option ->
 										stringBuilder.append("**").append(option.getIndex() + 1).append(".** ").append(option.getContent()).append("    *(Votes: ").append(option.getVotes().size()).append(")*\n"));
 							} else {
-								stringBuilder.append("**That'currentArgs kinda sad I guess, no one voted to the Poll!**");
+								stringBuilder.append("**That's kinda sad I guess, no one voted to the Poll!**");
 							}
 							builder.setDescription(stringBuilder.toString());
 							builder.setColor(Color.decode("#F89F3F"));
