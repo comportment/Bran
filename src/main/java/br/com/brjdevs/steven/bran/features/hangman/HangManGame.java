@@ -78,7 +78,7 @@ public class HangManGame {
 	}
 	
 	public String getFullWord() {
-		return word.keySet().stream().collect(Collectors.joining());
+		return word.keySet().stream().map(s -> s.substring(0, 1)).collect(Collectors.joining());
 	}
 	
 	public MessageChannel getChannel() {
@@ -112,10 +112,10 @@ public class HangManGame {
 				loose();
 			return;
 		}
-		if (word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().equalsIgnoreCase(s)).findFirst() == null) {
+		if (word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().substring(0, 1).equalsIgnoreCase(s)).findFirst() == null) {
 			getChannel().sendMessage("You already Guessed this Letter!").queue();
 		} else {
-			word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().equalsIgnoreCase(s)).forEach(entry -> word.replace(entry.getKey(), true));
+			word.entrySet().stream().filter(entry -> !entry.getValue() && entry.getKey().substring(0, 1).equalsIgnoreCase(s)).forEach(entry -> word.replace(entry.getKey(), true));
 			if (getFullWord().equals(getGuessedLetters())) {
 				win();
 				return;
