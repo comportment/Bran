@@ -258,7 +258,7 @@ public class Client {
 			}
 		});
 		
-		//getDiscordBotData().getPollPersistence().update();
+		getDiscordBotData().getPollPersistence().update();
 		getDiscordBotData().getDataHolderManager().update();
 		getDiscordBotData().getConfigDataManager().update();
 		getDiscordBotData().getHangmanWordsManager().update();

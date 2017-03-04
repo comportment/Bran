@@ -20,9 +20,6 @@ public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 	@Override
 	public void event(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
-		//TODO fix dis
-		//Action action = Action.getAction(event.getAuthor().getId());
-		//if (action != null && !action.getChannelId().equals(event.getChannel().getId())) return;
 		String msg = event.getMessage().getRawContent();
 		if (!MathUtils.isInteger(msg)) return;
 		if (!OPTION_INDEX.matcher(msg).matches()) return;
@@ -45,5 +42,6 @@ public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 			}
 			event.getMessage().addReaction("\u274c").queue();
 		}
+		client.getDiscordBotData().getPollPersistence().update();
 	}
 }
