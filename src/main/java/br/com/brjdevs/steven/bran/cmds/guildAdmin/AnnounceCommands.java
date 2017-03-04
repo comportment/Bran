@@ -9,6 +9,7 @@ import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Emojis;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 public class AnnounceCommands {
 	
@@ -20,6 +21,7 @@ public class AnnounceCommands {
 				.setDescription("Sets, checks and disables the greeting message!")
 				.setArgs(new Argument("msg/action", String.class, true))
 				.setRequiredPermission(Permissions.ANNOUNCE)
+				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					Argument arg = event.getArgument("msg/action");
 					GuildData data = event.getGuildData();
@@ -40,6 +42,7 @@ public class AnnounceCommands {
 					}
 					data.joinMsg = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated greeting message!").queue();
+					event.getClient().getDiscordBotData().getDataHolderManager().update();
 				})
 				.build();
 	}
@@ -51,6 +54,8 @@ public class AnnounceCommands {
 				.setName("Farewell Message Command")
 				.setDescription("Sets, checks and disables the farewell message!")
 				.setArgs(new Argument("msg/action", String.class, true))
+				.setRequiredPermission(Permissions.ANNOUNCE)
+				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					Argument arg = event.getArgument("msg/action");
 					GuildData data = event.getGuildData();
@@ -71,6 +76,7 @@ public class AnnounceCommands {
 					}
 					data.leaveMsg = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated farewell message!").queue();
+					event.getClient().getDiscordBotData().getDataHolderManager().update();
 				})
 				.build();
 	}
@@ -82,6 +88,8 @@ public class AnnounceCommands {
 				.setName("GreetingDM Message Command")
 				.setDescription("Sets, checks and disables the greetingDM message!")
 				.setArgs(new Argument("msg/action", String.class, true))
+				.setRequiredPermission(Permissions.ANNOUNCE)
+				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					Argument arg = event.getArgument("msg/action");
 					GuildData data = event.getGuildData();
@@ -102,6 +110,34 @@ public class AnnounceCommands {
 					}
 					data.joinMsgDM = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated greetingDM message!").queue();
+					event.getClient().getDiscordBotData().getDataHolderManager().update();
+				})
+				.build();
+	}
+	
+	@Command
+	private static ICommand announceschannel() {
+		return new CommandBuilder(Category.GUILD_ADMINISTRATOR)
+				.setAliases("announcechannel", "achannel", "ac")
+				.setName("Announce Channel Command")
+				.setDescription("Sets the announce channel (greeting/farewell) for the current guild!")
+				.setArgs(new Argument("channel/action", String.class))
+				.setRequiredPermission(Permissions.ANNOUNCE)
+				.setPrivateAvailable(false)
+				.setAction((event) -> {
+					String arg = ((String) event.getArgument("channel/action").get());
+					if (arg.equals("none") || arg.equals("remove")) {
+						event.getGuildData().setAnnounceTextChannel(null);
+						event.sendMessage("Removed the Announce channel!").queue();
+						return;
+					}
+					TextChannel channel = event.getMessage().getMentionedChannels().isEmpty() ? event.getMessage().getMentionedChannels().get(0) : event.getTextChannel();
+					if (channel == null) {
+						event.sendMessage("No channels found matching that criteria.").queue();
+						return;
+					}
+					event.getGuildData().setAnnounceTextChannel(channel);
+					event.sendMessage("Done, set the announce channel to " + channel.getAsMention()).queue();
 				})
 				.build();
 	}

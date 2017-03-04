@@ -5,6 +5,8 @@ import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.currency.Items;
+import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
@@ -54,6 +56,7 @@ public class KickCommand {
 						event.getGuild().getController().kick(user.getId()).queue(s -> {
 									String out = "Kicked " + users.stream().filter(Objects::nonNull).map(Utils::getUser).collect(Collectors.joining(", ")) + "!";
 									event.sendMessage(Quotes.SUCCESS, out).queue();
+									TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.KICK_BOOT, 5);
 								},
 								throwable -> {
 									if (throwable instanceof PermissionException) {

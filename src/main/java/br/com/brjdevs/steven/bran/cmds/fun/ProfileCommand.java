@@ -7,11 +7,13 @@ import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.currency.BankAccount;
 import br.com.brjdevs.steven.bran.core.currency.Item;
 import br.com.brjdevs.steven.bran.core.currency.Items;
 import br.com.brjdevs.steven.bran.core.currency.Profile;
 import br.com.brjdevs.steven.bran.core.currency.Profile.Rank;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
+import br.com.brjdevs.steven.bran.core.utils.Emojis;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
@@ -47,8 +49,29 @@ public class ProfileCommand {
 							event.sendMessage(event.getClient().getProfile(user).createEmbed(event.getJDA())).queue();
 						})
 						.build())
+				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
+						.setAliases("rankup")
+						.setName("Rankup Command")
+						.setDescription("Buy ranks!")
+						.setAction((event) -> {
+							Rank next = event.getUserData().getProfile().getRank().next();
+							Profile profile = event.getUserData().getProfile();
+							if (profile.getLevel() < next.getLevel()) {
+								event.sendMessage(Emojis.X + " You have to be at least level " + next.getLevel() + " to rank up!").queue();
+								return;
+							} else if (!profile.getBankAccount().takeCoins(next.getCost(), BankAccount.MAIN_BANK)) {
+								event.sendMessage(Emojis.X + " You don't have enough coins! (" + profile.getBankAccount().getCoins() + "/" + next.getColor() + ")").queue();
+								return;
+							}
+							Rank r = profile.getRank();
+							profile.setRank(next);
+							event.sendMessage("You ranked up from " + r + " to " + next + "!").queue();
+							event.getClient().getDiscordBotData().getDataHolderManager().update();
+						})
+						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("inventory")
+						.setName("Inventory Command")
 						.setDescription("Shows you your inventory.")
 						.setAction((event) -> {
 							Inventory inventory = event.getClient().getProfile(event.getAuthor()).getInventory();

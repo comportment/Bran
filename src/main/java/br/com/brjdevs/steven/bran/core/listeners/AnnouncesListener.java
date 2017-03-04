@@ -35,7 +35,8 @@ public class AnnouncesListener extends EventListener<GenericGuildMemberEvent> {
 	@Override
 	public void event(GenericGuildMemberEvent event) {
 		GuildData guildData = client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild());
-		if (guildData.getAnnounceTextChannel(event.getJDA()) == null) return;
+		if (guildData.getAnnounceTextChannel(event.getJDA()) == null || !guildData.getAnnounceTextChannel(event.getJDA()).canTalk())
+			return;
 		Member member = event.getMember();
 		if (event instanceof GuildMemberJoinEvent) {
 			if (!Utils.isEmpty(guildData.joinMsg))

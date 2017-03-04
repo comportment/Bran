@@ -4,8 +4,6 @@ import br.com.brjdevs.steven.bran.core.audio.timers.ChannelLeaveTimer;
 import br.com.brjdevs.steven.bran.core.audio.timers.MusicRegisterTimeout;
 import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.client.DiscordLog.Level;
-import br.com.brjdevs.steven.bran.core.utils.Hastebin;
-import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.sun.management.OperatingSystemMXBean;
 
@@ -60,12 +58,11 @@ public class TaskManager {
 			try {
 				shard.updateStats();
 				shard.updateCurrentGuildCount();
-				client.getDiscordLog().logToDiscord("Updated server_count in DiscordBots (Shard[" + shard.getId() + "])", "Successfully updated server_count at [Discord Bots](https://bots.discord.pw/bots/" + shard.getJDA().getSelfUser().getId() + ")", Level.INFO);
+				client.getDiscordLog().logToDiscord("Updated server_count in DiscordBots (Shard[" + shard.getId() + "])", "Successfully updated server_count at [Discord Bots/ABAL](https://bots.discord.pw/bots/" + shard.getJDA().getSelfUser().getId() + ")\n[Discord Bots/OLIY & TONKKU]()https://discordbots.org/bot/" + shard.getJDA().getSelfUser().getId() + ")", Level.INFO);
 			} catch (UnirestException e) {
 				client.getDiscordLog()
-						.logToDiscord("Failed to update Shard Stats at DiscordBots",
-								"Unexpected exception occurred while updating Shard " + shard.getId() + " server count!\n" + Hastebin.post(Utils.getStackTrace(e)),
-								Level.WARN);
+						.logToDiscord(e.getMessage(),
+								"Unexpected exception occurred while updating Shard " + shard.getId() + " server count!", Level.WARN);
 			}
 		}), 3600);
 	}

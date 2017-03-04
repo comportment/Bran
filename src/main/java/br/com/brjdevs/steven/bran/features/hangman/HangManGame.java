@@ -46,7 +46,7 @@ public class HangManGame {
 	}
 	
 	public static HangManGame getGame(User user) {
-		return games.stream().filter(game -> game.getInvitedUsers().contains(user) || game.getCreator().equals(user)).findFirst().orElse(null);
+		return games.stream().filter(game -> game.getInvitedUsers().contains(user) || game.getCreator() != null && game.getCreator().equals(user)).findFirst().orElse(null);
 	}
 	
 	public List<String> getGivenTips() {
@@ -104,7 +104,7 @@ public class HangManGame {
 	
 	public void guess(char c, UserData userData) {
 		String s = String.valueOf(c);
-		if (!getFullWord().contains(s) && !mistakes.contains(c)) {
+		if (!getFullWord().contains(s) && !mistakes.contains(s.toLowerCase().charAt(0)) && !mistakes.contains(s.toUpperCase().charAt(0))) {
 			reward(userData, 0, -4);
 			getChannel().sendMessage(baseEmbed().setDescription(Emojis.DISAPPOINTED + " Nope, that is not in the word. Keep trying!\n\n\n**Guesses:** " + getGuessedLetters() + "\nYou've made " + mistakes.size() + " out of " + getMaximumMistakes() + "." + (mistakes.isEmpty() ? "" : " (" + mistakes.stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")") + "\n\n" + (givenTips.isEmpty() ? "You didn't ask for any tips." : "These are the current given tips:\n" + (String.join("\n", givenTips))) + "\nMultiplayer: " + (invitedUsers.isEmpty()) + (invitedUsers.isEmpty() ? "" : "\n" + getInvitedUsers().stream().map(Utils::getUser).collect(Collectors.joining(", ")))).build()).queue();
 			mistakes.add(c);
@@ -120,7 +120,7 @@ public class HangManGame {
 				win();
 				return;
 			}
-			getChannel().sendMessage(baseEmbed().setDescription(Emojis.THUMBS_UP + " Alright you guessed a letter! Keep the good job!\n\n\n**Guesses:** " + getGuessedLetters() + "\nYou've made " + mistakes.size() + " out of " + getMaximumMistakes() + "." + (mistakes.isEmpty() ? "" : " (" + mistakes.stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")") + "\n\n" + (givenTips.isEmpty() ? "You didn't ask for any tips." : "These are the current given tips:\n" + (String.join("\n", givenTips))) + "\nMultiplayer: " + (invitedUsers.isEmpty()) + (invitedUsers.isEmpty() ? "" : "\n" + getInvitedUsers().stream().map(Utils::getUser).collect(Collectors.joining(", ")))).build()).queue();
+			getChannel().sendMessage(baseEmbed().setDescription(Emojis.THUMBS_UP + " Alright you guessed a letter! Keep the good job!\n\n\n**Guesses:** " + getGuessedLetters() + "\nYou've made " + mistakes.size() + " out of " + getMaximumMistakes() + "." + (mistakes.isEmpty() ? "" : " (" + mistakes.stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")") + "\n\n" + (givenTips.isEmpty() ? "You didn't ask for any tips." : "These are the current given tips:\n" + (String.join("\n", givenTips))) + "\nMultiplayer: " + (isMuliplayer()) + (invitedUsers.isEmpty() ? "" : "\n" + getInvitedUsers().stream().map(Utils::getUser).collect(Collectors.joining(", ")))).build()).queue();
 			reward(userData, 5, 1);
 		}
 	}

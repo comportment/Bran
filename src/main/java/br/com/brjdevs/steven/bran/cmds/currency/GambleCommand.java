@@ -80,7 +80,6 @@ public class GambleCommand {
 						acc.setCoins(Math.max(0, coins - i));
 						event.getChannel().sendMessage("You lost " + (coins == 0 ? "all your" : i) + " credits! " + Emojis.CRY).queue();
 					}
-					
 					event.getClient().getDiscordBotData().getDataHolderManager().update();
 				})
 				.build();

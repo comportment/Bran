@@ -12,6 +12,7 @@ public class Config {
 	public String botToken = "";
 	public String ownerId = "";
 	public String discordBotsToken = "";
+	public String discordBotsOrgToken = "";
 	public String mashapeKey = "";
 	public String defaultGame = "";
 	public boolean gameStream = false;

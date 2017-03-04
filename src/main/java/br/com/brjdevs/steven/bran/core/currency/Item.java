@@ -8,11 +8,13 @@ public class Item {
 	private String emoji, name, description;
 	private long price;
 	private boolean staticValue;
+	private int startDurability;
 	
-	public Item(String emoji, String name, String desc, long value) {
+	public Item(String emoji, String name, String desc, int startDurability, long value) {
 		this.emoji = emoji;
 		this.name = name;
 		this.description = desc;
+		this.startDurability = startDurability;
 		this.value = value;
 		this.price = value;
 		this.staticValue = false;
@@ -38,5 +40,9 @@ public class Item {
 	
 	public long getValue() {
 		return price;
+	}
+	
+	public int getStartDurability() {
+		return startDurability;
 	}
 }

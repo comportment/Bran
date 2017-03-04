@@ -1,8 +1,6 @@
 package br.com.brjdevs.steven.bran.core.client;
 
 import br.com.brjdevs.steven.bran.core.utils.Utils;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.AccountType;
@@ -122,17 +120,30 @@ public class ClientShard {
 		return leftGuilds;
 	}
 	
-	public HttpResponse<JsonNode> updateStats() throws UnirestException {
+	public void updateStats() throws UnirestException {
 		JSONObject data = new JSONObject();
 		data.put("server_count", jda.getGuilds().size());
 		if (totalShards > 1) {
 			data.put("shard_id", shardId);
 			data.put("shard_count", totalShards);
 		}
-		return Unirest.post("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
-				.header("Authorization", client.getConfig().discordBotsToken)
-				.header("Content-Type", "application/json")
-				.body(data.toString())
-				.asJson();
+		try {
+			Unirest.post("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
+					.header("Authorization", client.getConfig().discordBotsToken)
+					.header("Content-Type", "application/json")
+					.body(data.toString())
+					.asJson();
+		} catch (Exception e) {
+			throw new UnirestException("Could not update server count at DiscordBots.pw");
+		}
+		try {
+			Unirest.post("https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats")
+					.header("Authorization", client.getConfig().discordBotsOrgToken)
+					.header("Content-Type", "application/json")
+					.body(data.toString())
+					.asJson();
+		} catch (Exception e) {
+			throw new UnirestException("Could not update server cound at Discord Bots.org");
+		}
 	}
 }

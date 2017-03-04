@@ -5,6 +5,8 @@ import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.currency.Items;
+import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 
 public class RollCommand {
@@ -37,6 +39,7 @@ public class RollCommand {
 						}
 						int roll = MathUtils.random(min, max);
 						event.sendMessage("\uD83C\uDFB2 **You rolled a `" + roll + "`!**").queue();
+						TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.GAME_DIE, 2);
 						
 					} catch (NumberFormatException ex) {
 						String input = ex.getMessage().substring(ex.getMessage().indexOf("\"") + 1).replace("\"", "");

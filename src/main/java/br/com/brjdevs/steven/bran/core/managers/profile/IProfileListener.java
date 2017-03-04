@@ -4,7 +4,7 @@ import br.com.brjdevs.steven.bran.core.currency.Profile;
 
 public interface IProfileListener {
 	
-	void onLevelUp(Profile profile, boolean rankUp);
+	void onLevelUp(Profile profile);
 	
-	void onLevelDown(Profile profile, boolean rankDown);
+	void onLevelDown(Profile profile);
 }

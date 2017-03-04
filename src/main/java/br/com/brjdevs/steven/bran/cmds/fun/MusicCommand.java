@@ -10,6 +10,8 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.currency.Items;
+import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
@@ -92,6 +94,7 @@ public class MusicCommand {
 							if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:"))
 								trackUrl = "ytsearch:" + trackUrl;
 							event.getClient().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
+							TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.MUSICAL_NOTE, 10);
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -169,6 +172,7 @@ public class MusicCommand {
 							GuildMusicManager musicManager = event.getClient().getMusicManager().get(event.getGuild());
 							musicManager.getTrackScheduler().setRepeat(!musicManager.getTrackScheduler().isRepeat());
 							event.sendMessage(musicManager.getTrackScheduler().isRepeat() ? "The player is now on repeat." : "The player is no longer on repeat.").queue();
+							TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.MUSICAL_NOTE, 10);
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -236,6 +240,7 @@ public class MusicCommand {
 							}
 							GuildMusicManager musicManager = event.getClient().getMusicManager().get(event.getGuild());
 							musicManager.getTrackScheduler().restartSong(event.getTextChannel());
+							TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.MUSICAL_NOTE, 10);
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)

@@ -5,11 +5,13 @@ import br.com.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.command.CommandEvent;
 import br.com.brjdevs.steven.bran.core.command.CommandStatsManager;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
+import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.entities.ChannelType;
@@ -51,6 +53,8 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 				() -> {
 					try {
 						cmd.execute(e);
+						if (!e.isPrivate())
+							TextChannelGround.of(event.getTextChannel()).dropMoneyWithChance(MathUtils.random(100), 15);
 					} catch (Exception ex) {
 						LOG.log(ex);
 						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.\nException message: `" + ex.getMessage() + "`").queue();

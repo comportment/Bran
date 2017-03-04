@@ -22,7 +22,7 @@ public class Profile {
 	private HMStats HMStats;
 	private Rank rank;
 	private long level, experience;
-	private Inventory inventory;
+	private Inventory inv;
 	private transient List<IProfileListener> listeners;
 	
 	public Profile(User user) {
@@ -33,7 +33,7 @@ public class Profile {
 		this.experience = 0;
 		this.bankAccount = new BankAccount(user);
 		this.customHex = null;
-		this.inventory = new Inventory();
+		this.inv = new Inventory();
 		this.listeners = new ArrayList<>();
 	}
 	
@@ -86,8 +86,8 @@ public class Profile {
 	}
 	
 	public Inventory getInventory() {
-		if (inventory == null) inventory = new Inventory();
-		return inventory;
+		if (inv == null) inv = new Inventory();
+		return inv;
 	}
 	
 	public User getUser(JDA jda) {
@@ -95,21 +95,18 @@ public class Profile {
 	}
 	
 	public void addExperience(long experience) {
+		if (getExperience() <= 0 && getLevel() <= 0 && experience < 0) {
+			return;
+		}
 		setExperience(this.experience + experience);
 		if (getExperience() >= expForNextLevel(getLevel())) {
 			setExperience(getExperience() - Profile.expForNextLevel(getLevel()));
 			setLevel(getLevel() + 1);
-			boolean rankUp = level >= rank.next().getLevel() && !rank.equals(Rank.EXPERT);
-			if (rankUp)
-				setRank(getRank().next());
-			getRegisteredListeners().forEach(listener -> listener.onLevelUp(this, rankUp));
+			getRegisteredListeners().forEach(listener -> listener.onLevelUp(this));
 		} else if (getExperience() < 0 && getLevel() > 0) {
 			setExperience(Profile.expForNextLevel(getLevel() - 1) + getExperience());
 			setLevel(getLevel() - 1);
-			boolean rankDown = getLevel() < rank.getLevel() && !rank.equals(Rank.ROOKIE);
-			if (rankDown)
-				setRank(getRank().previous());
-			getRegisteredListeners().forEach(listener -> listener.onLevelDown(this, rankDown));
+			getRegisteredListeners().forEach(listener -> listener.onLevelDown(this));
 		}
 	}
 	
@@ -118,7 +115,7 @@ public class Profile {
 		this.rank = Rank.ROOKIE;
 		this.level = 0;
 		this.level = 0;
-		this.inventory = new Inventory();
+		this.inv = new Inventory();
 	}
 	
 	public boolean setCustomColor(String hex) {
@@ -166,7 +163,7 @@ public class Profile {
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);
 		builder.addField("\u2b50 Experience to Next Level", String.valueOf(expForNextLevel(getLevel())), true);
 		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(bankAccount.getCoins()), true);
-		builder.addField("\uD83D\uDCBC Inventory", String.valueOf(inventory.size(false)), true);
+		builder.addField("\uD83D\uDCBC Inventory", String.valueOf(inv.size(false)), true);
 		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
 		builder.addField("\uD83D\uDD79 Game", "HangMan", true).addField("\uD83C\uDFC6 Victories", String.valueOf(getHMStats().getVictories()), true).addField("☠ Defeats", String.valueOf(getHMStats().getDefeats()), true);
 		builder.setColor(this.getEffectiveColor());
@@ -174,23 +171,25 @@ public class Profile {
 	}
 	
 	public enum Rank {
-		ROOKIE(0, "#5838D6"),
-		BEGINNER(5, "#38C9D6"),
-		TALENTED(10, "#8438D6"),
-		SKILLED(20, "#4EE07D"),
-		INTERMEDIATE(35, "#93DA38"),
-		SKILLFUL(40, "#C0DA38"),
-		EXPERIENCED(50, "#DCF80C"),
-		ADVANCED(70, "#F8C90C"),
-		SENIOR(85, "#FFAD00"),
-		EXPERT(100, "#DB2121");
+		ROOKIE(0, "#5838D6", 0),
+		BEGINNER(5, "#38C9D6", 10),
+		TALENTED(10, "#8438D6", 50),
+		SKILLED(20, "#4EE07D", 100),
+		INTERMEDIATE(35, "#93DA38", 1000),
+		SKILLFUL(40, "#C0DA38", 1500),
+		EXPERIENCED(50, "#DCF80C", 6000),
+		ADVANCED(70, "#F8C90C", 10000),
+		SENIOR(85, "#FFAD00", 15000),
+		EXPERT(100, "#DB2121", 100000);
 		private static Rank[] vals = values();
 		private final int level;
 		private final String hex;
+		private long cost;
 		
-		Rank(int i, String hex) {
+		Rank(int i, String hex, long cost) {
 			this.level = i;
 			this.hex = hex;
+			this.cost = cost;
 		}
 		
 		public int getLevel() {
@@ -199,6 +198,10 @@ public class Profile {
 		
 		public Color getColor() {
 			return Color.decode(hex);
+		}
+		
+		public long getCost() {
+			return cost;
 		}
 		
 		public Rank next() {

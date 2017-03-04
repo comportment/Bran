@@ -20,7 +20,7 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
 		if (guess.isEmpty()) return;
 		if (guess.charAt(0) != '^')
 			return;
-		if (guess.equals("^giveup")) {
+		if (guess.matches("\\^(give ?up|end|stop)")) {
 			if (game.isMuliplayer()) {
 				event.getChannel().sendMessage("You cannot giveup to a Multiplayer session.").queue();
 			} else {

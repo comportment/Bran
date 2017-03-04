@@ -1,26 +1,25 @@
 package br.com.brjdevs.steven.bran.core.managers.profile;
 
 import br.com.brjdevs.steven.bran.core.currency.Item;
+import br.com.brjdevs.steven.bran.core.currency.ItemMeta;
 import br.com.brjdevs.steven.bran.core.currency.Items;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Inventory {
 	
-	private Map<Integer, AtomicInteger> items;
+	private Map<Integer, ItemMeta> items;
 	
 	public Inventory() {
 		this.items = new HashMap<>();
 	}
 	
 	public boolean put(Item item) {
-		int id = Items.idOf(item);
 		if (getAmountOf(item) + 1 < 0)
 			return false;
-		items.computeIfAbsent(id, i -> new AtomicInteger(0)).incrementAndGet();
+		items.computeIfAbsent(Items.idOf(item), i -> ItemMeta.of(item)).add();
 		return true;
 	}
 	
@@ -29,25 +28,25 @@ public class Inventory {
 		if (!items.containsKey(id))
 			return false;
 		if (getAmountOf(item) > 0)
-			items.get(id).decrementAndGet();
+			items.get(id).add();
 		else
 			items.remove(id);
 		return true;
 	}
 	
-	public int getAmountOf(Item item) {
-		return items.getOrDefault(Items.idOf(item), new AtomicInteger(0)).get();
+	public long getAmountOf(Item item) {
+		return items.getOrDefault(ItemMeta.of(item), ItemMeta.of(item)).getAmount();
 	}
 	
 	public boolean isEmpty() {
 		return items.isEmpty();
 	}
 	
-	public Map<Integer, AtomicInteger> getItems() {
+	public Map<Integer, ItemMeta> getItems() {
 		return Collections.unmodifiableMap(items);
 	}
 	
-	public int size(boolean unique) {
-		return !unique ? items.values().stream().mapToInt(AtomicInteger::get).sum() : items.size();
+	public long size(boolean unique) {
+		return !unique ? items.values().stream().mapToLong(ItemMeta::getAmount).sum() : items.size();
 	}
 }

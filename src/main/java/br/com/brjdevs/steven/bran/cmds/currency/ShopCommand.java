@@ -25,7 +25,7 @@ public class ShopCommand {
 	private static ICommand market() {
 		return new TreeCommandBuilder(Category.CURRENCY)
 				.setAliases("market")
-				.setName("Marked Command")
+				.setName("Market Command")
 				.setDescription("You should spend all your money here!")
 				.addSubCommand(new CommandBuilder(Category.CURRENCY)
 						.setAliases("list")

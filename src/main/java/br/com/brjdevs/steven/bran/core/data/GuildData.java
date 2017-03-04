@@ -76,7 +76,10 @@ public class GuildData {
 	}
 	
 	public void setAnnounceTextChannel(TextChannel textChannel) {
-		this.announceChannelId = Long.parseLong(textChannel.getId());
+		if (textChannel == null)
+			announceChannelId = 0;
+		else
+			this.announceChannelId = Long.parseLong(textChannel.getId());
 	}
 	
 	public List<Long> getPublicRoles() {

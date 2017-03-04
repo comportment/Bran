@@ -66,7 +66,7 @@ public class SnowflakeGenerator {
 	}
 	
 	public long getCreationTime(long snowflake) {
-		return (snowflake >> 22) + 1420070400000L;
+		return (snowflake >> 22) + 1288834974657L;
 	}
 	
 	private long timeGen() {
