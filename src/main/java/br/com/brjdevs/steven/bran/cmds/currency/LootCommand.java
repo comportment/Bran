@@ -23,7 +23,6 @@ public class LootCommand {
 				.setDescription("Loots stuff from the ground!")
 				.setPrivateAvailable(false)
 				.setAction((event) -> {
-					
 					if (!RATELIMITER.process(event.getAuthor())) {
 						event.sendMessage("Hey, slow down a little bit there buddy! Let other people loot too!").queue();
 						return;

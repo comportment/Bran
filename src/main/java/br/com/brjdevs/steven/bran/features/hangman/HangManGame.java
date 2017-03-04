@@ -127,6 +127,8 @@ public class HangManGame {
 	
 	private void win() {
 		getChannel().sendMessage(Emojis.PARTY_POPPER + " Yay you won! The word was `" + getFullWord() + "`! " + (invitedUsers.isEmpty() ? "You" : "Everyone") + " won 20 coins and 10 experience.").queue();
+		reward(getCreatorData(), 20, 10);
+		getInvitedUserDatas().forEach(userData -> reward(userData, 20, 10));
 		games.remove(this);
 	}
 	

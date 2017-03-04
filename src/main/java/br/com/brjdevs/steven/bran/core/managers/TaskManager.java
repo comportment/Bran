@@ -54,11 +54,10 @@ public class TaskManager {
 		startAsyncTask("CPU Thread",
 				(service) -> client.getSession().cpuUsage = client.getSession().calculateCpuUsage(os), 5);
 		startAsyncTask("DiscordBots Thread", (service) -> Arrays.stream(client.getShards()).forEach(shard -> {
-			if (shard.getCurrentGuildCount() > shard.getJDA().getGuilds().size()) return;
 			try {
 				shard.updateStats();
 				shard.updateCurrentGuildCount();
-				client.getDiscordLog().logToDiscord("Updated server_count in DiscordBots (Shard[" + shard.getId() + "])", "Successfully updated server_count at [Discord Bots/ABAL](https://bots.discord.pw/bots/" + shard.getJDA().getSelfUser().getId() + ")\n[Discord Bots/OLIY & TONKKU]()https://discordbots.org/bot/" + shard.getJDA().getSelfUser().getId() + ")", Level.INFO);
+				client.getDiscordLog().logToDiscord("Updated server_count in DiscordBots (Shard[" + shard.getId() + "])", "Successfully updated server_count at [Discord Bots/PW](https://bots.discord.pw/bots/" + shard.getJDA().getSelfUser().getId() + ") and [Discord Bots/ORG](https://discordbots.org/bot/" + shard.getJDA().getSelfUser().getId() + ")", Level.INFO);
 			} catch (UnirestException e) {
 				client.getDiscordLog()
 						.logToDiscord(e.getMessage(),

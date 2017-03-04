@@ -27,10 +27,7 @@ import redis.clients.jedis.JedisPool;
 
 import javax.security.auth.login.LoginException;
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -134,6 +131,10 @@ public class Client {
 	
 	public List<User> getUsers() {
 		return Arrays.stream(shards).map(bot -> bot.getJDA().getUsers()).flatMap(List::stream).collect(Collectors.toList());
+	}
+	
+	public User getUserById(String id) {
+		return Arrays.stream(shards).map(shard -> shard.getJDA().getUserById(id)).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 	
 	public List<TextChannel> getTextChannels() {

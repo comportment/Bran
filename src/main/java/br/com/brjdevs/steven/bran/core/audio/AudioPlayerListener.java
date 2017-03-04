@@ -92,6 +92,5 @@ public class AudioPlayerListener extends AudioEventAdapter {
 	public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
 		if (scheduler.getCurrentTrack().getContext() != null && scheduler.getCurrentTrack().getContext().canTalk())
 			scheduler.getCurrentTrack().getContext().sendMessage("Track got stuck, skipping...").queue();
-		scheduler.next(true);
 	}
 }
