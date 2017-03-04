@@ -7,12 +7,14 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.currency.BankAccount;
 import br.com.brjdevs.steven.bran.core.currency.ItemStack;
 import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
+import br.com.brjdevs.steven.bran.core.managers.RateLimiter;
 import br.com.brjdevs.steven.bran.core.utils.Emojis;
 
 import java.util.List;
 
 public class LootCommand {
 	
+	private static final RateLimiter RATELIMITER = new RateLimiter(10000);
 	@Command
 	private static ICommand loot() {
 		return new CommandBuilder(Category.CURRENCY)
@@ -21,6 +23,11 @@ public class LootCommand {
 				.setDescription("Loots stuff from the ground!")
 				.setPrivateAvailable(false)
 				.setAction((event) -> {
+					
+					if (!RATELIMITER.process(event.getAuthor())) {
+						event.sendMessage("Hey, slow down a little bit there buddy! Let other people loot too!").queue();
+						return;
+					}
 					TextChannelGround ground = TextChannelGround.of(event.getTextChannel());
 					List<ItemStack> items = ground.collectItems();
 					int money = ground.collectMoney();

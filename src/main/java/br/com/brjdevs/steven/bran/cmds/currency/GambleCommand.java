@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.currency.BankAccount;
 import br.com.brjdevs.steven.bran.core.data.UserData;
+import br.com.brjdevs.steven.bran.core.managers.RateLimiter;
 import br.com.brjdevs.steven.bran.core.utils.Emojis;
 
 import java.util.Random;
@@ -14,7 +15,7 @@ import java.util.Random;
 public class GambleCommand {
 	
 	private static final Random r = new Random();
-	
+	private static final RateLimiter RATELIMITER = new RateLimiter(3000);
 	@Command
 	private static ICommand gamble() {
 		return new CommandBuilder(Category.CURRENCY)
@@ -23,6 +24,10 @@ public class GambleCommand {
 				.setDescription("Gamble your money here!")
 				.setArgs(new Argument("quantity", String.class))
 				.setAction((event) -> {
+					if (!RATELIMITER.process(event.getAuthor())) {
+						event.sendMessage("Hey, slow down a little bit buddy! You're gambling faster than I can print money!").queue();
+						return;
+					}
 					String quantity = ((String) event.getArgument("quantity").get());
 					UserData data = event.getUserData();
 					long coins = data.getProfile().getBankAccount().getCoins();
