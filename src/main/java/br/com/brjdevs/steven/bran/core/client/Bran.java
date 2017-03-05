@@ -1,12 +1,12 @@
 package br.com.brjdevs.steven.bran.core.client;
 
 import br.com.brjdevs.steven.bran.core.audio.AudioUtils;
-import br.com.brjdevs.steven.bran.core.audio.ClientMusicManager;
+import br.com.brjdevs.steven.bran.core.audio.BranMusicManager;
 import br.com.brjdevs.steven.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.steven.bran.core.command.CommandManager;
 import br.com.brjdevs.steven.bran.core.currency.Profile;
+import br.com.brjdevs.steven.bran.core.data.BranDataManager;
 import br.com.brjdevs.steven.bran.core.data.Config;
-import br.com.brjdevs.steven.bran.core.data.DiscordBotData;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.utils.Session;
@@ -32,17 +32,17 @@ import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Client {
+public class Bran {
 	
-	private static Client instance;
+	private static Bran instance;
 	private static JedisPool jedisPool = new JedisPool("localhost", 6379);
 	private static SimpleLog LOG = SimpleLog.getLog("BotContainer");
 	public File workingDir;
 	private TaskManager taskManager;
 	private CommandManager commandManager;
-	private ClientMusicManager playerManager;
-	private DiscordBotData discordBotData;
-	private ClientShard[] shards;
+	private BranMusicManager playerManager;
+	private BranDataManager discordBotData;
+	private BranShard[] shards;
 	private DiscordLog discordLog;
 	private int totalShards;
 	private AtomicLongArray lastEvents;
@@ -51,9 +51,9 @@ public class Client {
 	private Session session;
 	private Messenger messenger;
 	
-	public Client() throws LoginException, InterruptedException, RateLimitedException {
+	public Bran() throws LoginException, InterruptedException, RateLimitedException {
 		instance = this;
-		this.discordBotData = new DiscordBotData();
+		this.discordBotData = new BranDataManager();
 		this.ownerId = 0;
 		this.ownerShardId = 0;
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
@@ -61,30 +61,30 @@ public class Client {
 			throw new NullPointerException("Could not create config.json");
 		this.totalShards = getRecommendedShards();
 		this.lastEvents = new AtomicLongArray(totalShards);
-		this.shards = new ClientShard[totalShards];
+		this.shards = new BranShard[totalShards];
 		initShards();
 		getOwner();
-		this.playerManager = new ClientMusicManager(this);
-		this.commandManager = new CommandManager(this);
-		this.discordLog = new DiscordLog(this);
-		this.session = new Session(this);
-		this.messenger = new Messenger(this);
-		this.taskManager = new TaskManager(this);
+		this.playerManager = new BranMusicManager();
+		this.commandManager = new CommandManager();
+		this.discordLog = new DiscordLog();
+		this.session = new Session();
+		this.messenger = new Messenger();
+		this.taskManager = new TaskManager();
 	}
 	
 	public static JedisPool getJedisPool() {
 		return jedisPool;
 	}
 	
-	public static Client getInstance() {
+	public static Bran getInstance() {
 		return instance;
 	}
 	
-	public ClientShard[] getShards() {
+	public BranShard[] getShards() {
 		return shards;
 	}
 	
-	public DiscordBotData getDiscordBotData() {
+	public BranDataManager getDataManager() {
 		return discordBotData;
 	}
 	
@@ -101,8 +101,8 @@ public class Client {
 		return totalShards;
 	}
 	
-	public ClientShard[] getOnlineShards() {
-		return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(ClientShard[]::new);
+	public BranShard[] getOnlineShards() {
+		return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(BranShard[]::new);
 	}
 	
 	public DiscordLog getDiscordLog() {
@@ -122,7 +122,7 @@ public class Client {
 	}
 	
 	public Config getConfig() {
-		return getDiscordBotData().getConfigDataManager().get();
+		return getDataManager().getConfigDataManager().get();
 	}
 	
 	public List<Guild> getGuilds() {
@@ -157,7 +157,7 @@ public class Client {
 		return taskManager;
 	}
 	
-	public synchronized boolean reboot(ClientShard shard) {
+	public synchronized boolean reboot(BranShard shard) {
 		try {
 			Map<Long, ImmutablePair<Long, GuildMusicManager>> shardPlayers = new HashMap<>();
 			Map<Long, GuildMusicManager> copy = new HashMap<>(playerManager.getMusicManagers());
@@ -182,7 +182,7 @@ public class Client {
 				GuildMusicManager musicManager = pair.right;
 				if (channel == null) return;
 				channel.getGuild().getAudioManager().setSendingHandler(musicManager.getSendHandler());
-				AudioUtils.connect(channel, musicManager.getTrackScheduler().getCurrentTrack().getContext(), this);
+				AudioUtils.connect(channel, musicManager.getTrackScheduler().getCurrentTrack().getContext());
 				playerManager.getMusicManagers().put(id, musicManager);
 				musicManager.getTrackScheduler().setPaused(false);
 				TextChannel context = musicManager.getTrackScheduler().getCurrentTrack().getContext();
@@ -201,7 +201,7 @@ public class Client {
 		return commandManager;
 	}
 	
-	public ClientMusicManager getMusicManager() {
+	public BranMusicManager getMusicManager() {
 		return playerManager;
 	}
 	
@@ -221,18 +221,18 @@ public class Client {
 	private void initShards() throws LoginException, InterruptedException, RateLimitedException {
 		for (int i = 0; i < shards.length; i++) {
 			LOG.info("Starting shard #" + i + " of " + shards.length);
-			shards[i] = new ClientShard(i, totalShards, this);
+			shards[i] = new BranShard(i, totalShards, this);
 			LOG.info("Finished shard #" + i);
 			Thread.sleep(5_000L);
 		}
-		for (ClientShard shard : shards) {
+		for (BranShard shard : shards) {
 			setLastEvent(shard.getId(), System.currentTimeMillis());
 		}
 	}
 	
 	public User getOwner() {
 		if (ownerId != 0) return getShards()[ownerShardId].getJDA().getUserById(String.valueOf(ownerId));
-		for (ClientShard shard : shards) {
+		for (BranShard shard : shards) {
 			User u = shard.getJDA().getUserById(getConfig().ownerId);
 			if (u != null) {
 				ownerId = Long.parseLong(u.getId());
@@ -259,12 +259,12 @@ public class Client {
 			}
 		});
 		
-		getDiscordBotData().getPollPersistence().update();
-		getDiscordBotData().getDataHolderManager().update();
-		getDiscordBotData().getConfigDataManager().update();
-		getDiscordBotData().getHangmanWordsManager().update();
+		getDataManager().getPollPersistence().update();
+		getDataManager().getDataHolderManager().update();
+		getDataManager().getConfigDataManager().update();
+		getDataManager().getHangmanWordsManager().update();
 		
-		Stream.of(shards).forEach(ClientShard::shutdown);
+		Stream.of(shards).forEach(BranShard::shutdown);
 		
 		System.exit(exitCode);
 	}

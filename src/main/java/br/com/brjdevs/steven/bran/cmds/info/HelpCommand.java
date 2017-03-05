@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.info;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.CommandManager;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -26,7 +27,7 @@ public class HelpCommand {
 						event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
 						return;
 					}
-					CommandManager commandManager = event.getClient().getCommandManager();
+					CommandManager commandManager = Bran.getInstance().getCommandManager();
 					commandManager.getCommands().sort(Comparator.comparing(ICommand::getCategory));
 					StringBuilder builder = new StringBuilder();
 					for (Category category : Category.values()) {

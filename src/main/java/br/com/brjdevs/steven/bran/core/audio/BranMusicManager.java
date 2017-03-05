@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
@@ -11,13 +11,11 @@ import net.dv8tion.jda.core.entities.User;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ClientMusicManager {
+public class BranMusicManager {
 	private final AudioPlayerManager playerManager;
 	private final Map<Long, GuildMusicManager> musicManagers;
-	private final Client client;
 	
-	public ClientMusicManager(Client client) {
-		this.client = client;
+	public BranMusicManager() {
 		this.musicManagers = new HashMap<>();
 		this.playerManager = new DefaultAudioPlayerManager();
 		AudioSourceManagers.registerRemoteSources(playerManager);
@@ -30,8 +28,8 @@ public class ClientMusicManager {
 	public void unregister(Long guildId) {
 		if (musicManagers.containsKey(guildId)) {
 			GuildMusicManager manager = musicManagers.remove(guildId);
-			client.getTaskManager().getChannelLeaveTimer().removeMusicPlayer(guildId.toString());
-			client.getTaskManager().getMusicRegisterTimeout().removeMusicPlayer(guildId.toString());
+			Bran.getInstance().getTaskManager().getChannelLeaveTimer().removeMusicPlayer(guildId.toString());
+			Bran.getInstance().getTaskManager().getMusicRegisterTimeout().removeMusicPlayer(guildId.toString());
 			if (manager.getGuild() != null)
 				manager.getGuild().getAudioManager().setSendingHandler(null);
 		}
@@ -44,7 +42,7 @@ public class ClientMusicManager {
 	public synchronized GuildMusicManager get(Guild guild) {
 		long guildId = Long.parseLong(guild.getId());
 		GuildMusicManager musicManager = musicManagers
-				.computeIfAbsent(guildId, k -> new GuildMusicManager(playerManager, guild, client));
+				.computeIfAbsent(guildId, k -> new GuildMusicManager(playerManager, guild));
 		
 		if (guild.getAudioManager().getSendingHandler() == null)
 			guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());

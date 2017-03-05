@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DiscordBotData {
+public class BranDataManager {
 	
 	private GsonDataFileManager<DataHolder> dataHolderManager;
 	private GsonDataFileManager<Config> configDataManager;
 	private GsonDataFileManager<Map<String, List<String>>> hangmanWordsManager;
 	private GsonDataFileManager<Polls> pollPersistence;
 	
-	public DiscordBotData() {
+	public BranDataManager() {
 		getDataHolderManager();
 		getConfigDataManager();
 		getHangmanWordsManager();

@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.command;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
-import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.Bran;
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.data.UserData;
@@ -31,9 +31,8 @@ public class CommandEvent {
 	private String prefix;
 	private Map<String, Argument> argsMap;
 	private Argument[] arguments;
-	private Client client;
 	
-	public CommandEvent(MessageReceivedEvent event, ICommand command, GuildData guildData, String args, String prefix, Client client) {
+	public CommandEvent(MessageReceivedEvent event, ICommand command, GuildData guildData, String args, String prefix) {
 		this.event = event;
         this.command = command;
         this.message = event.getMessage();
@@ -41,7 +40,6 @@ public class CommandEvent {
         this.args = args;
         this.prefix = prefix;
 	    this.argsMap = new HashMap<>();
-		this.client = client;
 		this.arguments = CommandUtils.copy(command);
 		Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
 		if (!Utils.isPrivate(event)) {
@@ -52,15 +50,11 @@ public class CommandEvent {
 	}
 	
 	public Messenger getMessenger() {
-		return client.getMessenger();
+		return Bran.getInstance().getMessenger();
 	}
 	
-	public ClientShard getShard() {
-		return client.getShards()[client.getShardId(event.getJDA())];
-	}
-	
-	public Client getClient() {
-		return client;
+	public BranShard getShard() {
+		return Bran.getInstance().getShards()[Bran.getInstance().getShardId(event.getJDA())];
 	}
 	
 	public String getPrefix() {
@@ -122,7 +116,7 @@ public class CommandEvent {
 	}
 	
 	public UserData getUserData() {
-		return getClient().getDiscordBotData().getDataHolderManager().get().getUser(event.getAuthor());
+		return Bran.getInstance().getDataManager().getDataHolderManager().get().getUser(event.getAuthor());
 	}
 	
 	public Guild getGuild() {
@@ -156,7 +150,7 @@ public class CommandEvent {
 	
 	public CommandEvent createChild(ICommand command, boolean b) {
         String newArgs = b ? args : args.replaceFirst(" ", "");
-		CommandEvent event = new CommandEvent(this.event, command, guildData, newArgs, prefix, client);
+		CommandEvent event = new CommandEvent(this.event, command, guildData, newArgs, prefix);
 		Thread.currentThread().setName(command.getName() + ">" + Utils.getUser(event.getAuthor()));
 		command.execute(event);
 		return event;

@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -20,7 +21,7 @@ public class YodaCommand {
 				.setDescription("Turn your sentences into Yoda-speak!")
 				.setArgs(new Argument("sentence", String.class, true))
 				.setAction((event) -> {
-					HttpResponse<String> response = null;
+					HttpResponse<String> response;
 					Argument argument = event.getArgument("sentence");
 					if (!argument.isPresent()) {
 						event.sendMessage("Teach you to speak like me if you tell me a sentence I will.  Herh herh herh.").queue();
@@ -29,7 +30,7 @@ public class YodaCommand {
 					try {
 						String string = URLEncoder.encode((String) argument.get(), "UTF-8");
 						response = Unirest.get("https://yoda.p.mashape.com/yoda?sentence=" + string)
-								.header("X-Mashape-Key", event.getClient().getConfig().mashapeKey)
+								.header("X-Mashape-Key", Bran.getInstance().getConfig().mashapeKey)
 								.header("Accept", "text/plain")
 								.asString();
 					} catch (Exception e) {

@@ -22,7 +22,7 @@ public class BankAccount {
 	}
 	
 	private void setLastTransaction(Transaction transaction) {
-		if (transactions.size() > 25) transactions.pollLast();
+		if (transactions.size() > 15) transactions.pollLast();
 		transactions.offerFirst(transaction);
 	}
 	

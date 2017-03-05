@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.responsewaiter;
 
-import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseListener;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
@@ -20,17 +20,17 @@ public class ResponseWaiter {
 	private long guildId;
 	private long expiresIn;
 	private String[] validInputs;
-	private ClientShard clientShard;
+	private BranShard branShard;
 	private ResponseListener responseListener;
 	private ExpectedResponseType expectedResponseType;
 	
-	public ResponseWaiter(User user, TextChannel textChannel, ClientShard clientShard, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType, ResponseListener responseListener) {
+	public ResponseWaiter(User user, TextChannel textChannel, BranShard branShard, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType, ResponseListener responseListener) {
 		this.userId = Long.parseLong(user.getId());
 		this.channelId = Long.parseLong(textChannel.getId());
 		this.guildId = Long.parseLong(textChannel.getGuild().getId());
 		this.expiresIn = expiresIn;
 		this.validInputs = validInputs;
-		this.clientShard = clientShard;
+		this.branShard = branShard;
 		this.responseListener = responseListener;
 		this.expectedResponseType = expectedResponseType;
 		if (responseWaiters.containsKey(userId)) {
@@ -40,11 +40,11 @@ public class ResponseWaiter {
 		EXPIRATION.addResponseWaiter(this, System.currentTimeMillis() + expiresIn);
 	}
 	
-	public ResponseWaiter(long userId, long channelId, long guildId, ClientShard clientShard, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType) {
+	public ResponseWaiter(long userId, long channelId, long guildId, BranShard branShard, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType) {
 		this.userId = userId;
 		this.channelId = channelId;
 		this.guildId = guildId;
-		this.clientShard = clientShard;
+		this.branShard = branShard;
 		this.expiresIn = expiresIn;
 		this.validInputs = validInputs;
 		this.expectedResponseType = expectedResponseType;
@@ -56,12 +56,12 @@ public class ResponseWaiter {
 		return userId;
 	}
 	
-	public ClientShard getClientShard() {
-		return clientShard;
+	public BranShard getBranShard() {
+		return branShard;
 	}
 	
 	public JDA getJDA() {
-		return getClientShard().getJDA();
+		return getBranShard().getJDA();
 	}
 	
 	public User getUser() {

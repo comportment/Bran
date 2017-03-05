@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.utils;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.listeners.EventListener;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
 import net.dv8tion.jda.core.JDA;
@@ -26,8 +26,8 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	private double lastProcessCpuTime = 0;
 	private long lastSystemTime = 0;
 	
-	public Session(Client client) {
-		super(GuildMessageReceivedEvent.class, client);
+	public Session() {
+		super(GuildMessageReceivedEvent.class);
 		this.cpuUsage = 0;
 		this.cmds = 0;
 		this.msgsReceived = 0;
@@ -72,15 +72,15 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	}
 	
 	public String toString(JDA jda) {
-		List<Guild> guilds = client.getGuilds();
-		List<TextChannel> channels = client.getTextChannels();
-		List<VoiceChannel> voiceChannels = client.getVoiceChannels();
-		List<User> users = client.getUsers();
+		List<Guild> guilds = Bran.getInstance().getGuilds();
+		List<TextChannel> channels = Bran.getInstance().getTextChannels();
+		List<VoiceChannel> voiceChannels = Bran.getInstance().getVoiceChannels();
+		List<User> users = Bran.getInstance().getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
-		long queueSize = client.getMusicManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
+		long queueSize = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
-		long nowPlaying = client.getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
-		long paused = client.getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
+		long nowPlaying = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
+		long paused = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
 		StringBuilder sb = new StringBuilder();
 		sb.append("```prolog\n");
 		sb.append("--Bot Stats--\n");
@@ -90,8 +90,8 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		sb.append("JDA Version: ").append(JDAInfo.VERSION).append('\n');
 		sb.append("RAM (USAGE/MAX): ").append(ram).append('\n');
 		sb.append("CPU Usage: ").append(cpuUsage).append("%\n");
-		sb.append("Shards (ONLINE/TOTAL): ").append(client.getOnlineShards().length).append("/").append(client.getTotalShards()).append("\n");
-		sb.append("API Responses: ").append(client.getResponseTotal()).append("\n\n");
+		sb.append("Shards (ONLINE/TOTAL): ").append(Bran.getInstance().getOnlineShards().length).append("/").append(Bran.getInstance().getTotalShards()).append("\n");
+		sb.append("API Responses: ").append(Bran.getInstance().getResponseTotal()).append("\n\n");
 		sb.append("--General--\n");
 		sb.append("Guilds: ").append(guilds.size()).append("\n");
 		sb.append("Users: ").append(users.size()).append("\n");
@@ -100,7 +100,7 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		sb.append("Sent Messages: ").append(msgsSent).append("\n");
 		sb.append("Received Messages: ").append(msgsReceived).append("\n");
 		sb.append("Executed Commands: ").append(cmds).append("\n");
-		sb.append("Running Polls: ").append(Poll.getRunningPolls(client).size()).append("\n\n");
+		sb.append("Running Polls: ").append(Poll.getRunningPolls().size()).append("\n\n");
 		sb.append("--Music--\n");
 		sb.append("Connections: ").append(audioConnections).append("\n");
 		sb.append("Queue Size: ").append(queueSize).append("\n");
@@ -111,6 +111,6 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	}
 	
 	public void event(GuildMessageReceivedEvent event) {
-		client.getSession().readMessage(event.getAuthor().getId().equals(event.getJDA().getSelfUser().getId()));
+		Bran.getInstance().getSession().readMessage(event.getAuthor().getId().equals(event.getJDA().getSelfUser().getId()));
 	}
 }

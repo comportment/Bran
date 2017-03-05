@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.entities.Guild;
@@ -15,8 +15,8 @@ import java.util.Map;
 
 public class AnnouncesListener extends EventListener<GenericGuildMemberEvent> {
 	
-	public AnnouncesListener(Client client) {
-		super(GenericGuildMemberEvent.class, client);
+	public AnnouncesListener() {
+		super(GenericGuildMemberEvent.class);
 	}
 	
 	public static String parse(String msg, Member member) {
@@ -34,7 +34,7 @@ public class AnnouncesListener extends EventListener<GenericGuildMemberEvent> {
 	
 	@Override
 	public void event(GenericGuildMemberEvent event) {
-		GuildData guildData = client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild());
+		GuildData guildData = Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild());
 		if (guildData.getAnnounceTextChannel(event.getJDA()) == null || !guildData.getAnnounceTextChannel(event.getJDA()).canTalk())
 			return;
 		Member member = event.getMember();

@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -46,7 +47,7 @@ public class ProfileCommand {
 								return;
 							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? event.getAuthor() : event.getMessage().getMentionedUsers().get(0);
-							event.sendMessage(event.getClient().getProfile(user).createEmbed(event.getJDA())).queue();
+							event.sendMessage(Bran.getInstance().getProfile(user).createEmbed(event.getJDA())).queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
@@ -66,7 +67,7 @@ public class ProfileCommand {
 							Rank r = profile.getRank();
 							profile.setRank(next);
 							event.sendMessage("You ranked up from " + r + " to " + next + "!").queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -74,7 +75,7 @@ public class ProfileCommand {
 						.setName("Inventory Command")
 						.setDescription("Shows you your inventory.")
 						.setAction((event) -> {
-							Inventory inventory = event.getClient().getProfile(event.getAuthor()).getInventory();
+							Inventory inventory = Bran.getInstance().getProfile(event.getAuthor()).getInventory();
 							if (inventory.isEmpty()) {
 								event.sendMessage("Your inventory is empty!").queue();
 								return;
@@ -100,7 +101,7 @@ public class ProfileCommand {
 								.setArgs(new Argument("hex", String.class, true))
 								.setDescription("Set or update your custom color!")
 								.setAction((event, rawArgs) -> {
-									Profile profile = event.getClient().getProfile(event.getAuthor());
+									Profile profile = Bran.getInstance().getProfile(event.getAuthor());
 									Argument argument = event.getArgument("hex");
 									if (!argument.isPresent()) {
 										if (profile.getCustomHex() != null) {
@@ -128,7 +129,7 @@ public class ProfileCommand {
 									if (isHex) {
 										boolean success = profile.setCustomColor(hex);
 										event.sendMessage(success ? "Updated your profile Color!" : "Failed to update your profile color!").queue();
-										event.getClient().getDiscordBotData().getDataHolderManager().update();
+										Bran.getInstance().getDataManager().getDataHolderManager().update();
 									} else {
 										event.sendMessage("This does not look like a known hex...").queue();
 									}

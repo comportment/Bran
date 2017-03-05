@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.currency;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -85,7 +86,7 @@ public class GambleCommand {
 						acc.setCoins(Math.max(0, coins - i));
 						event.getChannel().sendMessage("You lost " + (coins == 0 ? "all your" : i) + " credits! " + Emojis.CRY).queue();
 					}
-					event.getClient().getDiscordBotData().getDataHolderManager().update();
+					Bran.getInstance().getDataManager().getDataHolderManager().update();
 				})
 				.build();
 	}

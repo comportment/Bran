@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.poll;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
-import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.Bran;
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -21,22 +21,22 @@ public class Poll {
 	private final String guildId;
 	private int shardId;
 	
-	public Poll(String pollName, Member creator, LinkedList<Option> options, TextChannel channel, Client client) {
+	public Poll(String pollName, Member creator, LinkedList<Option> options, TextChannel channel) {
 		this.pollName = pollName;
 		this.creatorId = creator.getUser().getId();
 		this.options = options;
 		this.channelId = channel.getId();
 		this.guildId = channel.getGuild().getId();
-		setShardId(client.getShardId(channel.getJDA()));
-		getRunningPolls(client).add(this);
+		setShardId(Bran.getInstance().getShardId(channel.getJDA()));
+		getRunningPolls().add(this);
 	}
 	
-	public static List<Poll> getRunningPolls(Client client) {
-		return client.getDiscordBotData().getPollPersistence().get().polls;
+	public static List<Poll> getRunningPolls() {
+		return Bran.getInstance().getDataManager().getPollPersistence().get().polls;
 	}
 	
-	public static Poll getPoll(TextChannel channel, Client client) {
-		return getRunningPolls(client).stream().filter(poll -> poll.getChannelId().equals(channel.getId())).findFirst().orElse(null);
+	public static Poll getPoll(TextChannel channel) {
+		return getRunningPolls().stream().filter(poll -> poll.getChannelId().equals(channel.getId())).findFirst().orElse(null);
 	}
 	
 	public int getShardId() {
@@ -47,20 +47,20 @@ public class Poll {
 		this.shardId = shardId;
 	}
 	
-	public ClientShard getShard(Client client) {
-		return client.getShards()[shardId];
+	public BranShard getShard(Bran bran) {
+		return bran.getShards()[shardId];
 	}
 	
-	public JDA getJDA(Client client) {
-		return getShard(client).getJDA();
+	public JDA getJDA(Bran bran) {
+		return getShard(bran).getJDA();
 	}
 	
 	public String getGuildId() {
 		return guildId;
 	}
 	
-	public Guild getGuild(Client client) {
-		return getJDA(client).getGuildById(getGuildId());
+	public Guild getGuild(Bran bran) {
+		return getJDA(bran).getGuildById(getGuildId());
 	}
 
 	public String getPollName() {
@@ -71,8 +71,8 @@ public class Poll {
 		return creatorId;
 	}
 	
-	public User getCreator(Client client) {
-		return getJDA(client).getUserById(getCreatorId());
+	public User getCreator(Bran bran) {
+		return getJDA(bran).getUserById(getCreatorId());
 	}
 
 	public LinkedList<Option> getOptions() {
@@ -83,8 +83,8 @@ public class Poll {
 		return channelId;
 	}
 	
-	public TextChannel getChannel(Client client) {
-		return getJDA(client).getTextChannelById(getChannelId());
+	public TextChannel getChannel(Bran bran) {
+		return getJDA(bran).getTextChannelById(getChannelId());
 	}
 
 	public Option getOption(int optionIndex) {
@@ -115,8 +115,8 @@ public class Poll {
 		return options.stream().filter(option -> option.getVotes().size() == Collections.max(options.stream().map(o -> o.getVotes().size()).collect(Collectors.toList())) && option.getVotes().size() != 0).collect(Collectors.toList());
 	}
 	
-	public void remove(Client client) {
-		getRunningPolls(client).remove(this);
+	public void remove() {
+		getRunningPolls().remove(this);
 	}
 	
 	public Option getOption(String userId) {

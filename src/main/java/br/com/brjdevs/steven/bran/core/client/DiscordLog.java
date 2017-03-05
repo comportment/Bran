@@ -17,14 +17,12 @@ public class DiscordLog {
 	public String channelId;
 	private boolean isEnabled;
 	private long guildId;
-	private Client client;
 	private int shard;
 	
-	public DiscordLog(Client client) {
-		this.client = client;
+	public DiscordLog() {
 		this.guildId = Long.parseLong("219256419684188161");
-		this.shard = client.calcShardId(guildId);
-		Guild guild = client.getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
+		this.shard = Bran.getInstance().calcShardId(guildId);
+		Guild guild = Bran.getInstance().getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
 		if (guild == null) {
 			this.isEnabled = false;
 			LOG.fatal("Could not find Discord Log Guild.");
@@ -47,7 +45,7 @@ public class DiscordLog {
 	public void logToDiscord(GuildJoinEvent event) {
 		Guild guild = event.getGuild();
 		getLogChannel().sendMessage(Level.INFO.getBaseEmbed("\uD83C\uDFE0 Joined Guild")
-				.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Shard:** " + client.getShardId(guild.getJDA()) + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "\n**Owner:** " + Utils.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")")
+				.setDescription("**Name:** " + guild.getName() + "\n**ID:** " + guild.getId() + "\n**Shard:** " + Bran.getInstance().getShardId(guild.getJDA()) + "\n**Region:** " + guild.getRegion().toString() + "\n**Members:** " + guild.getMembers().size() + "\n**Owner:** " + Utils.getUser(guild.getOwner().getUser()) + " (ID: " + guild.getOwner().getUser().getId() + ")")
 				.build()).queue();
 	}
 	
@@ -67,7 +65,7 @@ public class DiscordLog {
 	}
 	
 	public Guild getGuild() {
-		return client.getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
+		return Bran.getInstance().getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
 	public enum Level {

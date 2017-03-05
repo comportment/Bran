@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.data.managers;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.dv8tion.jda.core.utils.SimpleLog;
@@ -18,7 +18,7 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 	
 	public GsonDataFileManager(Class<T> clazz, String key, Supplier<T> constructor) {
 		this.key = key;
-		try (Jedis jedis = Client.getJedisPool().getResource()) {
+		try (Jedis jedis = Bran.getJedisPool().getResource()) {
 			String s = jedis.get(key);
 			if (s == null) {
 				jedis.set(key, s = GSON.toJson(constructor.get()));
@@ -35,7 +35,7 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 	}
 	
 	public void update() {
-		try (Jedis jedis = Client.getJedisPool().getResource()) {
+		try (Jedis jedis = Bran.getJedisPool().getResource()) {
 			jedis.set(key, GSON.toJson(data));
 		} catch (Exception e) {
 			throw new RuntimeException(e);

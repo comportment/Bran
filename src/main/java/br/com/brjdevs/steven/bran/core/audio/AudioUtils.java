@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -46,7 +45,7 @@ public class AudioUtils {
 		return "0" + num;
 	}
 	
-	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan, Client client) {
+	public static VoiceChannel connect(VoiceChannel vchan, TextChannel tchan) {
 		if (!vchan.getGuild().getSelfMember().hasPermission(vchan, Permission.VOICE_CONNECT)) {
 			tchan.sendMessage("I can't connect to `" + vchan.getName() + "` due to a lack of permission!").queue();
 			return null;
@@ -66,7 +65,7 @@ public class AudioUtils {
 		if (audioManager.isConnected()) return audioManager.getConnectedChannel();
 		try {
 			audioManager.setSelfDeafened(true);
-			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild(), client));
+			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild()));
 			audioManager.openAudioConnection(vchan);
 		} catch (Exception e) {
 			tchan.sendMessage("I couldn't connect to the voice channel! ").queue();

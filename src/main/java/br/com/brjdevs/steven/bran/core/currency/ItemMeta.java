@@ -47,13 +47,22 @@ public class ItemMeta {
 		return amount;
 	}
 	
-	public void add() {
+	public void join() {
 		this.amount++;
 	}
 	
+	public void remove() {
+		this.amount--;
+	}
+	
 	public boolean doDamage(long damage) {
-		if (damage > getRemainingDurability())
+		if (damage > getRemainingDurability()) {
+			if (amount <= 0)
+				throw new NullPointerException("No " + getItem().getName() + " left!");
+			amount--;
+			this.damage = 0;
 			return false;
+		}
 		this.damage += damage;
 		return true;
 	}

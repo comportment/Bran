@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.responsewaiter.ExpectedResponseType;
 import br.com.brjdevs.steven.bran.core.responsewaiter.ResponseWaiter;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.UnexpectedResponseEvent;
@@ -12,8 +11,8 @@ import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 
 public class ActionListener extends EventListener<Event> {
 	
-	public ActionListener(Client client) {
-		super(Event.class, client);
+	public ActionListener() {
+		super(Event.class);
 	}
 	
 	@Override

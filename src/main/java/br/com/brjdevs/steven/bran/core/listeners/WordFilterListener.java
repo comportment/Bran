@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.utils.RestActionSleep;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 public class WordFilterListener extends EventListener<GuildMessageReceivedEvent> {
 	
-	public WordFilterListener(Client client) {
-		super(GuildMessageReceivedEvent.class, client);
+	public WordFilterListener() {
+		super(GuildMessageReceivedEvent.class);
 	}
 	
 	@Override
@@ -21,7 +21,7 @@ public class WordFilterListener extends EventListener<GuildMessageReceivedEvent>
 		if (event.getMessage() == null) return;
 		if (!event.getChannel().getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
 			return;
-		GuildData guildData = client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild());
+		GuildData guildData = Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild());
 		if (!guildData.isWordFilterEnabled) return;
 		boolean hasFilteredWord = false;
 		for (String word : guildData.filteredWords) {
@@ -32,7 +32,7 @@ public class WordFilterListener extends EventListener<GuildMessageReceivedEvent>
 		}
 		if (hasFilteredWord) {
 			event.getMessage().delete().queue();
-			client.getMessenger().sendMessage(event.getChannel(), "**" + Utils.getUser(event.getAuthor()) + "** you can't say that!!").queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(TimeUnit.SECONDS.toMillis(1), RestAction::queue));
+			Bran.getInstance().getMessenger().sendMessage(event.getChannel(), "**" + Utils.getUser(event.getAuthor()) + "** you can't say that!!").queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(TimeUnit.SECONDS.toMillis(1), RestAction::queue));
 		}
 	}
 }

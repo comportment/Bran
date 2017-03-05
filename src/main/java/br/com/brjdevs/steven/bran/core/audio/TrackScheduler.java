@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
-import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.Bran;
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 public class TrackScheduler {
 	
-	public Client client;
 	private AudioPlayer player;
 	private long guildId;
 	private List<String> voteSkips;
@@ -33,12 +32,11 @@ public class TrackScheduler {
 	private TrackContext currentTrack;
 	private TrackContext previousTrack;
 	
-	public TrackScheduler(GuildMusicManager musicManager, AudioPlayer player, long guildId, int shard, Client client) {
+	public TrackScheduler(GuildMusicManager musicManager, AudioPlayer player, long guildId, int shard) {
 		this.player = player;
 		this.guildId = guildId;
 		this.voteSkips = new ArrayList<>();
 		this.shard = shard;
-		this.client = client;
 		this.musicManager = musicManager;
 		this.queue = new LinkedBlockingQueue<>();
 	}
@@ -169,13 +167,13 @@ public class TrackScheduler {
 	
 	public boolean request(TrackContext track, boolean silent) {
 		if (track.getInfo().length > AudioUtils.MAX_SONG_LENGTH) {
-			track.getContext().sendMessage("Could not add `" + track.getInfo().title + "` to the queue. Reason: `This song it's too long, the maximum supported length is 3 hours!").queue();
+			track.getContext().sendMessage("Could not join `" + track.getInfo().title + "` to the queue. Reason: `This song it's too long, the maximum supported length is 3 hours!").queue();
 			if (isEmpty() && getCurrentTrack() == null) getGuild().getAudioManager().closeAudioConnection();
 			return false;
 		}
 		if (!canRequest(track)) {
 			String s;
-			switch (musicManager.client.getDiscordBotData().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel) {
+			switch (Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel) {
 				case 1:
 					s = "Oops, it looks like you already asked for this song, why don't you try another one? (FairQueue: 1)";
 					break;
@@ -184,7 +182,7 @@ public class TrackScheduler {
 					break;
 				default:
 					s = "Unrecognized FairQueue Level '" +
-							musicManager.client.getDiscordBotData().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel + "'\nReport this Message to my Master.";
+							Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel + "'\nReport this Message to my Master.";
 			}
 			track.getContext().sendMessage(s).queue();
 			return false;
@@ -203,7 +201,7 @@ public class TrackScheduler {
 	}
 	
 	public boolean canRequest(TrackContext track) {
-		switch (musicManager.client.getDiscordBotData().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel) {
+		switch (Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel) {
 			case 0:
 				return true;
 			case 1:
@@ -212,7 +210,7 @@ public class TrackScheduler {
 				return getMatches(queue, track) < 1;
 			default:
 				throw new UnsupportedOperationException("Unrecognized FairQueue Level '" +
-						musicManager.client.getDiscordBotData().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel + "'");
+						Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel + "'");
 		}
 	}
 	
@@ -220,7 +218,7 @@ public class TrackScheduler {
 		if (getPreviousTrack() != null && getPreviousTrack().getContext() != null && getPreviousTrack().getContext().canTalk()) {
 			getPreviousTrack().getContext().sendMessage("Finished playing queue, disconnecting... If you want to play more music use `!!music play [SONG]`.").queue();
 		}
-		musicManager.client.getTaskManager().getMusicRegisterTimeout().addMusicPlayer(String.valueOf(getGuild().getId()), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(30));
+		Bran.getInstance().getTaskManager().getMusicRegisterTimeout().addMusicPlayer(String.valueOf(getGuild().getId()), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(30));
 		getGuild().getAudioManager().closeAudioConnection();
 	}
 	
@@ -270,8 +268,8 @@ public class TrackScheduler {
 		getAudioPlayer().setPaused(paused);
 	}
 	
-	public ClientShard getShard() {
-		return client.getShards()[shard];
+	public BranShard getShard() {
+		return Bran.getInstance().getShards()[shard];
 	}
 	
 	public List<TrackContext> getTracksBy(User user) {

@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -22,7 +23,7 @@ public class WordFilterCommand {
 				.setPrivateAvailable(false)
 				.setRequiredPermission(Permissions.GUILD_MANAGE)
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
-						.setAliases("add")
+						.setAliases("join")
 						.setName("WordFilter Add Command")
 						.setDescription("Adds a Word to the WordFilter")
 						.setArgs(new Argument("word", String.class))
@@ -35,7 +36,7 @@ public class WordFilterCommand {
 							String word = ((String) event.getArgument("word").get());
 							event.getGuildData().filteredWords.add(word);
 							event.sendMessage("\uD83D\uDC4C Added word to the filter! *(Total: " + event.getGuildData().filteredWords.size() + ")*").queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)

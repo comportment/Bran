@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -53,7 +54,7 @@ public class ConfigCommand {
 										event.sendMessage("Got it! Now each user can only have " + i + " song(s) in the queue at once.").queue();
 									else
 										event.sendMessage("Got it! Now each user can have unlimited songs in the queue at once.").queue();
-									event.getClient().getDiscordBotData().getDataHolderManager().update();
+									Bran.getInstance().getDataManager().getDataHolderManager().update();
 								})
 								.build())
 						.build())

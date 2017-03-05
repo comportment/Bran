@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
@@ -44,7 +45,7 @@ public class RoleMeCommands {
 						}
 						event.getGuildData().addPublicRole(publicRole);
 						event.sendMessage(Quotes.SUCCESS, "Now " + publicRole.getName() + " is a Public Role, users can acquire it by using `" + event.getPrefix() + "giveme " + publicRole.getName() + "`.").queue();
-						event.getClient().getDiscordBotData().getDataHolderManager().update();
+						Bran.getInstance().getDataManager().getDataHolderManager().update();
 					}
 				})
 				.build();
@@ -79,7 +80,7 @@ public class RoleMeCommands {
 						}
 						event.getGuildData().removePublicRole(publicRole);
 						event.sendMessage(Quotes.SUCCESS, "Now " + publicRole.getName() + " is no longer a Public Role.").queue();
-						event.getClient().getDiscordBotData().getDataHolderManager().update();
+						Bran.getInstance().getDataManager().getDataHolderManager().update();
 					}
 				})
 				.build();

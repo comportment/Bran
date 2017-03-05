@@ -69,7 +69,7 @@ public class Argument {
 				obj = input;
 				break;
 			case "Integer":
-				if (!input.matches("^(\\+|-)?[0-9]$"))
+				if (!input.matches("^(\\+|-)?[0-9]+$"))
 					throw new ArgumentParsingException(type.getSimpleName(), input);
 				obj = Integer.parseInt(input);
 				break;

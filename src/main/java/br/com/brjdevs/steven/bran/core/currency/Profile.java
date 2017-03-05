@@ -24,6 +24,7 @@ public class Profile {
 	private long level, experience;
 	private Inventory inv;
 	private transient List<IProfileListener> listeners;
+	private int stamina;
 	
 	public Profile(User user) {
 		this.userId = user.getId();
@@ -35,6 +36,7 @@ public class Profile {
 		this.customHex = null;
 		this.inv = new Inventory();
 		this.listeners = new ArrayList<>();
+		this.stamina = 200;
 	}
 	
 	public static double getPercentToLevelUp(long experience, long level) {
@@ -46,6 +48,21 @@ public class Profile {
 		long expRequired = Math.round(expCalculate);
 		if (expCalculate - expRequired > 0) expRequired++;
 		return expRequired;
+	}
+	
+	public boolean takeStamina(int stamina) {
+		if (stamina > this.stamina)
+			return false;
+		this.stamina -= stamina;
+		return true;
+	}
+	
+	public int getStamina() {
+		return stamina;
+	}
+	
+	public void setStamina(int stamina) {
+		this.stamina = stamina;
 	}
 	
 	public BankAccount getBankAccount() {

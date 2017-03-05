@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.core.command.builders;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.CommandEvent;
 import br.com.brjdevs.steven.bran.core.command.HelpContainer;
@@ -134,14 +135,14 @@ public class TreeCommandBuilder {
 						return;
 					}
 				}
-				ICommand subCommand = event.getClient().getCommandManager().getCommand(this, alias);
+				ICommand subCommand = Bran.getInstance().getCommandManager().getCommand(this, alias);
 				if (subCommand == null) {
 					switch (onNotFound) {
 						case SHOW_ERROR:
 							event.sendMessage("No such SubCommand `" + alias + "` in " + getName() + ".").queue();
 							break;
 						case REDIRECT:
-							event.createChild(event.getClient().getCommandManager().getCommand(this, defaultCmd), true);
+							event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
 							break;
 						case SHOW_HELP:
 							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
@@ -158,7 +159,7 @@ public class TreeCommandBuilder {
 							event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(subCommand.getRequiredPermission())) + "*").queue();
 							break;
 						case REDIRECT:
-							event.createChild(event.getClient().getCommandManager().getCommand(this, defaultCmd), true);
+							event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
 							break;
 						case SHOW_HELP:
 							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {

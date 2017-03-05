@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -21,13 +21,11 @@ public class AudioPlayerListener extends AudioEventAdapter {
 	private static final String announce = "\uD83D\uDD0A Now Playing in **%s**: `%s` (`%s`) added by %s.";
 	private static final SimpleLog LOG = SimpleLog.getLog("AudioPlayerListener");
 	private TrackScheduler scheduler;
-	private Client client;
 	private long messageId;
 	private long channelId;
 	
 	public AudioPlayerListener(TrackScheduler scheduler) {
 		this.scheduler = scheduler;
-		this.client = scheduler.client;
 	}
 	
 	public BlockingQueue<TrackContext> getQueue() {
@@ -56,7 +54,7 @@ public class AudioPlayerListener extends AudioEventAdapter {
 	}
 	
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		client.getTaskManager().getMusicRegisterTimeout().removeMusicPlayer(scheduler.getGuild().getId());
+		Bran.getInstance().getTaskManager().getMusicRegisterTimeout().removeMusicPlayer(scheduler.getGuild().getId());
 		if (scheduler.getCurrentTrack() == null) {
 			LOG.fatal("Got TrackStartEvent with null CachedAudioTrack!");
 			return;

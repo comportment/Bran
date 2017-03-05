@@ -17,9 +17,9 @@ public class Inventory {
 	}
 	
 	public boolean put(Item item) {
-		if (getAmountOf(item) + 1 < 0)
+		if (getAmountOf(item) < 100)
 			return false;
-		items.computeIfAbsent(Items.idOf(item), i -> ItemMeta.of(item)).add();
+		items.computeIfAbsent(Items.idOf(item), i -> ItemMeta.of(item)).join();
 		return true;
 	}
 	
@@ -27,15 +27,17 @@ public class Inventory {
 		int id = Items.idOf(item);
 		if (!items.containsKey(id))
 			return false;
-		if (getAmountOf(item) > 0)
-			items.get(id).add();
+		if (getAmountOf(item) > 1)
+			items.get(id).remove();
 		else
 			items.remove(id);
 		return true;
 	}
 	
 	public long getAmountOf(Item item) {
-		return items.getOrDefault(ItemMeta.of(item), ItemMeta.of(item)).getAmount();
+		if (!items.containsKey(Items.idOf(item)))
+			return 0;
+		return items.get(Items.idOf(item)).getAmount();
 	}
 	
 	public boolean isEmpty() {

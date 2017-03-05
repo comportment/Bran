@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -30,7 +31,7 @@ public class PrefixesCommand {
 						.setArgs(new Argument("prefixes", String.class))
 						.setRequiredPermission(Permissions.PREFIX)
 						.setAction((event, rawArgs) -> {
-							List<String> list = event.getClient().getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild()).prefixes;
+							List<String> list = Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild()).prefixes;
 							if (list.size() == 1) {
 								event.sendMessage("This guild only has one prefix, you can't remove them anymore!").queue();
 								return;
@@ -46,26 +47,26 @@ public class PrefixesCommand {
 							amount -= list.size();
 							if (amount == 0) return;
 							event.sendMessage("Removed " + amount + " prefix" + (amount == 1 ? "" : "es") + ". Now these are my prefixes here: " + (String.join(", ", list))).queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
-						.setAliases("add")
+						.setAliases("join")
 						.setDescription("Adds prefixes to the bot.")
 						.setName("Prefix Add Command")
 						.setArgs(new Argument("prefixes", String.class))
 						.setRequiredPermission(Permissions.PREFIX)
 						.setAction((event, rawArgs) -> {
 							try{
-								if (event.getClient().getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild()).prefixes.size() > 5) {
+								if (Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild()).prefixes.size() > 5) {
 									event.sendMessage("You cannot have more than " + 5 + " prefixes.").queue();
 									return;
 								}
-								List<String> list = event.getClient().getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild()).prefixes;
+								List<String> list = Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild()).prefixes;
 								String[] prefixes = ((String) event.getArgument("prefixes").get()).split("\\s+");
 								Arrays.stream(prefixes).filter(prefix -> !list.contains(prefix)).forEach(list::add);
 								event.sendMessage("Now these are my prefixes here: " + (String.join(", ", list))).queue();
-								event.getClient().getDiscordBotData().getDataHolderManager().update();
+								Bran.getInstance().getDataManager().getDataHolderManager().update();
 							} catch (Exception e1) {
 								e1.printStackTrace();
 							}
@@ -77,7 +78,7 @@ public class PrefixesCommand {
 						.setName("Prefix List Command")
 						.setAction((event, args) -> {
 							MessageBuilder builder = new MessageBuilder().append("These are my prefixes here: ");
-							builder.append(String.join(", ", event.getClient().getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild()).prefixes));
+							builder.append(String.join(", ", Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild()).prefixes));
 							event.sendMessage(builder.build()).queue();
 						})
 						.build())

@@ -12,12 +12,10 @@ import br.com.brjdevs.steven.bran.core.currency.Items;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.EmojiConverter;
 import br.com.brjdevs.steven.bran.core.utils.Emojis;
-import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
-import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
+import net.dv8tion.jda.core.EmbedBuilder;
 
+import java.awt.*;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ShopCommand {
 	
@@ -31,16 +29,11 @@ public class ShopCommand {
 						.setAliases("list")
 						.setName("Shop List Command")
 						.setDescription("Gives you a full list of the available items do Buy!")
-						.setArgs(new Argument("page", Integer.class, true))
 						.setAction((event) -> {
-							Argument arg = event.getArgument("page");
-							int page = arg.isPresent() && (int) arg.get() > 0 ? (int) arg.get() : 1;
-							List<String> items = Arrays.stream(Items.ALL)
-									.map(item -> item.getEmoji() + " " + item.getName() + " - Price: " + item.getValue()).collect(Collectors.toList());
-							StringListBuilder listBuilder = new StringListBuilder(items, page, 15);
-							listBuilder.setName("Available Items");
-							listBuilder.setFooter("Total Items: " + Items.ALL.length);
-							event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
+							EmbedBuilder embedBuilder = new EmbedBuilder();
+							embedBuilder.setColor(Color.DARK_GRAY);
+							Arrays.stream(Items.ALL).forEach(item -> embedBuilder.addField(item.getEmoji() + " " + item.getName(), (item.isSellable() ? "\uD83D\uDCE4" + (item.isBuyable() ? "/" : "") : "") + (item.isBuyable() ? "\uD83D\uDCE5" : "") + " " + item.getValue() + " coins", true));
+							event.sendMessage(embedBuilder.build()).queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.CURRENCY)

@@ -7,10 +7,10 @@ public class Item {
 	private final long value;
 	private String emoji, name, description;
 	private long price;
-	private boolean staticValue;
+	private boolean staticValue, sellable, buyable;
 	private int startDurability;
 	
-	public Item(String emoji, String name, String desc, int startDurability, long value) {
+	public Item(String emoji, String name, String desc, int startDurability, long value, boolean sellable, boolean buyable) {
 		this.emoji = emoji;
 		this.name = name;
 		this.description = desc;
@@ -18,6 +18,8 @@ public class Item {
 		this.value = value;
 		this.price = value;
 		this.staticValue = false;
+		this.sellable = sellable;
+		this.buyable = buyable;
 	}
 	
 	public void changePrices(Random r) {
@@ -44,5 +46,13 @@ public class Item {
 	
 	public int getStartDurability() {
 		return startDurability;
+	}
+	
+	public boolean isBuyable() {
+		return buyable;
+	}
+	
+	public boolean isSellable() {
+		return sellable;
 	}
 }

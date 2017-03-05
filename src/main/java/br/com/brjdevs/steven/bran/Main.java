@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
-import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.Bran;
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
@@ -13,20 +13,20 @@ import java.util.Arrays;
 public class Main {
 	
 	public static Gson GSON = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
-	public static Client client;
+	public static Bran bran;
 	
 	public static void main(String[] args) {
 		try {
-			client = new Client();
+			bran = new Bran();
 			Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
 				throwable.printStackTrace();
 				String url = Hastebin.post(Utils.getStackTrace(throwable));
-				client.getDiscordLog().logToDiscord("Uncaught exception in Thread " + thread.getName(), "An unexpected `" + throwable.getClass().getSimpleName() + "` occurred.\nMessage: " + throwable.getMessage() + "\nStackTrace: " + url, Level.FATAL);
+				bran.getDiscordLog().logToDiscord("Uncaught exception in Thread " + thread.getName(), "An unexpected `" + throwable.getClass().getSimpleName() + "` occurred.\nMessage: " + throwable.getMessage() + "\nStackTrace: " + url, Level.FATAL);
 			});
 			
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 				try {
-					Arrays.stream(client.getShards()).forEach(ClientShard::shutdown);
+					Arrays.stream(bran.getShards()).forEach(BranShard::shutdown);
 				} catch (Exception e) {
 				}
 			}));

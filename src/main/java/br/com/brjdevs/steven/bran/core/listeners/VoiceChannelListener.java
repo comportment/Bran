@@ -4,7 +4,7 @@ import br.com.brjdevs.steven.bran.core.audio.AudioUtils;
 import br.com.brjdevs.steven.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
 import br.com.brjdevs.steven.bran.core.audio.timers.ChannelLeaveTimer;
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -20,20 +20,20 @@ import static br.com.brjdevs.steven.bran.core.audio.AudioUtils.isAlone;
 
 public class VoiceChannelListener extends EventListener<GenericGuildVoiceEvent> {
 	
-	public VoiceChannelListener(Client client) {
-		super(GenericGuildVoiceEvent.class, client);
+	public VoiceChannelListener() {
+		super(GenericGuildVoiceEvent.class);
 	}
 	
 	private void onJoin(Guild guild, VoiceChannel voiceChannel, Member member) {
-		ChannelLeaveTimer timer = client.getTaskManager().getChannelLeaveTimer();
+		ChannelLeaveTimer timer = Bran.getInstance().getTaskManager().getChannelLeaveTimer();
 		if (!timer.has(guild.getId())) return;
-		GuildMusicManager player = client.getMusicManager().get(guild);
+		GuildMusicManager player = Bran.getInstance().getMusicManager().get(guild);
 		TrackContext track = player.getTrackScheduler().getCurrentTrack();
 		VoiceChannel channel = guild.getJDA().getVoiceChannelById(timer.get(guild.getId()).getRight());
 		if (voiceChannel != channel && !member.equals(guild.getSelfMember()))
 			return;
 		if (!guild.getAudioManager().isConnected() && !guild.getAudioManager().isAttemptingToConnect())
-			AudioUtils.connect(channel, track.getContext(), client);
+			AudioUtils.connect(channel, track.getContext());
 		player.getTrackScheduler().setPaused(false);
 		if (track != null && track.getContext() != null && track.getContext().canTalk())
 			track.getContext().sendMessage(member.equals(guild.getSelfMember()) ? "Resumed the player!" : Utils.getUser(member.getUser()) + " joined the channel, resumed the player!").queue();
@@ -42,9 +42,9 @@ public class VoiceChannelListener extends EventListener<GenericGuildVoiceEvent> 
 	
 	public void onLeave(Guild guild, VoiceChannel voiceChannel) {
 		if (guild == null || guild.getSelfMember() == null) return;
-		ChannelLeaveTimer timer = client.getTaskManager().getChannelLeaveTimer();
+		ChannelLeaveTimer timer = Bran.getInstance().getTaskManager().getChannelLeaveTimer();
 		if (!AudioUtils.isAlone(voiceChannel)) return;
-		GuildMusicManager musicManager = client.getMusicManager().get(guild);
+		GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(guild);
 		TrackContext track = musicManager.getTrackScheduler().getCurrentTrack();
 		if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null) {
 			guild.getAudioManager().closeAudioConnection();

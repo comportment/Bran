@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.data;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
-import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.Bran;
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.core.managers.CustomExpirationManager;
 import br.com.brjdevs.steven.bran.core.utils.CollectionUtils;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 public class Giveaway {
 	
 	public static CustomExpirationManager<Giveaway> expiration = new CustomExpirationManager<>((giveaway) -> {
-		Client client = Client.getInstance();
+		Bran bran = Bran.getInstance();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.setColor(Color.decode("#43474B"));
-		embedBuilder.setAuthor("Information on the Giveaway for Guild " + giveaway.getGuild(client).getName(), null, giveaway.getGuild(client).getIconUrl());
-		embedBuilder.setFooter("Giveaway created by " + Utils.getUser(giveaway.getCreator(client).getUser()), giveaway.getCreator(client).getUser().getEffectiveAvatarUrl());
-		String desc = "This giveaway was available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(client).getName()) + ".\n";
-		String participating = giveaway.getParticipants(client).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
+		embedBuilder.setAuthor("Information on the Giveaway for Guild " + giveaway.getGuild(bran).getName(), null, giveaway.getGuild(bran).getIconUrl());
+		embedBuilder.setFooter("Giveaway created by " + Utils.getUser(giveaway.getCreator(bran).getUser()), giveaway.getCreator(bran).getUser().getEffectiveAvatarUrl());
+		String desc = "This giveaway was available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(bran).getName()) + ".\n";
+		String participating = giveaway.getParticipants(bran).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
 		if (participating.length() > EmbedBuilder.TEXT_MAX_LENGTH - desc.length())
 			participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
 		List<Long> p = new ArrayList<>(giveaway.getParticipants());
@@ -36,17 +36,17 @@ public class Giveaway {
 		for (int i = 0; i < giveaway.getMaxWinners() && !p.isEmpty(); i++) {
 			long l = CollectionUtils.random(p);
 			p.remove(l);
-			Member m = giveaway.getGuild(client).getMemberById(String.valueOf(l));
+			Member m = giveaway.getGuild(bran).getMemberById(String.valueOf(l));
 			if (m == null) continue;
 			winners.add(m);
 		}
 		desc += participating + "\n\nThere was " + giveaway.getTotalParticipants() + " users participating on this Giveaway!\n\nAnd the " + (giveaway.getMaxWinners() > 1 ? "winners are" : "winner is") + "... " + winners.stream().map(m -> Utils.getUser(m.getUser())).collect(Collectors.joining("\n"));
 		embedBuilder.setDescription(desc);
-		giveaway.getChannel(client).sendMessage(embedBuilder.build()).queue();
-		giveaway.getChannel(client).sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)! :smile:").queue();
-		winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(client).getName() + ", contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)!").queue()));
-		client.getDiscordBotData().getDataHolderManager().get().getGuild(giveaway.getGuild(client)).giveaway = null;
-		client.getDiscordBotData().getDataHolderManager().update();
+		giveaway.getChannel(bran).sendMessage(embedBuilder.build()).queue();
+		giveaway.getChannel(bran).sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)! :smile:").queue();
+		winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(bran).getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
+		bran.getDataManager().getDataHolderManager().get().getGuild(giveaway.getGuild(bran)).giveaway = null;
+		bran.getDataManager().getDataHolderManager().update();
 	});
 	
 	private int maxUsers;
@@ -89,12 +89,12 @@ public class Giveaway {
 		return roleId == -1L;
 	}
 	
-	public Guild getGuild(Client client) {
-		return getShard(client).getJDA().getGuildById(String.valueOf(guildId));
+	public Guild getGuild(Bran bran) {
+		return getShard(bran).getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
-	public Role getRole(Client client) {
-		return getGuild(client).getRoleById(String.valueOf(roleId));
+	public Role getRole(Bran bran) {
+		return getGuild(bran).getRoleById(String.valueOf(roleId));
 	}
 	
 	public long getExpiresIn() {
@@ -115,12 +115,12 @@ public class Giveaway {
 		return expiresIn > 0;
 	}
 	
-	public Member getCreator(Client client) {
-		return getGuild(client).getMemberById(String.valueOf(creator));
+	public Member getCreator(Bran bran) {
+		return getGuild(bran).getMemberById(String.valueOf(creator));
 	}
 	
-	public List<Member> getParticipants(Client client) {
-		return Collections.unmodifiableList(participating.stream().filter(l -> getGuild(client).getMemberById(String.valueOf(creator)) != null).map(l -> getGuild(client).getMemberById(String.valueOf(l))).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+	public List<Member> getParticipants(Bran bran) {
+		return Collections.unmodifiableList(participating.stream().filter(l -> getGuild(bran).getMemberById(String.valueOf(creator)) != null).map(l -> getGuild(bran).getMemberById(String.valueOf(l))).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
 	}
 	
 	public List<Long> getParticipants() {
@@ -131,12 +131,12 @@ public class Giveaway {
 		return participating.size();
 	}
 	
-	public TextChannel getChannel(Client client) {
+	public TextChannel getChannel(Bran bran) {
 		String id = String.valueOf(channel);
-		return getGuild(client).getTextChannelById(id) == null ? getGuild(client).getPublicChannel() : getGuild(client).getTextChannelById(id);
+		return getGuild(bran).getTextChannelById(id) == null ? getGuild(bran).getPublicChannel() : getGuild(bran).getTextChannelById(id);
 	}
 	
-	public ClientShard getShard(Client client) {
-		return client.getShards()[client.calcShardId(guildId)];
+	public BranShard getShard(Bran bran) {
+		return bran.getShards()[bran.calcShardId(guildId)];
 	}
 }

@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -100,7 +101,7 @@ public class PermissionCommand {
 	                        else
 		                        s = "Updated " + holder.value + " members permissions! Could not update " + (members.size() - holder.value) + " members permissions.";
 							event.sendMessage(s).queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
                         .build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)

@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.core.command;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
@@ -24,12 +23,10 @@ import static br.com.brjdevs.steven.bran.core.utils.Utils.isEmpty;
 
 public class CommandManager {
 	
-	private final Client client;
 	private final List<ICommand> commands = new ArrayList<>();
 	private final SimpleLog LOG = SimpleLog.getLog("Command Manager");
 	
-	public CommandManager(Client client) {
-		this.client = client;
+	public CommandManager() {
 		load();
 	}
 	

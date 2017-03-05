@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -9,17 +9,15 @@ import net.dv8tion.jda.core.entities.User;
 
 public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.ConnectionListener {
 	
-	public Client client;
 	private int attempts;
 	private long guildId;
 	private int shard;
 	private Message message;
 	
-	public ConnectionListenerImpl(Guild guild, Client client) {
+	public ConnectionListenerImpl(Guild guild) {
 		this.attempts = -1;
 		this.guildId = Long.parseLong(guild.getId());
-		this.client = client;
-		this.shard = client.getShardId(guild.getJDA());
+		this.shard = Bran.getInstance().getShardId(guild.getJDA());
 	}
 	
 	@Override
@@ -54,7 +52,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 			send("The channel I was connected to got deleted, stopped the queue.");
 			scheduler.stop();
 		} else if (connectionStatus == ConnectionStatus.DISCONNECTED_REMOVED_FROM_GUILD) {
-			client.getMusicManager().unregister(guildId);
+			Bran.getInstance().getMusicManager().unregister(guildId);
 		}
 	}
 	
@@ -63,11 +61,11 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	}
 	
 	public GuildMusicManager getMusicManager() {
-		return client.getMusicManager().get(getGuild());
+		return Bran.getInstance().getMusicManager().get(getGuild());
 	}
 	
 	public Guild getGuild() {
-		return client.getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
+		return Bran.getInstance().getShards()[shard].getJDA().getGuildById(String.valueOf(guildId));
 	}
 	
 	public void send(String content) {

@@ -3,7 +3,7 @@ package br.com.brjdevs.steven.bran.core.audio.timers;
 import br.com.brjdevs.steven.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.steven.bran.core.audio.TrackContext;
 import br.com.brjdevs.steven.bran.core.audio.TrackScheduler;
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,17 +16,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChannelLeaveTimer {
 	
-	public final Client client;
 	private final Map<String, Pair<Long, String>> TIMING_OUT;
 	private boolean timingOutUpdated = false;
 	
-	public ChannelLeaveTimer(Client client) {
-		this(new ConcurrentHashMap<>(), client);
+	public ChannelLeaveTimer() {
+		this(new ConcurrentHashMap<>());
 	}
 	
-	public ChannelLeaveTimer(Map<String, Pair<Long, String>> timingOut, Client client) {
+	public ChannelLeaveTimer(Map<String, Pair<Long, String>> timingOut) {
 		this.TIMING_OUT = Collections.synchronizedMap(timingOut);
-		this.client = client;
 		
 		Thread thread = new Thread(this::threadcode, "ChannelLeaveTimeout");
 		thread.setDaemon(true);
@@ -90,10 +88,10 @@ public class ChannelLeaveTimer {
 			if (!timingOutUpdated) {
 				String id = closestEntry.getKey();
 				TIMING_OUT.remove(id);
-				JDA jda = client.getShards()[client.calcShardId(Long.parseLong(id))].getJDA();
+				JDA jda = Bran.getInstance().getShards()[Bran.getInstance().calcShardId(Long.parseLong(id))].getJDA();
 				Guild guild = jda.getGuildById(id);
 				if (guild != null) {
-					GuildMusicManager musicManager = client.getMusicManager().get(guild);
+					GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(guild);
 					TrackScheduler scheduler = musicManager.getTrackScheduler();
 					if (scheduler.getAudioPlayer().isPaused()) {
 						TrackContext track = scheduler.getCurrentTrack() == null ? scheduler.getPreviousTrack()

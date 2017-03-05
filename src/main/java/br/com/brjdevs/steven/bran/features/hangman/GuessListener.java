@@ -1,13 +1,13 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.listeners.EventListener;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class GuessListener extends EventListener<MessageReceivedEvent> {
 	
-	public GuessListener(Client client) {
-		super(MessageReceivedEvent.class, client);
+	public GuessListener() {
+		super(MessageReceivedEvent.class);
 	}
 	
 	@Override
@@ -37,6 +37,6 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
 		}
 		if (guess.length() != 2)
 			return;
-		game.guess(guess.charAt(1), client.getDiscordBotData().getDataHolderManager().get().getUser(event.getAuthor()));
+		game.guess(guess.charAt(1), Bran.getInstance().getDataManager().getDataHolderManager().get().getUser(event.getAuthor()));
 	}
 }

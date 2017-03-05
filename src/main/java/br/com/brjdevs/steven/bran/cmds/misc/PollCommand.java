@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -38,7 +39,7 @@ public class PollCommand {
 						.setExample("poll create What should I play? ;Game 1;Game 2;Game 3;Game 4;")
 						.setArgs(new Argument("argument", String.class))
 						.setAction((event) -> {
-							if (Poll.getPoll(event.getTextChannel(), event.getClient()) != null) {
+							if (Poll.getPoll(event.getTextChannel()) != null) {
 								event.sendMessage("There's already a Poll running in this Channel!").queue();
 								return;
 							}
@@ -66,9 +67,9 @@ public class PollCommand {
 								LinkedList<Option> options = new LinkedList<>();
 								for (String string : list)
 									options.add(new Option(list.indexOf(string), string));
-								new Poll(name, event.getMember(), options, event.getTextChannel(), event.getClient());
-								event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll add reactions to the message as the votes get added/removed.").queue();
-								event.getClient().getDiscordBotData().getPollPersistence().update();
+								new Poll(name, event.getMember(), options, event.getTextChannel());
+								event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll join reactions to the message as the votes get added/removed.").queue();
+								Bran.getInstance().getDataManager().getPollPersistence().update();
 							}
 						})
 						.build())
@@ -77,7 +78,7 @@ public class PollCommand {
 						.setName("Poll Information Command")
 						.setDescription("Gives you information about a poll running in the current channel.")
 						.setAction((event) -> {
-							Poll poll = Poll.getPoll(event.getTextChannel(), event.getClient());
+							Poll poll = Poll.getPoll(event.getTextChannel());
 							if (poll == null) {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
@@ -99,7 +100,7 @@ public class PollCommand {
 						.setName("Poll End Command")
 						.setDescription("Ends a Poll running in the current channel.")
 						.setAction((event) -> {
-							Poll poll = Poll.getPoll(event.getTextChannel(), event.getClient());
+							Poll poll = Poll.getPoll(event.getTextChannel());
 							if (poll == null) {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
@@ -124,9 +125,9 @@ public class PollCommand {
 							}
 							builder.setDescription(stringBuilder.toString());
 							builder.setColor(Color.decode("#F89F3F"));
-							poll.remove(event.getClient());
+							poll.remove();
 							event.sendMessage(builder.build()).queue();
-							event.getClient().getDiscordBotData().getPollPersistence().update();
+							Bran.getInstance().getDataManager().getPollPersistence().update();
 						})
 						.build())
 				.build();

@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.currency;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
@@ -23,13 +24,13 @@ public class RichestCommand {
 				.setName("Richest Users Command")
 				.setDescription("Lists you the richest users!")
 				.setAction((event) -> {
-					List<BankAccount> bankAccounts = new ArrayList<>(event.getClient().getDiscordBotData().getDataHolderManager().get().users
+					List<BankAccount> bankAccounts = new ArrayList<>(Bran.getInstance().getDataManager().getDataHolderManager().get().users
 							.values().stream().map(userData -> userData.getProfile().getBankAccount())
 							.sorted(Comparator.comparing(BankAccount::getCoins)).limit(15).collect(Collectors.toList()));
 					EmbedBuilder embedBuilder = new EmbedBuilder();
 					embedBuilder.setColor(Color.DARK_GRAY);
 					embedBuilder.setDescription(bankAccounts.stream().map(bankAccount -> (bankAccounts.indexOf(bankAccount) + 1) + ". "
-							+ Utils.getUser(event.getClient().getUserById(bankAccount.userId)) + " - "
+							+ Utils.getUser(Bran.getInstance().getUserById(bankAccount.userId)) + " - "
 							+ (bankAccounts.indexOf(bankAccount) == 0 ? "**" : "") + bankAccount.getCoins() + " coins"
 							+ (bankAccounts.indexOf(bankAccount) == 0 ? "**" : "")).collect(Collectors.joining("\n")));
 					event.sendMessage(embedBuilder.build()).queue();

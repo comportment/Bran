@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.cmds.botAdmin;
 
-import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.Bran;
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -34,14 +35,14 @@ public class ShardCommand {
 						.setAction((event) -> {
 							String shard = ((String) event.getArgument("shard").get());
 							if (shard.charAt(0) == '*') {
-								Stream.of(event.getClient().getShards()).forEach(s -> event.sendMessage(createShardInfo(s)).queue());
+								Stream.of(Bran.getInstance().getShards()).forEach(s -> event.sendMessage(createShardInfo(s)).queue());
 							} else {
 								if (!MathUtils.isInteger(shard)) {
 									event.sendMessage("You have to tell me a Shard ID or use `*` to get info on all shards!").queue();
 									return;
 								}
 								int shardId = Integer.parseInt(shard);
-								ClientShard s = event.getClient().getShards()[shardId];
+								BranShard s = Bran.getInstance().getShards()[shardId];
 								event.sendMessage(createShardInfo(s)).queue();
 							}
 						})
@@ -54,9 +55,9 @@ public class ShardCommand {
 						.setAction((event) -> {
 							String shard = ((String) event.getArgument("shard").get());
 							if (shard.charAt(0) == '*') {
-								Stream.of(event.getClient().getShards()).forEach(s -> {
+								Stream.of(Bran.getInstance().getShards()).forEach(s -> {
 									try {
-										event.getClient().reboot(s);
+										Bran.getInstance().reboot(s);
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
@@ -67,9 +68,9 @@ public class ShardCommand {
 									return;
 								}
 								int shardId = Integer.parseInt(shard);
-								ClientShard s = event.getClient().getShards()[shardId];
+								BranShard s = Bran.getInstance().getShards()[shardId];
 								try {
-									event.getClient().reboot(s);
+									Bran.getInstance().reboot(s);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
@@ -79,13 +80,13 @@ public class ShardCommand {
 				.build();
 	}
 	
-	private static MessageEmbed createShardInfo(ClientShard shard) {
+	private static MessageEmbed createShardInfo(BranShard shard) {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		JDA jda = shard.getJDA();
 		embedBuilder.setTitle("Shard #" + shard.getId(), null);
 		embedBuilder.addField("Total Uptime", TimeUtils.format(System.currentTimeMillis() - shard.getStartup()), true);
 		embedBuilder.addField("Last Reboot", TimeUtils.format(System.currentTimeMillis() - shard.getLastReboot()), true);
-		embedBuilder.addField("Last Event", TimeUtils.format(System.currentTimeMillis() - shard.getClient().getLastEvents().get(shard.getId())), true);
+		embedBuilder.addField("Last Event", TimeUtils.format(System.currentTimeMillis() - shard.getBran().getLastEvents().get(shard.getId())), true);
 		embedBuilder.addField("Event Manager Shutdown", String.valueOf(shard.getEventManager().executor.isShutdown()), true);
 		embedBuilder.addField("Status", jda.getStatus().name(), true);
 		embedBuilder.addField("General", "**Users:** " + jda.getUsers().size() + "\n**Guilds:** " + jda.getGuilds().size() + "\n**Audio Connections:** " + jda.getGuilds().stream().filter(guild -> guild.getAudioManager().isConnected()).count(), true);

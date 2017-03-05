@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
 import br.com.brjdevs.steven.bran.ExitCodes;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -65,7 +66,7 @@ public class BotCommand {
 						.setAliases("stats", "status")
 						.setName("Stats Command")
 						.setDescription("Gives you my current statistics!")
-						.setAction((event) -> event.sendMessage(event.getClient().getSession().toString(event.getJDA())).queue())
+						.setAction((event) -> event.sendMessage(Bran.getInstance().getSession().toString(event.getJDA())).queue())
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("ping")
@@ -90,9 +91,9 @@ public class BotCommand {
 								.setDescription("Saves Guild and Bot Data.")
 								.setAction((event) -> {
 									try {
-										event.getClient().getDiscordBotData().getDataHolderManager().update();
-										event.getClient().getDiscordBotData().getConfigDataManager().update();
-										event.getClient().getDiscordBotData().getHangmanWordsManager().update();
+										Bran.getInstance().getDataManager().getDataHolderManager().update();
+										Bran.getInstance().getDataManager().getConfigDataManager().update();
+										Bran.getInstance().getDataManager().getHangmanWordsManager().update();
 										event.sendMessage(Quotes.SUCCESS, "Successfully saved Bot and Guild data.").queue();
 									} catch (Exception e) {
 										event.sendMessage(Quotes.FAIL, "There was an error while saving the data: " + Hastebin.post(Utils.getStackTrace(e))).queue();
@@ -105,7 +106,7 @@ public class BotCommand {
 								.setDescription("Saves Guild and Bot Data and stops the bot.")
 								.setAction((event, args) -> {
 									event.sendMessage("\uD83D\uDC4B").complete();
-									event.getClient().shutdownAll(ExitCodes.SHUTDOWN);
+									Bran.getInstance().shutdownAll(ExitCodes.SHUTDOWN);
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -114,7 +115,7 @@ public class BotCommand {
 								.setDescription("Restarts the Bot")
 								.setAction((event) -> {
 									event.sendMessage(":wave:").queue();
-									event.getClient().shutdownAll(ExitCodes.RESTART);
+									Bran.getInstance().shutdownAll(ExitCodes.RESTART);
 								})
 								.build())
 						.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -153,7 +154,7 @@ public class BotCommand {
 										.setArgs(new Argument("name", String.class))
 										.setAction((event, args) -> {
 											String name = (String) event.getArgument("name").get();
-											Stream.of(event.getClient().getShards()).forEach((shard) -> shard.getJDA().getSelfUser().getManager().setName(name).queue());
+											Stream.of(Bran.getInstance().getShards()).forEach((shard) -> shard.getJDA().getSelfUser().getManager().setName(name).queue());
 											event.sendMessage("Updated my name! Yay, I've got a new name, cool! :smile:").queue();
 										})
 										.build())
@@ -171,8 +172,8 @@ public class BotCommand {
 										.setAction((event, args) -> {
 											Argument pageArg = event.getArgument("page");
 											int page = pageArg.isPresent() ? (int) pageArg.get() : 1;
-											StringListBuilder listBuilder = new StringListBuilder(event.getClient().getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + event.getClient().getShardId(g.getJDA()) + "]) | Owner: " + Utils.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
-											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + event.getClient().getGuilds().size());
+											StringListBuilder listBuilder = new StringListBuilder(Bran.getInstance().getGuilds().stream().map(g -> g.getName() + " (" + g.getId() + "[" + Bran.getInstance().getShardId(g.getJDA()) + "]) | Owner: " + Utils.getUser(g.getOwner().getUser())).collect(Collectors.toList()), page, 15);
+											listBuilder.setName("Bran Server List").setFooter("Total Servers: " + Bran.getInstance().getGuilds().size());
 											event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
 										})
 										.build())

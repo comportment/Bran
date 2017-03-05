@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -38,14 +39,14 @@ public class CustomCmdsCommand {
 						.setAction((event) -> {
 							String cmdName = ((String) event.getArgument("name").get()).toLowerCase();
 							if (event.getGuildData().customCommands.containsKey(cmdName)) {
-								event.sendMessage(Quotes.FAIL, "This Guild already has a command named **" + cmdName + "**, if you want to add answers to the command use `" + event.getPrefix() + "cmds addanswer " + cmdName + " [answer]`.").queue();
+								event.sendMessage(Quotes.FAIL, "This Guild already has a command named **" + cmdName + "**, if you want to join answers to the command use `" + event.getPrefix() + "cmds addanswer " + cmdName + " [answer]`.").queue();
 								return;
 							}
 							String answer = (String) event.getArgument("answer").get();
 							CustomCommand command = new CustomCommand(answer, event.getAuthor());
 							event.getGuildData().customCommands.put(cmdName, command);
 							event.sendMessage("Created Custom Command **" + cmdName + "**!").queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -64,7 +65,7 @@ public class CustomCmdsCommand {
 							CustomCommand command = event.getGuildData().customCommands.get(cmdName);
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
 									&& !event.getGuildData().hasPermission(event.getAuthor(), Permissions.GUILD_MOD)) {
-								event.sendMessage("You can't add responses to this command because you're not its creator or has GUILD_MOD permission.").queue();
+								event.sendMessage("You can't join responses to this command because you're not its creator or has GUILD_MOD permission.").queue();
 								return;
 							}
 							if (command.getAnswers().contains(newAnswer)) {
@@ -73,7 +74,7 @@ public class CustomCmdsCommand {
 							}
 							command.getAnswers().add(newAnswer);
 							event.sendMessage(Quotes.SUCCESS, "Added a new answer for **" + cmdName + "**! This Command currently has " + command.getAnswers().size() + " answers.").queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -103,7 +104,7 @@ public class CustomCmdsCommand {
 								index = (int) argument.get();
 							command.getAnswers().remove(index);
 							event.sendMessage(Quotes.SUCCESS, "Removed answer index `" + index + "` from " + cmdName + ".\n").queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -126,7 +127,7 @@ public class CustomCmdsCommand {
 							}
 							event.getGuildData().customCommands.remove(cmdName);
 							event.sendMessage(Quotes.SUCCESS, "Deleted Custom Command `" + cmdName + "`.").queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -173,7 +174,7 @@ public class CustomCmdsCommand {
 							event.getGuildData().customCommands.remove(oldName);
 							event.getGuildData().customCommands.put(newName, command);
 							event.sendMessage(String.format(":ok_hand: Renamed `%s` to `%s", oldName, newName)).queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 							
 						}).build())
 				.build();

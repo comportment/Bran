@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
-import br.com.brjdevs.steven.bran.core.client.ClientShard;
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.core.currency.BankAccount;
 import br.com.brjdevs.steven.bran.core.data.UserData;
 import br.com.brjdevs.steven.bran.core.utils.Emojis;
@@ -22,7 +22,7 @@ public class HangManGame {
 	
 	public static List<HangManGame> games = new ArrayList<>();
 	
-	public ClientShard clientShard;
+	public BranShard branShard;
 	private long creatorId;
 	private List<Long> invitedUsers;
 	private LinkedHashMap<String, Boolean> word;
@@ -31,8 +31,8 @@ public class HangManGame {
 	private long channelId;
 	private boolean isPrivate;
 	
-	public HangManGame(ClientShard clientShard, MessageChannel channel, User creator, String word) {
-		this.clientShard = clientShard;
+	public HangManGame(BranShard branShard, MessageChannel channel, User creator, String word) {
+		this.branShard = branShard;
 		this.creatorId = Long.parseLong(creator.getId());
 		this.invitedUsers = new ArrayList<>();
 		this.word = new LinkedHashMap<>();
@@ -54,11 +54,11 @@ public class HangManGame {
 	}
 	
 	public User getCreator() {
-		return clientShard.getJDA().getUserById(String.valueOf(creatorId));
+		return branShard.getJDA().getUserById(String.valueOf(creatorId));
 	}
 	
 	public UserData getCreatorData() {
-		return clientShard.getClient().getDiscordBotData().getDataHolderManager().get().getUser(getCreator());
+		return branShard.getBran().getDataManager().getDataHolderManager().get().getUser(getCreator());
 	}
 	
 	public boolean isMuliplayer() {
@@ -66,11 +66,11 @@ public class HangManGame {
 	}
 	
 	public List<User> getInvitedUsers() {
-		return invitedUsers.stream().map(id -> clientShard.getJDA().getUserById(String.valueOf(id))).collect(Collectors.toList());
+		return invitedUsers.stream().map(id -> branShard.getJDA().getUserById(String.valueOf(id))).collect(Collectors.toList());
 	}
 	
 	public List<UserData> getInvitedUserDatas() {
-		return invitedUsers.stream().map(id -> clientShard.getClient().getDiscordBotData().getDataHolderManager().get().getUser(clientShard.getJDA().getUserById(String.valueOf(id)))).collect(Collectors.toList());
+		return invitedUsers.stream().map(id -> branShard.getBran().getDataManager().getDataHolderManager().get().getUser(branShard.getJDA().getUserById(String.valueOf(id)))).collect(Collectors.toList());
 	}
 	
 	public int getMaximumMistakes() {
@@ -82,7 +82,7 @@ public class HangManGame {
 	}
 	
 	public MessageChannel getChannel() {
-		return isPrivate ? clientShard.getJDA().getPrivateChannelById(String.valueOf(channelId)) : clientShard.getJDA().getTextChannelById(String.valueOf(channelId));
+		return isPrivate ? branShard.getJDA().getPrivateChannelById(String.valueOf(channelId)) : branShard.getJDA().getTextChannelById(String.valueOf(channelId));
 	}
 	
 	public EmbedBuilder baseEmbed() {
@@ -134,6 +134,8 @@ public class HangManGame {
 	
 	private void loose() {
 		getChannel().sendMessage(Emojis.CRY + " Too bad, you lost! The word was `" + getFullWord() + "`! " + (invitedUsers.isEmpty() ? "You" : "Everyone") + " lost 15 coins and 5 experience.").queue();
+		reward(getCreatorData(), 15, 5);
+		getInvitedUserDatas().forEach(userData -> reward(userData, 15, 5));
 		games.remove(this);
 	}
 	
@@ -160,7 +162,10 @@ public class HangManGame {
 	}
 	
 	private void reward(UserData userData, long coins, long exp) {
-		userData.getProfile().getBankAccount().addCoins(coins, BankAccount.MAIN_BANK);
+		if (coins > 0)
+			userData.getProfile().getBankAccount().addCoins(coins, BankAccount.MAIN_BANK);
+		else
+			userData.getProfile().getBankAccount().takeCoins(coins, BankAccount.MAIN_BANK);
 		userData.getProfile().addExperience(exp);
 	}
 }

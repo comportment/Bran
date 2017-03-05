@@ -34,8 +34,12 @@ public class LootCommand {
 						event.sendMessage("Nothing to loot here.").queue();
 						return;
 					}
+					if (!event.getUserData().getProfile().takeStamina(5)) {
+						event.sendMessage("You are too tired of walking, why don't you take a rest while your stamina regenerates?").queue();
+						return;
+					}
 					StringBuilder sb = new StringBuilder().append(Emojis.PARTY_POPPER + " ");
-					sb.append("You found ");
+					sb.append("You walk a little and find ");
 					if (!items.isEmpty()) {
 						items.forEach(stack -> {
 							ItemStack s = new ItemStack(stack.getItem(), 0);
@@ -53,7 +57,7 @@ public class LootCommand {
 						if (!event.getUserData().getProfile().getBankAccount().addCoins(money, BankAccount.MAIN_BANK)) {
 							ground.dropMoney(money);
 						} else {
-							if (!sb.toString().equals(Emojis.PARTY_POPPER + " You found "))
+							if (!sb.toString().equals(Emojis.PARTY_POPPER + " You walk a little and find "))
 								sb.append(" and ");
 							sb.append(money).append(" coins");
 						}

@@ -12,10 +12,10 @@ import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
 
-public class ClientShard {
+public class BranShard {
 	
-	private final Client client;
-	private final ClientEventManager eventManager;
+	private final Bran bran;
+	private final BranEventManager eventManager;
 	private int shardId;
 	private int totalShards;
 	private volatile JDA jda;
@@ -23,25 +23,25 @@ public class ClientShard {
 	private long lastReboot;
 	private int currentGuildCount;
 	
-	public ClientShard(int shardId, int totalShards, Client client) throws LoginException, InterruptedException, RateLimitedException {
+	public BranShard(int shardId, int totalShards, Bran bran) throws LoginException, InterruptedException, RateLimitedException {
 		this.shardId = shardId;
 		this.totalShards = totalShards;
-		this.client = client;
+		this.bran = bran;
 		this.startup = 0;
 		this.lastReboot = 0;
-		this.eventManager = new ClientEventManager(this);
+		this.eventManager = new BranEventManager(this);
 		restartJDA();
 	}
 	
-	public Client getClient() {
-		return client;
+	public Bran getBran() {
+		return bran;
 	}
 	
 	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
-		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(client.getConfig().botToken);
+		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(bran.getConfig().botToken);
 		Game game = null;
-		if (!Utils.isEmpty(client.getConfig().defaultGame))
-			game = client.getConfig().gameStream ? Game.of(client.getConfig().defaultGame, "https://twitch.tv/ ") : Game.of(client.getConfig().defaultGame);
+		if (!Utils.isEmpty(bran.getConfig().defaultGame))
+			game = bran.getConfig().gameStream ? Game.of(bran.getConfig().defaultGame, "https://twitch.tv/ ") : Game.of(bran.getConfig().defaultGame);
 		if (totalShards > 1) {
 			jdaBuilder.useSharding(shardId, totalShards);
 			if (game != null)
@@ -74,7 +74,7 @@ public class ClientShard {
 		return startup;
 	}
 	
-	public ClientEventManager getEventManager() {
+	public BranEventManager getEventManager() {
 		return eventManager;
 	}
 	
@@ -85,7 +85,7 @@ public class ClientShard {
 	}
 	
 	public String getInfo() {
-		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + Utils.getUser(client.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + client.getConfig().defaultPrefixes.get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + client.getConfig().defaultPrefixes.get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
+		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + Utils.getUser(bran.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + bran.getConfig().defaultPrefixes.get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + bran.getConfig().defaultPrefixes.get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
 	}
 	
 	public void updateCurrentGuildCount() {
@@ -105,7 +105,7 @@ public class ClientShard {
 		}
 		try {
 			Unirest.post("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
-					.header("Authorization", client.getConfig().discordBotsToken)
+					.header("Authorization", bran.getConfig().discordBotsToken)
 					.header("Content-Type", "application/json")
 					.body(data.toString())
 					.asJson();
@@ -114,7 +114,7 @@ public class ClientShard {
 		}
 		try {
 			Unirest.post("https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats")
-					.header("Authorization", client.getConfig().discordBotsOrgToken)
+					.header("Authorization", bran.getConfig().discordBotsOrgToken)
 					.header("Content-Type", "application/json")
 					.body(data.toString())
 					.asJson();

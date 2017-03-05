@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.misc;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -72,7 +72,7 @@ public class GiveawayCommand {
 							}
 							event.getGuildData().giveaway = new Giveaway(event.getMember(), event.getGuild(), role, event.getTextChannel(), numOfWinners, e);
 							event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who's participating by typing `.giveaway info`.").queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -80,7 +80,7 @@ public class GiveawayCommand {
 						.setName("Giveaway Information Command")
 						.setDescription("Shows you information on giveaways running in the current Guild.")
 						.setAction((event) -> {
-							Client client = event.getClient();
+							Bran bran = Bran.getInstance();
 							Giveaway giveaway = event.getGuildData().giveaway;
 							if (giveaway == null) {
 								event.sendMessage("No giveaway running in the current Guild!").queue();
@@ -89,10 +89,10 @@ public class GiveawayCommand {
 							EmbedBuilder embedBuilder = new EmbedBuilder();
 							embedBuilder.setColor(Color.decode("#43474B"));
 							embedBuilder.setAuthor("Information on the Giveaway for Guild " + event.getGuild().getName(), null, event.getGuild().getIconUrl());
-							Member creator = giveaway.getCreator(client);
-							embedBuilder.setFooter("Giveaway created by " + Utils.getUser(creator == null ? null : creator.getUser()), creator == null ? null : giveaway.getCreator(client).getUser().getEffectiveAvatarUrl());
-							String desc = "This giveaway is available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(client).getName() + "`") + ".\n\n";
-							String participating = giveaway.getParticipants(client).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
+							Member creator = giveaway.getCreator(bran);
+							embedBuilder.setFooter("Giveaway created by " + Utils.getUser(creator == null ? null : creator.getUser()), creator == null ? null : giveaway.getCreator(bran).getUser().getEffectiveAvatarUrl());
+							String desc = "This giveaway is available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(bran).getName() + "`") + ".\n\n";
+							String participating = giveaway.getParticipants(bran).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
 							if (participating.length() > EmbedBuilder.TEXT_MAX_LENGTH - desc.length())
 								participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
 							desc += participating + "\n\nTotal users Participating: " + giveaway.getTotalParticipants() + " out of " + giveaway.getMaxWinners() + " winners... Who do you bet will win? \uD83D\uDC40";
@@ -114,14 +114,14 @@ public class GiveawayCommand {
 								event.sendMessage("This Giveaway has expired, no more Members can participate!").queue();
 								return;
 							}
-							Role role = giveaway.getRole(event.getClient());
+							Role role = giveaway.getRole(Bran.getInstance());
 							if (role != null && !event.getMember().getRoles().contains(role)) {
 								event.sendMessage(Quotes.FAIL, "This Giveaway is only allowed for members with the role " + role.getName()).queue();
 								return;
 							}
 							boolean success = giveaway.participate(event.getMember());
 							event.sendMessage(success ? "You are now participating in the Giveaway!" : "You're already participating in the Giveaway!").queue();
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
@@ -130,7 +130,7 @@ public class GiveawayCommand {
 						.setDescription("Ends giveaways running in the current Guild.")
 						.setRequiredPermission(Permissions.CREATE_GIVEAWAY)
 						.setAction((event) -> {
-							Client client = event.getClient();
+							Bran bran = Bran.getInstance();
 							Giveaway giveaway = event.getGuildData().giveaway;
 							if (giveaway == null) {
 								event.sendMessage(Quotes.FAIL, "No giveaways running in the current Guild!").queue();
@@ -144,9 +144,9 @@ public class GiveawayCommand {
 							EmbedBuilder embedBuilder = new EmbedBuilder();
 							embedBuilder.setColor(Color.decode("#43474B"));
 							embedBuilder.setAuthor("Information on the Giveaway for Guild " + event.getGuild().getName(), null, event.getGuild().getIconUrl());
-							embedBuilder.setFooter("Giveaway created by " + Utils.getUser(giveaway.getCreator(client).getUser()), giveaway.getCreator(client).getUser().getEffectiveAvatarUrl());
-							String desc = "This giveaway was available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(client).getName()) + ".\n";
-							String participating = giveaway.getParticipants(client).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
+							embedBuilder.setFooter("Giveaway created by " + Utils.getUser(giveaway.getCreator(bran).getUser()), giveaway.getCreator(bran).getUser().getEffectiveAvatarUrl());
+							String desc = "This giveaway was available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(bran).getName()) + ".\n";
+							String participating = giveaway.getParticipants(bran).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
 							if (participating.length() > EmbedBuilder.TEXT_MAX_LENGTH - desc.length())
 								participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
 							List<Long> p = new ArrayList<>(giveaway.getParticipants());
@@ -161,11 +161,11 @@ public class GiveawayCommand {
 							desc += participating + "\n\nThere was " + giveaway.getTotalParticipants() + " users participating on this Giveaway!\n\nAnd the " + (giveaway.getMaxWinners() > 1 ? "winners are" : "winner is") + "... " + winners.stream().map(m -> Utils.getUser(m.getUser())).collect(Collectors.joining("\n"));
 							embedBuilder.setDescription(desc);
 							event.sendMessage(embedBuilder.build()).queue();
-							event.sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)! :smile:").queue();
-							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(client).getName() + ", contact " + Utils.getUser(giveaway.getCreator(client).getUser()) + " to receive your prize(s)!").queue()));
+							event.sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)! :smile:").queue();
+							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(bran).getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
 							Giveaway.expiration.remove(giveaway);
 							event.getGuildData().giveaway = null;
-							event.getClient().getDiscordBotData().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getDataHolderManager().update();
 						})
 						.build())
 				.build();

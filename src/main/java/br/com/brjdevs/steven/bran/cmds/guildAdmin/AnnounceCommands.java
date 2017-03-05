@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -42,7 +43,7 @@ public class AnnounceCommands {
 					}
 					data.joinMsg = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated greeting message!").queue();
-					event.getClient().getDiscordBotData().getDataHolderManager().update();
+					Bran.getInstance().getDataManager().getDataHolderManager().update();
 				})
 				.build();
 	}
@@ -76,7 +77,7 @@ public class AnnounceCommands {
 					}
 					data.leaveMsg = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated farewell message!").queue();
-					event.getClient().getDiscordBotData().getDataHolderManager().update();
+					Bran.getInstance().getDataManager().getDataHolderManager().update();
 				})
 				.build();
 	}
@@ -110,7 +111,7 @@ public class AnnounceCommands {
 					}
 					data.joinMsgDM = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated greetingDM message!").queue();
-					event.getClient().getDiscordBotData().getDataHolderManager().update();
+					Bran.getInstance().getDataManager().getDataHolderManager().update();
 				})
 				.build();
 	}

@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.listeners;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.command.CommandEvent;
 import br.com.brjdevs.steven.bran.core.command.CommandStatsManager;
@@ -22,8 +22,8 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 	
 	private static final SimpleLog LOG = SimpleLog.getLog("CommandListener");
 	
-	public CommandListener(Client client) {
-		super(MessageReceivedEvent.class, client);
+	public CommandListener() {
+		super(MessageReceivedEvent.class);
 	}
 	
 	@Override
@@ -32,22 +32,22 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 			return;
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
-		GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild());
-		String prefix = PrefixManager.getPrefix(args[0], guildData, client);
+		GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild());
+		String prefix = PrefixManager.getPrefix(args[0], guildData);
 		if (prefix == null) return;
 		String baseCmd = args[0].substring(prefix.length());
-		ICommand cmd = client.getCommandManager().getCommand(baseCmd);
+		ICommand cmd = Bran.getInstance().getCommandManager().getCommand(baseCmd);
 		if (cmd == null)
 			return;
 		else if (!cmd.isPrivateAvailable() && event.isFromType(ChannelType.PRIVATE)) {
 			event.getChannel().sendTyping().queue(success -> event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue());
 			
-		} else if (event.isFromType(ChannelType.PRIVATE) ? !client.getDiscordBotData().getDataHolderManager().get().getUser(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !client.getDiscordBotData().getDataHolderManager().get().getGuild(event.getGuild()).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
+		} else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getDataHolderManager().get().getUser(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild()).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
 			event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + "*").queue());
 			return;
 		}
-		CommandEvent e = new CommandEvent(event, cmd, guildData, event.getMessage().getRawContent(), prefix, client);
-		client.getSession().cmds++;
+		CommandEvent e = new CommandEvent(event, cmd, guildData, event.getMessage().getRawContent(), prefix);
+		Bran.getInstance().getSession().cmds++;
 		CommandStatsManager.log(cmd);
 		Utils.async(cmd.getName() + ">" + Utils.getUser(event.getAuthor()),
 				() -> {
@@ -59,7 +59,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 						LOG.log(ex);
 						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.\nException message: `" + ex.getMessage() + "`").queue();
 						String url = Hastebin.post(Utils.getStackTrace(ex));
-						client.getDiscordLog().logToDiscord("Uncaught exception in Thread " + Thread.currentThread().getName(), "An unexpected `" + ex.getClass().getSimpleName() + "` occurred.\nMessage: " + ex.getMessage() + "\nStackTrace: " + url, Level.FATAL);
+						Bran.getInstance().getDiscordLog().logToDiscord("Uncaught exception in Thread " + Thread.currentThread().getName(), "An unexpected `" + ex.getClass().getSimpleName() + "` occurred.\nMessage: " + ex.getMessage() + "\nStackTrace: " + url, Level.FATAL);
 					}
 				}).run();
 	}

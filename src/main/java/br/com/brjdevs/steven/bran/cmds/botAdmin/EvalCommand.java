@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.botAdmin;
 
-import br.com.brjdevs.steven.bran.core.client.Client;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -78,7 +78,7 @@ public class EvalCommand /*implements ICommand*/ {
 						.setArgs(new Argument("js code", String.class))
 						.setAction((event) -> {
 							eval.put("shard", event.getShard());
-							eval.put("client", event.getClient());
+							eval.put("bran", Bran.getInstance());
 							eval.put("jda", event.getJDA());
 							eval.put("event", event);
 							eval.put("author", event.getAuthor());
@@ -112,7 +112,7 @@ public class EvalCommand /*implements ICommand*/ {
 								stream.write(getBodyWithLines((String) event.getArgument("java code").get()).getBytes());
 								stream.close();
 								try {
-									FutureTask<?> task = new FutureTask<>(() -> compile(event.getClient()));
+									FutureTask<?> task = new FutureTask<>(() -> compile(Bran.getInstance()));
 									task.run();
 									x = task.get(15, TimeUnit.SECONDS);
 								} catch (TimeoutException e) {
@@ -144,7 +144,7 @@ public class EvalCommand /*implements ICommand*/ {
 								}
 								if (o == null || o.toString().isEmpty())
 									o = "Executed without error and no objects returned!";
-								o = o.toString().replaceAll(event.getClient().getConfig().botToken, "<BOT TOKEN>");
+								o = o.toString().replaceAll(Bran.getInstance().getConfig().botToken, "<BOT TOKEN>");
 								event.sendMessage(o.toString()).queue();
 							} catch (Exception e) {
 								if (x == null) x = e;
@@ -161,7 +161,7 @@ public class EvalCommand /*implements ICommand*/ {
 				.build();
 	}
 	
-	private static String compile(Client client) throws Exception {
+	private static String compile(Bran bran) throws Exception {
 		if (!f.exists())
 			throw new UnexpectedException("Unable to compile source file.");
 		ProcessBuilder builder = new ProcessBuilder();
@@ -174,7 +174,7 @@ public class EvalCommand /*implements ICommand*/ {
 		
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(p.getErrorStream(), writer, Charset.forName("UTF-8"));
-		String x = writer.toString().replace(client.workingDir.getPath(), "<ClassPath>").replace("\\classes", "");
+		String x = writer.toString().replace(bran.workingDir.getPath(), "<ClassPath>").replace("\\classes", "");
 		
 		sc.close();
 		scErr.close();
@@ -224,7 +224,7 @@ public class EvalCommand /*implements ICommand*/ {
 			case "js":
 			case "javascript":
 				eval.put("shard", event.getShard());
-				eval.put("container", event.getClient());
+				eval.put("container", Bran.getInstance());
 				eval.put("jda", event.getJDA());
 				eval.put("event", event);
 				eval.put("author", event.getAuthor());
@@ -252,7 +252,7 @@ public class EvalCommand /*implements ICommand*/ {
 					stream.write(getBodyWithLines((String) event.getArgument("java code").get()).getBytes());
 					stream.close();
 					try {
-						FutureTask<?> task = new FutureTask<>(() -> compile(event.getClient()));
+						FutureTask<?> task = new FutureTask<>(() -> compile(Bran.getInstance()));
 						task.run();
 						x = task.get(15, TimeUnit.SECONDS);
 					} catch (TimeoutException e) {
@@ -284,7 +284,7 @@ public class EvalCommand /*implements ICommand*/ {
 					}
 					if (o == null || o.toString().isEmpty())
 						o = "Executed without error and no objects returned!";
-					o = o.toString().replaceAll(event.getClient().getConfig().botToken, "<BOT TOKEN>");
+					o = o.toString().replaceAll(Bran.getInstance().getConfig().botToken, "<BOT TOKEN>");
 					event.sendMessage(o.toString()).queue();
 				} catch (Exception e) {
 					if (x == null) x = e;

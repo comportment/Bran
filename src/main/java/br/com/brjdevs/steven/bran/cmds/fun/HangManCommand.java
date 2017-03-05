@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.fun;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -45,7 +46,7 @@ public class HangManCommand {
 						.setDescription("Starts a HangMan Session.")
 						.setName("HangMan Start Command")
 						.setAction((event, args) -> {
-							if (event.getClient().getDiscordBotData().getHangmanWordsManager().get().isEmpty()) {
+							if (Bran.getInstance().getDataManager().getHangmanWordsManager().get().isEmpty()) {
 								event.sendMessage(Quotes.FAIL, "No words loaded, please report this message to my master!").queue();
 								return;
 							}
@@ -63,7 +64,7 @@ public class HangManCommand {
 									return;
 								}
 							}
-							session = new HangManGame(event.getShard(), event.getChannel(), event.getAuthor(), CollectionUtils.getEntryByIndex(event.getClient().getDiscordBotData().getHangmanWordsManager().get(), MathUtils.random(event.getClient().getDiscordBotData().getHangmanWordsManager().get().size())).getKey());
+							session = new HangManGame(event.getShard(), event.getChannel(), event.getAuthor(), CollectionUtils.getEntryByIndex(Bran.getInstance().getDataManager().getHangmanWordsManager().get(), MathUtils.random(Bran.getInstance().getDataManager().getHangmanWordsManager().get().size())).getKey());
 							event.sendMessage(session.baseEmbed().setDescription("Started game!\n\n\n**Guesses:** " + session.getGuessedLetters() + "\nYou've made " + session.getMistakes().size() + " out of " + session.getMaximumMistakes() + "." + (session.getMistakes().isEmpty() ? "" : " (" + session.getMistakes().stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")") + "\n\n" + (session.getGivenTips().isEmpty() ? "You didn't ask for any tips." : "These are the current given tips:\n" + (String.join("\n", session.getGivenTips()))) + "\nMultiplayer: " + (session.getInvitedUsers().isEmpty()) + (session.getInvitedUsers().isEmpty() ? "" : "\n" + session.getInvitedUsers().stream().map(Utils::getUser).collect(Collectors.joining(", ")))).build()).queue();
 							event.sendMessage("**Note:** Prefix your messages with `^` to do guesses!").queue();
 						})
@@ -164,19 +165,19 @@ public class HangManCommand {
 						.setAliases("words")
 						.setName("HangMan Words Command")
 						.setHelp("hm words ?")
-						.setExample("hm words add Cool")
+						.setExample("hm words join Cool")
 						.setRequiredPermission(Permissions.BOT_ADMIN)
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
-								.setAliases("add")
-								.setExample("hm words add Cool")
+								.setAliases("join")
+								.setExample("hm words join Cool")
 								.setName("HangMan Add Word Command")
 								.setDescription("Adds words to the HangMan Game!")
 								.setArgs(new Argument("word", String.class))
 								.setAction((event, rawArgs) -> {
 									String word = (String) event.getArgument("word").get();
-									event.getClient().getDiscordBotData().getHangmanWordsManager().get().put(word, new ArrayList<>());
-									event.sendMessage(Quotes.SUCCESS, "Added word to HangMan, you can add tips to it using `" + event.getPrefix() + "hangman words tip " + word + " [tip]`.").queue();
-									event.getClient().getDiscordBotData().getHangmanWordsManager().update();
+									Bran.getInstance().getDataManager().getHangmanWordsManager().get().put(word, new ArrayList<>());
+									event.sendMessage(Quotes.SUCCESS, "Added word to HangMan, you can join tips to it using `" + event.getPrefix() + "hangman words tip " + word + " [tip]`.").queue();
+									Bran.getInstance().getDataManager().getHangmanWordsManager().update();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -186,12 +187,12 @@ public class HangManCommand {
 								.setArgs(new Argument("word", String.class), new Argument("tip", String.class))
 								.setAction((event) -> {
 									String word = (String) event.getArgument("word").get();
-									if (!event.getClient().getDiscordBotData().getHangmanWordsManager().get().containsKey(word)) {
+									if (!Bran.getInstance().getDataManager().getHangmanWordsManager().get().containsKey(word)) {
 										event.sendMessage("Could not find word `" + word + "`.").queue();
 										return;
 									}
 									String tip = (String) event.getArgument("tip").get();
-									if (event.getClient().getDiscordBotData().getHangmanWordsManager().get().get(word).contains(tip)) {
+									if (Bran.getInstance().getDataManager().getHangmanWordsManager().get().get(word).contains(tip)) {
 										event.sendMessage("This word already has this Tip!").queue();
 										return;
 									}
@@ -199,9 +200,9 @@ public class HangManCommand {
 										event.sendMessage("The Tip can't be the word!").queue();
 										return;
 									}
-									event.getClient().getDiscordBotData().getHangmanWordsManager().get().get(word).add(tip);
-									event.sendMessage(Quotes.SUCCESS, "Added new tip to this word! *(Total tips: " + event.getClient().getDiscordBotData().getHangmanWordsManager().get().get(word).size() + ")*").queue();
-									event.getClient().getDiscordBotData().getHangmanWordsManager().update();
+									Bran.getInstance().getDataManager().getHangmanWordsManager().get().get(word).add(tip);
+									event.sendMessage(Quotes.SUCCESS, "Added new tip to this word! *(Total tips: " + Bran.getInstance().getDataManager().getHangmanWordsManager().get().get(word).size() + ")*").queue();
+									Bran.getInstance().getDataManager().getHangmanWordsManager().update();
 								})
 								.build())
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
@@ -212,7 +213,7 @@ public class HangManCommand {
 								.setAction((event, rawArgs) -> {
 									Argument argument = event.getArgument("page");
 									int page = argument.isPresent() && (int) argument.get() > 0 ? (int) argument.get() : 1;
-									List<String> list = event.getClient().getDiscordBotData().getHangmanWordsManager().get().entrySet().stream().map(entry -> entry.getKey() + " (" + entry.getValue().size() + " tips)").collect(Collectors.toList());
+									List<String> list = Bran.getInstance().getDataManager().getHangmanWordsManager().get().entrySet().stream().map(entry -> entry.getKey() + " (" + entry.getValue().size() + " tips)").collect(Collectors.toList());
 									StringListBuilder listBuilder = new StringListBuilder(list, page, 10);
 									listBuilder.setName("HangMan Words").setFooter("Total Words: " + list.size());
 									event.sendMessage(listBuilder.format(Format.CODE_BLOCK)).queue();
