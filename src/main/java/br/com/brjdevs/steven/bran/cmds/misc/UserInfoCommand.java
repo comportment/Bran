@@ -38,9 +38,9 @@ public class UserInfoCommand {
 					}
 					Member member = event.getMessage().getMentionedUsers().isEmpty() ? event.getMember() : event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
 					OffsetDateTime date = member.getJoinDate();
-					String joinDate = StringUtils.neat(date.getDayOfWeek().toString().substring(0, 3)) + ", " + date.getDayOfMonth() + " " + StringUtils.neat(date.getMonth().toString().substring(0, 3)) + " " + date.getYear() + " " + MathUtils.toOctalInteger(date.getHour()) + ":" + MathUtils.toOctalInteger(date.getMinute()) + ":" + MathUtils.toOctalInteger(date.getSecond()) + " GMT";
+					String joinDate = StringUtils.capitalize(date.getDayOfWeek().toString().substring(0, 3)) + ", " + date.getDayOfMonth() + " " + StringUtils.capitalize(date.getMonth().toString().substring(0, 3)) + " " + date.getYear() + " " + MathUtils.toOctalInteger(date.getHour()) + ":" + MathUtils.toOctalInteger(date.getMinute()) + ":" + MathUtils.toOctalInteger(date.getSecond()) + " GMT";
 					OffsetDateTime creation = member.getUser().getCreationTime();
-					String createdAt = StringUtils.neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + StringUtils.neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + MathUtils.toOctalInteger(creation.getHour()) + ":" + MathUtils.toOctalInteger(creation.getMinute()) + ":" + MathUtils.toOctalInteger(creation.getSecond()) + " GMT";
+					String createdAt = StringUtils.capitalize(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + StringUtils.capitalize(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + MathUtils.toOctalInteger(creation.getHour()) + ":" + MathUtils.toOctalInteger(creation.getMinute()) + ":" + MathUtils.toOctalInteger(creation.getSecond()) + " GMT";
 					User user = member.getUser();
 					EmbedBuilder embed = new EmbedBuilder();
 					embed.setTitle("\uD83D\uDC65 User information on " + Utils.getUser(user), null);

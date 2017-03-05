@@ -62,9 +62,9 @@ public class StringUtils {
     public static String getContentBetween(String fullSeq, String s) {
         return getContentBetween(fullSeq, s, s);
     }
-
-    public static String neat(String string) {
-        String firstChar = String.valueOf(string.charAt(0)).toUpperCase();
+	
+	public static String capitalize(String string) {
+		String firstChar = String.valueOf(string.charAt(0)).toUpperCase();
         string = string.substring(1).toLowerCase();
         return firstChar + string;
     }

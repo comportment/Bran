@@ -48,7 +48,7 @@ public class EmotesCommand {
 							}
 							Emote emote = event.getMessage().getEmotes().get(0);
 							OffsetDateTime creation = emote.getCreationTime();
-							String createdAt = StringUtils.neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + StringUtils.neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + creation.getHour() + ":" + creation.getMinute() + ":" + creation.getSecond() + " GMT";
+							String createdAt = StringUtils.capitalize(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + StringUtils.capitalize(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + creation.getHour() + ":" + creation.getMinute() + ":" + creation.getSecond() + " GMT";
 							MessageEmbed embed = new EmbedBuilder()
 									.setFooter("Requested by " + event.getAuthor().getName(), Utils.getAvatarUrl(event.getAuthor()))
 									.setTimestamp(event.getMessage().getCreationTime())

@@ -2,18 +2,20 @@ package br.com.brjdevs.steven.bran.core.utils;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.listeners.EventListener;
+import br.com.brjdevs.steven.bran.core.managers.GuildStatsManager;
 import br.com.brjdevs.steven.bran.core.poll.Poll;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
+import java.awt.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
+
+import static br.com.brjdevs.steven.bran.core.command.CommandStatsManager.*;
 
 public class Session extends EventListener<GuildMessageReceivedEvent> {
 	
@@ -69,6 +71,65 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		lastProcessCpuTime = processCpuTime;
 		
 		return cpuUsage / availableProcessors;
+	}
+	
+	public MessageEmbed toEmbedAbout(JDA jda) {
+		List<Guild> guilds = Bran.getInstance().getGuilds();
+		List<TextChannel> channels = Bran.getInstance().getTextChannels();
+		List<VoiceChannel> voiceChannels = Bran.getInstance().getVoiceChannels();
+		List<User> users = Bran.getInstance().getUsers();
+		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
+		long queueSize = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
+		long nowPlaying = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
+		long paused = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		embedBuilder.setAuthor("About me", null, jda.getSelfUser().getEffectiveAvatarUrl());
+		embedBuilder.setThumbnail(jda.getSelfUser().getAvatarUrl());
+		embedBuilder.addField("\uD83C\uDFD8 Guilds", String.valueOf(guilds.size()), true);
+		embedBuilder.addField("\uD83D\uDC65 Users", String.valueOf(users.size()), true);
+		embedBuilder.addField("\uD83D\uDCDD Text Channels", String.valueOf(channels.size()), true);
+		embedBuilder.addField("\uD83D\uDDE3 Voice Channels", String.valueOf(voiceChannels.size()), true);
+		embedBuilder.addField("\uD83D\uDCE4 Sent Messages", String.valueOf(msgsSent), true);
+		embedBuilder.addField("\uD83D\uDCE5 Received Messages", String.valueOf(msgsReceived), true);
+		embedBuilder.addField("\uD83D\uDCBB Executed Commands", String.valueOf(cmds), true);
+		embedBuilder.addField("\uD83D\uDD39 Shards (C/T)", Bran.getInstance().getOnlineShards().length + "/" + Bran.getInstance().getShards().length, true);
+		embedBuilder.addField("<:jda:230988580904763393> JDA Version", JDAInfo.VERSION, true);
+		embedBuilder.addField("\uD83D\uDCF0 API Responses", String.valueOf(Bran.getInstance().getResponseTotal()), true);
+		embedBuilder.addField("\uD83C\uDFB8 Music Stats", "\u00AD", false);
+		embedBuilder.addField("\uD83C\uDF10 Connections", String.valueOf(audioConnections), true);
+		embedBuilder.addField("\uD83C\uDFB6 Queue size", String.valueOf(queueSize), true);
+		embedBuilder.addField("\uD83D\uDD0A Now playing", String.valueOf(nowPlaying), true);
+		embedBuilder.addField("\u23f8 Paused", String.valueOf(paused), true);
+		return embedBuilder.setColor(Color.DARK_GRAY).build();
+	}
+	
+	public MessageEmbed toEmbedTechnical(JDA jda) {
+		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		embedBuilder.setAuthor("Technical Information", null, jda.getSelfUser().getEffectiveAvatarUrl());
+		embedBuilder.setThumbnail(jda.getSelfUser().getAvatarUrl());
+		embedBuilder.addField("Uptime", getUptime(), false);
+		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", true);
+		embedBuilder.addField("Threads", String.valueOf(Thread.activeCount()), true);
+		embedBuilder.addField("RAM (USAGE/MAX)", ram, true);
+		return embedBuilder.setColor(Color.DARK_GRAY).build();
+	}
+	
+	public MessageEmbed toEmbedCmds(JDA jda) {
+		return new EmbedBuilder().setTitle("Command Stats", null).setColor(Color.DARK_GRAY)
+				.addField("Now", GuildStatsManager.resume(GuildStatsManager.MINUTE_EVENTS), false)
+				.addField("Hourly", GuildStatsManager.resume(GuildStatsManager.HOUR_EVENTS), false)
+				.addField("Daily", GuildStatsManager.resume(GuildStatsManager.DAY_EVENTS), false)
+				.addField("Total", GuildStatsManager.resume(GuildStatsManager.TOTAL_EVENTS), false)
+				.setFooter("Guilds: " + Bran.getInstance().getGuilds().size(), null).build();
+	}
+	
+	public MessageEmbed toEmbedGuilds(JDA jda) {
+		return new EmbedBuilder().setTitle("Guild Stats", null).setColor(Color.DARK_GRAY)
+				.addField("Now", resume(MINUTE_CMDS), false)
+				.addField("Hourly", resume(HOUR_CMDS), false)
+				.addField("Daily", resume(DAY_CMDS), false)
+				.addField("Total", resume(TOTAL_CMDS), false).build();
 	}
 	
 	public String toString(JDA jda) {

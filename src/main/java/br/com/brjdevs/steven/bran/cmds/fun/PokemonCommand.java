@@ -52,7 +52,7 @@ public class PokemonCommand {
 						JsonArray abilities = item.get("abilities").getAsJsonArray();
 						JsonArray stats = item.get("stats").getAsJsonArray();
 						EmbedBuilder embedBuilder = new EmbedBuilder();
-						stringBuilder.append("**Name:** ").append(StringUtils.neat(
+						stringBuilder.append("**Name:** ").append(StringUtils.capitalize(
 								item.get("forms")
 										.getAsJsonArray()
 										.get(0).getAsJsonObject()
@@ -63,7 +63,7 @@ public class PokemonCommand {
 						for (int i = 0; i < abilities.size(); i++) {
 							JsonObject ability = abilities.get(i).getAsJsonObject();
 							stringBuilder.append("      **")
-									.append(StringUtils.neat(ability.get("ability")
+									.append(StringUtils.capitalize(ability.get("ability")
 											.getAsJsonObject().get("name").getAsString()).replaceAll("-", " "));
 							stringBuilder.append("**\n        ").append("**Is Hidden:** ").append(ability.get("is_hidden").getAsBoolean()).append("\n\n");
 						}
@@ -71,7 +71,7 @@ public class PokemonCommand {
 						for (int i = 0; i < stats.size(); i++) {
 							JsonObject stat = stats.get(i).getAsJsonObject();
 							String name = stat.get("stat").getAsJsonObject().get("name").getAsString();
-							name = StringUtils.neat(name.replaceAll("-", " "));
+							name = StringUtils.capitalize(name.replaceAll("-", " "));
 							int base = stat.get("base_stat").getAsInt();
 							stringBuilder.append("      **").append(name).append("**: ").append(base).append("\n");
 						}

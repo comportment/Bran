@@ -78,7 +78,7 @@ public class AudioPlayerListener extends AudioEventAdapter {
 	public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
 		if (scheduler.getCurrentTrack().getContext() != null && scheduler.getCurrentTrack().getContext().canTalk()) {
 			String string = "\u274c Failed to play `" + track.getInfo().title + "`!\n" +
-					(exception.severity.equals(Severity.COMMON) ? StringUtils.neat(track.getSourceManager().getSourceName()) + " said: " : exception.severity.equals(Severity.SUSPICIOUS) ? "I don't know what exactly caused it, but I've got this: " : "This error might be caused by the library (Lavaplayer) or an external unidentified factor: ") + "`" + exception.getMessage() + "`";
+					(exception.severity.equals(Severity.COMMON) ? StringUtils.capitalize(track.getSourceManager().getSourceName()) + " said: " : exception.severity.equals(Severity.SUSPICIOUS) ? "I don't know what exactly caused it, but I've got this: " : "This error might be caused by the library (Lavaplayer) or an external unidentified factor: ") + "`" + exception.getMessage() + "`";
 			Message msg = getMessage();
 			if (msg != null)
 				msg.editMessage(string).queue();

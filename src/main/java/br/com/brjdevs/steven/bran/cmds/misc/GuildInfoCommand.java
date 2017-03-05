@@ -19,7 +19,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static br.com.brjdevs.steven.bran.core.utils.StringUtils.neat;
+import static br.com.brjdevs.steven.bran.core.utils.StringUtils.capitalize;
 
 public class GuildInfoCommand {
 	
@@ -41,7 +41,7 @@ public class GuildInfoCommand {
 					if (guild == null) guild = event.getGuild();
 					Member guildOwner = guild.getOwner();
 					OffsetDateTime creation = guild.getCreationTime();
-					String creationDate = neat(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + neat(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + creation.getHour() + ":" + creation.getMinute() + ":" + creation.getSecond() + " GMT";
+					String creationDate = capitalize(creation.getDayOfWeek().toString().substring(0, 3)) + ", " + creation.getDayOfMonth() + " " + capitalize(creation.getMonth().toString().substring(0, 3)) + " " + creation.getYear() + " " + creation.getHour() + ":" + creation.getMinute() + ":" + creation.getSecond() + " GMT";
 					boolean hasEmotes = !guild.getEmotes().isEmpty();
 					EmbedBuilder embedBuilder = new EmbedBuilder();
 					embedBuilder.setThumbnail(guild.getIconUrl());
