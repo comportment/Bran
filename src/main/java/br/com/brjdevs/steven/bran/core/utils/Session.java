@@ -84,7 +84,6 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		long paused = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.setAuthor("About me", null, jda.getSelfUser().getEffectiveAvatarUrl());
-		embedBuilder.setThumbnail(jda.getSelfUser().getAvatarUrl());
 		embedBuilder.addField("\uD83C\uDFD8 Guilds", String.valueOf(guilds.size()), true);
 		embedBuilder.addField("\uD83D\uDC65 Users", String.valueOf(users.size()), true);
 		embedBuilder.addField("\uD83D\uDCDD Text Channels", String.valueOf(channels.size()), true);
@@ -95,6 +94,7 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		embedBuilder.addField("\uD83D\uDD39 Shards (C/T)", Bran.getInstance().getOnlineShards().length + "/" + Bran.getInstance().getShards().length, true);
 		embedBuilder.addField("<:jda:230988580904763393> JDA Version", JDAInfo.VERSION, true);
 		embedBuilder.addField("\uD83D\uDCF0 API Responses", String.valueOf(Bran.getInstance().getResponseTotal()), true);
+		embedBuilder.addBlankField(false);
 		embedBuilder.addField("\uD83C\uDFB8 Music Stats", "\u00AD", false);
 		embedBuilder.addField("\uD83C\uDF10 Connections", String.valueOf(audioConnections), true);
 		embedBuilder.addField("\uD83C\uDFB6 Queue size", String.valueOf(queueSize), true);
@@ -107,7 +107,6 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.setAuthor("Technical Information", null, jda.getSelfUser().getEffectiveAvatarUrl());
-		embedBuilder.setThumbnail(jda.getSelfUser().getAvatarUrl());
 		embedBuilder.addField("Uptime", getUptime(), false);
 		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", true);
 		embedBuilder.addField("Threads", String.valueOf(Thread.activeCount()), true);
@@ -116,20 +115,20 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	}
 	
 	public MessageEmbed toEmbedCmds(JDA jda) {
-		return new EmbedBuilder().setTitle("Command Stats", null).setColor(Color.DARK_GRAY)
+		return new EmbedBuilder().setTitle("Commands Stats", null).setColor(Color.DARK_GRAY)
+				.addField("Now", resume(MINUTE_CMDS), false)
+				.addField("Hourly", resume(HOUR_CMDS), false)
+				.addField("Daily", resume(DAY_CMDS), false)
+				.addField("Total", resume(TOTAL_CMDS), false).build();
+	}
+	
+	public MessageEmbed toEmbedGuilds(JDA jda) {
+		return new EmbedBuilder().setTitle("Guild Stats", null).setColor(Color.DARK_GRAY)
 				.addField("Now", GuildStatsManager.resume(GuildStatsManager.MINUTE_EVENTS), false)
 				.addField("Hourly", GuildStatsManager.resume(GuildStatsManager.HOUR_EVENTS), false)
 				.addField("Daily", GuildStatsManager.resume(GuildStatsManager.DAY_EVENTS), false)
 				.addField("Total", GuildStatsManager.resume(GuildStatsManager.TOTAL_EVENTS), false)
 				.setFooter("Guilds: " + Bran.getInstance().getGuilds().size(), null).build();
-	}
-	
-	public MessageEmbed toEmbedGuilds(JDA jda) {
-		return new EmbedBuilder().setTitle("Guild Stats", null).setColor(Color.DARK_GRAY)
-				.addField("Now", resume(MINUTE_CMDS), false)
-				.addField("Hourly", resume(HOUR_CMDS), false)
-				.addField("Daily", resume(DAY_CMDS), false)
-				.addField("Total", resume(TOTAL_CMDS), false).build();
 	}
 	
 	public String toString(JDA jda) {

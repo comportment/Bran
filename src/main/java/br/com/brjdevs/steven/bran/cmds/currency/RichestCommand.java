@@ -8,6 +8,7 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.currency.BankAccount;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -25,14 +26,18 @@ public class RichestCommand {
 				.setDescription("Lists you the richest users!")
 				.setAction((event) -> {
 					List<BankAccount> bankAccounts = new ArrayList<>(Bran.getInstance().getDataManager().getDataHolderManager().get().users
-							.values().stream().map(userData -> userData.getProfile().getBankAccount())
-							.sorted(Comparator.comparing(BankAccount::getCoins)).limit(15).collect(Collectors.toList()));
+							.values().stream().filter(userData -> {
+								User u = Bran.getInstance().getUserById(String.valueOf(userData.userId));
+								return u != null && !u.isBot();
+							}).map(userData -> userData.getProfile().getBankAccount())
+							.sorted(Comparator.comparingLong(bankAccount -> Long.MAX_VALUE - bankAccount.getCoins()))
+							.limit(15).collect(Collectors.toList()));
+					
 					EmbedBuilder embedBuilder = new EmbedBuilder();
 					embedBuilder.setColor(Color.DARK_GRAY);
 					embedBuilder.setDescription(bankAccounts.stream().map(bankAccount -> (bankAccounts.indexOf(bankAccount) + 1) + ". "
 							+ Utils.getUser(Bran.getInstance().getUserById(bankAccount.userId)) + " - "
-							+ (bankAccounts.indexOf(bankAccount) == 0 ? "**" : "") + bankAccount.getCoins() + " coins"
-							+ (bankAccounts.indexOf(bankAccount) == 0 ? "**" : "")).collect(Collectors.joining("\n")));
+							+ bankAccount.getCoins() + " coins").collect(Collectors.joining("\n")));
 					event.sendMessage(embedBuilder.build()).queue();
 				})
 				.build();

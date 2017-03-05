@@ -7,7 +7,7 @@ import net.dv8tion.jda.core.entities.User;
 
 public class UserData {
 	
-	private long userId;
+	public long userId;
 	private Profile profile;
 	private long globalPermission = Permissions.BASE_USR;
 	
