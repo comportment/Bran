@@ -54,6 +54,7 @@ public class AudioPlayerListener extends AudioEventAdapter {
 	}
 	
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
+		Bran.getInstance().getMusicManager().playedSongs.incrementAndGet();
 		Bran.getInstance().getTaskManager().getMusicRegisterTimeout().removeMusicPlayer(scheduler.getGuild().getId());
 		if (scheduler.getCurrentTrack() == null) {
 			LOG.fatal("Got TrackStartEvent with null CachedAudioTrack!");

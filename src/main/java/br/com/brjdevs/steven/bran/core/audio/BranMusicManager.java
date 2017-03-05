@@ -10,13 +10,16 @@ import net.dv8tion.jda.core.entities.User;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class BranMusicManager {
 	private final AudioPlayerManager playerManager;
 	private final Map<Long, GuildMusicManager> musicManagers;
+	public AtomicLong playedSongs;
 	
 	public BranMusicManager() {
 		this.musicManagers = new HashMap<>();
+		this.playedSongs = new AtomicLong(0);
 		this.playerManager = new DefaultAudioPlayerManager();
 		AudioSourceManagers.registerRemoteSources(playerManager);
 	}

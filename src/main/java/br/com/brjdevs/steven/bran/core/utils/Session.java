@@ -80,8 +80,6 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		List<User> users = Bran.getInstance().getUsers();
 		long audioConnections = guilds.stream().filter(g -> g.getAudioManager().isConnected()).count();
 		long queueSize = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
-		long nowPlaying = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getPlayer().getPlayingTrack() != null && !musicManager.getTrackScheduler().isPaused()).count();
-		long paused = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> musicManager.getTrackScheduler().isPaused()).count();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.setAuthor("About me", null, jda.getSelfUser().getEffectiveAvatarUrl());
 		embedBuilder.addField("\uD83C\uDFD8 Guilds", String.valueOf(guilds.size()), true);
@@ -94,12 +92,10 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		embedBuilder.addField("\uD83D\uDD39 Shards (C/T)", Bran.getInstance().getOnlineShards().length + "/" + Bran.getInstance().getShards().length, true);
 		embedBuilder.addField("<:jda:230988580904763393> JDA Version", JDAInfo.VERSION, true);
 		embedBuilder.addField("\uD83D\uDCF0 API Responses", String.valueOf(Bran.getInstance().getResponseTotal()), true);
-		embedBuilder.addBlankField(false);
-		embedBuilder.addField("\uD83C\uDFB8 Music Stats", "\u00AD", false);
-		embedBuilder.addField("\uD83C\uDF10 Connections", String.valueOf(audioConnections), true);
-		embedBuilder.addField("\uD83C\uDFB6 Queue size", String.valueOf(queueSize), true);
-		embedBuilder.addField("\uD83D\uDD0A Now playing", String.valueOf(nowPlaying), true);
-		embedBuilder.addField("\u23f8 Paused", String.valueOf(paused), true);
+		embedBuilder.addField("\uD83C\uDF10 Voice connections", String.valueOf(audioConnections), true);
+		embedBuilder.addField("\uD83C\uDFB6 Total queue size", String.valueOf(queueSize), true);
+		embedBuilder.addField("\uD83C\uDFBC Players in the last 30 minutes", String.valueOf(Bran.getInstance().getMusicManager().getMusicManagers().size()), true);
+		embedBuilder.addField("\uD83C\uDFB8 Played songs in this session", String.valueOf(Bran.getInstance().getMusicManager().playedSongs.get()), true);
 		return embedBuilder.setColor(Color.DARK_GRAY).build();
 	}
 	
