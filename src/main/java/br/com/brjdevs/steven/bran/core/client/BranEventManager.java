@@ -27,7 +27,7 @@ public class BranEventManager implements IEventManager {
 				.getSubTypesOf(EventListener.class).stream()
 				.map(clazz -> {
 					try {
-						return clazz.getConstructor(Bran.class).newInstance(shard.getBran());
+						return clazz.getConstructor().newInstance(shard.getBran());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
