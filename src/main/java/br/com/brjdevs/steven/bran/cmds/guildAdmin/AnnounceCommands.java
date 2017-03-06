@@ -132,7 +132,7 @@ public class AnnounceCommands {
 						event.sendMessage("Removed the Announce channel!").queue();
 						return;
 					}
-					TextChannel channel = event.getMessage().getMentionedChannels().isEmpty() ? event.getMessage().getMentionedChannels().get(0) : event.getTextChannel();
+					TextChannel channel = !event.getMessage().getMentionedChannels().isEmpty() ? event.getMessage().getMentionedChannels().get(0) : event.getTextChannel();
 					if (channel == null) {
 						event.sendMessage("No channels found matching that criteria.").queue();
 						return;
