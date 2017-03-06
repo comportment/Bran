@@ -10,6 +10,7 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
+import br.com.brjdevs.steven.bran.core.utils.Emojis;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
@@ -89,10 +90,12 @@ public class CustomCmdsCommand {
 							if (command == null) {
 								event.sendMessage(Quotes.FAIL, "This Guild does not have a Custom Command named **" + cmdName + "**, if you want to delete a specific answer from a command use `" + event.getPrefix() + "cmds rmanswer [command Name] [answer Index]` and if you want to delete a command use `" + event.getPrefix() + "cmds delete [command Name]`").queue();
 								return;
-							}
-							if (!command.getCreatorId().equals(event.getAuthor().getId())
+							} else if (!command.getCreatorId().equals(event.getAuthor().getId())
 									&& !event.getGuildData().hasPermission(event.getAuthor(), Permissions.GUILD_MOD)) {
 								event.sendMessage("You can't delete responses from this command because you're not its owner or has GUILD_MOD permission!").queue();
+								return;
+							} else if (command.getAnswers().size() == 1) {
+								event.sendMessage(Emojis.X + " There's only one answer left for this command!").queue();
 								return;
 							}
 							Argument argument = event.getArgument("answer index");

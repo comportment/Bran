@@ -37,6 +37,6 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
 		}
 		if (guess.length() != 2)
 			return;
-		game.guess(guess.charAt(1), Bran.getInstance().getDataManager().getDataHolderManager().get().getUser(event.getAuthor()));
+		game.guess(guess.toLowerCase().charAt(1), Bran.getInstance().getDataManager().getDataHolderManager().get().getUser(event.getAuthor()));
 	}
 }

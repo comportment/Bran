@@ -85,7 +85,7 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		embedBuilder.addField("\uD83C\uDFD8 Guilds", String.valueOf(guilds.size()), true);
 		embedBuilder.addField("\uD83D\uDC65 Users", String.valueOf(users.size()), true);
 		embedBuilder.addField("\uD83D\uDCDD Text Channels", String.valueOf(channels.size()), true);
-		embedBuilder.addField("\uD83D\uDDE3 Voice Channels", String.valueOf(voiceChannels.size()), true);
+		embedBuilder.addField(Emojis.MEGA + " Voice Channels", String.valueOf(voiceChannels.size()), true);
 		embedBuilder.addField("\uD83D\uDCE4 Sent Messages", String.valueOf(msgsSent), true);
 		embedBuilder.addField("\uD83D\uDCE5 Received Messages", String.valueOf(msgsReceived), true);
 		embedBuilder.addField("\uD83D\uDCBB Executed Commands", String.valueOf(cmds), true);

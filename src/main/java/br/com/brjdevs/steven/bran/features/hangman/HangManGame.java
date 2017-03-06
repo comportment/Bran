@@ -104,7 +104,7 @@ public class HangManGame {
 	
 	public void guess(char c, UserData userData) {
 		String s = String.valueOf(c);
-		if (!getFullWord().contains(s) && !mistakes.contains(s.toLowerCase().charAt(0)) && !mistakes.contains(s.toUpperCase().charAt(0))) {
+		if (!getFullWord().contains(s.toLowerCase()) && !getFullWord().contains(s.toUpperCase()) && !mistakes.contains(s.toLowerCase().charAt(0)) && !mistakes.contains(s.toUpperCase().charAt(0))) {
 			reward(userData, 0, -4);
 			getChannel().sendMessage(baseEmbed().setDescription(Emojis.DISAPPOINTED + " Nope, that is not in the word. Keep trying!\n\n\n**Guesses:** " + getGuessedLetters() + "\nYou've made " + mistakes.size() + " out of " + getMaximumMistakes() + "." + (mistakes.isEmpty() ? "" : " (" + mistakes.stream().map(String::valueOf).collect(Collectors.joining(", ")) + ")") + "\n\n" + (givenTips.isEmpty() ? "You didn't ask for any tips." : "These are the current given tips:\n" + (String.join("\n", givenTips))) + "\nMultiplayer: " + (invitedUsers.isEmpty()) + (invitedUsers.isEmpty() ? "" : "\n" + getInvitedUsers().stream().map(Utils::getUser).collect(Collectors.joining(", ")))).build()).queue();
 			mistakes.add(c);

@@ -17,7 +17,7 @@ public class Inventory {
 	}
 	
 	public boolean put(Item item) {
-		if (getAmountOf(item) < 100)
+		if (getAmountOf(item) > 100)
 			return false;
 		items.computeIfAbsent(Items.idOf(item), i -> ItemMeta.of(item)).join();
 		return true;

@@ -50,6 +50,9 @@ public class ShopCommand {
 							if (item == null) {
 								event.sendMessage(Quotes.FAIL, "No items found matching that criteria.").queue();
 								return;
+							} else if (!item.isBuyable()) {
+								event.sendMessage(Emojis.X + " This item is not buyable!").queue();
+								return;
 							} else if (!event.getUserData().getProfile().getBankAccount().takeCoins(item.getValue(), BankAccount.MAIN_BANK)) {
 								event.sendMessage(Emojis.X + " You don't have enough coins, go get some before spending these!").queue();
 								return;
@@ -74,15 +77,18 @@ public class ShopCommand {
 								item = Arrays.stream(Items.ALL).filter(i -> i.getName().equalsIgnoreCase(sItem)).findFirst().orElse(null);
 							if (item == null) {
 								event.sendMessage(Quotes.FAIL, "No items found matching that criteria.").queue();
-								return;
-							} else if (!event.getUserData().getProfile().getBankAccount().addCoins(item.getValue(), BankAccount.MAIN_BANK)) {
-								event.sendMessage(Emojis.X + " You have too much coins! Spend some money before getting more!").queue();
-								return;
+							} else if (!item.isSellable()) {
+								event.sendMessage(Emojis.X + " This item is not sellable!").queue();
+							} else if (event.getUserData().getProfile().getInventory().getAmountOf(item) <= 0) {
+								event.sendMessage("You don't have any `" + item.getName() + "` left in your inventory!").queue();
+							} else if (event.getUserData().getProfile().getInventory().remove(item)) {
+								if (!event.getUserData().getProfile().getBankAccount().addCoins(item.getValue(), BankAccount.MAIN_BANK)) {
+									event.sendMessage(Emojis.X + " You have too much coins! Spend some money before getting more!").queue();
+									event.getUserData().getProfile().getInventory().put(item);
+								} else {
+									event.sendMessage(Emojis.CHECK_MARK + " You've sold a " + item.getEmoji() + " " + item.getName() + "! Remaining " + item.getName() + ": " + event.getUserData().getProfile().getInventory().getAmountOf(item)).queue();
+								}
 							}
-							if (event.getUserData().getProfile().getInventory().remove(item))
-								event.sendMessage(Emojis.CHECK_MARK + " You've sold a " + item.getEmoji() + " " + item.getName() + "! Remaining " + item.getName() + ": " + event.getUserData().getProfile().getInventory().getAmountOf(item)).queue();
-							else
-								event.sendMessage(Emojis.X + " You don't have any " + item.getName() + " in your inventory so you can't sell any!").queue();
 							
 						})
 						.build())
