@@ -18,7 +18,8 @@ public class WordFilterListener extends EventListener<GuildMessageReceivedEvent>
 	
 	@Override
 	public void event(GuildMessageReceivedEvent event) {
-		if (event.getMessage() == null) return;
+		if (event.getAuthor().equals(event.getJDA().getSelfUser()))
+			return;
 		if (!event.getChannel().getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
 			return;
 		GuildData guildData = Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild());
