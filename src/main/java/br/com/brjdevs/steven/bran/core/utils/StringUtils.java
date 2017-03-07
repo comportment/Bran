@@ -80,7 +80,7 @@ public class StringUtils {
 	public static String getProgressBar(long percent, long duration, long total) {
 		int activeBlocks = (int) ((float) percent / duration * total);
 		StringBuilder builder = new StringBuilder().append(EMPTY_BLOCK);
-		for (int i = 0; i < total; i++) builder.append(activeBlocks >= i ? ACTIVE_BLOCK : ' ');
+		for (int i = 0; i < 10; i++) builder.append(activeBlocks >= i ? ACTIVE_BLOCK : ' ');
 		return builder.append(EMPTY_BLOCK).toString();
 	}
 	
