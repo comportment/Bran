@@ -104,7 +104,7 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.setAuthor("Technical Information", null, jda.getSelfUser().getEffectiveAvatarUrl());
-		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", true);
+		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", false);
 		embedBuilder.addField("Threads", String.valueOf(Thread.activeCount()), true);
 		embedBuilder.addField("RAM (USAGE/MAX)", ram, true);
 		return embedBuilder.setColor(Color.DARK_GRAY).build();
