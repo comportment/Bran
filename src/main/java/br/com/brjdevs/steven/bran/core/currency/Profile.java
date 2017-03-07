@@ -158,6 +158,8 @@ public class Profile {
 	}
 	
 	public List<IProfileListener> getRegisteredListeners() {
+		if (listeners == null)
+			listeners = new ArrayList<>();
 		return listeners;
 	}
 	
