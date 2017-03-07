@@ -68,7 +68,7 @@ public class PollCommand {
 								for (String string : list)
 									options.add(new Option(list.indexOf(string), string));
 								new Poll(name, event.getMember(), options, event.getTextChannel());
-								event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll join reactions to the message as the votes get added/removed.").queue();
+								event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll add reactions to the message as the votes get added/removed.").queue();
 								Bran.getInstance().getDataManager().getPollPersistence().update();
 							}
 						})

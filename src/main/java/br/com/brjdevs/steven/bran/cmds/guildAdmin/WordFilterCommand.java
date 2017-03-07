@@ -23,7 +23,7 @@ public class WordFilterCommand {
 				.setPrivateAvailable(false)
 				.setRequiredPermission(Permissions.GUILD_MANAGE)
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
-						.setAliases("join")
+						.setAliases("add")
 						.setName("WordFilter Add Command")
 						.setDescription("Adds a Word to the WordFilter")
 						.setArgs(new Argument("word", String.class))

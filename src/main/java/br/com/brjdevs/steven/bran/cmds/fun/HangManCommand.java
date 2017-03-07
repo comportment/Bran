@@ -165,18 +165,18 @@ public class HangManCommand {
 						.setAliases("words")
 						.setName("HangMan Words Command")
 						.setHelp("hm words ?")
-						.setExample("hm words join Cool")
+						.setExample("hm words add Cool")
 						.setRequiredPermission(Permissions.BOT_ADMIN)
 						.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
-								.setAliases("join")
-								.setExample("hm words join Cool")
+								.setAliases("add")
+								.setExample("hm words add Cool")
 								.setName("HangMan Add Word Command")
 								.setDescription("Adds words to the HangMan Game!")
 								.setArgs(new Argument("word", String.class))
 								.setAction((event, rawArgs) -> {
 									String word = (String) event.getArgument("word").get();
 									Bran.getInstance().getDataManager().getHangmanWordsManager().get().put(word, new ArrayList<>());
-									event.sendMessage(Quotes.SUCCESS, "Added word to HangMan, you can join tips to it using `" + event.getPrefix() + "hangman words tip " + word + " [tip]`.").queue();
+									event.sendMessage(Quotes.SUCCESS, "Added word to HangMan, you can add tips to it using `" + event.getPrefix() + "hangman words tip " + word + " [tip]`.").queue();
 									Bran.getInstance().getDataManager().getHangmanWordsManager().update();
 								})
 								.build())

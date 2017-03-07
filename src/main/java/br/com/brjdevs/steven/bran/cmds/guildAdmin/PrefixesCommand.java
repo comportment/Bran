@@ -51,7 +51,7 @@ public class PrefixesCommand {
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
-						.setAliases("join")
+						.setAliases("add")
 						.setDescription("Adds prefixes to the bot.")
 						.setName("Prefix Add Command")
 						.setArgs(new Argument("prefixes", String.class))
