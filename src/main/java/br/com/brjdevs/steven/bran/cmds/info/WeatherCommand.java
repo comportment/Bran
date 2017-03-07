@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.info;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -11,8 +12,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
-
-import java.awt.*;
 
 public class WeatherCommand {
 	
@@ -79,8 +78,7 @@ public class WeatherCommand {
 						embedBuilder.addField("Wind", "**Speed:** " + windSpeed + "     **Direction:** " + windDirecton + "     **Chill:** " + windChill + "\n", false);
 						embedBuilder.addField("Atmosphere", "**Humidity**: " + humidity + "     **Pressure:** " + pressure + "\n", false);
 						embedBuilder.addField("Weather", "**Temperature:** " + temp + "     **Description:** " + text, false);
-						if (!event.isPrivate())
-							embedBuilder.setColor(event.getSelfMember().getColor() == null ? Color.decode("#F1AC1A") : event.getSelfMember().getColor());
+						embedBuilder.setColor(Bran.COLOR);
 						event.sendMessage(embedBuilder.build()).queue();
 					} catch (Exception e) {
 						event.sendMessage("There was a parsing error while building the info. `" + e.getMessage() + "`").queue();

@@ -26,14 +26,17 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import redis.clients.jedis.JedisPool;
 
 import javax.security.auth.login.LoginException;
+import java.awt.*;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Bran {
 	
+	public static Color COLOR = Color.decode("#388BDF");
 	private static Bran instance;
 	private static JedisPool jedisPool = new JedisPool("localhost", 6379);
 	private static SimpleLog LOG = SimpleLog.getLog("BotContainer");

@@ -10,7 +10,6 @@ import net.dv8tion.jda.core.JDAInfo;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-import java.awt.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
@@ -97,7 +96,7 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		embedBuilder.addField("\uD83C\uDFB6 Total queue size", String.valueOf(queueSize), true);
 		embedBuilder.addField("\uD83C\uDFBC Players in the last 30 minutes", String.valueOf(Bran.getInstance().getMusicManager().getMusicManagers().size()), true);
 		embedBuilder.addField("\uD83C\uDFB8 Played songs in this session", String.valueOf(Bran.getInstance().getMusicManager().playedSongs.get()), true);
-		return embedBuilder.setColor(Color.DARK_GRAY).build();
+		return embedBuilder.setColor(Bran.COLOR).build();
 	}
 	
 	public MessageEmbed toEmbedTechnical(JDA jda) {
@@ -107,11 +106,11 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", false);
 		embedBuilder.addField("Threads", String.valueOf(Thread.activeCount()), true);
 		embedBuilder.addField("RAM (USAGE/MAX)", ram, true);
-		return embedBuilder.setColor(Color.DARK_GRAY).build();
+		return embedBuilder.setColor(Bran.COLOR).build();
 	}
 	
 	public MessageEmbed toEmbedCmds(JDA jda) {
-		return new EmbedBuilder().setTitle("Commands Stats", null).setColor(Color.DARK_GRAY)
+		return new EmbedBuilder().setTitle("Commands Stats", null).setColor(Bran.COLOR)
 				.addField("Now", resume(MINUTE_CMDS), false)
 				.addField("Hourly", resume(HOUR_CMDS), false)
 				.addField("Daily", resume(DAY_CMDS), false)
@@ -119,7 +118,7 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	}
 	
 	public MessageEmbed toEmbedGuilds(JDA jda) {
-		return new EmbedBuilder().setTitle("Guild Stats", null).setColor(Color.DARK_GRAY)
+		return new EmbedBuilder().setTitle("Guild Stats", null).setColor(Bran.COLOR)
 				.addField("Now", GuildStatsManager.resume(GuildStatsManager.MINUTE_EVENTS), false)
 				.addField("Hourly", GuildStatsManager.resume(GuildStatsManager.HOUR_EVENTS), false)
 				.addField("Daily", GuildStatsManager.resume(GuildStatsManager.DAY_EVENTS), false)

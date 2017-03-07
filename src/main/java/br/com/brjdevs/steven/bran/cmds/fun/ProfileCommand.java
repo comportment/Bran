@@ -86,6 +86,7 @@ public class ProfileCommand {
 										return item.getEmoji() + " " + item.getName() + "  x" + entry.getValue();
 									}).collect(Collectors.toList());
 							EmbedBuilder embedBuilder = new EmbedBuilder();
+							embedBuilder.setColor(Bran.COLOR);
 							embedBuilder.setAuthor("Your inventory", null, event.getAuthor().getEffectiveAvatarUrl());
 							embedBuilder.setDescription(String.join("\n", items));
 							event.sendMessage(embedBuilder.build()).queue();

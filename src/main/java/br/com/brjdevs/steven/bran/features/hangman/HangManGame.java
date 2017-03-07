@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.features.hangman;
 
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.core.currency.BankAccount;
 import br.com.brjdevs.steven.bran.core.data.UserData;
@@ -11,7 +12,6 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -87,7 +87,7 @@ public class HangManGame {
 	
 	public EmbedBuilder baseEmbed() {
 		User creator = getCreator();
-		return new EmbedBuilder().setColor(Color.decode("#3C4044")).setTitle("Hang Man Game", null).setFooter("Game session started by " + creator.getName() + "#" + creator.getDiscriminator(), creator.getEffectiveAvatarUrl());
+		return new EmbedBuilder().setColor(Bran.COLOR).setTitle("Hang Man Game", null).setFooter("Game session started by " + creator.getName() + "#" + creator.getDiscriminator(), creator.getEffectiveAvatarUrl());
 	}
 	
 	public String getGuessedLetters() {
