@@ -40,7 +40,7 @@ public class CustomCmdsCommand {
 						.setAction((event) -> {
 							String cmdName = ((String) event.getArgument("name").get()).toLowerCase();
 							if (event.getGuildData().customCommands.containsKey(cmdName)) {
-								event.sendMessage(Quotes.FAIL, "This Guild already has a command named **" + cmdName + "**, if you want to join answers to the command use `" + event.getPrefix() + "cmds addanswer " + cmdName + " [answer]`.").queue();
+								event.sendMessage(Quotes.FAIL, "This Guild already has a command named **" + cmdName + "**, if you want to add answers to the command use `" + event.getPrefix() + "cmds addanswer " + cmdName + " [answer]`.").queue();
 								return;
 							}
 							String answer = (String) event.getArgument("answer").get();
@@ -66,7 +66,7 @@ public class CustomCmdsCommand {
 							CustomCommand command = event.getGuildData().customCommands.get(cmdName);
 							if (!command.getCreatorId().equals(event.getAuthor().getId())
 									&& !event.getGuildData().hasPermission(event.getAuthor(), Permissions.GUILD_MOD)) {
-								event.sendMessage("You can't join responses to this command because you're not its creator or has GUILD_MOD permission.").queue();
+								event.sendMessage("You can't add responses to this command because you're not its creator or has GUILD_MOD permission.").queue();
 								return;
 							}
 							if (command.getAnswers().contains(newAnswer)) {
