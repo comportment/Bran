@@ -2,6 +2,7 @@ package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class RoleMeCommands {
 	
-	//@Command
+	@Command
 	private static ICommand rolemeadd() {
 		return new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 				.setPrivateAvailable(false)
@@ -51,7 +52,7 @@ public class RoleMeCommands {
 				.build();
 	}
 	
-	//@Command
+	@Command
 	private static ICommand rolemeremove() {
 		return new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 				.setPrivateAvailable(false)
@@ -86,7 +87,7 @@ public class RoleMeCommands {
 				.build();
 	}
 	
-	//@Command
+	@Command
 	private static ICommand roleme() {
 		return new CommandBuilder(Category.MISCELLANEOUS)
 				.setPrivateAvailable(false)

@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.currency.BankAccount;
 import br.com.brjdevs.steven.bran.core.currency.ItemMeta;
 import br.com.brjdevs.steven.bran.core.currency.Items;
+import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
 import br.com.brjdevs.steven.bran.core.managers.RateLimiter;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
 import br.com.brjdevs.steven.bran.core.utils.Emojis;
@@ -43,6 +44,8 @@ public class MineCommand {
 					if (!meta.doDamage(stamina * 2)) {
 						event.sendMessage("Unfortunately one of your pickaxes broke!").queue();
 					}
+					if (!event.isPrivate())
+						TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.PICKAXE, 15);
 				})
 				.build();
 	}

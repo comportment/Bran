@@ -54,6 +54,8 @@ public class Profile {
 		if (stamina > this.stamina)
 			return false;
 		this.stamina -= stamina;
+		if (this.stamina < 0)
+			this.stamina = 0;
 		return true;
 	}
 	

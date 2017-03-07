@@ -53,9 +53,9 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 				hours = duration / 3600000L % 24,
 				minutes = duration / 60000L % 60,
 				seconds = duration / 1000L % 60;
-		String uptime = (years == 0 ? "" : years + " Years, ") + (months == 0 ? "" : months + " Months, ")
-				+ (days == 0 ? "" : days + " Days, ") + (hours == 0 ? "" : hours + " Hours, ")
-				+ (minutes == 0 ? "" : minutes + " Minutes, ") + (seconds == 0 ? "" : seconds + " Seconds, ");
+		String uptime = (years == 0 ? "" : years + " years, ") + (months == 0 ? "" : months + " months, ")
+				+ (days == 0 ? "" : days + " days, ") + (hours == 0 ? "" : hours + " hours, ")
+				+ (minutes == 0 ? "" : minutes + " minutes, ") + (seconds == 0 ? "" : seconds + " seconds, ");
 		
 		uptime = StringUtils.replaceLast(uptime, ", ", "");
 		return StringUtils.replaceLast(uptime, ",", " and");
@@ -82,6 +82,7 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		long queueSize = Bran.getInstance().getMusicManager().getMusicManagers().values().stream().filter(musicManager -> !musicManager.getTrackScheduler().getQueue().isEmpty()).map(musicManager -> musicManager.getTrackScheduler().getQueue().size()).mapToInt(Integer::intValue).sum();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.setAuthor("About me", null, jda.getSelfUser().getEffectiveAvatarUrl());
+		embedBuilder.setDescription("\u23f1 I've been awake for " + getUptime());
 		embedBuilder.addField("\uD83C\uDFD8 Guilds", String.valueOf(guilds.size()), true);
 		embedBuilder.addField("\uD83D\uDC65 Users", String.valueOf(users.size()), true);
 		embedBuilder.addField("\uD83D\uDCDD Text Channels", String.valueOf(channels.size()), true);
@@ -103,7 +104,6 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.setAuthor("Technical Information", null, jda.getSelfUser().getEffectiveAvatarUrl());
-		embedBuilder.addField("Uptime", getUptime(), false);
 		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", true);
 		embedBuilder.addField("Threads", String.valueOf(Thread.activeCount()), true);
 		embedBuilder.addField("RAM (USAGE/MAX)", ram, true);

@@ -13,7 +13,6 @@ import org.json.JSONObject;
 import javax.security.auth.login.LoginException;
 
 public class BranShard {
-	
 	private final Bran bran;
 	private final BranEventManager eventManager;
 	private int shardId;
@@ -85,7 +84,13 @@ public class BranShard {
 	}
 	
 	public String getInfo() {
-		return "Hello, my name is " + getJDA().getSelfUser().getName() + "! I am a Discord Bot powered by JDA by DV8FromTheWorld#6297 and I was created by " + Utils.getUser(bran.getOwner()) + ". If you want me in your server *(how could you not?)* type `" + bran.getConfig().defaultPrefixes.get(0) + "bot inviteme`, and if you require support you can use that command too, it'll show you my guild invite, join it and ask my owner your question! Oh, and if you want a full list of my commands you can type `" + bran.getConfig().defaultPrefixes.get(0) + "help`. This is shard #" + shardId + " of " + totalShards + ", have Fun! :smile:";
+		return "Hello, I'm " + getJDA().getSelfUser().getName() + "! I am here to help and entertain your server! Here a little of what I can do:" +
+				"```diff\n" +
+				"+ Moderation tools (ban, kick, softban, prune, permissions, word filter, self role)\n" +
+				"+ Useful commands (weather, urban, math, giveaways, guild and user infos, polls)\n" +
+				"+ Fun commands (eight ball, choose, custom commands, random comics, yoda speak)\n" +
+				"+ Currency system (BETA)" +
+				"```";
 	}
 	
 	public void updateCurrentGuildCount() {

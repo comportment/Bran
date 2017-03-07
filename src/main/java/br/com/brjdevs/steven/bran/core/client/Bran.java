@@ -93,6 +93,10 @@ public class Bran {
 		return jda.getShardInfo().getShardId();
 	}
 	
+	public BranShard getShard(JDA jda) {
+		return getShards()[getShardId(jda)];
+	}
+	
 	public Profile getProfile(User user) {
 		return discordBotData.getDataHolderManager().get().getUser(user).getProfile();
 	}
