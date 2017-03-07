@@ -92,7 +92,7 @@ public class Profile {
 		return level;
 	}
 	
-	private void setLevel(long level) {
+	public void setLevel(long level) {
 		this.level = level;
 	}
 	

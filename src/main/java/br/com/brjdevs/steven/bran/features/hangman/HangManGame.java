@@ -128,14 +128,22 @@ public class HangManGame {
 	private void win() {
 		getChannel().sendMessage(Emojis.PARTY_POPPER + " Yay you won! The word was `" + getFullWord() + "`! " + (invitedUsers.isEmpty() ? "You" : "Everyone") + " won 20 coins and 10 experience.").queue();
 		reward(getCreatorData(), 20, 10);
-		getInvitedUserDatas().forEach(userData -> reward(userData, 20, 10));
+		getCreatorData().getProfile().getHMStats().addVictory();
+		getInvitedUserDatas().forEach(userData -> {
+			reward(userData, 20, 10);
+			userData.getProfile().getHMStats().addVictory();
+		});
 		games.remove(this);
 	}
 	
 	private void loose() {
 		getChannel().sendMessage(Emojis.CRY + " Too bad, you lost! The word was `" + getFullWord() + "`! " + (invitedUsers.isEmpty() ? "You" : "Everyone") + " lost 15 coins and 5 experience.").queue();
-		reward(getCreatorData(), 15, 5);
-		getInvitedUserDatas().forEach(userData -> reward(userData, 15, 5));
+		reward(getCreatorData(), -15, -5);
+		getCreatorData().getProfile().getHMStats().addDefeat();
+		getInvitedUserDatas().forEach(userData -> {
+			reward(userData, -15, -5);
+			userData.getProfile().getHMStats().addDefeat();
+		});
 		games.remove(this);
 	}
 	
