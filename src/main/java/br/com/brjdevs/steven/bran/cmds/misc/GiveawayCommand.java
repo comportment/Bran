@@ -72,7 +72,7 @@ public class GiveawayCommand {
 							}
 							event.getGuildData().giveaway = new Giveaway(event.getMember(), event.getGuild(), role, event.getTextChannel(), numOfWinners, e);
 							event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who's participating by typing `.giveaway info`.").queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -121,7 +121,7 @@ public class GiveawayCommand {
 							}
 							boolean success = giveaway.participate(event.getMember());
 							event.sendMessage(success ? "You are now participating in the Giveaway!" : "You're already participating in the Giveaway!").queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
@@ -165,7 +165,7 @@ public class GiveawayCommand {
 							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(bran).getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
 							Giveaway.expiration.remove(giveaway);
 							event.getGuildData().giveaway = null;
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
 						.build())
 				.build();

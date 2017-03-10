@@ -15,13 +15,13 @@ public class BranDataManager {
 	private GsonDataFileManager<Polls> pollPersistence;
 	
 	public BranDataManager() {
-		getDataHolderManager();
+		getUserDataManager();
 		getConfigDataManager();
 		getHangmanWordsManager();
 		getPollPersistence();
 	}
 	
-	public GsonDataFileManager<DataHolder> getDataHolderManager() {
+	public GsonDataFileManager<DataHolder> getUserDataManager() {
 		if (dataHolderManager == null)
 			dataHolderManager = new GsonDataFileManager<>(DataHolder.class, "dataholder.json", DataHolder::new);
 		return dataHolderManager;

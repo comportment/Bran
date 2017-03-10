@@ -47,7 +47,7 @@ public class CustomCmdsCommand {
 							CustomCommand command = new CustomCommand(answer, event.getAuthor());
 							event.getGuildData().customCommands.put(cmdName, command);
 							event.sendMessage("Created Custom Command **" + cmdName + "**!").queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -75,7 +75,7 @@ public class CustomCmdsCommand {
 							}
 							command.getAnswers().add(newAnswer);
 							event.sendMessage(Quotes.SUCCESS, "Added a new answer for **" + cmdName + "**! This Command currently has " + command.getAnswers().size() + " answers.").queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -107,7 +107,7 @@ public class CustomCmdsCommand {
 								index = (int) argument.get();
 							command.getAnswers().remove(index);
 							event.sendMessage(Quotes.SUCCESS, "Removed answer index `" + index + "` from " + cmdName + ".\n").queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -130,7 +130,7 @@ public class CustomCmdsCommand {
 							}
 							event.getGuildData().customCommands.remove(cmdName);
 							event.sendMessage(Quotes.SUCCESS, "Deleted Custom Command `" + cmdName + "`.").queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -177,7 +177,7 @@ public class CustomCmdsCommand {
 							event.getGuildData().customCommands.remove(oldName);
 							event.getGuildData().customCommands.put(newName, command);
 							event.sendMessage(String.format(":ok_hand: Renamed `%s` to `%s", oldName, newName)).queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 							
 						}).build())
 				.build();

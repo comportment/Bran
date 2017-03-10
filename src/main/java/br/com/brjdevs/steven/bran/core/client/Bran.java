@@ -101,7 +101,7 @@ public class Bran {
 	}
 	
 	public Profile getProfile(User user) {
-		return discordBotData.getDataHolderManager().get().getUser(user).getProfile();
+		return discordBotData.getUserDataManager().get().getUser(user).getProfile();
 	}
 	
 	public int getTotalShards() {
@@ -267,7 +267,7 @@ public class Bran {
 		});
 		
 		getDataManager().getPollPersistence().update();
-		getDataManager().getDataHolderManager().update();
+		getDataManager().getUserDataManager().update();
 		getDataManager().getConfigDataManager().update();
 		getDataManager().getHangmanWordsManager().update();
 		

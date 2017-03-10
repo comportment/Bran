@@ -173,7 +173,7 @@ public class TrackScheduler {
 		}
 		if (!canRequest(track)) {
 			String s;
-			switch (Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel) {
+			switch (Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(getGuild()).fairQueueLevel) {
 				case 1:
 					s = "Oops, it looks like you already asked for this song, why don't you try another one? (FairQueue: 1)";
 					break;
@@ -182,7 +182,7 @@ public class TrackScheduler {
 					break;
 				default:
 					s = "Unrecognized FairQueue Level '" +
-							Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel + "'\nReport this Message to my Master.";
+							Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(getGuild()).fairQueueLevel + "'\nReport this Message to my Master.";
 			}
 			track.getContext().sendMessage(s).queue();
 			return false;
@@ -201,7 +201,7 @@ public class TrackScheduler {
 	}
 	
 	public boolean canRequest(TrackContext track) {
-		switch (Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel) {
+		switch (Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(getGuild()).fairQueueLevel) {
 			case 0:
 				return true;
 			case 1:
@@ -210,7 +210,7 @@ public class TrackScheduler {
 				return getMatches(queue, track) < 1;
 			default:
 				throw new UnsupportedOperationException("Unrecognized FairQueue Level '" +
-						Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(getGuild()).fairQueueLevel + "'");
+						Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(getGuild()).fairQueueLevel + "'");
 		}
 	}
 	

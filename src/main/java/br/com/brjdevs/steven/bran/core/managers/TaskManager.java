@@ -63,7 +63,7 @@ public class TaskManager {
 			}
 		}), 3600);
 		startAsyncTask("Stamina Regenerator", (service) ->
-						Bran.getInstance().getDataManager().getDataHolderManager().get().users.values().stream().filter(userData -> userData.getProfile().getStamina() < 210).forEach(userData -> userData.getProfile().setStamina(userData.getProfile().getStamina() + 5))
+						Bran.getInstance().getDataManager().getUserDataManager().get().users.values().stream().filter(userData -> userData.getProfile().getStamina() < 100).forEach(userData -> userData.getProfile().setStamina(userData.getProfile().getStamina() + 5))
 				, 300);
 	}
 }

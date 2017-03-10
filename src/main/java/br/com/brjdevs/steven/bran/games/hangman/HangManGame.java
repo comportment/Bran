@@ -1,4 +1,4 @@
-package br.com.brjdevs.steven.bran.features.hangman;
+package br.com.brjdevs.steven.bran.games.hangman;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.client.BranShard;
@@ -58,7 +58,7 @@ public class HangManGame {
 	}
 	
 	public UserData getCreatorData() {
-		return branShard.getBran().getDataManager().getDataHolderManager().get().getUser(getCreator());
+		return branShard.getBran().getDataManager().getUserDataManager().get().getUser(getCreator());
 	}
 	
 	public boolean isMuliplayer() {
@@ -70,7 +70,7 @@ public class HangManGame {
 	}
 	
 	public List<UserData> getInvitedUserDatas() {
-		return invitedUsers.stream().map(id -> branShard.getBran().getDataManager().getDataHolderManager().get().getUser(branShard.getJDA().getUserById(String.valueOf(id)))).collect(Collectors.toList());
+		return invitedUsers.stream().map(id -> branShard.getBran().getDataManager().getUserDataManager().get().getUser(branShard.getJDA().getUserById(String.valueOf(id)))).collect(Collectors.toList());
 	}
 	
 	public int getMaximumMistakes() {

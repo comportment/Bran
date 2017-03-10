@@ -9,8 +9,6 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.currency.BankAccount;
-import br.com.brjdevs.steven.bran.core.currency.Item;
-import br.com.brjdevs.steven.bran.core.currency.Items;
 import br.com.brjdevs.steven.bran.core.currency.Profile;
 import br.com.brjdevs.steven.bran.core.currency.Profile.Rank;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
@@ -67,7 +65,7 @@ public class ProfileCommand {
 							Rank r = profile.getRank();
 							profile.setRank(next);
 							event.sendMessage("You ranked up from " + r + " to " + next + "!").queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -81,10 +79,7 @@ public class ProfileCommand {
 								return;
 							}
 							List<String> items = inventory.getItems().entrySet()
-									.stream().map(entry -> {
-										Item item = Items.fromId(entry.getKey());
-										return item.getEmoji() + " " + item.getName() + "  x" + entry.getValue();
-									}).collect(Collectors.toList());
+									.stream().map(entry -> entry.getValue().toString()).collect(Collectors.toList());
 							EmbedBuilder embedBuilder = new EmbedBuilder();
 							embedBuilder.setColor(Bran.COLOR);
 							embedBuilder.setAuthor("Your inventory", null, event.getAuthor().getEffectiveAvatarUrl());
@@ -130,7 +125,7 @@ public class ProfileCommand {
 									if (isHex) {
 										boolean success = profile.setCustomColor(hex);
 										event.sendMessage(success ? "Updated your profile Color!" : "Failed to update your profile color!").queue();
-										Bran.getInstance().getDataManager().getDataHolderManager().update();
+										Bran.getInstance().getDataManager().getUserDataManager().update();
 									} else {
 										event.sendMessage("This does not look like a known hex...").queue();
 									}

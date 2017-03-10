@@ -45,8 +45,8 @@ public class Giveaway {
 		giveaway.getChannel(bran).sendMessage(embedBuilder.build()).queue();
 		giveaway.getChannel(bran).sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)! :smile:").queue();
 		winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(bran).getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
-		bran.getDataManager().getDataHolderManager().get().getGuild(giveaway.getGuild(bran)).giveaway = null;
-		bran.getDataManager().getDataHolderManager().update();
+		bran.getDataManager().getUserDataManager().get().getGuild(giveaway.getGuild(bran)).giveaway = null;
+		bran.getDataManager().getUserDataManager().update();
 	});
 	
 	private int maxUsers;

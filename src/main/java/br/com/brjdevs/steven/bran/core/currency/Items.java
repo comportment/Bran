@@ -9,15 +9,20 @@ import java.util.stream.Stream;
 
 public class Items {
 	
-	public static final Item PICKAXE, MUSICAL_NOTE, PING_PONG, BAN_HAMMER, KICK_BOOT, GAME_DIE;
+	public static final Item PICKAXE, MUSICAL_NOTE, PING_PONG, GAME_DIE, STONE, COOPER, SILVER, IRON, GOLD, DIAMOND, EMERALD;
 	
 	public static final Item[] ALL = {
 			PICKAXE = new Item("\u26cf", "Pickaxe", "Mine... mine.... minecraft?", 100, 90, true, true),
 			MUSICAL_NOTE = new Item("\uD83C\uDFB5", "Musical Note", "I assume you like music, huh?", 1, 30, true, false),
 			PING_PONG = new Item("\uD83C\uDFD3", "Ping Pong Racket", "I won by a few milliseconds.", 1, 20, true, false),
-			BAN_HAMMER = new Item("\uD83D\uDD28", "Ban Hammer", "Best item ever.", 1, 25, true, false),
-			KICK_BOOT = new Item("\uD83D\uDC62", "Kick Boot", "Not so cool as Ban Hammer but pretty great.", 1, 25, true, false),
-			GAME_DIE = new Item("\uD83C\uDFB2", "Game Die", "It looks like you like games.", 1, 60, true, false)
+			GAME_DIE = new Item("\uD83C\uDFB2", "Game Die", "It looks like you like games.", 1, 60, true, false),
+			STONE = new Item("", "Stone", "", 1, 2, true, false),
+			COOPER = new Item("", "Copper", "", 1, 10, true, false),
+			SILVER = new Item("", "Silver", "", 1, 15, true, false),
+			IRON = new Item("", "Iron", "", 1, 25, true, false),
+			GOLD = new Item("", "Gold", "", 1, 50, true, false),
+			DIAMOND = new Item("\uD83D\uDD39", "Diamond", "", 1, 100, true, false),
+			EMERALD = new Item("", "Emerald", "", 1, 150, true, false)
 	};
 	
 	static {

@@ -16,6 +16,15 @@ public class MathUtils {
 			return false;
 		}
 	}
+	
+	public static boolean isLong(String s) {
+		try {
+			Long.parseLong(s);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
 	public static String toOctalInteger(int i) {
 		if (i > 9) return String.valueOf(i);
 		return "0" + i;
@@ -25,19 +34,11 @@ public class MathUtils {
 		return check > min && check < max;
 	}
 	
-	public static int parseIntOrDefault(String str, int d) {
-		try {
-			return Integer.parseInt(str);
-		} catch (NumberFormatException e) {
-			return d;
-		}
-	}
-	
 	public static int random(int min, int max) {
 		return random.nextInt(max - min) + min;
 	}
 	
-	public float getPercentage(float total, float p) {
+	public static float getPercentage(float total, float p) {
 		return (100f / total) * p;
 	}
 }

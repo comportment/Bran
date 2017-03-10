@@ -7,7 +7,7 @@ public class ItemMeta {
 	private long damage;
 	private long amount;
 	
-	public ItemMeta(Item item, long duration) {
+	private ItemMeta(Item item, long duration) {
 		this.itemId = Items.idOf(item);
 		this.duration = duration;
 		this.damage = 0;
@@ -47,8 +47,15 @@ public class ItemMeta {
 		return amount;
 	}
 	
-	public void join() {
-		this.amount++;
+	public ItemMeta join() {
+		return join(1);
+	}
+	
+	public ItemMeta join(long amount) {
+		this.amount += amount;
+		if (this.amount > 100)
+			this.amount = 100;
+		return this;
 	}
 	
 	public void remove() {
@@ -65,5 +72,10 @@ public class ItemMeta {
 		}
 		this.damage += damage;
 		return true;
+	}
+	
+	public String toString() {
+		Item item = getItem();
+		return item.getEmoji() + " " + item.getName() + " x" + getAmount();
 	}
 }

@@ -11,8 +11,6 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.currency.Items;
-import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
@@ -92,10 +90,11 @@ public class MusicCommand {
 								event.sendMessage("You can only have " + event.getGuildData().maxSongsPerUser + " songs in the queue.").queue();
 								return;
 							}
-							if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:"))
+							if (trackUrl.substring(0, trackUrl.indexOf(" ")).matches("sc|soundcould"))
+								trackUrl = trackUrl.replaceFirst("sc|soundcloud ", "scsearch:");
+							if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:") && !trackUrl.startsWith("scsearch:"))
 								trackUrl = "ytsearch:" + trackUrl;
 							Bran.getInstance().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
-							TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.MUSICAL_NOTE, 10);
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -173,7 +172,6 @@ public class MusicCommand {
 							GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
 							musicManager.getTrackScheduler().setRepeat(!musicManager.getTrackScheduler().isRepeat());
 							event.sendMessage(musicManager.getTrackScheduler().isRepeat() ? "The player is now on repeat." : "The player is no longer on repeat.").queue();
-							TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.MUSICAL_NOTE, 10);
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -241,7 +239,6 @@ public class MusicCommand {
 							}
 							GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
 							musicManager.getTrackScheduler().restartSong(event.getTextChannel());
-							TextChannelGround.of(event.getTextChannel()).dropItemWithChance(Items.MUSICAL_NOTE, 10);
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.FUN)
@@ -372,7 +369,7 @@ public class MusicCommand {
 							} else {
 								event.getGuildData().fairQueueLevel = ((int) argument.get());
 								event.sendMessage("Done, now the FairQueue Level for this Guild is `" + argument.get() + "`.").queue();
-								Bran.getInstance().getDataManager().getDataHolderManager().update();
+								Bran.getInstance().getDataManager().getUserDataManager().update();
 							}
 						})
 						.build())

@@ -42,7 +42,7 @@ public class LoveCommand {
 					}
 					String percentage = response.getString("percentage");
 					String result = response.getString("result");
-					event.sendMessage("**LOVE CALCULATOR**\n\uD83D\uDC97 *`" + firstName + "`*\n\uD83D\uDC97 *`" + secondName + "`*\n**" + percentage + "%** `" + StringUtils.getProgressBar(Integer.parseInt(percentage), 15) + "` " + result).queue();
+					event.sendMessage("**LOVE CALCULATOR**\n\uD83D\uDC97 *`" + firstName + "`*\n\uD83D\uDC97 *`" + secondName + "`*\n**" + percentage + "%** `" + StringUtils.getProgressBar(Integer.parseInt(percentage)) + "` " + result).queue();
 				})
 				.build();
 	}

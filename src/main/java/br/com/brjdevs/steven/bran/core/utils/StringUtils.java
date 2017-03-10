@@ -6,7 +6,7 @@ import java.util.Random;
 public class StringUtils {
 	
 	private static final String ACTIVE_BLOCK = "\u2588";
-	private static final String EMPTY_BLOCK = "\u200b";
+	private static final String EMPTY_BLOCK = "\u00AD";
 	
     public static String[] splitArgs(String args, int expectedArgs) {
         String[] raw = args.split("\\s+", expectedArgs);
@@ -65,20 +65,12 @@ public class StringUtils {
 	
 	public static String capitalize(String string) {
 		String firstChar = String.valueOf(string.charAt(0)).toUpperCase();
-        string = string.substring(1).toLowerCase();
-        return firstChar + string;
-    }
-	
-	public static boolean containsEqualsIgnoreCase(String toCheck, String s) {
-		return Utils.containsEqualsIgnoreCase(Arrays.asList(toCheck.split("")), s);
+		string = string.substring(1).toLowerCase();
+		return firstChar + string;
 	}
 	
-	public static String getProgressBar(long percent, long total) {
-		return getProgressBar(percent, 100, total);
-	}
-	
-	public static String getProgressBar(long percent, long duration, long total) {
-		int activeBlocks = (int) ((float) percent / duration * total);
+	public static String getProgressBar(long percent) {
+		int activeBlocks = (int) ((float) percent / (float) 100 * 10f);
 		StringBuilder builder = new StringBuilder().append(EMPTY_BLOCK);
 		for (int i = 0; i < 10; i++) builder.append(activeBlocks >= i ? ACTIVE_BLOCK : ' ');
 		return builder.append(EMPTY_BLOCK).toString();

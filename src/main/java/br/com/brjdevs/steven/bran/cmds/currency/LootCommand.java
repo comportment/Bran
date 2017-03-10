@@ -5,12 +5,9 @@ import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.currency.BankAccount;
-import br.com.brjdevs.steven.bran.core.currency.ItemStack;
-import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
+import br.com.brjdevs.steven.bran.core.currency.DroppedMoney;
 import br.com.brjdevs.steven.bran.core.managers.RateLimiter;
 import br.com.brjdevs.steven.bran.core.utils.Emojis;
-
-import java.util.List;
 
 public class LootCommand {
 	
@@ -20,17 +17,16 @@ public class LootCommand {
 		return new CommandBuilder(Category.CURRENCY)
 				.setAliases("loot")
 				.setName("Loot Command")
-				.setDescription("Loots stuff from the ground!")
+				.setDescription("Loots money from the ground!")
 				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					if (!RATELIMITER.process(event.getAuthor())) {
 						event.sendMessage("Hey, slow down a little bit there buddy! Let other people loot too!").queue();
 						return;
 					}
-					TextChannelGround ground = TextChannelGround.of(event.getTextChannel());
-					List<ItemStack> items = ground.collectItems();
-					int money = ground.collectMoney();
-					if (items.isEmpty() && money <= 0) {
+					DroppedMoney ground = DroppedMoney.of(event.getTextChannel());
+					int money = ground.collect();
+					if (money <= 0) {
 						event.sendMessage("Nothing to loot here.").queue();
 						return;
 					}
@@ -40,25 +36,11 @@ public class LootCommand {
 					}
 					StringBuilder sb = new StringBuilder().append(Emojis.PARTY_POPPER + " ");
 					sb.append("You walk a little and find ");
-					if (!items.isEmpty()) {
-						items.forEach(stack -> {
-							ItemStack s = new ItemStack(stack.getItem(), 0);
-							for (int i = 0; i < stack.getAmount(); i++) {
-								if (!event.getUserData().getProfile().getInventory().put(stack.getItem())) {
-									ground.dropItem(stack.getItem());
-								} else {
-									s = s.join(new ItemStack(stack.getItem(), 1));
-								}
-							}
-							sb.append(s.toString());
-						});
-					}
 					if (money > 0) {
 						if (!event.getUserData().getProfile().getBankAccount().addCoins(money, BankAccount.MAIN_BANK)) {
-							ground.dropMoney(money);
+							ground.drop(money);
+							event.sendMessage("It looks like your bank account is full! Why don't you spend some money first?").queue();
 						} else {
-							if (!sb.toString().equals(Emojis.PARTY_POPPER + " You walk a little and find "))
-								sb.append(" and ");
 							sb.append(money).append(" coins");
 						}
 					}

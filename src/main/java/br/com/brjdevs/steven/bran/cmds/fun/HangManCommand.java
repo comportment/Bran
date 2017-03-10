@@ -19,7 +19,7 @@ import br.com.brjdevs.steven.bran.core.utils.MathUtils;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
-import br.com.brjdevs.steven.bran.features.hangman.HangManGame;
+import br.com.brjdevs.steven.bran.games.hangman.HangManGame;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.entities.TextChannel;

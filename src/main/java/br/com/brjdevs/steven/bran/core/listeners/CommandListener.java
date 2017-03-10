@@ -5,7 +5,7 @@ import br.com.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.command.CommandEvent;
 import br.com.brjdevs.steven.bran.core.command.CommandStatsManager;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.com.brjdevs.steven.bran.core.currency.TextChannelGround;
+import br.com.brjdevs.steven.bran.core.currency.DroppedMoney;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.managers.PrefixManager;
@@ -32,7 +32,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 			return;
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
-		GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild());
+		GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild());
 		String prefix = PrefixManager.getPrefix(args[0], guildData);
 		if (prefix == null) return;
 		String baseCmd = args[0].substring(prefix.length());
@@ -42,7 +42,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 		else if (!cmd.isPrivateAvailable() && event.isFromType(ChannelType.PRIVATE)) {
 			event.getChannel().sendTyping().queue(success -> event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue());
 			
-		} else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getDataHolderManager().get().getUser(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild()).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
+		} else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getUserDataManager().get().getUser(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild()).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
 			event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + "*").queue());
 			return;
 		}
@@ -54,7 +54,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 					try {
 						cmd.execute(e);
 						if (!e.isPrivate())
-							TextChannelGround.of(event.getTextChannel()).dropMoneyWithChance(MathUtils.random(100), 15);
+							DroppedMoney.of(event.getTextChannel()).dropWithChance(MathUtils.random(100), 15);
 					} catch (Exception ex) {
 						LOG.log(ex);
 						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.\nException message: `" + ex.getMessage() + "`").queue();

@@ -22,7 +22,7 @@ public class WordFilterListener extends EventListener<GuildMessageReceivedEvent>
 			return;
 		if (!event.getChannel().getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
 			return;
-		GuildData guildData = Bran.getInstance().getDataManager().getDataHolderManager().get().getGuild(event.getGuild());
+		GuildData guildData = Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild());
 		if (!guildData.isWordFilterEnabled) return;
 		boolean hasFilteredWord = false;
 		for (String word : guildData.filteredWords) {

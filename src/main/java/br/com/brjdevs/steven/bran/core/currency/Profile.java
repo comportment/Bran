@@ -33,11 +33,10 @@ public class Profile {
 		this.rank = Rank.ROOKIE;
 		this.level = 0;
 		this.experience = 0;
-		this.bankAccount = new BankAccount(user);
 		this.customHex = null;
 		this.inv = new Inventory();
 		this.listeners = new ArrayList<>();
-		this.stamina = 200;
+		this.stamina = 100;
 	}
 	
 	public static double getPercentToLevelUp(long experience, long level) {
@@ -66,6 +65,10 @@ public class Profile {
 	
 	public void setStamina(int stamina) {
 		this.stamina = stamina;
+	}
+	
+	public boolean hasBankAccount() {
+		return bankAccount != null;
 	}
 	
 	public BankAccount getBankAccount() {
@@ -181,7 +184,7 @@ public class Profile {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setAuthor(getUser(jda).getName() + "'s profile information", null, Utils.getAvatarUrl(getUser(jda)));
 		builder.setDescription(EMPTY + "\n" + EMPTY);
-		builder.addField("\uD83D\uDEB6 Stamina", getStamina() + " `" + StringUtils.getProgressBar(getStamina(), 200) + "`", false);
+		builder.addField("\uD83D\uDEB6 Stamina", getStamina() + " [`" + StringUtils.getProgressBar(getStamina()) + "`]", false);
 		builder.addField("\u2694 Level", String.valueOf(getLevel()), true);
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);
 		builder.addField("\u2b50 Experience to Next Level", String.valueOf(expForNextLevel(getLevel())), true);

@@ -101,7 +101,7 @@ public class PermissionCommand {
 	                        else
 		                        s = "Updated " + holder.value + " members permissions! Could not update " + (members.size() - holder.value) + " members permissions.";
 							event.sendMessage(s).queue();
-							Bran.getInstance().getDataManager().getDataHolderManager().update();
+							Bran.getInstance().getDataManager().getUserDataManager().update();
 						})
                         .build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)

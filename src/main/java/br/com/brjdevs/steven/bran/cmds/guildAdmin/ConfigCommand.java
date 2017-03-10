@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.guildAdmin;
 
+import br.com.brjdevs.steven.bran.core.audio.AudioLoader;
 import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.Argument;
 import br.com.brjdevs.steven.bran.core.command.Command;
@@ -8,18 +9,22 @@ import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
+import br.com.brjdevs.steven.bran.core.quote.Quotes;
 import br.com.brjdevs.steven.bran.core.utils.MathUtils;
+import br.com.brjdevs.steven.bran.core.utils.TimeUtils;
+
+import java.util.concurrent.TimeUnit;
 
 public class ConfigCommand {
 	
 	@Command
 	private static ICommand config() {
 		return new TreeCommandBuilder(Category.GUILD_ADMINISTRATOR)
-				.setAliases("config", "cfg")
+				.setAliases("config", "cfg", "options", "opts")
 				.setName("Config Command")
 				.setRequiredPermission(Permissions.GUILD_MANAGE)
 				.setPrivateAvailable(false)
-				.setExample("cfg max_musics_per_user 10")
+				.setExample("cfg music max_musics_per_user 10")
 				.setDescription("Manage extra options with this command!")
 				.setHelp("cfg ?")
 				.addSubCommand(new TreeCommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -51,10 +56,34 @@ public class ConfigCommand {
 									if (i < -1) i = -1;
 									event.getGuildData().maxSongsPerUser = i;
 									if (i > 0)
-										event.sendMessage("Got it! Now each user can only have " + i + " song(s) in the queue at once.").queue();
+										event.sendMessage(Quotes.SUCCESS, "Now each user can only have " + i + " song(s) in the queue at once.").queue();
 									else
-										event.sendMessage("Got it! Now each user can have unlimited songs in the queue at once.").queue();
-									Bran.getInstance().getDataManager().getDataHolderManager().update();
+										event.sendMessage(Quotes.SUCCESS, "Now each user can have unlimited songs in the queue at once.").queue();
+									Bran.getInstance().getDataManager().getUserDataManager().update();
+								})
+								.build())
+						.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
+								.setAliases("max_song_duration")
+								.setName("Max Song Duration Command")
+								.setDescription("Change the max song duration for the current guild!")
+								.setArgs(new Argument("duration", String.class, true))
+								.setRequiredPermission(Permissions.GUILD_MOD)
+								.setAction((event) -> {
+									Argument argument = event.getArgument("duration");
+									if (!argument.isPresent()) {
+										event.sendMessage("The current max song duration: `" +
+												TimeUtils.format(event.getGuildData().maxSongDuration) + "`.").queue();
+										return;
+									}
+									long duration = TimeUtils.getTime(((String) argument.get()), TimeUnit.MILLISECONDS);
+									if (duration > AudioLoader.MAX_SONG_LENGTH || duration < 0) {
+										event.sendMessage("The max song duration has to be bigger than 0 and lower than 3 hours!").queue();
+										return;
+									}
+									event.getGuildData().maxSongDuration = duration;
+									event.sendMessage(Quotes.SUCCESS, "Now the max song duration is `" +
+											TimeUtils.format(event.getGuildData().maxSongDuration) + "`!").queue();
+									Bran.getInstance().getDataManager().getUserDataManager().update();
 								})
 								.build())
 						.build())

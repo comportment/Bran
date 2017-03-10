@@ -47,7 +47,7 @@ public class CommandStatsManager {
 				.limit(12)
 				.forEachOrdered(entry -> {
 					int percent = entry.getValue().get() * 100 / total;
-					builder.addField(entry.getKey().getName(), String.format("[`%s`] %d%%", StringUtils.getProgressBar(percent, 15), percent), true);
+					builder.addField(entry.getKey().getName(), String.format("[`%s`] %d%%", StringUtils.getProgressBar(percent), percent), true);
 				});
 		
 		return builder;
@@ -62,7 +62,7 @@ public class CommandStatsManager {
 				.limit(5)
 				.map(entry -> {
 					int percent = entry.getValue().get() * 100 / total;
-					return String.format("[`%s`] %d%% **%s**", StringUtils.getProgressBar(percent, 15), percent, entry.getKey().getName());
+					return String.format("[`%s`] %d%% **%s**", StringUtils.getProgressBar(percent), percent, entry.getKey().getName());
 				})
 				.collect(Collectors.joining("\n")));
 	}

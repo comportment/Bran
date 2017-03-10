@@ -23,6 +23,17 @@ public class Inventory {
 		return true;
 	}
 	
+	public boolean put(Item item, ItemMeta itemMeta) {
+		if (getAmountOf(item) > 100)
+			return false;
+		int id = Items.idOf(item);
+		if (items.containsKey(id))
+			items.get(id).join(itemMeta.getAmount());
+		else
+			items.put(id, itemMeta);
+		return true;
+	}
+	
 	public boolean remove(Item item) {
 		int id = Items.idOf(item);
 		if (!items.containsKey(id))

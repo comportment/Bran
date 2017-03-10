@@ -10,14 +10,12 @@ public class TrackContext {
 	
 	private TrackScheduler scheduler;
 	private AudioTrack track;
-	private String url;
 	private String djId;
 	private String contextId;
 	
-	public TrackContext(AudioTrack track, String url, User dj, TextChannel context, TrackScheduler scheduler) {
+	public TrackContext(AudioTrack track, User dj, TextChannel context, TrackScheduler scheduler) {
 		this.scheduler = scheduler;
 		this.track = track;
-		this.url = url;
 		this.djId = dj.getId();
 		this.contextId = context.getId();
 	}
@@ -27,7 +25,7 @@ public class TrackContext {
 	}
 	
 	public String getURL() {
-		return url;
+		return getInfo().uri;
 	}
 	
 	public String getDJId() {

@@ -1,4 +1,4 @@
-package br.com.brjdevs.steven.bran.features.hangman;
+package br.com.brjdevs.steven.bran.games.hangman;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.listeners.EventListener;
@@ -37,6 +37,6 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
 		}
 		if (guess.length() != 2)
 			return;
-		game.guess(guess.toLowerCase().charAt(1), Bran.getInstance().getDataManager().getDataHolderManager().get().getUser(event.getAuthor()));
+		game.guess(guess.toLowerCase().charAt(1), Bran.getInstance().getDataManager().getUserDataManager().get().getUser(event.getAuthor()));
 	}
 }

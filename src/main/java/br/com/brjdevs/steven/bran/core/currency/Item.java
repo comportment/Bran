@@ -7,7 +7,7 @@ public class Item {
 	private final long value;
 	private String emoji, name, description;
 	private long price;
-	private boolean staticValue, sellable, buyable;
+	private boolean sellable, buyable;
 	private int startDurability;
 	
 	public Item(String emoji, String name, String desc, int startDurability, long value, boolean sellable, boolean buyable) {
@@ -17,13 +17,11 @@ public class Item {
 		this.startDurability = startDurability;
 		this.value = value;
 		this.price = value;
-		this.staticValue = false;
 		this.sellable = sellable;
 		this.buyable = buyable;
 	}
 	
 	public void changePrices(Random r) {
-		if (staticValue) return;
 		long min = (long) (value * 0.9), max = (long) (value * 1.1), dif = max - min;
 		price = min + r.nextInt((int) dif);
 	}
