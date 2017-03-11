@@ -188,7 +188,7 @@ public class Profile {
 		builder.addField("\u2694 Level", String.valueOf(getLevel()), true);
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);
 		builder.addField("\u2b50 Experience to Next Level", String.valueOf(expForNextLevel(getLevel())), true);
-		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(bankAccount.getCoins()), true);
+		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(getBankAccount().getCoins()), true);
 		builder.addField("\uD83D\uDCBC Inventory", String.valueOf(getInventory().size(false)), true);
 		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
 		builder.addField("\uD83D\uDD79 Game", "HangMan", true).addField("\uD83C\uDFC6 Victories", String.valueOf(getHMStats().getVictories()), true).addField("☠ Defeats", String.valueOf(getHMStats().getDefeats()), true);
