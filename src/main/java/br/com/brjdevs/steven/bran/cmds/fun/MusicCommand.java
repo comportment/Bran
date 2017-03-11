@@ -90,8 +90,6 @@ public class MusicCommand {
 								event.sendMessage("You can only have " + event.getGuildData().maxSongsPerUser + " songs in the queue.").queue();
 								return;
 							}
-							if (trackUrl.substring(0, trackUrl.indexOf(" ")).matches("sc|soundcould"))
-								trackUrl = trackUrl.replaceFirst("sc|soundcloud ", "scsearch:");
 							if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:") && !trackUrl.startsWith("scsearch:"))
 								trackUrl = "ytsearch:" + trackUrl;
 							Bran.getInstance().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
