@@ -37,7 +37,7 @@ public class GuildData {
 	
 	public GuildData(Guild guild) {
 		this.guildId = Long.parseLong(guild.getId());
-		this.prefixes.addAll(Arrays.asList("b!"));
+		this.prefixes.addAll(Arrays.asList(".", "!!"));
 	}
 	
 	public Guild getGuild(JDA jda) {
