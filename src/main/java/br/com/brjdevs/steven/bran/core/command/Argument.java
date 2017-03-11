@@ -88,6 +88,10 @@ public class Argument {
 		return result;
 	}
 	
+	public Object getOrDefault(Object d) {
+		return result == null ? d : result;
+	}
+	
 	Argument copy() {
 		return new Argument(name, type, isOptional);
 	}

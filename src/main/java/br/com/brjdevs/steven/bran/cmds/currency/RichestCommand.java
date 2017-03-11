@@ -1,7 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.currency;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
-import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class RichestCommand {
 	
-	@Command
+	//@Command
 	private static ICommand richest() {
 		return new CommandBuilder(Category.CURRENCY)
 				.setAliases("richest")

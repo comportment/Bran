@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.cmds.currency;
 
-import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
@@ -20,7 +19,7 @@ public class MineCommand {
 	private static final RateLimiter RATE_LIMITER = new RateLimiter(5000);
 	private static final Random r = new Random();
 	
-	@Command
+	//@Command
 	private static ICommand mine() {
 		return new CommandBuilder(Category.CURRENCY)
 				.setAliases("mine")

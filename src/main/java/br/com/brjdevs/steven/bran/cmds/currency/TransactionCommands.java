@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.cmds.currency;
 
-import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
@@ -17,7 +16,7 @@ public class TransactionCommands {
 	private static final String RECEIVE = "\uD83D\uDCE5";
 	private static final String GIVE = "\uD83D\uDCE4";
 	
-	@Command
+	//@Command
 	private static ICommand transaction() {
 		return new CommandBuilder(Category.CURRENCY)
 				.setAliases("transactions")

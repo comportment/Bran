@@ -1,7 +1,6 @@
 package br.com.brjdevs.steven.bran.cmds.currency;
 
 import br.com.brjdevs.steven.bran.core.command.Argument;
-import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
@@ -19,7 +18,7 @@ import java.util.Arrays;
 
 public class ShopCommand {
 	
-	@Command
+	//@Command
 	private static ICommand market() {
 		return new TreeCommandBuilder(Category.CURRENCY)
 				.setAliases("market")
@@ -72,9 +71,7 @@ public class ShopCommand {
 						.setAction((event) -> {
 							String sItem = ((String) event.getArgument("item").get());
 							String unicode = EmojiConverter.toUnicode(sItem);
-							Item item = Items.fromEmoji(unicode).orElse(null);
-							if (item == null)
-								item = Arrays.stream(Items.ALL).filter(i -> i.getName().equalsIgnoreCase(sItem)).findFirst().orElse(null);
+							Item item = Items.fromEmoji(unicode).orElse(Arrays.stream(Items.ALL).filter(i -> i.getName().equalsIgnoreCase(sItem)).findFirst().orElse(null));
 							if (item == null) {
 								event.sendMessage(Quotes.FAIL, "No items found matching that criteria.").queue();
 							} else if (!item.isSellable()) {

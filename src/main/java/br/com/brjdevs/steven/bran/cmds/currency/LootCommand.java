@@ -1,6 +1,5 @@
 package br.com.brjdevs.steven.bran.cmds.currency;
 
-import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
@@ -12,7 +11,8 @@ import br.com.brjdevs.steven.bran.core.utils.Emojis;
 public class LootCommand {
 	
 	private static final RateLimiter RATELIMITER = new RateLimiter(10000);
-	@Command
+	
+	//@Command
 	private static ICommand loot() {
 		return new CommandBuilder(Category.CURRENCY)
 				.setAliases("loot")

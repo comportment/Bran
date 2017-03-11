@@ -54,7 +54,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 					try {
 						cmd.execute(e);
 						if (!e.isPrivate())
-							DroppedMoney.of(event.getTextChannel()).dropWithChance(MathUtils.random(100), 15);
+							DroppedMoney.of(event.getTextChannel()).dropWithChance(MathUtils.random(100), 5);
 					} catch (Exception ex) {
 						LOG.log(ex);
 						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.\nException message: `" + ex.getMessage() + "`").queue();

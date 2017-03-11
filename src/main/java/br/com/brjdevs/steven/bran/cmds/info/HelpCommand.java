@@ -44,7 +44,7 @@ public class HelpCommand {
 					if (event.getGuild() != null)
 						color = event.getGuild().getSelfMember().getColor();
 					builder.append("\n**If you need a detailed description on a command [click here](http://bran.readthedocs.io/en/latest/)** *(WIP)*\n")
-							.append("**To get help on a command use `" + event.getPrefix() + "[cmd] help`.**");
+							.append("**To get help on a command use `").append(event.getPrefix()).append("[cmd] help`.**");
 					MessageEmbed embed = new EmbedBuilder()
 							.setDescription(builder.toString())
 							.setColor(color == null ? Color.decode("#D68A38") : color)
