@@ -79,7 +79,7 @@ public class BranShard {
 	
 	public void shutdown() {
 		jda.getGuilds().forEach(g -> g.getAudioManager().closeAudioConnection());
-		jda.shutdownNow(true);
+		jda.shutdown(true);
 		eventManager.executor.shutdown();
 	}
 	
