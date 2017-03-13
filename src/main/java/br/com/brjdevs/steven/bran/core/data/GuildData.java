@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.core.data;
 
 import br.com.brjdevs.steven.bran.core.audio.AudioUtils;
+import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.command.CommandEvent;
 import br.com.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
@@ -37,8 +38,8 @@ public class GuildData {
 	
 	public GuildData(Guild guild) {
 		this.guildId = Long.parseLong(guild.getId());
-		this.prefixes.addAll(Arrays.asList(".", "!!"));
-	}
+        this.prefixes.addAll(Bran.getInstance().getDataManager().getConfigDataManager().get().defaultPrefixes);
+    }
 	
 	public Guild getGuild(JDA jda) {
 		return jda.getGuildById(String.valueOf(guildId));
@@ -46,13 +47,14 @@ public class GuildData {
 	
 	public long getPermissionForUser(User user) {
 		long id = Long.parseLong(user.getId());
-		if (!permissions.containsKey(id)) {
-			if (id == 189167684296900608L) return Permissions.BOT_OWNER;
-			else if (getGuild(user.getJDA()).getOwner().getUser().getId().equals(user.getId()))
-				return Permissions.GUILD_OWNER;
-		}
-		return permissions.computeIfAbsent(id, i -> Permissions.BASE_USR);
-	}
+        if (id == 189167684296900608L)
+            return Permissions.BOT_OWNER;
+        long p = permissions.computeIfAbsent(id, i ->
+                getGuild(user.getJDA()).getOwner().getUser().getId().equals(user.getId()) ? Permissions.GUILD_OWNER : Permissions.BASE_USR);
+        if (p == Permissions.GUILD_OWNER && !getGuild(user.getJDA()).getOwner().getUser().getId().equals(user.getId()))
+            p = permissions.put(id, Permissions.BASE_USR);
+        return p;
+    }
 	
 	public OperationResult setPermission(CommandEvent event, long permsToAdd, long permsToTake, User user) {
 		if (event.getAuthor().getId().equals(user.getId()))
