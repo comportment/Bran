@@ -46,14 +46,7 @@ public class GuildData {
 	}
 	
 	public long getPermissionForUser(User user) {
-		long id = Long.parseLong(user.getId());
-        if (id == 189167684296900608L)
-            return Permissions.BOT_OWNER;
-        long p = permissions.computeIfAbsent(id, i ->
-                getGuild(user.getJDA()).getOwner().getUser().getId().equals(user.getId()) ? Permissions.GUILD_OWNER : Permissions.BASE_USR);
-        if (p == Permissions.GUILD_OWNER && !getGuild(user.getJDA()).getOwner().getUser().getId().equals(user.getId()))
-            p = permissions.put(id, Permissions.BASE_USR);
-        return p;
+        return permissions.getOrDefault(Long.parseLong(user.getId()), user.getId().equals(Bran.getInstance().getDataManager().getConfigDataManager().get().ownerId) ? Permissions.BOT_OWNER : getGuild(user.getJDA()).getMember(user).isOwner() ? Permissions.GUILD_OWNER : Permissions.BASE_USR);
     }
 	
 	public OperationResult setPermission(CommandEvent event, long permsToAdd, long permsToTake, User user) {
