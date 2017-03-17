@@ -16,7 +16,8 @@ public abstract class AbstractGame {
             this.location = location;
             this.info = info;
             this.listener = listener;
-            this.info.getPlayers().get(0).getUserData().getProfile().registerListener(listener);
+            if (listener != null)
+                this.info.getPlayers().get(0).getUserData().getProfile().registerListener(listener);
             if (!setup())
                 this.gameState = GameState.ERRORED;
             else
@@ -36,7 +37,8 @@ public abstract class AbstractGame {
     }
     
     public void invite(UserData user) {
-        user.getProfile().registerListener(listener);
+        if (listener != null)
+            user.getProfile().registerListener(listener);
         info.getPlayers().add(new GamePlayer(user, false));
     }
     
