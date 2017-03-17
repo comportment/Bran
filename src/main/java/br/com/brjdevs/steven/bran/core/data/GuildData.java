@@ -31,8 +31,8 @@ public class GuildData {
 	public String joinMsgDM = null;
 	public String leaveMsg = null;
 	public Giveaway giveaway = null;
-	private long guildId;
-	private Map<Long, Long> permissions = new HashMap<>();
+    public Map<Long, Long> permissions = new HashMap<>();
+    private long guildId;
 	private long announceChannelId;
 	private List<Long> publicRoles = new ArrayList<>();
 	
