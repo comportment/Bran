@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 
 public class GameManager {
     
-    private static final ConcurrentHashMap<Long, AbstractGame> games = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<GameReference, AbstractGame> games = new ConcurrentHashMap<>();
     
-    public static AbstractGame getGame(long gameId) {
-        return games.get(gameId);
+    public static AbstractGame getGame(GameReference reference) {
+        return games.get(reference);
     }
     
-    public static Map<Long, AbstractGame> getGames() {
+    public static Map<GameReference, AbstractGame> getGames() {
         return Collections.unmodifiableMap(new HashMap<>(games));
     }
     

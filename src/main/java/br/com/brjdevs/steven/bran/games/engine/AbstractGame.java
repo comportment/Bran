@@ -1,30 +1,38 @@
 package br.com.brjdevs.steven.bran.games.engine;
 
+import br.com.brjdevs.steven.bran.core.currency.Profile;
 import br.com.brjdevs.steven.bran.core.data.UserData;
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
+import br.com.brjdevs.steven.bran.core.snowflakes.SnowflakeGenerator;
+
+import java.rmi.UnexpectedException;
 
 public abstract class AbstractGame {
     
+    private static final SnowflakeGenerator GAME_ID_GENERATOR = new SnowflakeGenerator(2, 1);
     private GameLocation location;
     private GameInfo info;
     private GameState gameState;
+    private GameReference reference;
     private IProfileListener listener;
     
-    public AbstractGame(GameLocation location, GameInfo info, IProfileListener listener) {
+    public AbstractGame(GameLocation location, GameInfo info) {
         try {
             this.gameState = GameState.STARTING;
             this.location = location;
             this.info = info;
-            this.listener = listener;
+            this.reference = new GameReference(GAME_ID_GENERATOR.nextId());
+            this.listener = new DefaultGameProfileListener(reference);
+            Profile owner = this.info.getPlayers().get(0).getUserData().getProfile();
             if (listener != null)
-                this.info.getPlayers().get(0).getUserData().getProfile().registerListener(listener);
+                owner.registerListener(listener);
+            owner.setCurrentGame(reference);
             if (!setup())
-                this.gameState = GameState.ERRORED;
+                throw new UnexpectedException("Failed to setup Game!");
             else
                 this.gameState = GameState.READY;
         } catch (Exception e) {
             this.gameState = GameState.ERRORED;
-            throw new RuntimeException(e);
         }
     }
     
@@ -39,6 +47,7 @@ public abstract class AbstractGame {
     public void invite(UserData user) {
         if (listener != null)
             user.getProfile().registerListener(listener);
+        user.getProfile().setCurrentGame(reference);
         info.getPlayers().add(new GamePlayer(user, false));
     }
     
@@ -47,8 +56,14 @@ public abstract class AbstractGame {
             return false;
         GamePlayer oldOwner = info.getPlayers().pollFirst();
         info.getPlayers().addFirst(new GamePlayer(user, true));
+        user.getProfile().registerListener(listener);
+        user.getProfile().setCurrentGame(reference);
         if (inviteOldOwner)
             invite(oldOwner.getUserData()); //invites the old owner
+        else {
+            oldOwner.getUserData().getProfile().unregisterListener(listener);
+            oldOwner.getUserData().getProfile().setCurrentGame(reference);
+        }
         return true;
     }
     

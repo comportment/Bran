@@ -4,6 +4,7 @@ import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
 import br.com.brjdevs.steven.bran.core.managers.profile.Inventory;
 import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
+import br.com.brjdevs.steven.bran.games.engine.GameReference;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -26,8 +27,9 @@ public class Profile {
 	private Inventory inv;
 	private transient List<IProfileListener> listeners;
 	private int stamina;
-	
-	public Profile(User user) {
+    private transient GameReference currentGame;
+    
+    public Profile(User user) {
 		this.userId = user.getId();
 		this.HMStats = new HMStats();
 		this.rank = Rank.ROOKIE;
@@ -179,9 +181,17 @@ public class Profile {
 		if (listeners == null) listeners = new ArrayList<>();
 		this.listeners.remove(listener);
 	}
-	
-	public MessageEmbed createEmbed(JDA jda) {
-		EmbedBuilder builder = new EmbedBuilder();
+    
+    public GameReference getCurrentGame() {
+        return currentGame;
+    }
+    
+    public void setCurrentGame(GameReference currentGame) {
+        this.currentGame = currentGame;
+    }
+    
+    public MessageEmbed createEmbed(JDA jda) {
+        EmbedBuilder builder = new EmbedBuilder();
 		builder.setAuthor(getUser(jda).getName() + "'s profile information", null, Utils.getAvatarUrl(getUser(jda)));
 		builder.setDescription(EMPTY + "\n" + EMPTY);
 		builder.addField("\uD83D\uDEB6 Stamina", getStamina() + " [`" + StringUtils.getProgressBar(getStamina()) + "`]", false);

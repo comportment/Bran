@@ -13,5 +13,6 @@ public class Emojis {
 			MEGA = "\uD83D\uDCE3",
 			X = "\u274c",
 			WARNING_SIGN = "\u26a0",
-			CHECK_MARK = "\u2705";
+            CHECK_MARK = "\u2705",
+            THUMBS_DOWN = "\uD83D\uDC4E";
 }
