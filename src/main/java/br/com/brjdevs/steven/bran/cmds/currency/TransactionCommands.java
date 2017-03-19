@@ -23,14 +23,14 @@ public class TransactionCommands {
 				.setName("Transactions Command")
 				.setDescription("Show you your latest transactions!")
 				.setAction((event) -> {
-					if (event.getUserData().getProfile().getBankAccount().getTransactions().isEmpty()) {
-						event.sendMessage("No transactions found in your bank account!").queue();
+                    if (event.getUserData().getProfileData().getBankAccount().getTransactions().isEmpty()) {
+                        event.sendMessage("No transactions found in your bank account!").queue();
 						return;
 					}
 					String currentArgs = "Your transactions: \n\n";
-					BankAccount bank = event.getUserData().getProfile().getBankAccount();
-					LinkedList<Transaction> transactions = event.getUserData().getProfile().getBankAccount().getTransactions();
-					for (Transaction transaction : transactions) {
+                    BankAccount bank = event.getUserData().getProfileData().getBankAccount();
+                    LinkedList<Transaction> transactions = event.getUserData().getProfileData().getBankAccount().getTransactions();
+                    for (Transaction transaction : transactions) {
 						currentArgs += String.format("%s`\u200B%+4d` %s - %s\n",
 								!transaction.senderId.equals(bank.userId) ? RECEIVE : GIVE,
 								transaction.senderId.equals(bank.userId) ? -transaction.amount : transaction.amount,

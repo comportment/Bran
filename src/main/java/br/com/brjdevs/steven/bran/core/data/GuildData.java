@@ -38,7 +38,7 @@ public class GuildData {
 	
 	public GuildData(Guild guild) {
 		this.guildId = Long.parseLong(guild.getId());
-        this.prefixes.addAll(Bran.getInstance().getDataManager().getConfigDataManager().get().defaultPrefixes);
+        this.prefixes.addAll(Bran.getInstance().getDataManager().getConfig().get().defaultPrefixes);
     }
 	
 	public Guild getGuild(JDA jda) {
@@ -46,7 +46,7 @@ public class GuildData {
 	}
 	
 	public long getPermissionForUser(User user) {
-        return permissions.getOrDefault(Long.parseLong(user.getId()), user.getId().equals(Bran.getInstance().getDataManager().getConfigDataManager().get().ownerId) ? Permissions.BOT_OWNER : getGuild(user.getJDA()).getMember(user).isOwner() ? Permissions.GUILD_OWNER : Permissions.BASE_USR);
+        return permissions.getOrDefault(Long.parseLong(user.getId()), user.getId().equals(Bran.getInstance().getDataManager().getConfig().get().ownerId) ? Permissions.BOT_OWNER : getGuild(user.getJDA()).getMember(user).isOwner() ? Permissions.GUILD_OWNER : Permissions.BASE_USR);
     }
 	
 	public OperationResult setPermission(CommandEvent event, long permsToAdd, long permsToTake, User user) {

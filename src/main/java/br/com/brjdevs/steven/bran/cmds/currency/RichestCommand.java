@@ -23,12 +23,12 @@ public class RichestCommand {
 				.setName("Richest Users Command")
 				.setDescription("Lists you the richest users!")
 				.setAction((event) -> {
-					List<BankAccount> bankAccounts = new ArrayList<>(Bran.getInstance().getDataManager().getUserDataManager().get().users
-							.values().stream().filter(userData -> {
+                    List<BankAccount> bankAccounts = new ArrayList<>(Bran.getInstance().getDataManager().getData().get().users
+                            .values().stream().filter(userData -> {
 								User u = Bran.getInstance().getUserById(String.valueOf(userData.userId));
 								return u != null && !u.isBot();
-							}).map(userData -> userData.getProfile().getBankAccount())
-							.sorted(Comparator.comparingLong(bankAccount -> Long.MAX_VALUE - bankAccount.getCoins()))
+                            }).map(userData -> userData.getProfileData().getBankAccount())
+                            .sorted(Comparator.comparingLong(bankAccount -> Long.MAX_VALUE - bankAccount.getCoins()))
 							.limit(15).collect(Collectors.toList()));
 					EmbedBuilder embedBuilder = new EmbedBuilder();
 					embedBuilder.setTitle("Richest users", null);
@@ -36,8 +36,8 @@ public class RichestCommand {
 					embedBuilder.setDescription(bankAccounts.stream().map(bankAccount -> (bankAccounts.indexOf(bankAccount) + 1) + ". "
 							+ Utils.getUser(Bran.getInstance().getUserById(bankAccount.userId)) + " - "
 							+ bankAccount.getCoins() + " coins").collect(Collectors.joining("\n")));
-					embedBuilder.setFooter("Total registered bank accounts: " + Bran.getInstance().getDataManager().getUserDataManager().get().users.values().stream().filter(userData -> userData.getProfile().hasBankAccount()).count(), event.getJDA().getSelfUser().getEffectiveAvatarUrl());
-					event.sendMessage(embedBuilder.build()).queue();
+                    embedBuilder.setFooter("Total registered bank accounts: " + Bran.getInstance().getDataManager().getData().get().users.values().stream().filter(userData -> userData.getProfileData().hasBankAccount()).count(), event.getJDA().getSelfUser().getEffectiveAvatarUrl());
+                    event.sendMessage(embedBuilder.build()).queue();
 				})
 				.build();
 	}

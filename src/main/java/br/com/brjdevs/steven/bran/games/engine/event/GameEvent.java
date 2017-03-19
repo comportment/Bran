@@ -1,5 +1,6 @@
 package br.com.brjdevs.steven.bran.games.engine.event;
 
+import br.com.brjdevs.steven.bran.core.client.BranShard;
 import br.com.brjdevs.steven.bran.games.engine.AbstractGame;
 
 public abstract class GameEvent {
@@ -12,5 +13,9 @@ public abstract class GameEvent {
     
     public AbstractGame getGame() {
         return game;
+    }
+    
+    public BranShard getShard() {
+        return game.getShard();
     }
 }

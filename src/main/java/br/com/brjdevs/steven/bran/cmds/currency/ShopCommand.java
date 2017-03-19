@@ -52,12 +52,12 @@ public class ShopCommand {
 							} else if (!item.isBuyable()) {
 								event.sendMessage(Emojis.X + " This item is not buyable!").queue();
 								return;
-							} else if (!event.getUserData().getProfile().getBankAccount().takeCoins(item.getValue(), BankAccount.MAIN_BANK)) {
-								event.sendMessage(Emojis.X + " You don't have enough coins, go get some before spending these!").queue();
+                            } else if (!event.getUserData().getProfileData().getBankAccount().takeCoins(item.getValue(), BankAccount.MAIN_BANK)) {
+                                event.sendMessage(Emojis.X + " You don't have enough coins, go get some before spending these!").queue();
 								return;
 							}
-							if (event.getUserData().getProfile().getInventory().put(item))
-								event.sendMessage(Emojis.CHECK_MARK + " You've bought a " + item.getEmoji() + " " + item.getName() + "!").queue();
+                            if (event.getUserData().getProfileData().getInventory().put(item))
+                                event.sendMessage(Emojis.CHECK_MARK + " You've bought a " + item.getEmoji() + " " + item.getName() + "!").queue();
 							else
 								event.sendMessage(Emojis.X + " You can't buy " + item.getName() + " because you have too much of it!").queue();
 							
@@ -76,15 +76,15 @@ public class ShopCommand {
 								event.sendMessage(Quotes.FAIL, "No items found matching that criteria.").queue();
 							} else if (!item.isSellable()) {
 								event.sendMessage(Emojis.X + " This item is not sellable!").queue();
-							} else if (event.getUserData().getProfile().getInventory().getAmountOf(item) <= 0) {
-								event.sendMessage("You don't have any `" + item.getName() + "` left in your inventory!").queue();
-							} else if (event.getUserData().getProfile().getInventory().remove(item)) {
-								if (!event.getUserData().getProfile().getBankAccount().addCoins(item.getValue(), BankAccount.MAIN_BANK)) {
-									event.sendMessage(Emojis.X + " You have too much coins! Spend some money before getting more!").queue();
-									event.getUserData().getProfile().getInventory().put(item);
-								} else {
-									event.sendMessage(Emojis.CHECK_MARK + " You've sold a " + item.getEmoji() + " " + item.getName() + "! Remaining " + item.getName() + ": " + event.getUserData().getProfile().getInventory().getAmountOf(item)).queue();
-								}
+                            } else if (event.getUserData().getProfileData().getInventory().getAmountOf(item) <= 0) {
+                                event.sendMessage("You don't have any `" + item.getName() + "` left in your inventory!").queue();
+                            } else if (event.getUserData().getProfileData().getInventory().remove(item)) {
+                                if (!event.getUserData().getProfileData().getBankAccount().addCoins(item.getValue(), BankAccount.MAIN_BANK)) {
+                                    event.sendMessage(Emojis.X + " You have too much coins! Spend some money before getting more!").queue();
+                                    event.getUserData().getProfileData().getInventory().put(item);
+                                } else {
+                                    event.sendMessage(Emojis.CHECK_MARK + " You've sold a " + item.getEmoji() + " " + item.getName() + "! Remaining " + item.getName() + ": " + event.getUserData().getProfileData().getInventory().getAmountOf(item)).queue();
+                                }
 							}
 							
 						})

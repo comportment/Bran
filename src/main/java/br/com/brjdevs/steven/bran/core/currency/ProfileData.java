@@ -14,9 +14,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Profile {
-	
-	private static String EMPTY = "\u00AD";
+public class ProfileData {
+    
+    private static String EMPTY = "\u00AD";
 	
 	public String customHex;
 	private BankAccount bankAccount;
@@ -29,19 +29,23 @@ public class Profile {
 	private int stamina;
     private transient GameReference currentGame;
     
-    public Profile(User user) {
-		this.userId = user.getId();
-		this.HMStats = new HMStats();
-		this.rank = Rank.ROOKIE;
-		this.level = 0;
-		this.experience = 0;
-		this.customHex = null;
-		this.inv = new Inventory();
-		this.listeners = new ArrayList<>();
-		this.stamina = 100;
-	}
-	
-	public static double getPercentToLevelUp(long experience, long level) {
+    public ProfileData(User user) {
+        this(user.getId());
+    }
+    
+    public ProfileData(String userId) {
+        this.userId = userId;
+        this.HMStats = new HMStats();
+        this.rank = Rank.ROOKIE;
+        this.level = 0;
+        this.experience = 0;
+        this.customHex = null;
+        this.inv = new Inventory();
+        this.listeners = new ArrayList<>();
+        this.stamina = 100;
+    }
+    
+    public static double getPercentToLevelUp(long experience, long level) {
 		return Math.floor(experience / expForNextLevel(level) * 10000) / 100;
 	}
 	
@@ -81,9 +85,9 @@ public class Profile {
 	public String getCustomHex() {
 		return customHex;
 	}
-	
-	public Profile.HMStats getHMStats() {
-		return HMStats;
+    
+    public ProfileData.HMStats getHMStats() {
+        return HMStats;
 	}
 	
 	public Rank getRank() {
@@ -125,12 +129,12 @@ public class Profile {
 		}
 		setExperience(this.experience + experience);
 		if (getExperience() >= expForNextLevel(getLevel())) {
-			setExperience(getExperience() - Profile.expForNextLevel(getLevel()));
-			setLevel(getLevel() + 1);
+            setExperience(getExperience() - ProfileData.expForNextLevel(getLevel()));
+            setLevel(getLevel() + 1);
 			getRegisteredListeners().forEach(listener -> listener.onLevelUp(this));
 		} else if (getExperience() < 0 && getLevel() > 0) {
-			setExperience(Profile.expForNextLevel(getLevel() - 1) + getExperience());
-			setLevel(getLevel() - 1);
+            setExperience(ProfileData.expForNextLevel(getLevel() - 1) + getExperience());
+            setLevel(getLevel() - 1);
 			getRegisteredListeners().forEach(listener -> listener.onLevelDown(this));
 		}
 	}

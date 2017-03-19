@@ -32,8 +32,8 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 			return;
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
-		GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild());
-		String prefix = PrefixManager.getPrefix(args[0], guildData);
+        GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild());
+        String prefix = PrefixManager.getPrefix(args[0], guildData);
 		if (prefix == null) return;
 		String baseCmd = args[0].substring(prefix.length());
 		ICommand cmd = Bran.getInstance().getCommandManager().getCommand(baseCmd);
@@ -41,9 +41,9 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 			return;
 		else if (!cmd.isPrivateAvailable() && event.isFromType(ChannelType.PRIVATE)) {
 			event.getChannel().sendTyping().queue(success -> event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue());
-			
-		} else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getUserDataManager().get().getUser(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild()).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
-			event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + "*").queue());
+            
+        } else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getData().get().getUser(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
+            event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + "*").queue());
 			return;
 		}
 		CommandEvent e = new CommandEvent(event, cmd, guildData, event.getMessage().getRawContent(), prefix);

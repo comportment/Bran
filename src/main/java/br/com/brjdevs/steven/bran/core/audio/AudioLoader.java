@@ -44,8 +44,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 	
 	@Override
 	public void trackLoaded(AudioTrack track) {
-		GuildData guildData = Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(channel.getGuild());
-		if (track.getInfo().length > guildData.maxSongDuration) {
+        GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild());
+        if (track.getInfo().length > guildData.maxSongDuration) {
 			channel.sendMessage("This song is too long! The maximum supported length is 3 hours. *" + AudioUtils.format(track.getInfo().length) + "/" + AudioUtils.format(MAX_SONG_LENGTH) + "*").queue();
 			if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
 				channel.getGuild().getAudioManager().closeAudioConnection();
@@ -124,8 +124,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 					channel.getGuild().getAudioManager().closeAudioConnection();
 				return;
 			}
-			GuildData guildData = Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(channel.getGuild());
-			channel.sendMessage("Queueing playlist " + playlist.getName() + " by " + Utils.getUser(user)).queue(msg -> {
+            GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild());
+            channel.sendMessage("Queueing playlist " + playlist.getName() + " by " + Utils.getUser(user)).queue(msg -> {
 				int queued = 0;
 				for (TrackContext trackContext : playlistTracks) {
 					if (trackContext.getInfo().length > guildData.maxSongDuration) {

@@ -16,32 +16,32 @@ public class BranDataManager {
 	private GsonDataRedisManager<Polls> pollPersistence;
 	
 	public BranDataManager() {
-		getUserDataManager();
-		getConfigDataManager();
-		getHangmanWordsManager();
-		getPollPersistence();
-	}
-	
-	public GsonDataRedisManager<DataHolder> getUserDataManager() {
-		if (dataHolderManager == null)
+        getData();
+        getConfig();
+        getHangmanWords();
+        getPolls();
+    }
+    
+    public GsonDataRedisManager<DataHolder> getData() {
+        if (dataHolderManager == null)
 			dataHolderManager = new GsonDataRedisManager<>(DataHolder.class, "dataholder.json", DataHolder::new);
 		return dataHolderManager;
 	}
-	
-	public GsonDataFileManager<Config> getConfigDataManager() {
-		if (configDataManager == null)
+    
+    public GsonDataFileManager<Config> getConfig() {
+        if (configDataManager == null)
 			configDataManager = new GsonDataFileManager<>(Config.class, "config.json", Config::new);
 		return configDataManager;
 	}
-	
-	public GsonDataRedisManager<Map<String, List<String>>> getHangmanWordsManager() {
-		if (hangmanWordsManager == null)
+    
+    public GsonDataRedisManager<Map<String, List<String>>> getHangmanWords() {
+        if (hangmanWordsManager == null)
 			hangmanWordsManager = (GsonDataRedisManager<Map<String, List<String>>>) new GsonDataRedisManager(HashMap.class, "hangmanwords.json", HashMap::new);
 		return hangmanWordsManager;
 	}
-	
-	public GsonDataRedisManager<Polls> getPollPersistence() {
-		if (pollPersistence == null)
+    
+    public GsonDataRedisManager<Polls> getPolls() {
+        if (pollPersistence == null)
 			pollPersistence = new GsonDataRedisManager<>(Polls.class, "pollpersistence", Polls::new);
 		return pollPersistence;
 	}

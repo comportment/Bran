@@ -116,8 +116,8 @@ public class CommandEvent {
 	}
 	
 	public UserData getUserData() {
-		return Bran.getInstance().getDataManager().getUserDataManager().get().getUser(event.getAuthor());
-	}
+        return Bran.getInstance().getDataManager().getData().get().getUser(event.getAuthor());
+    }
 	
 	public Guild getGuild() {
 		return guild;

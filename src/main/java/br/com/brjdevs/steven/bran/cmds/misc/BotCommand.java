@@ -115,10 +115,10 @@ public class BotCommand {
 								.setDescription("Saves Guild and Bot Data.")
 								.setAction((event) -> {
 									try {
-										Bran.getInstance().getDataManager().getUserDataManager().update();
-										Bran.getInstance().getDataManager().getConfigDataManager().update();
-										Bran.getInstance().getDataManager().getHangmanWordsManager().update();
-										event.sendMessage(Quotes.SUCCESS, "Successfully saved Bot and Guild data.").queue();
+                                        Bran.getInstance().getDataManager().getData().update();
+                                        Bran.getInstance().getDataManager().getConfig().update();
+                                        Bran.getInstance().getDataManager().getHangmanWords().update();
+                                        event.sendMessage(Quotes.SUCCESS, "Successfully saved Bot and Guild data.").queue();
 									} catch (Exception e) {
 										event.sendMessage(Quotes.FAIL, "There was an error while saving the data: " + Hastebin.post(Utils.getStackTrace(e))).queue();
 									}

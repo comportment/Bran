@@ -11,4 +11,8 @@ public class GameReference {
     public long getGameId() {
         return gameId;
     }
+    
+    public boolean isInstanceOf(Class<? extends AbstractGame> clazz) {
+        return clazz.isInstance(GameManager.getGame(this));
+    }
 }

@@ -7,10 +7,7 @@ import br.com.brjdevs.steven.bran.core.utils.CollectionUtils;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -29,8 +26,8 @@ public class Giveaway {
 		embedBuilder.setFooter("Giveaway created by " + Utils.getUser(giveaway.getCreator(bran).getUser()), giveaway.getCreator(bran).getUser().getEffectiveAvatarUrl());
 		String desc = "This giveaway was available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(bran).getName()) + ".\n";
 		String participating = giveaway.getParticipants(bran).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
-		if (participating.length() > EmbedBuilder.TEXT_MAX_LENGTH - desc.length())
-			participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
+        if (participating.length() > MessageEmbed.TEXT_MAX_LENGTH - desc.length())
+            participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
 		List<Long> p = new ArrayList<>(giveaway.getParticipants());
 		List<Member> winners = new ArrayList<>();
 		for (int i = 0; i < giveaway.getMaxWinners() && !p.isEmpty(); i++) {
@@ -45,9 +42,9 @@ public class Giveaway {
 		giveaway.getChannel(bran).sendMessage(embedBuilder.build()).queue();
 		giveaway.getChannel(bran).sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)! :smile:").queue();
 		winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(bran).getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
-		bran.getDataManager().getUserDataManager().get().getGuild(giveaway.getGuild(bran)).giveaway = null;
-		bran.getDataManager().getUserDataManager().update();
-	});
+        bran.getDataManager().getData().get().getGuild(giveaway.getGuild(bran)).giveaway = null;
+        bran.getDataManager().getData().update();
+    });
 	
 	private int maxUsers;
 	private long creator;

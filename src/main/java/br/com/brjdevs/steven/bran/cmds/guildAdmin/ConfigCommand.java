@@ -59,8 +59,8 @@ public class ConfigCommand {
 										event.sendMessage(Quotes.SUCCESS, "Now each user can only have " + i + " song(s) in the queue at once.").queue();
 									else
 										event.sendMessage(Quotes.SUCCESS, "Now each user can have unlimited songs in the queue at once.").queue();
-									Bran.getInstance().getDataManager().getUserDataManager().update();
-								})
+                                    Bran.getInstance().getDataManager().getData().update();
+                                })
 								.build())
 						.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 								.setAliases("max_song_duration")
@@ -83,8 +83,8 @@ public class ConfigCommand {
 									event.getGuildData().maxSongDuration = duration;
 									event.sendMessage(Quotes.SUCCESS, "Now the max song duration is `" +
 											TimeUtils.format(event.getGuildData().maxSongDuration) + "`!").queue();
-									Bran.getInstance().getDataManager().getUserDataManager().update();
-								})
+                                    Bran.getInstance().getDataManager().getData().update();
+                                })
 								.build())
 						.build())
 				.build();

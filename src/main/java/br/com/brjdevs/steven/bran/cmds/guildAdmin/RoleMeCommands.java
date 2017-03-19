@@ -46,8 +46,8 @@ public class RoleMeCommands {
 						}
 						event.getGuildData().addPublicRole(publicRole);
 						event.sendMessage(Quotes.SUCCESS, "Now " + publicRole.getName() + " is a Public Role, users can acquire it by using `" + event.getPrefix() + "giveme " + publicRole.getName() + "`.").queue();
-						Bran.getInstance().getDataManager().getUserDataManager().update();
-					}
+                        Bran.getInstance().getDataManager().getData().update();
+                    }
 				})
 				.build();
 	}
@@ -81,8 +81,8 @@ public class RoleMeCommands {
 						}
 						event.getGuildData().removePublicRole(publicRole);
 						event.sendMessage(Quotes.SUCCESS, "Now " + publicRole.getName() + " is no longer a Public Role.").queue();
-						Bran.getInstance().getDataManager().getUserDataManager().update();
-					}
+                        Bran.getInstance().getDataManager().getData().update();
+                    }
 				})
 				.build();
 	}

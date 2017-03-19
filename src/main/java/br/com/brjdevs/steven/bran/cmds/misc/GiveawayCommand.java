@@ -16,6 +16,7 @@ import br.com.brjdevs.steven.bran.core.utils.TimeUtils;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Role;
 
 import java.awt.*;
@@ -72,8 +73,8 @@ public class GiveawayCommand {
 							}
 							event.getGuildData().giveaway = new Giveaway(event.getMember(), event.getGuild(), role, event.getTextChannel(), numOfWinners, e);
 							event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who's participating by typing `.giveaway info`.").queue();
-							Bran.getInstance().getDataManager().getUserDataManager().update();
-						})
+                            Bran.getInstance().getDataManager().getData().update();
+                        })
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("info", "information")
@@ -93,8 +94,8 @@ public class GiveawayCommand {
 							embedBuilder.setFooter("Giveaway created by " + Utils.getUser(creator == null ? null : creator.getUser()), creator == null ? null : giveaway.getCreator(bran).getUser().getEffectiveAvatarUrl());
 							String desc = "This giveaway is available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(bran).getName() + "`") + ".\n\n";
 							String participating = giveaway.getParticipants(bran).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
-							if (participating.length() > EmbedBuilder.TEXT_MAX_LENGTH - desc.length())
-								participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
+                            if (participating.length() > MessageEmbed.TEXT_MAX_LENGTH - desc.length())
+                                participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
 							desc += participating + "\n\nTotal users Participating: " + giveaway.getTotalParticipants() + " out of " + giveaway.getMaxWinners() + " winners... Who do you bet will win? \uD83D\uDC40";
 							embedBuilder.setDescription(desc);
 							event.sendMessage(embedBuilder.build()).queue();
@@ -121,8 +122,8 @@ public class GiveawayCommand {
 							}
 							boolean success = giveaway.participate(event.getMember());
 							event.sendMessage(success ? "You are now participating in the Giveaway!" : "You're already participating in the Giveaway!").queue();
-							Bran.getInstance().getDataManager().getUserDataManager().update();
-						})
+                            Bran.getInstance().getDataManager().getData().update();
+                        })
 						.build())
 				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("end")
@@ -147,8 +148,8 @@ public class GiveawayCommand {
 							embedBuilder.setFooter("Giveaway created by " + Utils.getUser(giveaway.getCreator(bran).getUser()), giveaway.getCreator(bran).getUser().getEffectiveAvatarUrl());
 							String desc = "This giveaway was available for " + (giveaway.isPublic() ? "everyone" : "members with role `" + giveaway.getRole(bran).getName()) + ".\n";
 							String participating = giveaway.getParticipants(bran).stream().map(member -> Utils.getUser(member.getUser())).collect(Collectors.joining("\n"));
-							if (participating.length() > EmbedBuilder.TEXT_MAX_LENGTH - desc.length())
-								participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
+                            if (participating.length() > MessageEmbed.TEXT_MAX_LENGTH - desc.length())
+                                participating = "The list was too long so I uploaded it to Hastebin: " + Hastebin.post(participating);
 							List<Long> p = new ArrayList<>(giveaway.getParticipants());
 							List<Member> winners = new ArrayList<>();
 							for (int i = 0; i < giveaway.getMaxWinners() && !p.isEmpty(); i++) {
@@ -165,8 +166,8 @@ public class GiveawayCommand {
 							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(bran).getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
 							Giveaway.expiration.remove(giveaway);
 							event.getGuildData().giveaway = null;
-							Bran.getInstance().getDataManager().getUserDataManager().update();
-						})
+                            Bran.getInstance().getDataManager().getData().update();
+                        })
 						.build())
 				.build();
 	}

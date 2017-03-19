@@ -37,8 +37,8 @@ public class BranShard {
 	}
 	
 	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
-		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(bran.getConfig().botToken);
-		Game game = null;
+        JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(bran.getConfig().botToken);
+        Game game = null;
 		if (!Utils.isEmpty(bran.getConfig().defaultGame))
 			game = bran.getConfig().gameStream ? Game.of(bran.getConfig().defaultGame, "https://twitch.tv/ ") : Game.of(bran.getConfig().defaultGame);
 		if (totalShards > 1) {

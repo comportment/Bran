@@ -35,6 +35,6 @@ public class CollectionUtils {
     }
     
     public static <T, K> Entry<T, K> getRandomEntry(Map<T, K> map) {
-        return (Entry<T, K>) map.entrySet().toArray()[r.nextInt(map.size() - 1)];
+        return (Entry<T, K>) map.entrySet().toArray()[r.nextInt(map.size())];
     }
 }

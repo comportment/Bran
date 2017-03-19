@@ -1,18 +1,18 @@
 package br.com.brjdevs.steven.bran.games.engine.event;
 
+import br.com.brjdevs.steven.bran.core.currency.ProfileData;
 import br.com.brjdevs.steven.bran.games.engine.AbstractGame;
-import br.com.brjdevs.steven.bran.games.engine.GamePlayer;
 
 public class LeaveEvent extends GameEvent {
     
-    private GamePlayer player;
+    private ProfileData player;
     
-    public LeaveEvent(AbstractGame game, GamePlayer player) {
+    public LeaveEvent(AbstractGame game, ProfileData player) {
         super(game);
         this.player = player;
     }
     
-    public GamePlayer getPlayer() {
+    public ProfileData getProfileData() {
         return player;
     }
 }

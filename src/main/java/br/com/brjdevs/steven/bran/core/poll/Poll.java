@@ -32,8 +32,8 @@ public class Poll {
 	}
 	
 	public static List<Poll> getRunningPolls() {
-		return Bran.getInstance().getDataManager().getPollPersistence().get().polls;
-	}
+        return Bran.getInstance().getDataManager().getPolls().get().polls;
+    }
 	
 	public static Poll getPoll(TextChannel channel) {
 		return getRunningPolls().stream().filter(poll -> poll.getChannelId().equals(channel.getId())).findFirst().orElse(null);

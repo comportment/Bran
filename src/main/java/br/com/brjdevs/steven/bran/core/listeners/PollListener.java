@@ -23,8 +23,8 @@ public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 		String msg = event.getMessage().getRawContent();
 		if (!MathUtils.isInteger(msg)) return;
 		if (!OPTION_INDEX.matcher(msg).matches()) return;
-		GuildData guildData = Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild());
-		if (!guildData.hasPermission(event.getAuthor(), Permissions.POLL)) return;
+        GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild());
+        if (!guildData.hasPermission(event.getAuthor(), Permissions.POLL)) return;
 		Poll poll = Poll.getPoll(event.getChannel());
 		if (poll == null) return;
 		int i = Integer.parseInt(msg) - 1;
@@ -42,6 +42,6 @@ public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 			}
 			event.getMessage().addReaction("\u274c").queue();
 		}
-		Bran.getInstance().getDataManager().getPollPersistence().update();
-	}
+        Bran.getInstance().getDataManager().getPolls().update();
+    }
 }

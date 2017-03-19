@@ -4,7 +4,7 @@ import br.com.brjdevs.steven.bran.core.audio.AudioUtils;
 import br.com.brjdevs.steven.bran.core.audio.BranMusicManager;
 import br.com.brjdevs.steven.bran.core.audio.GuildMusicManager;
 import br.com.brjdevs.steven.bran.core.command.CommandManager;
-import br.com.brjdevs.steven.bran.core.currency.Profile;
+import br.com.brjdevs.steven.bran.core.currency.ProfileData;
 import br.com.brjdevs.steven.bran.core.data.BranDataManager;
 import br.com.brjdevs.steven.bran.core.data.Config;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
@@ -23,7 +23,6 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import javax.security.auth.login.LoginException;
@@ -57,9 +56,9 @@ public class Bran {
 	
 	public Bran() throws LoginException, InterruptedException, RateLimitedException {
 		instance = this;
-        try (Jedis jedis = jedisPool.getResource()) {
-            jedis.auth("stup2016");
-        }
+        //try (Jedis jedis = jedisPool.getResource()) {
+        //jedis.auth("stup2016");
+        //}
         this.discordBotData = new BranDataManager();
 		this.ownerId = 0;
 		this.ownerShardId = 0;
@@ -103,10 +102,10 @@ public class Bran {
 	public BranShard getShard(JDA jda) {
 		return getShards()[getShardId(jda)];
 	}
-	
-	public Profile getProfile(User user) {
-		return discordBotData.getUserDataManager().get().getUser(user).getProfile();
-	}
+    
+    public ProfileData getProfile(User user) {
+        return discordBotData.getData().get().getUser(user).getProfileData();
+    }
 	
 	public int getTotalShards() {
 		return totalShards;
@@ -133,8 +132,8 @@ public class Bran {
 	}
 	
 	public Config getConfig() {
-		return getDataManager().getConfigDataManager().get();
-	}
+        return getDataManager().getConfig().get();
+    }
 	
 	public List<Guild> getGuilds() {
 		return Arrays.stream(shards).map(bot -> bot.getJDA().getGuilds()).flatMap(List::stream).collect(Collectors.toList());
@@ -269,13 +268,13 @@ public class Bran {
 			} catch (Exception ignored) {
 			}
 		});
-		
-		getDataManager().getPollPersistence().update();
-		getDataManager().getUserDataManager().update();
-		getDataManager().getConfigDataManager().update();
-		getDataManager().getHangmanWordsManager().update();
-		
-		Stream.of(shards).forEach(BranShard::shutdown);
+        
+        getDataManager().getPolls().update();
+        getDataManager().getData().update();
+        getDataManager().getConfig().update();
+        getDataManager().getHangmanWords().update();
+        
+        Stream.of(shards).forEach(BranShard::shutdown);
 		
 		System.exit(exitCode);
 	}

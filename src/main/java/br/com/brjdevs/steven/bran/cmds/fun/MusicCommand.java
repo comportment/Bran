@@ -367,8 +367,8 @@ public class MusicCommand {
 							} else {
 								event.getGuildData().fairQueueLevel = ((int) argument.get());
 								event.sendMessage("Done, now the FairQueue Level for this Guild is `" + argument.get() + "`.").queue();
-								Bran.getInstance().getDataManager().getUserDataManager().update();
-							}
+                                Bran.getInstance().getDataManager().getData().update();
+                            }
 						})
 						.build())
 				.build();

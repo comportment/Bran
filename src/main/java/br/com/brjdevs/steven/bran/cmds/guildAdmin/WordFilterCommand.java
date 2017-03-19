@@ -36,8 +36,8 @@ public class WordFilterCommand {
 							String word = ((String) event.getArgument("word").get());
 							event.getGuildData().filteredWords.add(word);
 							event.sendMessage("\uD83D\uDC4C Added word to the filter! *(Total: " + event.getGuildData().filteredWords.size() + ")*").queue();
-							Bran.getInstance().getDataManager().getUserDataManager().update();
-						})
+                            Bran.getInstance().getDataManager().getData().update();
+                        })
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("list")

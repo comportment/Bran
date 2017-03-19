@@ -9,10 +9,7 @@ import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.*;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
@@ -64,13 +61,13 @@ public class GuildInfoCommand {
 					List<Role> roles = guild.getRoles().stream()
 							.filter(role -> !role.getName().equals("@everyone")).collect(Collectors.toList());
 					String strRoles = roles.stream().map(Role::getName).collect(Collectors.joining(", "));
-					if (strRoles.length() <= EmbedBuilder.VALUE_MAX_LENGTH)
-						embedBuilder.addField("Roles", strRoles, false);
+                    if (strRoles.length() <= MessageEmbed.VALUE_MAX_LENGTH)
+                        embedBuilder.addField("Roles", strRoles, false);
 					if (hasEmotes) {
 						List<Emote> emotes = guild.getEmotes();
 						String strEmotes = emotes.stream().map(Emote::getAsMention).collect(Collectors.joining(", "));
-						if (strEmotes.length() <= EmbedBuilder.VALUE_MAX_LENGTH)
-							embedBuilder.addField("Emotes", strEmotes, true);
+                        if (strEmotes.length() <= MessageEmbed.VALUE_MAX_LENGTH)
+                            embedBuilder.addField("Emotes", strEmotes, true);
 					}
 					event.sendMessage(embedBuilder.build()).queue();
 				})

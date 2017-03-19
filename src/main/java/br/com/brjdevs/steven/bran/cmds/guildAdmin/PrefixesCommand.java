@@ -31,8 +31,8 @@ public class PrefixesCommand {
 						.setArgs(new Argument("prefixes", String.class))
 						.setRequiredPermission(Permissions.PREFIX)
 						.setAction((event, rawArgs) -> {
-							List<String> list = Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild()).prefixes;
-							if (list.size() == 1) {
+                            List<String> list = Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).prefixes;
+                            if (list.size() == 1) {
 								event.sendMessage("This guild only has one prefix, you can't remove them anymore!").queue();
 								return;
 							}
@@ -47,8 +47,8 @@ public class PrefixesCommand {
 							amount -= list.size();
 							if (amount == 0) return;
 							event.sendMessage("Removed " + amount + " prefix" + (amount == 1 ? "" : "es") + ". Now these are my prefixes here: " + (String.join(", ", list))).queue();
-							Bran.getInstance().getDataManager().getUserDataManager().update();
-						})
+                            Bran.getInstance().getDataManager().getData().update();
+                        })
 						.build())
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
 						.setAliases("add")
@@ -58,16 +58,16 @@ public class PrefixesCommand {
 						.setRequiredPermission(Permissions.PREFIX)
 						.setAction((event, rawArgs) -> {
 							try{
-								if (Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild()).prefixes.size() > 5) {
-									event.sendMessage("You cannot have more than " + 5 + " prefixes.").queue();
+                                if (Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).prefixes.size() > 5) {
+                                    event.sendMessage("You cannot have more than " + 5 + " prefixes.").queue();
 									return;
 								}
-								List<String> list = Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild()).prefixes;
-								String[] prefixes = ((String) event.getArgument("prefixes").get()).split("\\s+");
+                                List<String> list = Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).prefixes;
+                                String[] prefixes = ((String) event.getArgument("prefixes").get()).split("\\s+");
 								Arrays.stream(prefixes).filter(prefix -> !list.contains(prefix)).forEach(list::add);
 								event.sendMessage("Now these are my prefixes here: " + (String.join(", ", list))).queue();
-								Bran.getInstance().getDataManager().getUserDataManager().update();
-							} catch (Exception e1) {
+                                Bran.getInstance().getDataManager().getData().update();
+                            } catch (Exception e1) {
 								e1.printStackTrace();
 							}
 						})
@@ -78,8 +78,8 @@ public class PrefixesCommand {
 						.setName("Prefix List Command")
 						.setAction((event, args) -> {
 							MessageBuilder builder = new MessageBuilder().append("These are my prefixes here: ");
-							builder.append(String.join(", ", Bran.getInstance().getDataManager().getUserDataManager().get().getGuild(event.getGuild()).prefixes));
-							event.sendMessage(builder.build()).queue();
+                            builder.append(String.join(", ", Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).prefixes));
+                            event.sendMessage(builder.build()).queue();
 						})
 						.build())
 				.build();

@@ -14,5 +14,9 @@ public class Emojis {
 			X = "\u274c",
 			WARNING_SIGN = "\u26a0",
             CHECK_MARK = "\u2705",
-            THUMBS_DOWN = "\uD83D\uDC4E";
+            THUMBS_DOWN = "\uD83D\uDC4E",
+            STUCK_OUT_TONGUE = "\uD83D\uDE1D",
+            FACEPALM = "\uD83E\uDD26",
+            WINK = "\uD83D\uDE09",
+            DOOR = "\uD83D\uDEAA";
 }

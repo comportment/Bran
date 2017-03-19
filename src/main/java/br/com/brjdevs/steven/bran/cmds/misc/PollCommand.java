@@ -69,8 +69,8 @@ public class PollCommand {
 									options.add(new Option(list.indexOf(string), string));
 								new Poll(name, event.getMember(), options, event.getTextChannel());
 								event.sendMessage("Created a Poll! You can vote by typing the number of the option, I'll add reactions to the message as the votes get added/removed.").queue();
-								Bran.getInstance().getDataManager().getPollPersistence().update();
-							}
+                                Bran.getInstance().getDataManager().getPolls().update();
+                            }
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
@@ -127,8 +127,8 @@ public class PollCommand {
 							builder.setColor(Color.decode("#F89F3F"));
 							poll.remove();
 							event.sendMessage(builder.build()).queue();
-							Bran.getInstance().getDataManager().getPollPersistence().update();
-						})
+                            Bran.getInstance().getDataManager().getPolls().update();
+                        })
 						.build())
 				.build();
 	}

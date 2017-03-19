@@ -26,8 +26,8 @@ public class MineCommand {
 				.setName("Mine Command")
 				.setDescription("Let's mine some ores!")
 				.setAction((event) -> {
-					Inventory inv = event.getUserData().getProfile().getInventory();
-					long amount = inv.getAmountOf(Items.PICKAXE);
+                    Inventory inv = event.getUserData().getProfileData().getInventory();
+                    long amount = inv.getAmountOf(Items.PICKAXE);
 					if (amount <= 0) {
 						event.sendMessage("You don't have any pickaxes in your inventory!").queue();
 						return;
@@ -37,9 +37,9 @@ public class MineCommand {
 						usedStamina += 5;
 						event.sendMessage("*You are mining too fast so your stamina goes lower faster.*").queue();
 					}
-					
-					if (!event.getUserData().getProfile().takeStamina(usedStamina)) {
-						event.sendMessage("You are too tired of mining, go rest a little bit while your stamina regenerates!").queue();
+                    
+                    if (!event.getUserData().getProfileData().takeStamina(usedStamina)) {
+                        event.sendMessage("You are too tired of mining, go rest a little bit while your stamina regenerates!").queue();
 						return;
 					}
 					
@@ -48,9 +48,9 @@ public class MineCommand {
 					Ore ore = Ore.random(luck);
 					ItemMeta oreItemMeta = ore.getItemMeta(luck);
 					Item item = oreItemMeta.getItem();
-					
-					if (!event.getUserData().getProfile().getInventory().put(item, oreItemMeta)) {
-						event.sendMessage(Emojis.X + " Your inventory is too full of " + ore.getName() + " go sell some first!").queue();
+                    
+                    if (!event.getUserData().getProfileData().getInventory().put(item, oreItemMeta)) {
+                        event.sendMessage(Emojis.X + " Your inventory is too full of " + ore.getName() + " go sell some first!").queue();
 						return;
 					}
 					

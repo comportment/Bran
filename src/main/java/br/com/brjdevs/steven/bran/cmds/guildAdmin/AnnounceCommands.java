@@ -43,8 +43,8 @@ public class AnnounceCommands {
 					}
 					data.joinMsg = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated greeting message!").queue();
-					Bran.getInstance().getDataManager().getUserDataManager().update();
-				})
+                    Bran.getInstance().getDataManager().getData().update();
+                })
 				.build();
 	}
 	
@@ -77,8 +77,8 @@ public class AnnounceCommands {
 					}
 					data.leaveMsg = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated farewell message!").queue();
-					Bran.getInstance().getDataManager().getUserDataManager().update();
-				})
+                    Bran.getInstance().getDataManager().getData().update();
+                })
 				.build();
 	}
 	
@@ -111,8 +111,8 @@ public class AnnounceCommands {
 					}
 					data.joinMsgDM = (String) arg.get();
 					event.sendMessage(Quotes.SUCCESS, "Updated greetingDM message!").queue();
-					Bran.getInstance().getDataManager().getUserDataManager().update();
-				})
+                    Bran.getInstance().getDataManager().getData().update();
+                })
 				.build();
 	}
 	

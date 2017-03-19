@@ -20,8 +20,8 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 	
 	public GsonDataFileManager(Class<T> clazz, String path, Supplier<T> constructor) {
 		this.path = Paths.get(path);
-		try {
-			if (!this.path.toFile().exists()) {
+        try {
+            if (!this.path.toFile().exists()) {
 				LOG.info("Could not find config file at " + this.path.toFile().getAbsolutePath() + ", creating a new one...");
 				if (this.path.toFile().createNewFile()) {
 					LOG.info("Generated new config file at " + this.path.toFile().getAbsolutePath() + ".");
@@ -33,8 +33,8 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 			} else {
 				this.data = GSON.fromJson(IOUtils.read(this.path), clazz);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}

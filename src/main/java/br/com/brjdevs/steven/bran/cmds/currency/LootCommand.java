@@ -30,15 +30,15 @@ public class LootCommand {
 						event.sendMessage("Nothing to loot here.").queue();
 						return;
 					}
-					if (!event.getUserData().getProfile().takeStamina(5)) {
-						event.sendMessage("You are too tired of walking, why don't you take a rest while your stamina regenerates?").queue();
+                    if (!event.getUserData().getProfileData().takeStamina(5)) {
+                        event.sendMessage("You are too tired of walking, why don't you take a rest while your stamina regenerates?").queue();
 						return;
 					}
 					StringBuilder sb = new StringBuilder().append(Emojis.PARTY_POPPER + " ");
 					sb.append("You walk a little and find ");
 					if (money > 0) {
-						if (!event.getUserData().getProfile().getBankAccount().addCoins(money, BankAccount.MAIN_BANK)) {
-							ground.drop(money);
+                        if (!event.getUserData().getProfileData().getBankAccount().addCoins(money, BankAccount.MAIN_BANK)) {
+                            ground.drop(money);
 							event.sendMessage("It looks like your bank account is full! Why don't you spend some money first?").queue();
 						} else {
 							sb.append(money).append(" coins");
