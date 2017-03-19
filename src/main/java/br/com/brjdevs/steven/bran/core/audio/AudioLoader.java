@@ -84,34 +84,37 @@ public class AudioLoader implements AudioLoadResultHandler {
 					}
 					new ResponseWaiter(user, channel, musicManager.getShard(), 30000, inputs, ExpectedResponseType.MESSAGE,
 							(ResponseEvent responseEvent) -> {
-								if (responseEvent instanceof ValidResponseEvent) {
-									Message m = ((Message) ((ValidResponseEvent) responseEvent).response);
-									if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
-										m.delete().queue();
-									String response = m.getContent();
-									if (!MathUtils.isInteger(response)) {
-										channel.sendMessage("Query canceled!").queue();
-										if (msg != null)
-											msg.delete().queue();
-										if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
-											channel.getGuild().getAudioManager().closeAudioConnection();
-										return;
-									}
-									int i = Integer.parseInt(response);
-									TrackContext trackContext = tracks.get(i - 1);
-									musicManager.getTrackScheduler().request(trackContext, false);
-									if (msg != null)
-										msg.delete().queue();
-								} else if (responseEvent instanceof UnexpectedResponseEvent) {
-									channel.sendMessage("You didn't type " + StringUtils.replaceLast(Arrays.stream(inputs).collect(Collectors.joining(", ")), ", ", " or ") + ", query canceled!").queue();
-									if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
-										channel.getGuild().getAudioManager().closeAudioConnection();
-								} else if (responseEvent instanceof ResponseTimeoutEvent) {
-									channel.sendMessage("You took too long to pick a song so I've picked the first song!").queue();
-									musicManager.getTrackScheduler().request(tracks.get(0), false);
-									
-								}
-							});
+                                try {
+                                    if (responseEvent instanceof ValidResponseEvent) {
+                                        Message m = ((Message) ((ValidResponseEvent) responseEvent).response);
+                                        if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE))
+                                            m.delete().queue();
+                                        String response = m.getContent();
+                                        if (!MathUtils.isInteger(response)) {
+                                            channel.sendMessage("Query canceled!").queue();
+                                            if (msg != null)
+                                                msg.delete().queue();
+                                            if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
+                                                channel.getGuild().getAudioManager().closeAudioConnection();
+                                            return;
+                                        }
+                                        int i = Integer.parseInt(response);
+                                        TrackContext trackContext = tracks.get(i - 1);
+                                        musicManager.getTrackScheduler().request(trackContext, false);
+                                        if (msg != null)
+                                            msg.delete().queue();
+                                    } else if (responseEvent instanceof UnexpectedResponseEvent) {
+                                        channel.sendMessage("You didn't type " + StringUtils.replaceLast(Arrays.stream(inputs).collect(Collectors.joining(", ")), ", ", " or ") + ", query canceled!").queue();
+                                        if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
+                                            channel.getGuild().getAudioManager().closeAudioConnection();
+                                    } else if (responseEvent instanceof ResponseTimeoutEvent) {
+                                        channel.sendMessage("You took too long to pick a song so I've picked the first song!").queue();
+                                        musicManager.getTrackScheduler().request(tracks.get(0), false);
+                                        
+                                    }
+                                } catch (NullPointerException ignored) {
+                                }
+                            });
 				});
 				return;
 			}
