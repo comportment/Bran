@@ -76,6 +76,7 @@ public class HangMan extends AbstractGame<HangManGameListener> {
             if (getFullWord().equals(getGuesses())) {
                 end();
                 getEventListener().onWin(new WinEvent(this));
+                getInfo().getPlayers().forEach(userData -> userData.getProfileData().getHMStats().addVictory());
                 return;
             }
             getEventListener().onGuess(new GuessEvent(this, c, profileData, GuessType.VALID));
@@ -84,6 +85,7 @@ public class HangMan extends AbstractGame<HangManGameListener> {
             if (mistakes.size() > getMaximumMistakes()) {
                 end();
                 getEventListener().onLoose(new LooseEvent(this));
+                getInfo().getPlayers().forEach(userData -> userData.getProfileData().getHMStats().addDefeat());
                 return;
             }
             getEventListener().onGuess(new GuessEvent(this, c, profileData, GuessType.INVALID));
