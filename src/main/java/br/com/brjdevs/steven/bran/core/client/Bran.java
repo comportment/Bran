@@ -59,7 +59,7 @@ public class Bran {
 	public Bran() throws LoginException, InterruptedException, RateLimitedException {
 		instance = this;
         try (Jedis jedis = jedisPool.getResource()) {
-            //jedis.auth("stup2016");
+            jedis.auth("stup2016");
         }
         this.discordBotData = new BranDataManager();
 		this.ownerId = 0;
