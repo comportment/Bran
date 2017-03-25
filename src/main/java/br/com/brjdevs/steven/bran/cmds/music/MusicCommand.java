@@ -39,7 +39,7 @@ public class MusicCommand {
     @Command
     private static ICommand play() {
         return new CommandBuilder(Category.MUSIC)
-                .setAliases("play")
+                .setAliases("play", "p")
                 .setName("Play Command")
                 .setDescription("Play the songs you want!")
                 .setExample("play Catch & Release")
