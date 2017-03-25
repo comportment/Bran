@@ -473,9 +473,9 @@ public class MusicCommand {
                     embedBuilder.setAuthor("How to play music", null, "https://is.gd/1avlwi");
                     embedBuilder.setDescription("This a small tutorial of how to use my music feature!");
                     embedBuilder.addField("How do I add songs to the queue?", "Use the `.play` command, it'll display three options (unless forceplay is active), then you type the number of the song you want to add.", false);
-                    embedBuilder.addField("I don't like to always have to type `1, 2 or 3`", "Use `.forceplay`, it will switch that option. When active, will pick the first song, when disabled it will display 3 options of songs.", false);
                     embedBuilder.addField("I don't like this song, can I skip it?", "Yes, just use the `.skip` command. But remember, if there are other people listening to the song they have to want to skip it as well!", false);
                     embedBuilder.addField("I don't like this song and I have the DJ permission.", "Just use the `.forceskip` command!", false);
+                    embedBuilder.addField("I don't like to always have to type `1, 2 or 3`", "Use the `.forceplay` command!", false);
                     embedBuilder.addField("I'm really into this song, I want to listen to it forever!", "And I can help, just use the `.repeat` command!", false);
                     embedBuilder.addField("I want to see the whole queue!", "Use the `.queue` command.", false);
                     embedBuilder.addField("I want to see what's playing now!", "Use the `.nowplaying` command.", false);
