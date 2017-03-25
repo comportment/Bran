@@ -101,7 +101,6 @@ public class HangManCommand {
                                 return;
 							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? null : event.getMessage().getMentionedUsers().get(0);
-                            UserData userData = Bran.getInstance().getDataManager().getData().get().getUser(user);
                             if (user == null) {
                                 event.sendMessage("If you want to play with someone you have to mention them!").queue();
                                 return;
@@ -111,11 +110,12 @@ public class HangManCommand {
 							} else if (user.equals(event.getAuthor())) {
                                 event.sendMessage("Ya can't fool me! You cannot invite yourself. " + Emojis.STUCK_OUT_TONGUE).queue();
                                 return;
-                            } else if (game.getInfo().isInvited(userData)) {
+                            } else if (game.getInfo().isInvited(Bran.getInstance().getDataManager().getData().get().getUser(user))) {
                                 event.sendMessage("B-but... " + user.getName() + " is already playing with you!").queue();
                                 return;
 							}
-							event.sendMessage(Utils.getUser(user) + ", react to this message with " + ACCEPT + " to join the game or with " + DENY + " to deny.")
+                            UserData userData = Bran.getInstance().getDataManager().getData().get().getUser(user);
+                            event.sendMessage(Utils.getUser(user) + ", react to this message with " + ACCEPT + " to join the game or with " + DENY + " to deny.")
 									.queue(msg -> {
 										msg.addReaction(ACCEPT).queue();
 										msg.addReaction(DENY).queue();
@@ -161,16 +161,15 @@ public class HangManCommand {
                                 return;
 							}
 							User user = event.getMessage().getMentionedUsers().isEmpty() ? null : event.getMessage().getMentionedUsers().get(0);
-                            UserData userData = Bran.getInstance().getDataManager().getData().get().getUser(user);
                             if (user == null) {
                                 event.sendMessage("If you want to pass the ownership to someone, you have to mention them! " + Emojis.WINK).queue();
                                 return;
 							}
-                            if (!game.getInfo().isInvited(userData)) {
+                            if (!game.getInfo().isInvited(Bran.getInstance().getDataManager().getData().get().getUser(user))) {
                                 event.sendMessage("You cannot pass the ownership if the person isn't playing with you! " + Emojis.WINK).queue();
                                 return;
 							}
-                            game.passOwnership(userData, true);
+                            game.passOwnership(Bran.getInstance().getDataManager().getData().get().getUser(user), true);
                             event.sendMessage("Alright, now **" + Utils.getUser(user) + "** is the new creator of the Session. " + event.getMember().getEffectiveName() + ", I've put you as an invited user, so you can type `giveup` to leave the session.").queue();
                         })
 						.build())

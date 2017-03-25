@@ -63,6 +63,8 @@ public abstract class AbstractGame<T extends GameEventListener> {
     }
     
     public void invite(UserData user) {
+        if (!info.isMultiplayerAvailable())
+            throw new UnsupportedOperationException("Cannot invite users in a Single Player game!");
         if (profileListener != null)
             user.getProfileData().registerListener(profileListener);
         user.getProfileData().setCurrentGame(reference);
@@ -70,6 +72,8 @@ public abstract class AbstractGame<T extends GameEventListener> {
     }
     
     public void kick(UserData user) {
+        if (!info.isMultiplayerAvailable())
+            throw new UnsupportedOperationException("Cannot kick users in a Single Player game!");
         if (profileListener != null)
             user.getProfileData().unregisterListener(profileListener);
         user.getProfileData().setCurrentGame(null);
@@ -77,6 +81,8 @@ public abstract class AbstractGame<T extends GameEventListener> {
     }
     
     public boolean passOwnership(UserData user, boolean inviteOldOwner) {
+        if (!info.isMultiplayerAvailable())
+            throw new UnsupportedOperationException("Cannot pass ownership in a Single Player game!");
         if (!info.isInvited(user))
             return false;
         UserData oldOwner = info.getPlayers().pollFirst();
@@ -110,9 +116,5 @@ public abstract class AbstractGame<T extends GameEventListener> {
     
     public long getTimeOut() {
         return timeOut;
-    }
-    
-    public enum GameEndReason {
-        GIVEUP, VICTORY, DEFEAT, ERROR
     }
 }

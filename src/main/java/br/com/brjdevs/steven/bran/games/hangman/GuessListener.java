@@ -34,8 +34,6 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
             } else {
                 game.end();
                 game.getEventListener().onGiveUp(new GiveUpEvent(game));
-                user.getProfileData().setCurrentGame(null);
-                GameManager.getGames().remove(ref);
             }
             return;
         } else if (guess.equals("^leave")) {
@@ -43,7 +41,6 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
                 event.getChannel().sendMessage("\\" + Emojis.X + " You cannot leave a SinglePlayer session.").queue();
             } else {
                 game.leave(user);
-                user.getProfileData().setCurrentGame(null);
             }
             return;
         }
