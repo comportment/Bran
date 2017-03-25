@@ -47,8 +47,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 	public void trackLoaded(AudioTrack track) {
         GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild(), true);
         if (track.getInfo().length > guildData.maxSongDuration) {
-			channel.sendMessage("This song is too long! The maximum supported length is 3 hours. *" + AudioUtils.format(track.getInfo().length) + "/" + AudioUtils.format(MAX_SONG_LENGTH) + "*").queue();
-			if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
+            channel.sendMessage("This song is too long! The maximum supported length is " + AudioUtils.format(guildData.maxSongDuration)).queue();
+            if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			return;
 		}
@@ -88,7 +88,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 					for (int i = tracks.size(); i > 0; i--) {
 						inputs[1 + i] = String.valueOf(i);
 					}
-					new ResponseWaiter(user, channel, musicManager.getShard(), 30000, inputs, ExpectedResponseType.MESSAGE,
+                    GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild(), true);
+                    new ResponseWaiter(user, channel, musicManager.getShard(), 30000, inputs, ExpectedResponseType.MESSAGE,
 							(ResponseEvent responseEvent) -> {
                                 try {
                                     if (responseEvent instanceof ValidResponseEvent) {
@@ -106,6 +107,12 @@ public class AudioLoader implements AudioLoadResultHandler {
                                         }
                                         int i = Integer.parseInt(response);
                                         TrackContext trackContext = tracks.get(i - 1);
+                                        if (trackContext.getInfo().length > guildData.maxSongDuration) {
+                                            channel.sendMessage("This song is too long! The maximum supported length is " + AudioUtils.format(guildData.maxSongDuration)).queue();
+                                            if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
+                                                channel.getGuild().getAudioManager().closeAudioConnection();
+                                            return;
+                                        }
                                         musicManager.getTrackScheduler().request(trackContext, false);
                                         if (msg != null)
                                             msg.delete().queue();
