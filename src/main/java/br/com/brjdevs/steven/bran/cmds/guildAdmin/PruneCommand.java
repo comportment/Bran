@@ -23,8 +23,8 @@ public class PruneCommand {
 	@Command
 	private static ICommand prune() {
 		return new TreeCommandBuilder(Category.GUILD_ADMINISTRATOR)
-				.setAliases("prune")
-				.setName("Prune Command")
+                .setAliases("prune", "purge")
+                .setName("Prune Command")
 				.setHelp("prune ?")
 				.setPrivateAvailable(false)
 				.setDescription("Delete multiple messages instantly with this command!")
