@@ -2,7 +2,6 @@ package br.com.brjdevs.steven.bran.core.audio;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
-import br.com.brjdevs.steven.bran.core.data.UserData;
 import br.com.brjdevs.steven.bran.core.responsewaiter.ExpectedResponseType;
 import br.com.brjdevs.steven.bran.core.responsewaiter.ResponseWaiter;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseEvent;
@@ -75,11 +74,6 @@ public class AudioLoader implements AudioLoadResultHandler {
 		} else {
 			List<TrackContext> playlistTracks = playlist.getTracks().stream().map(track -> new TrackContext(track, user, channel, musicManager.getTrackScheduler())).collect(Collectors.toList());
 			if (playlist.isSearchResult()) {
-                UserData userData = Bran.getInstance().getDataManager().getData().get().getUser(user);
-                if (userData.shouldPickFirstSong()) {
-                    trackLoaded(playlist.getTracks().get(0));
-                    return;
-                }
                 List<TrackContext> tracks = playlistTracks.stream().filter(track -> playlistTracks.indexOf(track) < 3).collect(Collectors.toList());
 				channel.sendMessage(Utils.getUser(user) + ", results found by `" + trackUrl.substring(9).trim() + "`:\n" + String.join("\n", tracks.stream().map(track -> "`[" + (tracks.indexOf(track) + 1) + "]` " + track.getTrack().getInfo().title + " (`" + AudioUtils.format(track.getTrack().getInfo().length) + "`)").collect(Collectors.toList())) + "\n*This will expire in 30 seconds*").queue(msg -> {
 					String[] inputs = new String[2 + tracks.size()];

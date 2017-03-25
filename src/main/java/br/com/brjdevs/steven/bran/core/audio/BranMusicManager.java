@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
@@ -52,9 +53,10 @@ public class BranMusicManager {
 		
 		return musicManager;
 	}
-	
-	public void loadAndPlay(final User user, final TextChannel channel, final String trackUrl) {
-		GuildMusicManager musicManager = get(channel.getGuild());
-		playerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoader(channel, user, trackUrl, musicManager));
-	}
+    
+    public void loadAndPlay(final User user, final TextChannel channel, final String trackUrl, boolean force) {
+        GuildMusicManager musicManager = get(channel.getGuild());
+        AudioLoadResultHandler loader = force ? new ForcePlayAudioLoader(channel, user, trackUrl, musicManager) : new AudioLoader(channel, user, trackUrl, musicManager);
+        playerManager.loadItemOrdered(musicManager, trackUrl, loader);
+    }
 }

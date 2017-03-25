@@ -10,7 +10,6 @@ public class UserData {
 	public long userId;
     private ProfileData profileData;
     private long globalPermission = Permissions.BASE_USR;
-    private boolean pickFirstSong;
     
     public UserData(User user, ProfileData profileData) {
         this.userId = Long.parseLong(user.getId());
@@ -28,14 +27,6 @@ public class UserData {
     
     public void setProfileData(ProfileData profileData) {
         this.profileData = profileData;
-    }
-    
-    public void setPickFirstSong(boolean pickFirstSong) {
-        this.pickFirstSong = pickFirstSong;
-    }
-    
-    public boolean shouldPickFirstSong() {
-        return pickFirstSong;
     }
     
     public User getUser(JDA jda) {

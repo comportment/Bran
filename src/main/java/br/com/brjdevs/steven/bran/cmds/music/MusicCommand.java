@@ -13,7 +13,6 @@ import br.com.brjdevs.steven.bran.core.command.enums.Category;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.managers.Permissions;
 import br.com.brjdevs.steven.bran.core.quote.Quotes;
-import br.com.brjdevs.steven.bran.core.utils.Emojis;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
 import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
@@ -90,7 +89,7 @@ public class MusicCommand {
                         trackUrl = trackUrl.replaceFirst("soundcloud ", "scsearch:");
                     if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:") && !trackUrl.startsWith("scsearch:"))
                         trackUrl = "ytsearch:" + trackUrl;
-                    Bran.getInstance().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
+                    Bran.getInstance().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl, false);
                 })
                 .build();
     }
@@ -415,8 +414,50 @@ public class MusicCommand {
                 .setName("Force Play Command")
                 .setDescription("Toggles the force play flag.")
                 .setAction((event) -> {
-                    event.getUserData().setPickFirstSong(!event.getUserData().shouldPickFirstSong());
-                    event.sendMessage(event.getUserData().shouldPickFirstSong() ? Emojis.CHECK_MARK + " Now the first song will be automatically chosen when you request a song!" : Emojis.CHECK_MARK + " Now I'll display 3 options for you to chose when you request a song!").queue();
+                    String trackUrl = event.getArgument("title/url").isPresent() ? ((String) event.getArgument("title/url").get()) : "";
+                    GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+    
+                    if (trackUrl.isEmpty()) {
+                        if (musicManager.getTrackScheduler().isPaused()) {
+                            musicManager.getTrackScheduler().setPaused(false);
+                            event.sendMessage("Resumed the Player!").queue();
+                        } else
+                            event.sendMessage("You have to tell me a song name or link!").queue();
+                        return;
+                    }
+                    if (musicManager.getTrackScheduler().isPaused()) {
+                        musicManager.getTrackScheduler().setPaused(false);
+                        event.sendMessage("Resumed the Player!").queue();
+                    }
+                    VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
+                    if (vchan == null && event.getMember().getVoiceState().inVoiceChannel()) {
+                        vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel());
+                        if (vchan == null) return;
+                    } else if (vchan == null && !event.getMember().getVoiceState().inVoiceChannel()) {
+                        event.sendMessage(Quotes.FAIL, "Before asking for songs you should join a Voice Channel ").queue();
+                        return;
+                    }
+                    if (vchan == null) {
+                        event.sendMessage("Something went wrong!").queue();
+                        return;
+                    }
+                    if (!vchan.getMembers().contains(event.getMember())) {
+                        event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
+                        return;
+                    }
+                    if (event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE))
+                        event.getMessage().delete().queue();
+                    TrackScheduler scheduler = Bran.getInstance().getMusicManager().get(event.getGuild()).getTrackScheduler();
+                    List<TrackContext> tracksByUser = scheduler.getTracksBy(event.getAuthor());
+                    if (event.getGuildData(true).maxSongsPerUser > 0 && tracksByUser.size() >= event.getGuildData(true).maxSongsPerUser) {
+                        event.sendMessage("You can only have " + event.getGuildData(true).maxSongsPerUser + " songs in the queue.").queue();
+                        return;
+                    }
+                    if (trackUrl.startsWith("soundcloud "))
+                        trackUrl = trackUrl.replaceFirst("soundcloud ", "scsearch:");
+                    if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:") && !trackUrl.startsWith("scsearch:"))
+                        trackUrl = "ytsearch:" + trackUrl;
+                    Bran.getInstance().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl, false);
                 })
                 .build();
     }
