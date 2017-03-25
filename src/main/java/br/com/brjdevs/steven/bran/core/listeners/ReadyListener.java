@@ -2,6 +2,7 @@ package br.com.brjdevs.steven.bran.core.listeners;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.utils.SimpleLog;
@@ -27,5 +28,6 @@ public class ReadyListener extends EventListener<ReadyEvent> {
         if (event.getJDA().getShardInfo() != null && game != null)
             game = Game.of(game.getName() + " | [" + event.getJDA().getShardInfo().getShardId() + "]", game.getUrl());
         event.getJDA().getPresence().setGame(game);
+        event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
     }
 }
