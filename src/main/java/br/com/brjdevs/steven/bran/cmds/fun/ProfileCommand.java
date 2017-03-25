@@ -28,17 +28,17 @@ public class ProfileCommand {
 	@Command
 	private static ICommand profile() {
 		return new TreeCommandBuilder(Category.FUN)
-                .setName("ProfileData Command")
+                .setName("Profile Command")
                 .setAliases("profile")
 				.setDefault("view")
 				.setHelp("profile ?")
-                .setDescription("Manage and View your ProfileData!")
+                .setDescription("Manage and View your Profile!")
                 .onNotFound(CommandAction.REDIRECT)
 				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
 						.setAliases("view")
 						.setDescription("Gives you information on the requested profile.")
 						.setArgs(new Argument("mention", String.class, true))
-                        .setName("ProfileData View Command")
+                        .setName("Profile View Command")
                         .setAction((event) -> {
 							if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
 								event.sendMessage("I need to have MESSAGE_EMBED_LINKS permission to send this message!").queue();
@@ -89,11 +89,11 @@ public class ProfileCommand {
 						.build())
 				.addSubCommand(new TreeCommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("edit")
-                        .setName("ProfileData Edit Command")
+                        .setName("Profile Edit Command")
                         .setHelp("profile edit ?")
 						.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 								.setAliases("customcolor", "color")
-                                .setName("ProfileData Edit Color Command")
+                                .setName("Profile Edit Color Command")
                                 .setArgs(new Argument("hex", String.class, true))
 								.setDescription("Set or update your custom color!")
 								.setAction((event, rawArgs) -> {
@@ -112,7 +112,7 @@ public class ProfileCommand {
 									}
 									if (pattern.matcher(hex).matches()) {
                                         profileData.setCustomColor(null);
-                                        event.sendMessage("\uD83D\uDC4C Reseted your ProfileData color.").queue();
+                                        event.sendMessage("\uD83D\uDC4C Reseted your Profile color.").queue();
                                         return;
 									}
 									if (hex.charAt(0) != '#')
@@ -124,7 +124,7 @@ public class ProfileCommand {
 									} catch (Exception ignored) {}
 									if (isHex) {
                                         boolean success = profileData.setCustomColor(hex);
-                                        event.sendMessage(success ? "Updated your profileData Color!" : "Failed to update your profileData color!").queue();
+                                        event.sendMessage(success ? "Updated your profile Color!" : "Failed to update your profile color!").queue();
                                         Bran.getInstance().getDataManager().getData().update();
                                     } else {
 										event.sendMessage("This does not look like a known hex...").queue();

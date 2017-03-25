@@ -16,6 +16,7 @@ import br.com.brjdevs.steven.bran.core.utils.StringUtils;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.PermissionException;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class CommandListener extends EventListener<MessageReceivedEvent> {
@@ -56,7 +57,11 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 						if (!e.isPrivate())
 							DroppedMoney.of(event.getTextChannel()).dropWithChance(MathUtils.random(100), 5);
 					} catch (Exception ex) {
-						LOG.log(ex);
+                        if (ex instanceof PermissionException) {
+                            e.sendMessage(ex.getMessage()).queue();
+                            return;
+                        }
+                        LOG.log(ex);
 						e.sendMessage(Quotes.FAIL, "An unexpected `" + ex.getClass().getSimpleName() + "` occurred while executing this command, my owner has been informed about this so you don't need to report it.\nException message: `" + ex.getMessage() + "`").queue();
 						String url = Hastebin.post(Utils.getStackTrace(ex));
 						Bran.getInstance().getDiscordLog().logToDiscord("Uncaught exception in Thread " + Thread.currentThread().getName(), "An unexpected `" + ex.getClass().getSimpleName() + "` occurred.\nMessage: " + ex.getMessage() + "\nStackTrace: " + url, Level.FATAL);
