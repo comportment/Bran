@@ -364,6 +364,7 @@ public class MusicCommand {
                         .setAliases("clear")
                         .setName("Queue Clear Command")
                         .setDescription("Clears the queue.")
+                        .setRequiredPermission(Permissions.DJ)
                         .setAction((event) -> {
                             GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
                             if (musicManager.getTrackScheduler().getQueue().isEmpty()) {
@@ -395,6 +396,7 @@ public class MusicCommand {
                 .setAliases("stop")
                 .setName("Stop Command")
                 .setDescription("Stops the player!")
+                .setRequiredPermission(Permissions.DJ)
                 .setPrivateAvailable(false)
                 .setAction((event) -> {
                     GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
