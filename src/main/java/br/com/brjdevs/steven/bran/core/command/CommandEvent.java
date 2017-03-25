@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.command;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
-import br.com.brjdevs.steven.bran.core.client.BranShard;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
 import br.com.brjdevs.steven.bran.core.data.UserData;
@@ -27,13 +27,12 @@ public class CommandEvent {
     private MessageReceivedEvent event;
     private ICommand command;
     private String args;
-	private GuildData guildData;
 	private String prefix;
 	private Map<String, Argument> argsMap;
 	private Argument[] arguments;
-	
-	public CommandEvent(MessageReceivedEvent event, ICommand command, GuildData guildData, String args, String prefix) {
-		this.event = event;
+    
+    public CommandEvent(MessageReceivedEvent event, ICommand command, String args, String prefix) {
+        this.event = event;
         this.command = command;
         this.message = event.getMessage();
         this.author = event.getAuthor();
@@ -43,7 +42,6 @@ public class CommandEvent {
 		this.arguments = CommandUtils.copy(command);
 		Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
 		if (!Utils.isPrivate(event)) {
-			this.guildData = guildData;
 			this.member = event.getMember();
             this.guild = event.getGuild();
 		}
@@ -52,9 +50,9 @@ public class CommandEvent {
 	public Messenger getMessenger() {
 		return Bran.getInstance().getMessenger();
 	}
-	
-	public BranShard getShard() {
-		return Bran.getInstance().getShards()[Bran.getInstance().getShardId(event.getJDA())];
+    
+    public Client getShard() {
+        return Bran.getInstance().getShards()[Bran.getInstance().getShardId(event.getJDA())];
 	}
 	
 	public String getPrefix() {
@@ -110,10 +108,10 @@ public class CommandEvent {
     public Message getMessage() {
         return message;
     }
-	
-	public GuildData getGuildData() {
-		return guildData;
-	}
+    
+    public GuildData getGuildData(boolean readOnly) {
+        return Bran.getInstance().getDataManager().getData().get().getGuild(guild, readOnly);
+    }
 	
 	public UserData getUserData() {
         return Bran.getInstance().getDataManager().getData().get().getUser(event.getAuthor());
@@ -150,8 +148,8 @@ public class CommandEvent {
 	
 	public CommandEvent createChild(ICommand command, boolean b) {
         String newArgs = b ? args : args.replaceFirst(" ", "");
-		CommandEvent event = new CommandEvent(this.event, command, guildData, newArgs, prefix);
-		Thread.currentThread().setName(command.getName() + ">" + Utils.getUser(event.getAuthor()));
+        CommandEvent event = new CommandEvent(this.event, command, newArgs, prefix);
+        Thread.currentThread().setName(command.getName() + ">" + Utils.getUser(event.getAuthor()));
 		command.execute(event);
 		return event;
     }

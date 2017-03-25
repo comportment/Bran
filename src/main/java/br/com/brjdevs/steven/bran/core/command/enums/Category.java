@@ -2,7 +2,8 @@ package br.com.brjdevs.steven.bran.core.command.enums;
 
 public enum Category {
 	MISCELLANEOUS("Miscellaneous", "\uD83D\uDD2E"),
-	FUN("Fun", "\uD83D\uDD79"),
+    MUSIC("Music", "\uD83C\uDFB5"),
+    FUN("Fun", "\uD83D\uDD79"),
 	GUILD_ADMINISTRATOR("Guild Administrator", "\uD83D\uDDA5"),
 	BOT_ADMINISTRATOR("Bot Administrator", "\u2699"),
 	INFORMATIVE("Informative", "\uD83C\uDF10"),

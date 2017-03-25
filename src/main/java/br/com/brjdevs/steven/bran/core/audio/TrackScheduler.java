@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
-import br.com.brjdevs.steven.bran.core.client.BranShard;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
@@ -173,7 +173,7 @@ public class TrackScheduler {
 		}
 		if (!canRequest(track)) {
 			String s;
-            switch (Bran.getInstance().getDataManager().getData().get().getGuild(getGuild()).fairQueueLevel) {
+            switch (Bran.getInstance().getDataManager().getData().get().getGuild(getGuild(), true).fairQueueLevel) {
                 case 1:
 					s = "Oops, it looks like you already asked for this song, why don't you try another one? (FairQueue: 1)";
 					break;
@@ -182,7 +182,7 @@ public class TrackScheduler {
 					break;
 				default:
 					s = "Unrecognized FairQueue Level '" +
-                            Bran.getInstance().getDataManager().getData().get().getGuild(getGuild()).fairQueueLevel + "'\nReport this Message to my Master.";
+                            Bran.getInstance().getDataManager().getData().get().getGuild(getGuild(), true).fairQueueLevel + "'\nReport this Message to my Master.";
             }
 			track.getContext().sendMessage(s).queue();
 			return false;
@@ -201,7 +201,7 @@ public class TrackScheduler {
 	}
 	
 	public boolean canRequest(TrackContext track) {
-        switch (Bran.getInstance().getDataManager().getData().get().getGuild(getGuild()).fairQueueLevel) {
+        switch (Bran.getInstance().getDataManager().getData().get().getGuild(getGuild(), true).fairQueueLevel) {
             case 0:
 				return true;
 			case 1:
@@ -210,7 +210,7 @@ public class TrackScheduler {
 				return getMatches(queue, track) < 1;
 			default:
 				throw new UnsupportedOperationException("Unrecognized FairQueue Level '" +
-                        Bran.getInstance().getDataManager().getData().get().getGuild(getGuild()).fairQueueLevel + "'");
+                        Bran.getInstance().getDataManager().getData().get().getGuild(getGuild(), true).fairQueueLevel + "'");
         }
 	}
 	
@@ -267,9 +267,9 @@ public class TrackScheduler {
 	public void setPaused(boolean paused) {
 		getAudioPlayer().setPaused(paused);
 	}
-	
-	public BranShard getShard() {
-		return Bran.getInstance().getShards()[shard];
+    
+    public Client getShard() {
+        return Bran.getInstance().getShards()[shard];
 	}
 	
 	public List<TrackContext> getTracksBy(User user) {

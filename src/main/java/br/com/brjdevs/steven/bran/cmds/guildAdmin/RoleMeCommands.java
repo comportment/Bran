@@ -40,12 +40,12 @@ public class RoleMeCommands {
 						event.sendMessage("Found " + matches.size() + " matches, please narrow down your search!").queue();
 					} else {
 						Role publicRole = matches.get(0);
-						if (event.getGuildData().getPublicRoles(event.getJDA()).contains(publicRole)) {
-							event.sendMessage(Quotes.FAIL, "This role is already public! Users can acquire it by using `" + event.getPrefix() + "giveme " + publicRole.getName() + "`.").queue();
+                        if (event.getGuildData(true).getPublicRoles(event.getJDA()).contains(publicRole)) {
+                            event.sendMessage(Quotes.FAIL, "This role is already public! Users can acquire it by using `" + event.getPrefix() + "giveme " + publicRole.getName() + "`.").queue();
 							return;
 						}
-						event.getGuildData().addPublicRole(publicRole);
-						event.sendMessage(Quotes.SUCCESS, "Now " + publicRole.getName() + " is a Public Role, users can acquire it by using `" + event.getPrefix() + "giveme " + publicRole.getName() + "`.").queue();
+                        event.getGuildData(false).addPublicRole(publicRole);
+                        event.sendMessage(Quotes.SUCCESS, "Now " + publicRole.getName() + " is a Public Role, users can acquire it by using `" + event.getPrefix() + "giveme " + publicRole.getName() + "`.").queue();
                         Bran.getInstance().getDataManager().getData().update();
                     }
 				})
@@ -75,12 +75,12 @@ public class RoleMeCommands {
 						event.sendMessage("Found " + matches.size() + " matches, please narrow down your search!").queue();
 					} else {
 						Role publicRole = matches.get(0);
-						if (!event.getGuildData().getPublicRoles(event.getJDA()).contains(publicRole)) {
-							event.sendMessage(Quotes.FAIL, "This role isn't public!").queue();
+                        if (!event.getGuildData(true).getPublicRoles(event.getJDA()).contains(publicRole)) {
+                            event.sendMessage(Quotes.FAIL, "This role isn't public!").queue();
 							return;
 						}
-						event.getGuildData().removePublicRole(publicRole);
-						event.sendMessage(Quotes.SUCCESS, "Now " + publicRole.getName() + " is no longer a Public Role.").queue();
+                        event.getGuildData(false).removePublicRole(publicRole);
+                        event.sendMessage(Quotes.SUCCESS, "Now " + publicRole.getName() + " is no longer a Public Role.").queue();
                         Bran.getInstance().getDataManager().getData().update();
                     }
 				})
@@ -97,11 +97,11 @@ public class RoleMeCommands {
 				.setDescription("Gives you a Public Role.")
 				.setAction((event) -> {
 					if (!event.getArgument("rolename").isPresent()) {
-						if (event.getGuildData().getPublicRoles().isEmpty()) {
-							event.sendMessage("Seems like there are no roles available for this Command!").queue();
+                        if (event.getGuildData(true).getPublicRoles().isEmpty()) {
+                            event.sendMessage("Seems like there are no roles available for this Command!").queue();
 						} else {
-							event.sendMessage("These are all the available roles for this Command:\n" + event.getGuildData().getPublicRoles(event.getJDA()).stream().map(Role::getId).collect(Collectors.joining("\n"))).queue();
-						}
+                            event.sendMessage("These are all the available roles for this Command:\n" + event.getGuildData(true).getPublicRoles(event.getJDA()).stream().map(Role::getId).collect(Collectors.joining("\n"))).queue();
+                        }
 						return;
 					}
 					String role = ((String) event.getArgument("rolename").get());
@@ -111,8 +111,8 @@ public class RoleMeCommands {
 						if (r != null)
 							roles.add(r);
 					}
-					GuildData guildData = event.getGuildData();
-					roles = roles.stream().filter(guildData::isPublic).collect(Collectors.toList());
+                    GuildData guildData = event.getGuildData(true);
+                    roles = roles.stream().filter(guildData::isPublic).collect(Collectors.toList());
 					if (roles.isEmpty()) {
 						event.sendMessage("I couldn't find any roles with that name or ID!").queue();
 					} else if (roles.size() > 1) {

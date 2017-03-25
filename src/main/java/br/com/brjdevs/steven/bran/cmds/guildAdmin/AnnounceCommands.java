@@ -25,8 +25,8 @@ public class AnnounceCommands {
 				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					Argument arg = event.getArgument("msg/action");
-					GuildData data = event.getGuildData();
-					if (!arg.isPresent()) {
+                    GuildData data = event.getGuildData(true);
+                    if (!arg.isPresent()) {
 						if (data.joinMsg == null)
 							event.sendMessage(Emojis.X + " You didn't set a greeting message!").queue();
 						else
@@ -36,8 +36,8 @@ public class AnnounceCommands {
 						if (data.joinMsg == null)
 							event.sendMessage(Emojis.X + " There's no greeting message to clear!").queue();
 						else {
-							data.joinMsg = null;
-							event.sendMessage(Quotes.SUCCESS, "Removed the greeting message!").queue();
+                            event.getGuildData(false).joinMsg = null;
+                            event.sendMessage(Quotes.SUCCESS, "Removed the greeting message!").queue();
 						}
 						return;
 					}
@@ -59,8 +59,8 @@ public class AnnounceCommands {
 				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					Argument arg = event.getArgument("msg/action");
-					GuildData data = event.getGuildData();
-					if (!arg.isPresent()) {
+                    GuildData data = event.getGuildData(true);
+                    if (!arg.isPresent()) {
 						if (data.leaveMsg == null)
 							event.sendMessage(Emojis.X + " You didn't set a farewell message!").queue();
 						else
@@ -75,8 +75,8 @@ public class AnnounceCommands {
 						}
 						return;
 					}
-					data.leaveMsg = (String) arg.get();
-					event.sendMessage(Quotes.SUCCESS, "Updated farewell message!").queue();
+                    event.getGuildData(false).leaveMsg = (String) arg.get();
+                    event.sendMessage(Quotes.SUCCESS, "Updated farewell message!").queue();
                     Bran.getInstance().getDataManager().getData().update();
                 })
 				.build();
@@ -93,8 +93,8 @@ public class AnnounceCommands {
 				.setPrivateAvailable(false)
 				.setAction((event) -> {
 					Argument arg = event.getArgument("msg/action");
-					GuildData data = event.getGuildData();
-					if (!arg.isPresent()) {
+                    GuildData data = event.getGuildData(true);
+                    if (!arg.isPresent()) {
 						if (data.joinMsgDM == null)
 							event.sendMessage(Emojis.X + " You didn't set a greetingDM message!").queue();
 						else
@@ -109,8 +109,8 @@ public class AnnounceCommands {
 						}
 						return;
 					}
-					data.joinMsgDM = (String) arg.get();
-					event.sendMessage(Quotes.SUCCESS, "Updated greetingDM message!").queue();
+                    event.getGuildData(false).joinMsgDM = (String) arg.get();
+                    event.sendMessage(Quotes.SUCCESS, "Updated greetingDM message!").queue();
                     Bran.getInstance().getDataManager().getData().update();
                 })
 				.build();
@@ -128,8 +128,8 @@ public class AnnounceCommands {
 				.setAction((event) -> {
 					String arg = ((String) event.getArgument("channel/action").get());
 					if (arg.equals("none") || arg.equals("remove")) {
-						event.getGuildData().setAnnounceTextChannel(null);
-						event.sendMessage("Removed the Announce channel!").queue();
+                        event.getGuildData(false).setAnnounceTextChannel(null);
+                        event.sendMessage("Removed the Announce channel!").queue();
 						return;
 					}
 					TextChannel channel = !event.getMessage().getMentionedChannels().isEmpty() ? event.getMessage().getMentionedChannels().get(0) : event.getTextChannel();
@@ -137,8 +137,8 @@ public class AnnounceCommands {
 						event.sendMessage("No channels found matching that criteria.").queue();
 						return;
 					}
-					event.getGuildData().setAnnounceTextChannel(channel);
-					event.sendMessage("Done, set the announce channel to " + channel.getAsMention()).queue();
+                    event.getGuildData(false).setAnnounceTextChannel(channel);
+                    event.sendMessage("Done, set the announce channel to " + channel.getAsMention()).queue();
 				})
 				.build();
 	}

@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.core.audio;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
-import br.com.brjdevs.steven.bran.core.client.BranShard;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import net.dv8tion.jda.core.entities.Guild;
@@ -23,9 +23,9 @@ public class GuildMusicManager {
 	public Guild getGuild() {
 		return getShard().getJDA().getGuildById(String.valueOf(guildId));
 	}
-	
-	public BranShard getShard() {
-		return Bran.getInstance().getShards()[shard];
+    
+    public Client getShard() {
+        return Bran.getInstance().getShards()[shard];
 	}
 	public TrackScheduler getTrackScheduler() {
 		return scheduler;

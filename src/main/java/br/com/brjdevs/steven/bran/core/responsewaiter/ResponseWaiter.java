@@ -1,6 +1,6 @@
 package br.com.brjdevs.steven.bran.core.responsewaiter;
 
-import br.com.brjdevs.steven.bran.core.client.BranShard;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseListener;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
@@ -20,18 +20,18 @@ public class ResponseWaiter {
 	private long guildId;
 	private long expiresIn;
 	private String[] validInputs;
-	private BranShard branShard;
-	private ResponseListener responseListener;
+    private Client client;
+    private ResponseListener responseListener;
 	private ExpectedResponseType expectedResponseType;
-	
-	public ResponseWaiter(User user, TextChannel textChannel, BranShard branShard, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType, ResponseListener responseListener) {
-		this.userId = Long.parseLong(user.getId());
+    
+    public ResponseWaiter(User user, TextChannel textChannel, Client client, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType, ResponseListener responseListener) {
+        this.userId = Long.parseLong(user.getId());
 		this.channelId = Long.parseLong(textChannel.getId());
 		this.guildId = Long.parseLong(textChannel.getGuild().getId());
 		this.expiresIn = expiresIn;
 		this.validInputs = validInputs;
-		this.branShard = branShard;
-		this.responseListener = responseListener;
+        this.client = client;
+        this.responseListener = responseListener;
 		this.expectedResponseType = expectedResponseType;
 		if (responseWaiters.containsKey(userId)) {
 			EXPIRATION.removeResponseWaiter(responseWaiters.get(userId));
@@ -39,13 +39,13 @@ public class ResponseWaiter {
 		responseWaiters.put(userId, this);
 		EXPIRATION.addResponseWaiter(this, System.currentTimeMillis() + expiresIn);
 	}
-	
-	public ResponseWaiter(long userId, long channelId, long guildId, BranShard branShard, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType) {
-		this.userId = userId;
+    
+    public ResponseWaiter(long userId, long channelId, long guildId, Client client, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType) {
+        this.userId = userId;
 		this.channelId = channelId;
 		this.guildId = guildId;
-		this.branShard = branShard;
-		this.expiresIn = expiresIn;
+        this.client = client;
+        this.expiresIn = expiresIn;
 		this.validInputs = validInputs;
 		this.expectedResponseType = expectedResponseType;
 		responseWaiters.put(userId, this);
@@ -55,14 +55,14 @@ public class ResponseWaiter {
 	long getUserId() {
 		return userId;
 	}
-	
-	public BranShard getBranShard() {
-		return branShard;
-	}
+    
+    public Client getClient() {
+        return client;
+    }
 	
 	public JDA getJDA() {
-		return getBranShard().getJDA();
-	}
+        return getClient().getJDA();
+    }
 	
 	public User getUser() {
 		return getJDA().getUserById(String.valueOf(userId));

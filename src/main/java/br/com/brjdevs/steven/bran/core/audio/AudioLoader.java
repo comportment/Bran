@@ -2,6 +2,7 @@ package br.com.brjdevs.steven.bran.core.audio;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
 import br.com.brjdevs.steven.bran.core.data.GuildData;
+import br.com.brjdevs.steven.bran.core.data.UserData;
 import br.com.brjdevs.steven.bran.core.responsewaiter.ExpectedResponseType;
 import br.com.brjdevs.steven.bran.core.responsewaiter.ResponseWaiter;
 import br.com.brjdevs.steven.bran.core.responsewaiter.events.ResponseEvent;
@@ -44,7 +45,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 	
 	@Override
 	public void trackLoaded(AudioTrack track) {
-        GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild());
+        GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild(), true);
         if (track.getInfo().length > guildData.maxSongDuration) {
 			channel.sendMessage("This song is too long! The maximum supported length is 3 hours. *" + AudioUtils.format(track.getInfo().length) + "/" + AudioUtils.format(MAX_SONG_LENGTH) + "*").queue();
 			if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
@@ -74,7 +75,12 @@ public class AudioLoader implements AudioLoadResultHandler {
 		} else {
 			List<TrackContext> playlistTracks = playlist.getTracks().stream().map(track -> new TrackContext(track, user, channel, musicManager.getTrackScheduler())).collect(Collectors.toList());
 			if (playlist.isSearchResult()) {
-				List<TrackContext> tracks = playlistTracks.stream().filter(track -> playlistTracks.indexOf(track) < 3).collect(Collectors.toList());
+                UserData userData = Bran.getInstance().getDataManager().getData().get().getUser(user);
+                if (userData.shouldPickFirstSong()) {
+                    trackLoaded(playlist.getTracks().get(0));
+                    return;
+                }
+                List<TrackContext> tracks = playlistTracks.stream().filter(track -> playlistTracks.indexOf(track) < 3).collect(Collectors.toList());
 				channel.sendMessage(Utils.getUser(user) + ", results found by `" + trackUrl.substring(9).trim() + "`:\n" + String.join("\n", tracks.stream().map(track -> "`[" + (tracks.indexOf(track) + 1) + "]` " + track.getTrack().getInfo().title + " (`" + AudioUtils.format(track.getTrack().getInfo().length) + "`)").collect(Collectors.toList())) + "\n*This will expire in 30 seconds*").queue(msg -> {
 					String[] inputs = new String[2 + tracks.size()];
 					inputs[0] = "c";
@@ -127,7 +133,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 					channel.getGuild().getAudioManager().closeAudioConnection();
 				return;
 			}
-            GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild());
+            GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild(), true);
             channel.sendMessage("Queueing playlist " + playlist.getName() + " by " + Utils.getUser(user)).queue(msg -> {
 				int queued = 0;
 				for (TrackContext trackContext : playlistTracks) {

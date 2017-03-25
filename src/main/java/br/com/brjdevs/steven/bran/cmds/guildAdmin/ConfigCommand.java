@@ -39,9 +39,9 @@ public class ConfigCommand {
 								.setAction((event) -> {
 									Argument argument = event.getArgument("value");
 									if (!argument.isPresent()) {
-										
-										long current = event.getGuildData().maxSongsPerUser;
-										if (current > 0)
+                                        
+                                        long current = event.getGuildData(true).maxSongsPerUser;
+                                        if (current > 0)
 											event.sendMessage("The current maximum amount of songs per user in the queue is " + current).queue();
 										else
 											event.sendMessage("There is no limit of maximum amount of songs per user set in this guild").queue();
@@ -54,8 +54,8 @@ public class ConfigCommand {
 									}
 									int i = !value.equals("none") ? Integer.parseInt(value) : -1;
 									if (i < -1) i = -1;
-									event.getGuildData().maxSongsPerUser = i;
-									if (i > 0)
+                                    event.getGuildData(false).maxSongsPerUser = i;
+                                    if (i > 0)
 										event.sendMessage(Quotes.SUCCESS, "Now each user can only have " + i + " song(s) in the queue at once.").queue();
 									else
 										event.sendMessage(Quotes.SUCCESS, "Now each user can have unlimited songs in the queue at once.").queue();
@@ -68,25 +68,47 @@ public class ConfigCommand {
 								.setDescription("Change the max song duration for the current guild!")
 								.setArgs(new Argument("duration", String.class, true))
 								.setRequiredPermission(Permissions.GUILD_MOD)
-								.setAction((event) -> {
-									Argument argument = event.getArgument("duration");
-									if (!argument.isPresent()) {
-										event.sendMessage("The current max song duration: `" +
-												TimeUtils.format(event.getGuildData().maxSongDuration) + "`.").queue();
-										return;
-									}
-									long duration = TimeUtils.getTime(((String) argument.get()), TimeUnit.MILLISECONDS);
-									if (duration > AudioLoader.MAX_SONG_LENGTH || duration < 0) {
-										event.sendMessage("The max song duration has to be bigger than 0 and lower than 3 hours!").queue();
-										return;
-									}
-									event.getGuildData().maxSongDuration = duration;
-									event.sendMessage(Quotes.SUCCESS, "Now the max song duration is `" +
-											TimeUtils.format(event.getGuildData().maxSongDuration) + "`!").queue();
+                                .setAction((event) -> {
+                                    Argument argument = event.getArgument("duration");
+                                    if (!argument.isPresent()) {
+                                        event.sendMessage("The current max song duration: `" +
+                                                TimeUtils.format(event.getGuildData(true).maxSongDuration) + "`.").queue();
+                                        return;
+                                    }
+                                    long duration = TimeUtils.getTime(((String) argument.get()), TimeUnit.MILLISECONDS);
+                                    if (duration > AudioLoader.MAX_SONG_LENGTH || duration < 0) {
+                                        event.sendMessage("The max song duration has to be bigger than 0 and lower than 3 hours!").queue();
+                                        return;
+                                    }
+                                    event.getGuildData(false).maxSongDuration = duration;
+                                    event.sendMessage(Quotes.SUCCESS, "Now the max song duration is `" +
+                                            TimeUtils.format(event.getGuildData(false).maxSongDuration) + "`!").queue();
                                     Bran.getInstance().getDataManager().getData().update();
                                 })
-								.build())
-						.build())
+                                .build())
+                        
+                        .addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
+                                .setAliases("fairqueue")
+                                .setName("FairQueue Command")
+                                .setDescription("Change the FairQueue configs for the Guild.")
+                                .setArgs(new Argument("level", Integer.class, true))
+                                .setRequiredPermission(Permissions.GUILD_MOD)
+                                .setAction((event) -> {
+                                    Argument argument = event.getArgument("level");
+                                    if (!argument.isPresent()) {
+                                        event.sendMessage("The current FairQueue Level for this Guild is `" + event.getGuildData(true).fairQueueLevel + "`.").queue();
+                                    } else if (((int) argument.get()) > 2) {
+                                        event.sendMessage("The biggest FairQueue Level is 2!").queue();
+                                    } else if (((int) argument.get()) < 0) {
+                                        event.sendMessage("The FairQueue Level has to be bigger or equal 0!").queue();
+                                    } else {
+                                        event.getGuildData(false).fairQueueLevel = ((int) argument.get());
+                                        event.sendMessage("Done, now the FairQueue Level for this Guild is `" + argument.get() + "`.").queue();
+                                        Bran.getInstance().getDataManager().getData().update();
+                                    }
+                                })
+                                .build())
+                        .build())
 				.build();
 	}
 }

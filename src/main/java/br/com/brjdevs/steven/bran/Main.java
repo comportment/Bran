@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
-import br.com.brjdevs.steven.bran.core.client.BranShard;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import br.com.brjdevs.steven.bran.core.utils.Hastebin;
 import br.com.brjdevs.steven.bran.core.utils.Utils;
@@ -26,8 +26,8 @@ public class Main {
 			
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 				try {
-					Arrays.stream(bran.getShards()).forEach(BranShard::shutdown);
-				} catch (Exception e) {
+                    Arrays.stream(bran.getShards()).forEach(Client::shutdown);
+                } catch (Exception e) {
 				}
 			}));
 		} catch (Exception e) {

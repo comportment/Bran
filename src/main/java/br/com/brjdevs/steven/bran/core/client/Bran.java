@@ -7,6 +7,7 @@ import br.com.brjdevs.steven.bran.core.command.CommandManager;
 import br.com.brjdevs.steven.bran.core.currency.ProfileData;
 import br.com.brjdevs.steven.bran.core.data.BranDataManager;
 import br.com.brjdevs.steven.bran.core.data.Config;
+import br.com.brjdevs.steven.bran.core.managers.MessageCache;
 import br.com.brjdevs.steven.bran.core.managers.Messenger;
 import br.com.brjdevs.steven.bran.core.managers.TaskManager;
 import br.com.brjdevs.steven.bran.core.utils.Session;
@@ -23,6 +24,7 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import javax.security.auth.login.LoginException;
@@ -45,8 +47,8 @@ public class Bran {
 	private CommandManager commandManager;
 	private BranMusicManager playerManager;
 	private BranDataManager discordBotData;
-	private BranShard[] shards;
-	private DiscordLog discordLog;
+    private Client[] shards;
+    private DiscordLog discordLog;
 	private int totalShards;
 	private AtomicLongArray lastEvents;
 	private long ownerId;
@@ -56,9 +58,9 @@ public class Bran {
 	
 	public Bran() throws LoginException, InterruptedException, RateLimitedException {
 		instance = this;
-        //try (Jedis jedis = jedisPool.getResource()) {
-        //jedis.auth("stup2016");
-        //}
+        try (Jedis jedis = jedisPool.getResource()) {
+            //jedis.auth("stup2016");
+        }
         this.discordBotData = new BranDataManager();
 		this.ownerId = 0;
 		this.ownerShardId = 0;
@@ -67,8 +69,8 @@ public class Bran {
 			throw new NullPointerException("Could not create config.json");
 		this.totalShards = getRecommendedShards();
 		this.lastEvents = new AtomicLongArray(totalShards);
-		this.shards = new BranShard[totalShards];
-		initShards();
+        this.shards = new Client[totalShards];
+        initShards();
 		getOwner();
 		this.playerManager = new BranMusicManager();
 		this.commandManager = new CommandManager();
@@ -76,7 +78,8 @@ public class Bran {
 		this.session = new Session();
 		this.messenger = new Messenger();
 		this.taskManager = new TaskManager();
-	}
+        new MessageCache();
+    }
 	
 	public static JedisPool getJedisPool() {
 		return jedisPool;
@@ -85,9 +88,9 @@ public class Bran {
 	public static Bran getInstance() {
 		return instance;
 	}
-	
-	public BranShard[] getShards() {
-		return shards;
+    
+    public Client[] getShards() {
+        return shards;
 	}
 	
 	public BranDataManager getDataManager() {
@@ -98,9 +101,9 @@ public class Bran {
 		if (jda.getShardInfo() == null) return 0;
 		return jda.getShardInfo().getShardId();
 	}
-	
-	public BranShard getShard(JDA jda) {
-		return getShards()[getShardId(jda)];
+    
+    public Client getShard(JDA jda) {
+        return getShards()[getShardId(jda)];
 	}
     
     public ProfileData getProfile(User user) {
@@ -110,10 +113,10 @@ public class Bran {
 	public int getTotalShards() {
 		return totalShards;
 	}
-	
-	public BranShard[] getOnlineShards() {
-		return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(BranShard[]::new);
-	}
+    
+    public Client[] getOnlineShards() {
+        return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(Client[]::new);
+    }
 	
 	public DiscordLog getDiscordLog() {
 		return discordLog;
@@ -166,9 +169,9 @@ public class Bran {
 	public TaskManager getTaskManager() {
 		return taskManager;
 	}
-	
-	public synchronized boolean reboot(BranShard shard) {
-		try {
+    
+    public synchronized boolean reboot(Client shard) {
+        try {
 			Map<Long, ImmutablePair<Long, GuildMusicManager>> shardPlayers = new HashMap<>();
 			Map<Long, GuildMusicManager> copy = new HashMap<>(playerManager.getMusicManagers());
 			copy.forEach((guildId, musicManager) -> {
@@ -176,9 +179,6 @@ public class Bran {
 				if (guild != null) {
 					if (guild.getAudioManager().isConnected() || guild.getAudioManager().isAttemptingToConnect()) {
 						shardPlayers.put(guildId, new ImmutablePair<>(Long.parseLong(guild.getAudioManager().getConnectedChannel().getId()), musicManager));
-						TextChannel channel = musicManager.getTrackScheduler().getCurrentTrack().getContext();
-						if (channel != null && channel.canTalk())
-							channel.sendMessage("I'm going to reboot this shard (#" + shard.getId() + "), I'll be right back...").queue();
 						musicManager.getTrackScheduler().setPaused(true);
 						playerManager.unregister(guildId);
 					}
@@ -195,9 +195,6 @@ public class Bran {
 				AudioUtils.connect(channel, musicManager.getTrackScheduler().getCurrentTrack().getContext());
 				playerManager.getMusicManagers().put(id, musicManager);
 				musicManager.getTrackScheduler().setPaused(false);
-				TextChannel context = musicManager.getTrackScheduler().getCurrentTrack().getContext();
-				if (context != null && context.canTalk())
-					context.sendMessage("Rebooted Shard, resuming the player...").queue();
 				
 			});
 		} catch (Exception e) {
@@ -231,19 +228,19 @@ public class Bran {
 	private void initShards() throws LoginException, InterruptedException, RateLimitedException {
 		for (int i = 0; i < shards.length; i++) {
 			LOG.info("Starting shard #" + i + " of " + shards.length);
-			shards[i] = new BranShard(i, totalShards, this);
-			LOG.info("Finished shard #" + i);
+            shards[i] = new Client(i, totalShards);
+            LOG.info("Finished shard #" + i);
 			Thread.sleep(5_000L);
 		}
-		for (BranShard shard : shards) {
-			setLastEvent(shard.getId(), System.currentTimeMillis());
+        for (Client shard : shards) {
+            setLastEvent(shard.getId(), System.currentTimeMillis());
 		}
 	}
 	
 	public User getOwner() {
 		if (ownerId != 0) return getShards()[ownerShardId].getJDA().getUserById(String.valueOf(ownerId));
-		for (BranShard shard : shards) {
-			User u = shard.getJDA().getUserById(getConfig().ownerId);
+        for (Client shard : shards) {
+            User u = shard.getJDA().getUserById(getConfig().ownerId);
 			if (u != null) {
 				ownerId = Long.parseLong(u.getId());
 				break;
@@ -264,8 +261,8 @@ public class Bran {
 				if (musicManager.getTrackScheduler().getCurrentTrack() == null) return;
 				TextChannel channel = musicManager.getTrackScheduler().getCurrentTrack().getContext();
 				if (channel != null && channel.canTalk())
-					channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, strong and better.").complete();
-			} catch (Exception ignored) {
+                    channel.sendMessage("Hey, I'm sorry to bother you but I need to restart. I'll be back bigger, stronger and better.").complete();
+            } catch (Exception ignored) {
 			}
 		});
         
@@ -274,8 +271,8 @@ public class Bran {
         getDataManager().getConfig().update();
         getDataManager().getHangmanWords().update();
         
-        Stream.of(shards).forEach(BranShard::shutdown);
-		
-		System.exit(exitCode);
+        Stream.of(shards).forEach(Client::shutdown);
+        
+        System.exit(exitCode);
 	}
 }

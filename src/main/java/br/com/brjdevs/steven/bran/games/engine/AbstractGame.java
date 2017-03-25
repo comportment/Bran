@@ -1,7 +1,7 @@
 package br.com.brjdevs.steven.bran.games.engine;
 
 import br.com.brjdevs.steven.bran.core.client.Bran;
-import br.com.brjdevs.steven.bran.core.client.BranShard;
+import br.com.brjdevs.steven.bran.core.client.Client;
 import br.com.brjdevs.steven.bran.core.currency.ProfileData;
 import br.com.brjdevs.steven.bran.core.data.UserData;
 import br.com.brjdevs.steven.bran.core.managers.profile.IProfileListener;
@@ -21,8 +21,9 @@ public abstract class AbstractGame<T extends GameEventListener> {
     protected IProfileListener profileListener;
     protected T eventListener;
     protected int shardId;
+    protected long timeOut;
     
-    public AbstractGame(GameLocation location, GameInfo info, T eventListener, JDA shard) {
+    public AbstractGame(GameLocation location, GameInfo info, T eventListener, JDA shard, long timeOut) {
         try {
             this.gameState = GameState.STARTING;
             this.location = location;
@@ -31,6 +32,7 @@ public abstract class AbstractGame<T extends GameEventListener> {
             this.eventListener = eventListener;
             this.profileListener = new DefaultGameProfileListener(reference);
             this.shardId = Bran.getInstance().getShardId(shard);
+            this.timeOut = timeOut;
             ProfileData owner = this.info.getPlayers().get(0).getProfileData();
             if (profileListener != null)
                 owner.registerListener(profileListener);
@@ -102,8 +104,12 @@ public abstract class AbstractGame<T extends GameEventListener> {
         return eventListener;
     }
     
-    public BranShard getShard() {
+    public Client getShard() {
         return Bran.getInstance().getShards()[shardId];
+    }
+    
+    public long getTimeOut() {
+        return timeOut;
     }
     
     public enum GameEndReason {

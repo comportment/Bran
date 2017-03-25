@@ -1,0 +1,433 @@
+package br.com.brjdevs.steven.bran.cmds.music;
+
+import br.com.brjdevs.steven.bran.core.audio.AudioUtils;
+import br.com.brjdevs.steven.bran.core.audio.GuildMusicManager;
+import br.com.brjdevs.steven.bran.core.audio.TrackContext;
+import br.com.brjdevs.steven.bran.core.audio.TrackScheduler;
+import br.com.brjdevs.steven.bran.core.client.Bran;
+import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
+import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
+import br.com.brjdevs.steven.bran.core.command.enums.Category;
+import br.com.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.com.brjdevs.steven.bran.core.managers.Permissions;
+import br.com.brjdevs.steven.bran.core.quote.Quotes;
+import br.com.brjdevs.steven.bran.core.utils.Emojis;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder;
+import br.com.brjdevs.steven.bran.core.utils.StringListBuilder.Format;
+import br.com.brjdevs.steven.bran.core.utils.Utils;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.VoiceChannel;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static br.com.brjdevs.steven.bran.core.managers.Permissions.DJ;
+
+public class MusicCommand {
+    
+    private static final String URL_REGEX = "^((ht|f)tp(s?)://)(\\w+(:\\w+)?@)?((((((25[0-5])|(2[0-4][0-9])|([01]?[0-9]?[0-9]))\\.){3}((25[0-4])|(2[0-4][0-9])|((1?[1-9]?[1-9])|([1-9]0))))|(0\\.){3}0)|([0-9a-z_!~*'()-]+\\.)*([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\.[a-z]{2,6}|([a-zA-Z][-a-zA-Z0-9]+))(:[0-9]{1,5})?((/?)|(/[0-9a-zA-Z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+    private static final String PLAYING = "\u25b6";
+    private static final String PAUSED = "\u23f8";
+    private static final String REPEAT = "\uD83D\uDD01";
+    
+    @Command
+    private static ICommand play() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("play")
+                .setName("Play Command")
+                .setDescription("Play the songs you want!")
+                .setExample("play Catch & Release")
+                .setRequiredPermission(Permissions.MUSIC)
+                .setPrivateAvailable(false)
+                .setArgs(new Argument("title/url", String.class, true))
+                .setAction((event, args) -> {
+                    String trackUrl = event.getArgument("title/url").isPresent() ? ((String) event.getArgument("title/url").get()) : "";
+                    GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                    
+                    if (trackUrl.isEmpty()) {
+                        if (musicManager.getTrackScheduler().isPaused()) {
+                            musicManager.getTrackScheduler().setPaused(false);
+                            event.sendMessage("Resumed the Player!").queue();
+                        } else
+                            event.sendMessage("You have to tell me a song name or link!").queue();
+                        return;
+                    }
+                    if (musicManager.getTrackScheduler().isPaused()) {
+                        musicManager.getTrackScheduler().setPaused(false);
+                        event.sendMessage("Resumed the Player!").queue();
+                    }
+                    VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
+                    if (vchan == null && event.getMember().getVoiceState().inVoiceChannel()) {
+                        vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel());
+                        if (vchan == null) return;
+                    } else if (vchan == null && !event.getMember().getVoiceState().inVoiceChannel()) {
+                        event.sendMessage(Quotes.FAIL, "Before asking for songs you should join a Voice Channel ").queue();
+                        return;
+                    }
+                    if (vchan == null) {
+                        event.sendMessage("Something went wrong!").queue();
+                        return;
+                    }
+                    if (!vchan.getMembers().contains(event.getMember())) {
+                        event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
+                        return;
+                    }
+                    if (event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_MANAGE))
+                        event.getMessage().delete().queue();
+                    TrackScheduler scheduler = Bran.getInstance().getMusicManager().get(event.getGuild()).getTrackScheduler();
+                    List<TrackContext> tracksByUser = scheduler.getTracksBy(event.getAuthor());
+                    if (event.getGuildData(true).maxSongsPerUser > 0 && tracksByUser.size() >= event.getGuildData(true).maxSongsPerUser) {
+                        event.sendMessage("You can only have " + event.getGuildData(true).maxSongsPerUser + " songs in the queue.").queue();
+                        return;
+                    }
+                    if (trackUrl.startsWith("soundcloud "))
+                        trackUrl = trackUrl.replaceFirst("soundcloud ", "scsearch:");
+                    if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:") && !trackUrl.startsWith("scsearch:"))
+                        trackUrl = "ytsearch:" + trackUrl;
+                    Bran.getInstance().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl);
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand forceskip() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("forceskip", "fskip", "fs")
+                .setName("Music ForceSkip Command")
+                .setDescription("Forces the player to skip the current song.")
+                .setPrivateAvailable(false)
+                .setRequiredPermission(DJ)
+                .setAction((event) -> {
+                    VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
+                    if (vchan == null) {
+                        event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to locate you. Are you even in a voice channel?").queue();
+                        return;
+                    }
+                    if (!vchan.getMembers().contains(event.getMember())) {
+                        event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
+                        return;
+                    }
+                    GuildMusicManager manager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                    TrackScheduler scheduler = manager.getTrackScheduler();
+                    if (manager.getPlayer().getPlayingTrack() == null) {
+                        event.sendMessage("I'm not playing anything, so I can't skip!").queue();
+                        return;
+                    }
+                    if (manager.getPlayer().getPlayingTrack().getState() != AudioTrackState.PLAYING) {
+                        event.sendMessage("This track is still loading, please wait!").queue();
+                        return;
+                    }
+                    event.sendMessage("Skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`...").queue();
+                    scheduler.skip();
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand nowplaying() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("nowplaying", "nowp", "np", "n")
+                .setName("Music NowPlaying Command")
+                .setDescription("Gives you information about the current song.")
+                .setPrivateAvailable(false)
+                .setAction((event) -> {
+                    GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                    if (musicManager.getTrackScheduler().getCurrentTrack() == null || musicManager.getPlayer().getPlayingTrack() == null) {
+                        event.sendMessage("I'm not playing anything, use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
+                        return;
+                    }
+                    AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
+                    TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
+                    TrackScheduler scheduler = musicManager.getTrackScheduler();
+                    Iterator<TrackContext> it = scheduler.getQueue().iterator();
+                    TrackContext next = it.hasNext() ? it.next() : null;
+                    VoiceChannel channel = event.getGuild().getAudioManager().isAttemptingToConnect() ? event.getGuild().getAudioManager().getQueuedAudioConnection() : event.getGuild().getAudioManager().getConnectedChannel();
+                    String out = "[Current song information for `" + channel.getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
+                    out += "\uD83D\uDC49 DJ » `" + Utils.getUser(context.getDJ()) + "`\n\n";
+                    out += (scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : PLAYING) + " ";
+                    out += AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length) + " [" + AudioUtils.format(context.getTrack().getPosition()) + "/" + AudioUtils.format(info.length) + "]";
+                    if (next != null) {
+                        info = next.getTrack().getInfo();
+                        out += "\n\n";
+                        out += "[Next up in ` " + channel.getName() + "`] \uD83C\uDFB6 " + info.title + "\n\n";
+                        out += "\uD83D\uDC49 DJ » `" + Utils.getUser(next.getDJ()) + "`\n";
+                        out += "\uD83D\uDC49 Duration » " + " `" + AudioUtils.format(info.length) + "`";
+                    }
+                    event.sendMessage(out).queue();
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand repeat() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("repeat")
+                .setName("Repeat Toggle Command")
+                .setDescription("Toggles the Repeat.")
+                .setPrivateAvailable(false)
+                .setRequiredPermission(DJ)
+                .setAction((event) -> {
+                    GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                    musicManager.getTrackScheduler().setRepeat(!musicManager.getTrackScheduler().isRepeat());
+                    event.sendMessage(musicManager.getTrackScheduler().isRepeat() ? "The player is now on repeat." : "The player is no longer on repeat.").queue();
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand pause() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("pause")
+                .setName("Music (Un)Pause Command")
+                .setDescription("Pauses/Resumes the player.")
+                .setPrivateAvailable(false)
+                .setRequiredPermission(DJ)
+                .setAction((event) -> {
+                    GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                    if (musicManager.getPlayer().getPlayingTrack() == null) {
+                        event.sendMessage("I can't pause if I'm not playing anything.").queue();
+                        return;
+                    }
+                    musicManager.getTrackScheduler().setPaused(!musicManager.getTrackScheduler().isPaused());
+                    event.sendMessage(musicManager.getTrackScheduler().isPaused() ? "The player is now paused. Use `" + event.getPrefix() + "m pause` again to resume." : "The player is no longer paused.").queue();
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand skip() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("skip", "s")
+                .setName("Music Vote Skip Command")
+                .setDescription("Voting for skipping song.")
+                .setPrivateAvailable(false)
+                .setAction((event) -> {
+                    GuildMusicManager manager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                    TrackScheduler scheduler = manager.getTrackScheduler();
+                    VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
+                    if (vchan == null) {
+                        event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to locate you. Are you even in a voice channel?").queue();
+                        return;
+                    }
+                    if (!vchan.getMembers().contains(event.getMember())) {
+                        event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
+                        return;
+                    }
+                    if (manager.getPlayer().getPlayingTrack() == null) {
+                        event.sendMessage("I'm not playing anything! Use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
+                        return;
+                    }
+                    if (manager.getPlayer().getPlayingTrack().getState() != AudioTrackState.PLAYING) {
+                        event.sendMessage("This track is still loading, please wait!").queue();
+                        return;
+                    }
+                    TrackContext context = scheduler.getCurrentTrack();
+                    if (AudioUtils.isAllowed(event.getAuthor(), context)) {
+                        event.sendMessage("The DJ has decided to skip!").queue();
+                        scheduler.skip();
+                        return;
+                    }
+                    if (scheduler.getVoteSkips().contains(event.getAuthor().getId()))
+                        scheduler.getVoteSkips().remove(event.getAuthor().getId());
+                    else
+                        scheduler.getVoteSkips().add(event.getAuthor().getId());
+                    if (scheduler.getVoteSkips().size() >= scheduler.getRequiredSkipVotes()) {
+                        event.sendMessage("Reached the required amount of votes, skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`...").queue();
+                        scheduler.skip();
+                        return;
+                    }
+                    event.sendMessage(scheduler.getVoteSkips().size() + " users voted for skipping `" + manager.getPlayer().getPlayingTrack().getInfo().title + "`. More `" + (scheduler.getRequiredSkipVotes() - scheduler.getVoteSkips().size()) + "` votes are required.").queue();
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand restart() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("restart")
+                .setName("Music Restart Command")
+                .setDescription("If playing, restarts the current song otherwise restarts the last played track.")
+                .setRequiredPermission(DJ)
+                .setPrivateAvailable(false)
+                .setAction((event) -> {
+                    VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
+                    if (vchan == null && event.getMember().getVoiceState().inVoiceChannel()) {
+                        vchan = AudioUtils.connect(event.getMember().getVoiceState().getChannel(), event.getTextChannel());
+                        if (vchan == null) return;
+                    } else if (vchan == null && !event.getMember().getVoiceState().inVoiceChannel()) {
+                        event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to track you. Are you even in a voice channel?").queue();
+                        return;
+                    }
+                    if (vchan == null) {
+                        event.sendMessage("Something went wrong...").queue();
+                        return;
+                    }
+                    if (!vchan.getMembers().contains(event.getMember())) {
+                        event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
+                        return;
+                    }
+                    GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                    musicManager.getTrackScheduler().restartSong(event.getTextChannel());
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand queue() {
+        return new TreeCommandBuilder(Category.MUSIC)
+                .setAliases("queue")
+                .setDefault("list")
+                .setName("Music Queue Command")
+                .setDescription("Clears, lists and remove tracks from the queue!")
+                .setPrivateAvailable(false)
+                .addSubCommand(new CommandBuilder(Category.MUSIC)
+                        .setAliases("list")
+                        .setDescription("Lists you the current queue.")
+                        .setArgs(new Argument("page", Integer.class, true))
+                        .setAction((event, args) -> {
+                            Argument argument = event.getArgument("page");
+                            int page = argument.isPresent() && (int) argument.get() > 0 ? (int) argument.get() : 1;
+                            GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                            StringBuilder builder = new StringBuilder();
+                            List<String> list = musicManager.getTrackScheduler().getQueue().stream().map(track -> {
+                                AudioTrackInfo i = track.getTrack().getInfo();
+                                return "**" + (musicManager.getTrackScheduler().getPosition(track) + 1) + "**) " + i.title + " » (`" + AudioUtils.format(i.length) + "`)" + " (DJ: `" + Utils.getUser(track.getDJ()) + "`)";
+                            }).collect(Collectors.toList());
+                            TrackScheduler scheduler = musicManager.getTrackScheduler();
+                            VoiceChannel channel = event.getGuild().getAudioManager().isAttemptingToConnect() ? event.getGuild().getAudioManager().getQueuedAudioConnection() : event.getGuild().getAudioManager().getConnectedChannel();
+                            if (musicManager.getPlayer().getPlayingTrack() != null) {
+                                AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
+                                TrackContext context = musicManager.getTrackScheduler().getCurrentTrack();
+                                builder.append("[Current song information for `").append(channel == null ? "Not connected." : channel.getName()).append("`] \uD83C\uDFB6 ").append(info.title).append("\n\n");
+                                builder.append("\uD83D\uDC49 DJ » `").append(Utils.getUser(context.getDJ())).append("`\n\n");
+                                builder.append(scheduler.isPaused() ? PAUSED : scheduler.isRepeat() ? REPEAT : PLAYING).append(" ");
+                                builder.append(AudioUtils.getProgressBar(context.getTrack().getPosition(), context.getTrack().getInfo().length)).append(" [").append(AudioUtils.format(context.getTrack().getPosition())).append("/").append(AudioUtils.format(info.length)).append("]");
+                                builder.append("\n");
+                            }
+                            StringListBuilder listBuilder = new StringListBuilder(list, page, 10);
+                            builder.append("\n[Queue information for `").append(event.getGuild().getName()).append("`] (").append(scheduler.getQueue().size()).append(" entries) - Page ").append(page).append("/").append(listBuilder.getMaxPages()).append("\n\n");
+                            if (!scheduler.getQueue().isEmpty()) {
+                                builder.append(listBuilder.format(Format.NONE));
+                                builder.append("\n\n__Total Queue Duration__: ").append(scheduler.getQueueDuration());
+                            } else {
+                                builder.append("The queue is empty.");
+                            }
+                            event.sendMessage(builder.toString()).queue();
+                        })
+                        .build())
+                .addSubCommand(new CommandBuilder(Category.MUSIC)
+                        .setAliases("remove", "r", "rm")
+                        .setName("Music Queue Remove Command")
+                        .setDescription("Removes a track from the queue.")
+                        .setArgs(new Argument("trackPos", Integer.class))
+                        .setAction((event) -> {
+                            Argument argument = event.getArgument("trackPos");
+                            int index = (int) argument.get() - 1;
+                            if (index < 0) {
+                                event.sendMessage("The Track position has to be bigger than 0. You can see all tracks and positions by using `" + event.getPrefix() + "music queue`.").queue();
+                                return;
+                            }
+                            VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
+                            if (vchan == null) {
+                                event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to locate you. Are you even in a voice channel?").queue();
+                                return;
+                            }
+                            if (!vchan.getMembers().contains(event.getMember())) {
+                                event.sendMessage(Quotes.FAIL, "You're not connected to the Voice Channel I am currently playing.").queue();
+                                return;
+                            }
+                            GuildMusicManager manager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                            TrackScheduler scheduler = manager.getTrackScheduler();
+                            if (scheduler.getQueue().isEmpty()) {
+                                event.sendMessage("The queue is empty, so you can't remove any songs.").queue();
+                                return;
+                            }
+                            TrackContext toRemove = scheduler.getByPosition(index);
+                            if (toRemove == null) {
+                                event.sendMessage("Could not remove from the queue. Reason: `Index is bigger than queue size`").queue();
+                                return;
+                            }
+                            if (!toRemove.getDJId().equals(event.getAuthor().getId()) && !event.getGuildData(true).hasPermission(event.getAuthor(), Permissions.DJ)) {
+                                event.sendMessage("You can't do this because you're not this song's DJ!").queue();
+                                return;
+                            }
+                            scheduler.getQueue().remove(toRemove);
+                            event.sendMessage(Quotes.SUCCESS, "Removed `" + toRemove.getTrack().getInfo().title + "` from the queue.").queue();
+                        })
+                        .build())
+                .addSubCommand(new CommandBuilder(Category.MUSIC)
+                        .setAliases("clear")
+                        .setName("Queue Clear Command")
+                        .setDescription("Clears the queue.")
+                        .setAction((event) -> {
+                            GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                            if (musicManager.getTrackScheduler().getQueue().isEmpty()) {
+                                event.sendMessage("B-but... The queue is empty! \uD83D\uDE05").queue();
+                                return;
+                            }
+                            int size = musicManager.getTrackScheduler().getQueue().size();
+                            musicManager.getTrackScheduler().getQueue().clear();
+                            event.sendMessage("Removed `" + size + "` songs from the queue. \uD83D\uDDD1").queue();
+                        })
+                        .build())
+                .build();
+    }
+    
+    @Command
+    private static ICommand stop() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("stop")
+                .setName("Stop Command")
+                .setDescription("Stops the player!")
+                .setPrivateAvailable(false)
+                .setAction((event) -> {
+                    GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                    if (musicManager.getTrackScheduler().isStopped()) {
+                        event.sendMessage("B-but... I am not playing anything! \uD83D\uDE05").queue();
+                        return;
+                    }
+                    musicManager.getTrackScheduler().stop();
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand forceplay() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("forceplay", "fp")
+                .setName("Force Play Command")
+                .setDescription("Toggles the force play flag.")
+                .setAction((event) -> {
+                    event.getUserData().setPickFirstSong(!event.getUserData().shouldPickFirstSong());
+                    event.sendMessage(event.getUserData().shouldPickFirstSong() ? Emojis.CHECK_MARK + " Now the first song will be automatically chosen when you request a song!" : Emojis.CHECK_MARK + " Now I'll display 3 options for you to chose when you request a song!").queue();
+                })
+                .build();
+    }
+    
+    @Command
+    private static ICommand music() {
+        return new CommandBuilder(Category.MUSIC)
+                .setAliases("music")
+                .setName("Music Info Command")
+                .setDescription("Do you want to know about music?")
+                .setAction((event) -> {
+                    event.sendMessage("The music commands changed to:\n" +
+                            "`.music queue` -> `.queue`\n" +
+                            "`.music reset/stop` -> `.stop\n" +
+                            "`.music shuffle` -> `.queue shuffle`\n" +
+                            "`.music repeat` -> `.repeat`\n" +
+                            "`.music play` -> `.play`\n" +
+                            "`.music rm` -> `.queue rm`\n" +
+                            "`.music skip` -> `.skip`\n" +
+                            "`.music forceskip` -> `.forceskip`\n" +
+                            "`.music pause` -> `.pause`\n" +
+                            "`.music nowplaying` -> `.nowplaying`").queue();
+                })
+                .build();
+    }
+}

@@ -31,7 +31,7 @@ public class PrefixesCommand {
 						.setArgs(new Argument("prefixes", String.class))
 						.setRequiredPermission(Permissions.PREFIX)
 						.setAction((event, rawArgs) -> {
-                            List<String> list = Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).prefixes;
+                            List<String> list = Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild(), false).prefixes;
                             if (list.size() == 1) {
 								event.sendMessage("This guild only has one prefix, you can't remove them anymore!").queue();
 								return;
@@ -58,11 +58,11 @@ public class PrefixesCommand {
 						.setRequiredPermission(Permissions.PREFIX)
 						.setAction((event, rawArgs) -> {
 							try{
-                                if (Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).prefixes.size() > 5) {
+                                if (Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild(), true).prefixes.size() > 5) {
                                     event.sendMessage("You cannot have more than " + 5 + " prefixes.").queue();
 									return;
 								}
-                                List<String> list = Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).prefixes;
+                                List<String> list = Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild(), false).prefixes;
                                 String[] prefixes = ((String) event.getArgument("prefixes").get()).split("\\s+");
 								Arrays.stream(prefixes).filter(prefix -> !list.contains(prefix)).forEach(list::add);
 								event.sendMessage("Now these are my prefixes here: " + (String.join(", ", list))).queue();
@@ -78,7 +78,7 @@ public class PrefixesCommand {
 						.setName("Prefix List Command")
 						.setAction((event, args) -> {
 							MessageBuilder builder = new MessageBuilder().append("These are my prefixes here: ");
-                            builder.append(String.join(", ", Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild()).prefixes));
+                            builder.append(String.join(", ", Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild(), true).prefixes));
                             event.sendMessage(builder.build()).queue();
 						})
 						.build())

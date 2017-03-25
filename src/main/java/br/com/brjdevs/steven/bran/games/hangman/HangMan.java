@@ -28,10 +28,10 @@ public class HangMan extends AbstractGame<HangManGameListener> {
     private List<Character> mistakes;
     
     public HangMan(MessageChannel channel, UserData user) {
-        super(new GameLocation(channel), new GameInfo(user, true, false), new HangManGameListener(), channel.getJDA());
+        super(new GameLocation(channel), new GameInfo(user, true, false), new HangManGameListener(), channel.getJDA(), 120000 + System.currentTimeMillis());
     }
     
-    private static String captalize(String s) {
+    private static String capitalize(String s) {
         return Arrays.stream(s.split(" +")).map(StringUtils::capitalize).collect(Collectors.joining(" "));
     }
     
@@ -95,11 +95,11 @@ public class HangMan extends AbstractGame<HangManGameListener> {
     }
     
     public String getFullWord() {
-        return captalize(word.keySet().stream().map(s -> s.substring(0, 1)).collect(Collectors.joining()));
+        return capitalize(word.keySet().stream().map(s -> s.substring(0, 1)).collect(Collectors.joining()));
     }
     
     public String getGuesses() {
-        return captalize(word.keySet().stream().map(c -> word.get(c) ? c.substring(0, 1) : "\\_").collect(Collectors.joining()));
+        return capitalize(word.keySet().stream().map(c -> word.get(c) ? c.substring(0, 1) : "\\_").collect(Collectors.joining()));
     }
     
     public int getMaximumMistakes() {

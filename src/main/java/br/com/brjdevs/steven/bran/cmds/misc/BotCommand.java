@@ -97,13 +97,9 @@ public class BotCommand {
 						.setName("Ping Command")
 						.setDescription("Gives you my ping!")
 						.setAction((event) -> {
-							long time = System.currentTimeMillis();
-							event.getChannel().sendTyping().queue(success -> {
-								long ping = System.currentTimeMillis() - time;
-								event.getChannel().sendMessage("\uD83C\uDFD3 Pong: `" + ping + "ms`").queue();
-							});
-						})
-						.build())
+                            event.sendMessage("\uD83C\uDFD3 Pong: `" + event.getJDA().getPing() + "ms`").queue();
+                        })
+                        .build())
 				.addSubCommand(new TreeCommandBuilder(Category.BOT_ADMINISTRATOR)
 						.setAliases("admin")
 						.setName("Bot Admin Command")

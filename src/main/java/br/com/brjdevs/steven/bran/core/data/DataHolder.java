@@ -9,10 +9,10 @@ public class DataHolder {
 	
 	public ConcurrentHashMap<String, GuildData> guilds = new ConcurrentHashMap<>();
 	public ConcurrentHashMap<String, UserData> users = new ConcurrentHashMap<>();
-	
-	public GuildData getGuild(Guild guild) {
-		return guilds.computeIfAbsent(guild.getId(), id -> new GuildData(guild));
-	}
+    
+    public GuildData getGuild(Guild guild, boolean readOnly) {
+        return !readOnly ? guilds.computeIfAbsent(guild.getId(), id -> new GuildData(guild)) : guilds.getOrDefault(guild.getId(), new GuildData(guild));
+    }
 	
 	public UserData getUser(User user) {
 		return users.computeIfAbsent(user.getId(), id -> new UserData(user));

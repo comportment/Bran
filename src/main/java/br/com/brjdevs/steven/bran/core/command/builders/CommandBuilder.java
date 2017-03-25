@@ -12,6 +12,7 @@ import br.com.brjdevs.steven.bran.core.utils.Utils;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class CommandBuilder {
 	
@@ -25,8 +26,9 @@ public class CommandBuilder {
 	protected Long perm = Permissions.RUN_BASECMD;
 	protected Category category;
 	private String help;
-	
-	public CommandBuilder(Category category) {
+    private Function<String, String[]> parser = (raw) -> args.length > 1 ? Arrays.stream(Argument.split(raw, args.length - 1)).filter(a -> !Utils.isEmpty(a)).toArray(String[]::new) : new String[] {raw};
+    
+    public CommandBuilder(Category category) {
 		this.category = category;
 	}
 	
@@ -64,8 +66,13 @@ public class CommandBuilder {
 		this.isPrivate = isPrivate;
 		return this;
 	}
-	
-	public CommandBuilder setRequiredPermission(Long perm) {
+    
+    public CommandBuilder setArgumentParser(Function<String, String[]> parser) {
+        this.parser = parser;
+        return this;
+    }
+    
+    public CommandBuilder setRequiredPermission(Long perm) {
 		this.perm = perm;
 		return this;
 	}
@@ -88,8 +95,8 @@ public class CommandBuilder {
 				if (event.isPrivate() && !isPrivateAvailable()) {
 					event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
 					return;
-				} else if (event.isPrivate() ? !event.getUserData().hasPermission(getRequiredPermission()) : !event.getGuildData().hasPermission(event.getAuthor(), getRequiredPermission())) {
-					event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
+                } else if (event.isPrivate() ? !event.getUserData().hasPermission(getRequiredPermission()) : !event.getGuildData(true).hasPermission(event.getAuthor(), getRequiredPermission())) {
+                    event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
 					return;
 				}
 				String[] split = event.getArgs(2);
@@ -100,8 +107,8 @@ public class CommandBuilder {
 				split[1] = split[1].trim();
 				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\' && split[1].matches("^(\\?|help)$"))
 					split[1] = split[1].substring(1);
-				String[] s = args.length > 1 ? Arrays.stream(Argument.split(split[1], args.length - 1)).filter(a -> !Utils.isEmpty(a)).toArray(String[]::new) : new String[] {split[1]};
-				Argument[] args = event.getArguments();
+                String[] s = parser.apply(split[1]);
+                Argument[] args = event.getArguments();
 				if (args != null) {
 					for (int i = 0; i < args.length; i++) {
 						try {

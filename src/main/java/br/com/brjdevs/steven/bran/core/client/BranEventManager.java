@@ -18,10 +18,10 @@ public class BranEventManager implements IEventManager {
 	
 	private final CopyOnWriteArrayList<net.dv8tion.jda.core.hooks.EventListener> listeners = new CopyOnWriteArrayList<>();
 	public ExecutorService executor;
-	private BranShard shard;
-	
-	public BranEventManager(BranShard shard) {
-		this.shard = shard;
+    private Client shard;
+    
+    public BranEventManager(Client shard) {
+        this.shard = shard;
 		this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("Event Manager [" + shard.getId() + "]-%d").build());
 		register(new Reflections("br.com.brjdevs.steven.bran")
 				.getSubTypesOf(EventListener.class).stream()
@@ -57,17 +57,17 @@ public class BranEventManager implements IEventManager {
 	@Override
 	public void handle(Event event) {
 		if (executor.isShutdown()) {
-			shard.getBran().getDiscordLog().logToDiscord(new Exception("Event Manager Executor for Shard " + shard.getId() + " has already been shutdown!"), event.getClass().getSimpleName());
-			return;
+            Bran.getInstance().getDiscordLog().logToDiscord(new Exception("Event Manager Executor for Shard " + shard.getId() + " has already been shutdown!"), event.getClass().getSimpleName());
+            return;
 		}
 		final List<Object> listeners = getRegisteredListeners();
 		executor.submit(() -> listeners.forEach(listener -> {
 			try {
 				((net.dv8tion.jda.core.hooks.EventListener) listener).onEvent(event);
-				shard.getBran().setLastEvent(shard.getId(), System.currentTimeMillis());
-			} catch (Exception e) {
-				shard.getBran().getDiscordLog().logToDiscord(e, "Unexpected error at event `" + event.getClass().getSimpleName() + "`");
-				e.printStackTrace();
+                Bran.getInstance().setLastEvent(shard.getId(), System.currentTimeMillis());
+            } catch (Exception e) {
+                Bran.getInstance().getDiscordLog().logToDiscord(e, "Unexpected error at event `" + event.getClass().getSimpleName() + "`");
+                e.printStackTrace();
 			}
 		}));
 	}

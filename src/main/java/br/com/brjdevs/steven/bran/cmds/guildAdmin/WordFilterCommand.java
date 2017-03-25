@@ -29,13 +29,13 @@ public class WordFilterCommand {
 						.setArgs(new Argument("word", String.class))
 						.setRequiredPermission(Permissions.GUILD_MANAGE)
 						.setAction((event, rawArgs) -> {
-							if (!event.getGuildData().isWordFilterEnabled) {
-								event.sendMessage("Before adding words to the WordFilter you have to enable it! Use `" + event.getPrefix() + "wordfilter toggle` to enable.").queue();
+                            if (!event.getGuildData(true).isWordFilterEnabled) {
+                                event.sendMessage("Before adding words to the WordFilter you have to enable it! Use `" + event.getPrefix() + "wordfilter toggle` to enable.").queue();
 								return;
 							}
 							String word = ((String) event.getArgument("word").get());
-							event.getGuildData().filteredWords.add(word);
-							event.sendMessage("\uD83D\uDC4C Added word to the filter! *(Total: " + event.getGuildData().filteredWords.size() + ")*").queue();
+                            event.getGuildData(false).filteredWords.add(word);
+                            event.sendMessage("\uD83D\uDC4C Added word to the filter! *(Total: " + event.getGuildData(true).filteredWords.size() + ")*").queue();
                             Bran.getInstance().getDataManager().getData().update();
                         })
 						.build())
@@ -44,13 +44,13 @@ public class WordFilterCommand {
 						.setName("WordFilter List Command")
 						.setDescription("Lists the filtered words in the current guild.")
 						.setAction((event) -> {
-							if (!event.getGuildData().isWordFilterEnabled) {
-								event.sendMessage("The WordFilter is disabled in this guild.").queue();
+                            if (!event.getGuildData(true).isWordFilterEnabled) {
+                                event.sendMessage("The WordFilter is disabled in this guild.").queue();
 								return;
 							}
 							event.sendPrivate("These are the filtered words in " + event.getGuild().getName()
-									+ ":\n" + (String.join(", ", event.getGuildData().filteredWords.stream()
-									.map(w -> "`" + w + "`").collect(Collectors.toList())))).queue();
+                                    + ":\n" + (String.join(", ", event.getGuildData(true).filteredWords.stream()
+                                    .map(w -> "`" + w + "`").collect(Collectors.toList())))).queue();
 							event.sendMessage(
 									"I've sent you the filtered words as a private message, check your DMs!")
 									.queue();
@@ -62,9 +62,8 @@ public class WordFilterCommand {
 						.setName("WordFilter Toggle Command")
 						.setRequiredPermission(Permissions.GUILD_MANAGE)
 						.setAction((event) -> {
-							event.getGuildData().isWordFilterEnabled = !event.getGuildData().isWordFilterEnabled;
-							boolean isEnabled = event.getGuildData().isWordFilterEnabled;
-							event.sendMessage(isEnabled ? "The WordFilter is now enabled!" : "The WordFilter is no longer enabled.").queue();
+                            boolean isEnabled = event.getGuildData(false).isWordFilterEnabled = !event.getGuildData(true).isWordFilterEnabled;
+                            event.sendMessage(isEnabled ? "The WordFilter is now enabled!" : "The WordFilter is no longer enabled.").queue();
 						})
 						.build())
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -74,14 +73,14 @@ public class WordFilterCommand {
 						.setDescription("Removes a word from the WordFilter.")
 						.setArgs(new Argument("word", String.class))
 						.setAction((event, rawArgs) -> {
-							if (!event.getGuildData().isWordFilterEnabled) {
-								event.sendMessage("The WordFilter is disabled in this Guild.").queue();
+                            if (!event.getGuildData(true).isWordFilterEnabled) {
+                                event.sendMessage("The WordFilter is disabled in this Guild.").queue();
 								return;
 							}
 							String word = ((String) event.getArgument("word").get());
-							event.getGuildData().filteredWords.remove(word);
-							event.sendMessage("\uD83D\uDC4C Removed word from the filter! *(Total: " + event.getGuildData().filteredWords.size() + ")*").queue();
-						})
+                            event.getGuildData(false).filteredWords.remove(word);
+                            event.sendMessage("\uD83D\uDC4C Removed word from the filter! *(Total: " + event.getGuildData(true).filteredWords.size() + ")*").queue();
+                        })
 						.build())
 				.build();
 	}

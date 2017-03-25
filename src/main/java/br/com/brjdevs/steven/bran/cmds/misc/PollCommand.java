@@ -37,21 +37,21 @@ public class PollCommand {
 						.setName("Poll Create Command")
 						.setDescription("Creates polls in the current channel!")
 						.setExample("poll create What should I play? ;Game 1;Game 2;Game 3;Game 4;")
-						.setArgs(new Argument("argument", String.class))
-						.setAction((event) -> {
+                        .setArgs(new Argument("pollName", String.class), new Argument("options", String.class))
+                        .setArgumentParser((input) -> {
+                            if (!input.contains(";"))
+                                return new String[] {input};
+                            int index = input.indexOf(";");
+                            return new String[] {input.substring(0, index), input.substring(index + 1)};
+                        })
+                        .setAction((event) -> {
 							if (Poll.getPoll(event.getTextChannel()) != null) {
 								event.sendMessage("There's already a Poll running in this Channel!").queue();
 								return;
 							}
-							String name = ((String) event.getArgument("argument").get());
-							int index = name.indexOf(";");
-							if (index < 0) {
-								event.sendMessage("You have to supply options splitted by a `;`!").queue();
-								return;
-							}
-							name = name.substring(0, index);
-							String rawOptions = ((String) event.getArgument("argument").get()).substring(name.length() + 1).trim();
-							name = name.trim();
+                            String name = ((String) event.getArgument("pollName").get());
+                            String rawOptions = ((String) event.getArgument("options").get()).trim();
+                            name = name.trim();
 							if (name.isEmpty()) {
 								event.sendMessage(Quotes.FAIL, "You cannot create a Poll without a name!").queue();
 							} else {
@@ -105,8 +105,8 @@ public class PollCommand {
 								event.sendMessage("No Polls running in this channel!").queue();
 								return;
 							}
-							if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildData().hasPermission(event.getAuthor(), Permissions.GUILD_MOD)) {
-								event.sendMessage("You can't do this... You're not the creator of this poll nor a Guild Moderator to end this poll!").queue();
+                            if (!poll.getCreatorId().equals(event.getAuthor().getId()) && !event.getGuildData(true).hasPermission(event.getAuthor(), Permissions.GUILD_MOD)) {
+                                event.sendMessage("You can't do this... You're not the creator of this poll nor a Guild Moderator to end this poll!").queue();
 								return;
 							}
 							boolean wasOwner = poll.getCreatorId().equals(event.getAuthor().getId());

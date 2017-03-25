@@ -1,56 +1,52 @@
 package br.com.brjdevs.steven.bran.core.client;
 
-import br.com.brjdevs.steven.bran.core.utils.Utils;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
 
-public class BranShard {
-	private final Bran bran;
-	private final BranEventManager eventManager;
+public class Client {
+    
+    private final BranEventManager eventManager;
 	private int shardId;
 	private int totalShards;
 	private volatile JDA jda;
 	private long startup;
 	private long lastReboot;
 	private int currentGuildCount;
-	
-	public BranShard(int shardId, int totalShards, Bran bran) throws LoginException, InterruptedException, RateLimitedException {
-		this.shardId = shardId;
-		this.totalShards = totalShards;
-		this.bran = bran;
-		this.startup = 0;
-		this.lastReboot = 0;
-		this.eventManager = new BranEventManager(this);
-		restartJDA();
-	}
-	
-	public Bran getBran() {
-		return bran;
-	}
-	
-	public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
-        JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(bran.getConfig().botToken);
-        Game game = null;
-		if (!Utils.isEmpty(bran.getConfig().defaultGame))
-			game = bran.getConfig().gameStream ? Game.of(bran.getConfig().defaultGame, "https://twitch.tv/ ") : Game.of(bran.getConfig().defaultGame);
-		if (totalShards > 1) {
+    
+    public Client(int shardId, int totalShards) throws LoginException, InterruptedException, RateLimitedException {
+        this.shardId = shardId;
+        this.totalShards = totalShards;
+        this.startup = 0;
+        this.lastReboot = 0;
+        this.eventManager = new BranEventManager(this);
+        restartJDA();
+        //TaskManager.startAsyncTask("Shard [" + shardId + "] Guard", (service) -> {
+        //if (Bran.getInstance().getLastEvents().get(shardId) + 10000 < System.currentTimeMillis()) {
+        //Bran.getInstance().reboot(this);
+        //}
+        //}, 1);
+    }
+    
+    public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
+        JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(Bran.getInstance().getConfig().botToken);
+        if (totalShards > 1) {
 			jdaBuilder.useSharding(shardId, totalShards);
-			if (game != null)
-				game = Game.of(game.getName() + " | [" + shardId + "]", game.getUrl());
 		}
-		jdaBuilder.setGame(game);
 		jdaBuilder.setEventManager(eventManager);
 		jdaBuilder.setBulkDeleteSplittingEnabled(false);
 		jdaBuilder.setAutoReconnect(true);
-		jda = jdaBuilder.buildBlocking();
+        jdaBuilder.setGame(Game.of("waking up..."));
+        jdaBuilder.setStatus(OnlineStatus.IDLE);
+        jda = jdaBuilder.buildBlocking();
 		if (startup == 0)
 			this.startup = System.currentTimeMillis();
 		this.lastReboot = System.currentTimeMillis();
@@ -110,8 +106,8 @@ public class BranShard {
 		}
 		try {
 			Unirest.post("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
-					.header("Authorization", bran.getConfig().discordBotsToken)
-					.header("Content-Type", "application/json")
+                    .header("Authorization", Bran.getInstance().getConfig().discordBotsToken)
+                    .header("Content-Type", "application/json")
 					.body(data.toString())
 					.asJson();
 		} catch (Exception e) {
@@ -119,8 +115,8 @@ public class BranShard {
 		}
 		try {
 			Unirest.post("https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats")
-					.header("Authorization", bran.getConfig().discordBotsOrgToken)
-					.header("Content-Type", "application/json")
+                    .header("Authorization", Bran.getInstance().getConfig().discordBotsOrgToken)
+                    .header("Content-Type", "application/json")
 					.body(data.toString())
 					.asJson();
 		} catch (Exception e) {

@@ -26,12 +26,13 @@ public class GuildData {
 	public int fairQueueLevel = 0;
 	public boolean isWordFilterEnabled = false;
 	public List<String> filteredWords = new ArrayList<>();
-	public boolean isAnnouncesEnabled = false;
 	public String joinMsg = null;
 	public String joinMsgDM = null;
 	public String leaveMsg = null;
 	public Giveaway giveaway = null;
     public Map<Long, Long> permissions = new HashMap<>();
+    private boolean modLogEnabled = false;
+    private long modLogChannel;
     private long guildId;
 	private long announceChannelId;
 	private List<Long> publicRoles = new ArrayList<>();
@@ -102,4 +103,20 @@ public class GuildData {
 		if (publicRoles == null) publicRoles = new ArrayList<>();
 		publicRoles.remove(Long.valueOf(role.getId()));
 	}
+    
+    public boolean isModLogEnabled() {
+        return modLogEnabled;
+    }
+    
+    public void setModLogEnabled(boolean modLogEnabled) {
+        this.modLogEnabled = modLogEnabled;
+    }
+    
+    public TextChannel getModLogChannel(JDA jda) {
+        return jda.getTextChannelById(String.valueOf(modLogChannel));
+    }
+    
+    public void setModLogChannel(TextChannel modLogChannel) {
+        this.modLogChannel = Long.parseLong(modLogChannel.getId());
+    }
 }

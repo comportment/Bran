@@ -71,8 +71,8 @@ public class GiveawayCommand {
 									return;
 								}
 							}
-							event.getGuildData().giveaway = new Giveaway(event.getMember(), event.getGuild(), role, event.getTextChannel(), numOfWinners, e);
-							event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who's participating by typing `.giveaway info`.").queue();
+                            event.getGuildData(false).giveaway = new Giveaway(event.getMember(), event.getGuild(), role, event.getTextChannel(), numOfWinners, e);
+                            event.sendMessage(Quotes.SUCCESS, "Created a Giveaway! You can check who's participating by typing `.giveaway info`.").queue();
                             Bran.getInstance().getDataManager().getData().update();
                         })
 						.build())
@@ -82,8 +82,8 @@ public class GiveawayCommand {
 						.setDescription("Shows you information on giveaways running in the current Guild.")
 						.setAction((event) -> {
 							Bran bran = Bran.getInstance();
-							Giveaway giveaway = event.getGuildData().giveaway;
-							if (giveaway == null) {
+                            Giveaway giveaway = event.getGuildData(true).giveaway;
+                            if (giveaway == null) {
 								event.sendMessage("No giveaway running in the current Guild!").queue();
 								return;
 							}
@@ -106,8 +106,8 @@ public class GiveawayCommand {
 						.setName("Giveaway Join Command")
 						.setDescription("Joins a giveaway!")
 						.setAction((event) -> {
-							Giveaway giveaway = event.getGuildData().giveaway;
-							if (giveaway == null) {
+                            Giveaway giveaway = event.getGuildData(true).giveaway;
+                            if (giveaway == null) {
 								event.sendMessage("No giveaways running in this Guild!").queue();
 								return;
 							}
@@ -132,15 +132,15 @@ public class GiveawayCommand {
 						.setRequiredPermission(Permissions.CREATE_GIVEAWAY)
 						.setAction((event) -> {
 							Bran bran = Bran.getInstance();
-							Giveaway giveaway = event.getGuildData().giveaway;
-							if (giveaway == null) {
+                            Giveaway giveaway = event.getGuildData(false).giveaway;
+                            if (giveaway == null) {
 								event.sendMessage(Quotes.FAIL, "No giveaways running in the current Guild!").queue();
 								return;
 							}
 							if (giveaway.getParticipants().isEmpty()) {
 								event.sendMessage("No users were participating in this Giveaway :cry:").queue();
-								event.getGuildData().giveaway = null;
-								return;
+                                event.getGuildData(false).giveaway = null;
+                                return;
 							}
 							EmbedBuilder embedBuilder = new EmbedBuilder();
 							embedBuilder.setColor(Color.decode("#43474B"));
@@ -163,9 +163,9 @@ public class GiveawayCommand {
 							embedBuilder.setDescription(desc);
 							event.sendMessage(embedBuilder.build()).queue();
 							event.sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)! :smile:").queue();
-							winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild(bran).getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
-							Giveaway.expiration.remove(giveaway);
-							event.getGuildData().giveaway = null;
+                            winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild().getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
+                            Giveaway.expiration.remove(giveaway);
+                            event.getGuildData(false).giveaway = null;
                             Bran.getInstance().getDataManager().getData().update();
                         })
 						.build())

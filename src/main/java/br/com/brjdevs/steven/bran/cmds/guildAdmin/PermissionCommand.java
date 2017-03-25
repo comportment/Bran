@@ -78,14 +78,14 @@ public class PermissionCommand {
 							List<Member> members = event.getGuild().getMembers().stream().filter(member -> member.getUser() != event.getAuthor() && !member.getUser().isBot() && !member.getUser().isFake()).collect(Collectors.toList());
 							OperationResult operationResult = null;
 	                        if (!isEveryone) {
-		                        operationResult = event.getGuildData().setPermission(event, toBeSet, toBeUnset, user);
-	                        }
+                                operationResult = event.getGuildData(false).setPermission(event, toBeSet, toBeUnset, user);
+                            }
 	                        else {
 		                        long fToBeSet = toBeSet;
 		                        long fToBeUnset = toBeUnset;
 		                        members.forEach(member -> {
-			                        if (event.getGuildData().setPermission(event, fToBeSet, fToBeUnset, member.getUser()).getResult() == ResultType.SUCCESS)
-				                        holder.value++;
+                                    if (event.getGuildData(false).setPermission(event, fToBeSet, fToBeUnset, member.getUser()).getResult() == ResultType.SUCCESS)
+                                        holder.value++;
 		                        });
 	                        }
 	                        String s;
@@ -119,8 +119,8 @@ public class PermissionCommand {
 	                        if (user == null) user = event.getAuthor();
 	                        EmbedBuilder builder = new EmbedBuilder();
 	                        builder.setTitle("Permissions for " + Utils.getUser(user), null);
-	                        builder.setDescription((String.join(", ", Permissions.toCollection(event.getGuildData().getPermissionForUser(user)))) + "\n\nRaw: " + event.getGuildData().getPermissionForUser(user));
-	                        builder.setThumbnail(Utils.getAvatarUrl(user));
+                            builder.setDescription((String.join(", ", Permissions.toCollection(event.getGuildData(true).getPermissionForUser(user)))) + "\n\nRaw: " + event.getGuildData(true).getPermissionForUser(user));
+                            builder.setThumbnail(Utils.getAvatarUrl(user));
 	                        builder.setFooter("Requested by " + Utils.getUser(event.getAuthor()), Utils.getAvatarUrl(event.getAuthor()));
 	                        builder.setColor(Color.decode("#9318E6"));
                             event.sendMessage(builder.build()).queue();
@@ -179,21 +179,21 @@ public class PermissionCommand {
 									return;
 								}
 							}
-							long defaultPerm = event.getGuildData().defaultPermission;
-							int fset = toBeSet, funset = toBeUnset;
+                            long defaultPerm = event.getGuildData(true).defaultPermission;
+                            int fset = toBeSet, funset = toBeUnset;
 							long newPerm = defaultPerm ^ (defaultPerm & toBeUnset) | toBeSet;
-							if (!event.getGuildData().hasPermission(event.getAuthor(), newPerm)) {
-								event.sendMessage("You don't have enough permissions!").queue();
+                            if (!event.getGuildData(true).hasPermission(event.getAuthor(), newPerm)) {
+                                event.sendMessage("You don't have enough permissions!").queue();
 								return;
 							}
-							event.getGuildData().defaultPermission = newPerm;
-							event.getGuild().getMembers().forEach(m -> event.getGuildData().setPermission(event, fset, funset, m.getUser()));
-							Message m = new MessageBuilder()
+                            event.getGuildData(false).defaultPermission = newPerm;
+                            event.getGuild().getMembers().forEach(m -> event.getGuildData(false).setPermission(event, fset, funset, m.getUser()));
+                            Message m = new MessageBuilder()
 									.append(Quotes.getQuote(Quotes.SUCCESS))
 									.append("Now these are the default permissions:")
 									.setEmbed(new EmbedBuilder()
-											.setDescription((String.join(", ", Permissions.toCollection(event.getGuildData().defaultPermission))) + "\n\nRaw: " + event.getGuildData().defaultPermission)
-											.setTitle("Default Permission(s)", null)
+                                            .setDescription((String.join(", ", Permissions.toCollection(event.getGuildData(false).defaultPermission))) + "\n\nRaw: " + event.getGuildData(false).defaultPermission)
+                                            .setTitle("Default Permission(s)", null)
 											.build())
 									.build();
 							event.sendMessage(m).queue();
