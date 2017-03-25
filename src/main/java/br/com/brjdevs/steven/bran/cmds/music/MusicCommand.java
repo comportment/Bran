@@ -413,6 +413,7 @@ public class MusicCommand {
                 .setAliases("forceplay", "fp")
                 .setName("Force Play Command")
                 .setDescription("Toggles the force play flag.")
+                .setArgs(new Argument("title/url", String.class))
                 .setAction((event) -> {
                     String trackUrl = event.getArgument("title/url").isPresent() ? ((String) event.getArgument("title/url").get()) : "";
                     GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
