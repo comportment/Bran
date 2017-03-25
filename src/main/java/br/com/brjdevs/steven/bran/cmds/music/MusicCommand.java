@@ -376,6 +376,17 @@ public class MusicCommand {
                             event.sendMessage("Removed `" + size + "` songs from the queue. \uD83D\uDDD1").queue();
                         })
                         .build())
+                .addSubCommand(new CommandBuilder(Category.MUSIC)
+                        .setAliases("shuffle")
+                        .setName("Music Shuffle Command")
+                        .setDescription("Set the Queue to Shuffle.")
+                        .setRequiredPermission(DJ)
+                        .setAction((event) -> {
+                            GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
+                            musicManager.getTrackScheduler().shuffle();
+                            event.sendMessage("Shuffled the Queue!").queue();
+                        })
+                        .build())
                 .build();
     }
     
