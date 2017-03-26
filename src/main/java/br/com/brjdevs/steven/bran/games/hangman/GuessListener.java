@@ -20,11 +20,11 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
     public void event(MessageReceivedEvent event) {
         if (event.getAuthor().isBot() || event.getAuthor().isFake())
             return;
-        GameReference ref = Bran.getInstance().getDataManager().getData().get().getUser(event.getAuthor()).getProfileData().getCurrentGame();
+        GameReference ref = Bran.getInstance().getDataManager().getData().get().getUserData(event.getAuthor()).getProfileData().getCurrentGame();
         if (ref == null || !ref.isInstanceOf(HangMan.class))
             return;
         AbstractGame rawGame = GameManager.getGame(ref);
-        UserData user = Bran.getInstance().getDataManager().getData().get().getUser(event.getAuthor());
+        UserData user = Bran.getInstance().getDataManager().getData().get().getUserData(event.getAuthor());
         HangMan game = (HangMan) rawGame;
         String guess = event.getMessage().getRawContent();
         if (guess.charAt(0) != '^') return;

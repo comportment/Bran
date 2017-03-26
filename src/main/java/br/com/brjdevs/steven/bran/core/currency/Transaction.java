@@ -16,10 +16,10 @@ public class Transaction {
 	}
 	
 	public BankAccount getSender(DataHolder data) {
-        return data.getUserById(senderId).getProfileData().getBankAccount();
+        return data.getUserDataById(senderId).getProfileData().getBankAccount();
     }
 	
 	public BankAccount getReceiver(DataHolder data) {
-        return data.getUserById(receiverId).getProfileData().getBankAccount();
+        return data.getUserDataById(receiverId).getProfileData().getBankAccount();
     }
 }

@@ -18,5 +18,7 @@ public class Emojis {
             STUCK_OUT_TONGUE = "\uD83D\uDE1D",
             FACEPALM = "\uD83E\uDD26",
             WINK = "\uD83D\uDE09",
-            DOOR = "\uD83D\uDEAA";
+            DOOR = "\uD83D\uDEAA",
+            PISTOL = "\uD83D\uDD2B",
+            ROBOT = "\uD83E\uDD16";
 }

@@ -110,11 +110,11 @@ public class CommandEvent {
     }
     
     public GuildData getGuildData(boolean readOnly) {
-        return Bran.getInstance().getDataManager().getData().get().getGuild(guild, readOnly);
+        return Bran.getInstance().getDataManager().getData().get().getGuildData(guild, readOnly);
     }
 	
 	public UserData getUserData() {
-        return Bran.getInstance().getDataManager().getData().get().getUser(event.getAuthor());
+        return Bran.getInstance().getDataManager().getData().get().getUserData(event.getAuthor());
     }
 	
 	public Guild getGuild() {

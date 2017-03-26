@@ -1,6 +1,7 @@
 package br.com.brjdevs.steven.bran.cmds.currency;
 
 import br.com.brjdevs.steven.bran.core.command.Argument;
+import br.com.brjdevs.steven.bran.core.command.Command;
 import br.com.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.com.brjdevs.steven.bran.core.command.enums.Category;
@@ -17,10 +18,10 @@ import java.awt.*;
 import java.util.Arrays;
 
 public class ShopCommand {
-	
-	//@Command
-	private static ICommand market() {
-		return new TreeCommandBuilder(Category.CURRENCY)
+    
+    @Command
+    private static ICommand shop() {
+        return new TreeCommandBuilder(Category.CURRENCY)
 				.setAliases("market")
 				.setName("Market Command")
 				.setDescription("You should spend all your money here!")

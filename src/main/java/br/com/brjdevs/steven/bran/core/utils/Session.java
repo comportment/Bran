@@ -17,8 +17,9 @@ import java.util.List;
 import static br.com.brjdevs.steven.bran.core.command.CommandStatsManager.*;
 
 public class Session extends EventListener<GuildMessageReceivedEvent> {
-	
-	private final Runtime instance = Runtime.getRuntime();
+    
+    private static double gb = 1024 * 1024 * 1024;
+    private final Runtime instance = Runtime.getRuntime();
 	public double cpuUsage;
 	public long cmds;
 	public long msgsReceived;
@@ -38,8 +39,16 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	private static double calculateProcessCpuTime(OperatingSystemMXBean os) {
 		return ((com.sun.management.OperatingSystemMXBean) os).getProcessCpuTime();
 	}
-	
-	public void readMessage(boolean isSelf) {
+    
+    private static double calculateVPSFreeMemory() {
+        return ((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getFreePhysicalMemorySize() / gb;
+    }
+    
+    private static double calculateVPSMaxMemory() {
+        return ((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize() / gb;
+    }
+    
+    public void readMessage(boolean isSelf) {
 		if (isSelf) msgsSent++; else msgsReceived++;
 	}
 	
@@ -71,7 +80,11 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		
 		return cpuUsage / availableProcessors;
 	}
-	
+    
+    public double getMachineCPUUsage() {
+        return ((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getSystemCpuLoad() * 100;
+    }
+    
 	public MessageEmbed toEmbedAbout(JDA jda) {
 		List<Guild> guilds = Bran.getInstance().getGuilds();
 		List<TextChannel> channels = Bran.getInstance().getTextChannels();
@@ -101,12 +114,13 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	
 	public MessageEmbed toEmbedTechnical(JDA jda) {
 		String ram = ((instance.totalMemory() - instance.freeMemory()) >> 20) + " MB/" + (instance.maxMemory() >> 20) + " MB";
-		EmbedBuilder embedBuilder = new EmbedBuilder();
-		embedBuilder.setAuthor("Technical Information", null, jda.getSelfUser().getEffectiveAvatarUrl());
-		embedBuilder.addField("CPU Usage", String.valueOf(cpuUsage) + "%", false);
-		embedBuilder.addField("Threads", String.valueOf(Thread.activeCount()), true);
-		embedBuilder.addField("RAM (USAGE/MAX)", ram, true);
-		return embedBuilder.setColor(Bran.COLOR).build();
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setAuthor("Technical Information", null, jda.getSelfUser().getEffectiveAvatarUrl());
+        embedBuilder.addField("CPU (JVM/Machine)", String.format("%.2f", cpuUsage) + "% / " + String.format("%.2f", getMachineCPUUsage()) + "%", false);
+        embedBuilder.addField("RAM (USAGE/MAX)", ram, true);
+        embedBuilder.addField("VPS RAM (USAGE/MAX) ", String.format("%.2f", calculateVPSMaxMemory() - calculateVPSFreeMemory()) + " GB/" + String.format("%.2f", calculateVPSMaxMemory()) + " GB", true);
+        embedBuilder.addField("Threads", String.valueOf(Thread.activeCount()), true);
+        return embedBuilder.setColor(Bran.COLOR).build();
 	}
 	
 	public MessageEmbed toEmbedCmds(JDA jda) {

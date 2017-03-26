@@ -33,7 +33,7 @@ public class ForcePlayAudioLoader implements AudioLoadResultHandler {
     
     @Override
     public void trackLoaded(AudioTrack track) {
-        GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild(), true);
+        GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuildData(channel.getGuild(), true);
         if (track.getInfo().length > guildData.maxSongDuration) {
             channel.sendMessage("This song is too long! The maximum supported length is " + AudioUtils.format(guildData.maxSongDuration)).queue();
             if (musicManager.getTrackScheduler().getQueue().isEmpty() && musicManager.getTrackScheduler().getCurrentTrack() == null)
@@ -75,7 +75,7 @@ public class ForcePlayAudioLoader implements AudioLoadResultHandler {
                     channel.getGuild().getAudioManager().closeAudioConnection();
                 return;
             }
-            GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(channel.getGuild(), true);
+            GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuildData(channel.getGuild(), true);
             channel.sendMessage("Queueing playlist " + playlist.getName() + " by " + Utils.getUser(user)).queue(msg -> {
                 int queued = 0;
                 for (TrackContext trackContext : playlistTracks) {

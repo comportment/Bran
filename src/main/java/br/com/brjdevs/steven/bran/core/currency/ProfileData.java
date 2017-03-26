@@ -17,9 +17,9 @@ import java.util.List;
 public class ProfileData {
     
     private static String EMPTY = "\u00AD";
-	
-	public String customHex;
-	private BankAccount bankAccount;
+    
+    public String customHex;
+    private BankAccount bankAccount;
 	private String userId;
 	private HMStats HMStats;
 	private Rank rank;
@@ -27,6 +27,8 @@ public class ProfileData {
 	private Inventory inv;
 	private transient List<IProfileListener> listeners;
 	private int stamina;
+    private long lastDaily;
+    private TicTacToeStats ticTacToeStats;
     private transient GameReference currentGame;
     
     public ProfileData(User user) {
@@ -43,6 +45,7 @@ public class ProfileData {
         this.inv = new Inventory();
         this.listeners = new ArrayList<>();
         this.stamina = 100;
+        this.lastDaily = 0;
     }
     
     public static double getPercentToLevelUp(long experience, long level) {
@@ -55,9 +58,15 @@ public class ProfileData {
 		if (expCalculate - expRequired > 0) expRequired++;
 		return expRequired;
 	}
-	
-	public boolean takeStamina(int stamina) {
-		if (stamina > this.stamina)
+    
+    public TicTacToeStats getTicTacToeStats() {
+        if (ticTacToeStats == null)
+            ticTacToeStats = new TicTacToeStats();
+        return ticTacToeStats;
+    }
+    
+    public boolean takeStamina(int stamina) {
+        if (stamina > this.stamina)
 			return false;
 		this.stamina -= stamina;
 		if (this.stamina < 0)
@@ -138,9 +147,17 @@ public class ProfileData {
 			getRegisteredListeners().forEach(listener -> listener.onLevelDown(this));
 		}
 	}
-	
-	public void reset() {
-		this.HMStats = new HMStats();
+    
+    public long getLastDaily() {
+        return lastDaily;
+    }
+    
+    public void setLastDaily(long lastDaily) {
+        this.lastDaily = lastDaily;
+    }
+    
+    public void reset() {
+        this.HMStats = new HMStats();
 		this.rank = Rank.ROOKIE;
 		this.level = 0;
 		this.level = 0;
@@ -205,8 +222,14 @@ public class ProfileData {
 		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(getBankAccount().getCoins()), true);
 		builder.addField("\uD83D\uDCBC Inventory", String.valueOf(getInventory().size(false)), true);
 		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
-		builder.addField("\uD83D\uDD79 Game", "HangMan", true).addField("\uD83C\uDFC6 Victories", String.valueOf(getHMStats().getVictories()), true).addField("☠ Defeats", String.valueOf(getHMStats().getDefeats()), true);
-		builder.setColor(this.getEffectiveColor());
+        builder.addField("<:hangman:295383212207767553> Hang Man", "\u00AD", true);
+        builder.addField("Victories", String.valueOf(getHMStats().getVictories()), true);
+        builder.addField("Defeats", String.valueOf(getHMStats().getDefeats()), true);
+        builder.addField("<:tictactoe:295382903716839434> Tic Tac Toe", "\u00AD", true);
+        builder.addField("Victories", String.valueOf(getTicTacToeStats().getVictories()), true);
+        builder.addField("Defeats", String.valueOf(getTicTacToeStats().getDefeats()), true);
+        //builder.addField("\uD83D\uDD79 Game", "<:hangman:295383212207767553> HangMan\n", true).addField("\uD83C\uDFC6 Victories", String.valueOf(getHMStats().getVictories()) + "\n" + getTicTacToeStats().getVictories(), true).addField("☠ Defeats", String.valueOf(getHMStats().getDefeats()) + "\n" + getTicTacToeStats().getDefeats(), true);
+        builder.setColor(this.getEffectiveColor());
 		return builder.build();
 	}
 	
@@ -277,4 +300,28 @@ public class ProfileData {
 			return defeats;
 		}
 	}
+    
+    public static class TicTacToeStats {
+        
+        private int victory;
+        private int defeats;
+        
+        public int getVictories() {
+            return victory;
+        }
+        
+        public int getDefeats() {
+            return defeats;
+        }
+        
+        public int addVictory() {
+            this.victory++;
+            return victory;
+        }
+        
+        public int addDefeat() {
+            this.defeats++;
+            return defeats;
+        }
+    }
 }

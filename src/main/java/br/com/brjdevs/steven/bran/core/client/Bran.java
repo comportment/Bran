@@ -107,7 +107,7 @@ public class Bran {
 	}
     
     public ProfileData getProfile(User user) {
-        return discordBotData.getData().get().getUser(user).getProfileData();
+        return discordBotData.getData().get().getUserData(user).getProfileData();
     }
 	
 	public int getTotalShards() {

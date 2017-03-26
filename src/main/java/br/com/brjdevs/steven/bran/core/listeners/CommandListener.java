@@ -33,7 +33,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 			return;
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
-        GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild(), true);
+        GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true);
         String prefix = PrefixManager.getPrefix(args[0], guildData);
 		if (prefix == null) return;
 		String baseCmd = args[0].substring(prefix.length());
@@ -43,7 +43,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 		else if (!cmd.isPrivateAvailable() && event.isFromType(ChannelType.PRIVATE)) {
 			event.getChannel().sendTyping().queue(success -> event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue());
             
-        } else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getData().get().getUser(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild(), true).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
+        } else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getData().get().getUserData(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
             event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + "*").queue());
 			return;
 		}

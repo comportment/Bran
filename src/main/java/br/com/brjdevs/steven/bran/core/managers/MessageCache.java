@@ -7,10 +7,10 @@ public class MessageCache {
         /*Thread lazyLoad = new Thread(() ->
             Bran.getInstance().getGuilds().stream()
                     .filter(g -> Bran.getInstance().getDataManager().getData()
-                            .get().getGuild(g, true).isModLogEnabled())
+                            .get().getGuildData(g, true).isModLogEnabled())
                     .forEach(guild ->
                         guild.getTextChannels().stream().filter(channel ->
-                                channel.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_HISTORY, Permission.MESSAGE_READ))
+                                channel.getGuildData().getSelfMember().hasPermission(Permission.MESSAGE_HISTORY, Permission.MESSAGE_READ))
                                 .forEach(channel ->
                                     channel.getHistory().retrievePast(20)
                                             .queue(history -> history.stream()

@@ -33,30 +33,14 @@ public class TimeUtils {
 				hours = duration / 3600000L % 24,
 				minutes = duration / 60000L % 60,
 				seconds = duration / 1000L % 60;
-		String uptime = (years == 0 ? "" : years + " Years, ") + (months == 0 ? "" : months + " Months, ")
-				+ (days == 0 ? "" : days + " Days, ") + (hours == 0 ? "" : hours + " Hours, ")
-				+ (minutes == 0 ? "" : minutes + " Minutes, ") + (seconds == 0 ? "" : seconds + " Seconds, ");
-		
-		uptime = StringUtils.replaceLast(uptime, ", ", "");
+        String uptime = (years == 0 ? "" : years + " years, ") + (months == 0 ? "" : months + " months, ")
+                + (days == 0 ? "" : days + " days, ") + (hours == 0 ? "" : hours + " hours, ")
+                + (minutes == 0 ? "" : minutes + " minutes, ") + (seconds == 0 ? "" : seconds + " seconds, ");
+        
+        uptime = StringUtils.replaceLast(uptime, ", ", "");
 		return StringUtils.replaceLast(uptime, ",", " and");
 		
 	}
-	
-	public static String format0(long time) {
-		final long years = time / 31104000000L,
-				months = time / 2592000000L % 12,
-				days = time / 86400000L % 30,
-				hours = time / 3600000L % 24,
-				minutes = time / 60000L % 60,
-				seconds = time / 1000L % 60;
-		return (years == 0 ? "" : decimal(years) + ":")
-				+ (months == 0 ? "" : decimal(months) + ":")
-				+ (days == 0 ? "" : decimal(days) + ":")
-				+ (hours == 0 ? "" : decimal(hours) + ":")
-				+ (minutes == 0 ? "" : decimal(minutes) + ":")
-				+ (seconds == 0 ? "" : decimal(seconds));
-	}
-	
 	public static Iterable<String> iterate(Matcher matcher) {
 		return new Iterable<String>() {
 			
@@ -105,9 +89,8 @@ public class TimeUtils {
 					unit = TimeUnit.DAYS;
 					break;
 				default:
-					unit = TimeUnit.SECONDS;
-					break;
-			}
+                    throw new UnsupportedOperationException("Unknown time unit \"" + string.charAt(string.length() - 1) + "\".");
+            }
 			time[0] += unit.toMillis(Long.parseLong(l));
 		});
 		return u.convert(time[0], TimeUnit.MILLISECONDS);

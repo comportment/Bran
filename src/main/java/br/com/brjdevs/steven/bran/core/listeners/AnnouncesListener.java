@@ -36,7 +36,7 @@ public class AnnouncesListener extends EventListener<GenericGuildMemberEvent> {
 	public void event(GenericGuildMemberEvent event) {
         if (!event.getGuild().isMember(event.getJDA().getSelfUser()))
             return;
-        GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuild(event.getGuild(), true);
+        GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true);
         if (guildData.getAnnounceTextChannel(event.getJDA()) == null || !guildData.getAnnounceTextChannel(event.getJDA()).canTalk())
 			return;
 		Member member = event.getMember();

@@ -42,7 +42,7 @@ public class Giveaway {
 		giveaway.getChannel(bran).sendMessage(embedBuilder.build()).queue();
 		giveaway.getChannel(bran).sendMessage("Congratulations, " + (winners.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "))) + "! You won this Giveaway, contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)! :smile:").queue();
         winners.forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("Hey there! Congratulations! You were one of the winners in a Giveaway running in " + giveaway.getGuild().getName() + ", contact " + Utils.getUser(giveaway.getCreator(bran).getUser()) + " to receive your prize(s)!").queue()));
-        bran.getDataManager().getData().get().getGuild(giveaway.getGuild(), true).giveaway = null;
+        bran.getDataManager().getData().get().getGuildData(giveaway.getGuild(), true).giveaway = null;
         bran.getDataManager().getData().update();
     });
 	

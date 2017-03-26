@@ -75,15 +75,19 @@ public class ConfigCommand {
                                                 TimeUtils.format(event.getGuildData(true).maxSongDuration) + "`.").queue();
                                         return;
                                     }
-                                    long duration = TimeUtils.getTime(((String) argument.get()), TimeUnit.MILLISECONDS);
-                                    if (duration > AudioLoader.MAX_SONG_LENGTH || duration < 0) {
-                                        event.sendMessage("The max song duration has to be bigger than 0 and lower than 3 hours!").queue();
-                                        return;
+                                    try {
+                                        long duration = ((String) argument.get()).matches("none|remove|default") ? AudioLoader.MAX_SONG_LENGTH : TimeUtils.getTime(((String) argument.get()), TimeUnit.MILLISECONDS);
+                                        if (duration > AudioLoader.MAX_SONG_LENGTH || duration < 0) {
+                                            event.sendMessage("The max song duration has to be bigger than 0 and lower than 3 hours!").queue();
+                                            return;
+                                        }
+                                        event.getGuildData(false).maxSongDuration = duration;
+                                        event.sendMessage(Quotes.SUCCESS, "Now the max song duration is `" +
+                                                TimeUtils.format(event.getGuildData(false).maxSongDuration) + "`!").queue();
+                                        Bran.getInstance().getDataManager().getData().update();
+                                    } catch (UnsupportedOperationException e) {
+                                        event.sendMessage(e.getMessage() + " The correct format is `2h59m59s` for example.").queue();
                                     }
-                                    event.getGuildData(false).maxSongDuration = duration;
-                                    event.sendMessage(Quotes.SUCCESS, "Now the max song duration is `" +
-                                            TimeUtils.format(event.getGuildData(false).maxSongDuration) + "`!").queue();
-                                    Bran.getInstance().getDataManager().getData().update();
                                 })
                                 .build())
                         
