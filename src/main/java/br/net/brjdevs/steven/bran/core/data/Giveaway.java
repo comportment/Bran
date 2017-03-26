@@ -42,7 +42,7 @@ public class Giveaway {
                         if (m == null) continue;
                         winners.add(m);
                     }
-                    desc += participating + "\n\nThere was " + giveaway.getTotalParticipants() + " users participating on this Giveaway!\n\nAnd the "
+                    desc += participating + "\n\nThere were " + giveaway.getTotalParticipants() + " users participating on this Giveaway!\n\nAnd the "
                             + (giveaway.getMaxWinners() > 1 ? "winners are" : "winner is") + "... " + winners.stream().map(m -> Utils.getUser(m.getUser()))
                             .collect(Collectors.joining("\n"));
                     embedBuilder.setDescription(desc);
