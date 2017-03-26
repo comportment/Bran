@@ -23,8 +23,8 @@ public class BranEventManager implements IEventManager {
     public BranEventManager(Client shard) {
         this.shard = shard;
 		this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("Event Manager [" + shard.getId() + "]-%d").build());
-		register(new Reflections("br.com.brjdevs.steven.bran")
-				.getSubTypesOf(EventListener.class).stream()
+        register(new Reflections("br.net.brjdevs.steven.bran")
+                .getSubTypesOf(EventListener.class).stream()
 				.map(clazz -> {
 					try {
 						return clazz.getConstructor().newInstance();

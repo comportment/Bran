@@ -51,8 +51,8 @@ public class CommandManager {
 	}
 	
 	private void load() {
-	    String url = "br.com.brjdevs.steven.bran.cmds";
-	    Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage(url)).setScanners(new SubTypesScanner(),
+        String url = "br.net.brjdevs.steven.bran.cmds";
+        Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage(url)).setScanners(new SubTypesScanner(),
 			    new TypeAnnotationsScanner(), new MethodAnnotationsScanner()).filterInputsBy(new FilterBuilder().includePackage(url)));
 	    Set<Method> commands = reflections.getMethodsAnnotatedWith(Command.class);
 	    commands.forEach(method -> {

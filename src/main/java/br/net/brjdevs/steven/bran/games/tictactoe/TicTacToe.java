@@ -63,7 +63,7 @@ public class TicTacToe extends AbstractGame<TicTacToeListener> {
         getEventListener().onMove(new MoveEvent(this, tile));
         for (int[] combo : winCombos) {
             if (board[combo[0]].isFree())
-                return;
+                continue;
             if (board[combo[0]].getPlayer() == board[combo[1]].getPlayer()
                     && board[combo[1]].getPlayer() == board[combo[2]].getPlayer()) {
                 getEventListener().onWin(new WinEvent(this));

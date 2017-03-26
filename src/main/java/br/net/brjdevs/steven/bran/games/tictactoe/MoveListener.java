@@ -32,7 +32,7 @@ public class MoveListener extends EventListener<MessageReceivedEvent> {
         AbstractGame abstractGame = GameManager.getGame(ref);
         if (abstractGame instanceof TicTacToe) {
             TicTacToe t = (TicTacToe) abstractGame;
-            int player = t.getInfo().getPlayers().get(0).equals(user) ? 0 : 1;
+            int player = t.getInfo().getPlayers().indexOf(user);
             t.move(player, tile - 1);
         }
     }

@@ -54,10 +54,10 @@ public class EvalCommand /*implements ICommand*/ {
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
 				.setScanners(new SubTypesScanner(false), new ResourcesScanner())
 				.setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))
-				.filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("br.com.brjdevs.steven.bran"))));
-		Set<Class<?>> classes = reflections.getSubTypesOf(Object.class).stream().filter(clazz -> clazz != null && clazz.getCanonicalName() != null).collect(Collectors.toSet());
-		classes.addAll(new Reflections("br.com.brjdevs.steven.bran").getSubTypesOf(Enum.class));
-		classes.forEach(clazz -> imports.append("import ").append(clazz.getCanonicalName()).append(";\n"));
+                .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("br.net.brjdevs.steven.bran"))));
+        Set<Class<?>> classes = reflections.getSubTypesOf(Object.class).stream().filter(clazz -> clazz != null && clazz.getCanonicalName() != null).collect(Collectors.toSet());
+        classes.addAll(new Reflections("br.net.brjdevs.steven.bran").getSubTypesOf(Enum.class));
+        classes.forEach(clazz -> imports.append("import ").append(clazz.getCanonicalName()).append(";\n"));
 	}
 	
 	@Command

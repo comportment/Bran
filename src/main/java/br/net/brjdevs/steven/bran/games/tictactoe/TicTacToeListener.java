@@ -1,5 +1,6 @@
 package br.net.brjdevs.steven.bran.games.tictactoe;
 
+import br.net.brjdevs.steven.bran.core.data.UserData;
 import br.net.brjdevs.steven.bran.games.engine.event.*;
 import br.net.brjdevs.steven.bran.games.tictactoe.events.InvalidMoveEvent;
 import br.net.brjdevs.steven.bran.games.tictactoe.events.MoveEvent;
@@ -17,8 +18,10 @@ public class TicTacToeListener extends GameEventListener {
     @Override
     public void onWin(WinEvent event) {
         TicTacToe ticTacToe = ((TicTacToe) event.getGame());
-        event.getGame().getLocation().send("**" + ticTacToe.getInfo().getPlayers().get(ticTacToe.getPlayer() == 0 ? 1 : 0)
-                .getUser(event.getShard().getJDA()).getName() + "** won!").queue();
+        UserData userData = ticTacToe.getInfo().getPlayers().get(ticTacToe.getPlayer() == 0 ? 1 : 0);
+        userData.getProfileData().getTicTacToeStats().addVictory();
+        ticTacToe.getTurn().getProfileData().getTicTacToeStats().addDefeat();
+        event.getGame().getLocation().send("**" + userData.getUser(event.getShard().getJDA()).getName() + "** won!").queue();
     }
     
     @Override
