@@ -2,8 +2,10 @@ package br.net.brjdevs.steven.bran.games.engine;
 
 import br.net.brjdevs.steven.bran.core.managers.TaskManager;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class GameManager {
     
@@ -31,5 +33,9 @@ public class GameManager {
         AbstractGame game = games.remove(ref);
         if (game != null)
             game.getInfo().getPlayers().forEach(userData -> userData.getProfileData().setCurrentGame(null));
+    }
+    
+    public static <T extends AbstractGame> List<T> getGames(Class<T> clazz) {
+        return games.values().stream().filter(clazz::isInstance).map(clazz::cast).collect(Collectors.toList());
     }
 }

@@ -1,5 +1,6 @@
 package br.net.brjdevs.steven.bran.games.tictactoe;
 
+import br.net.brjdevs.steven.bran.core.currency.BankAccount;
 import br.net.brjdevs.steven.bran.core.data.UserData;
 import br.net.brjdevs.steven.bran.games.engine.event.*;
 import br.net.brjdevs.steven.bran.games.tictactoe.events.InvalidMoveEvent;
@@ -20,7 +21,10 @@ public class TicTacToeListener extends GameEventListener {
         TicTacToe ticTacToe = ((TicTacToe) event.getGame());
         UserData userData = ticTacToe.getInfo().getPlayers().get(ticTacToe.getPlayer() == 0 ? 1 : 0);
         userData.getProfileData().getTicTacToeStats().addVictory();
+        userData.getProfileData().getBankAccount().addCoins(15, BankAccount.MAIN_BANK);
+        userData.getProfileData().addExperience(1);
         ticTacToe.getTurn().getProfileData().getTicTacToeStats().addDefeat();
+        userData.getProfileData().addExperience(-2);
         event.getGame().getLocation().send("**" + userData.getUser(event.getShard().getJDA()).getName() + "** won!").queue();
     }
     

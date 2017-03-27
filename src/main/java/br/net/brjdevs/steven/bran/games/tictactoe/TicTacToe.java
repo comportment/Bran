@@ -1,11 +1,13 @@
 package br.net.brjdevs.steven.bran.games.tictactoe;
 
 import br.net.brjdevs.steven.bran.core.data.UserData;
+import br.net.brjdevs.steven.bran.core.managers.TaskManager;
 import br.net.brjdevs.steven.bran.core.utils.Emojis;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
 import br.net.brjdevs.steven.bran.games.engine.AbstractGame;
 import br.net.brjdevs.steven.bran.games.engine.GameInfo;
 import br.net.brjdevs.steven.bran.games.engine.GameLocation;
+import br.net.brjdevs.steven.bran.games.engine.GameManager;
 import br.net.brjdevs.steven.bran.games.engine.event.LooseEvent;
 import br.net.brjdevs.steven.bran.games.engine.event.WinEvent;
 import br.net.brjdevs.steven.bran.games.tictactoe.events.InvalidMoveEvent;
@@ -27,13 +29,21 @@ public class TicTacToe extends AbstractGame<TicTacToeListener> {
             {2, 4, 6}
     };
     
+    static {
+        TaskManager.startAsyncTask("TicTacToe", (service) -> GameManager.getGames(TicTacToe.class).forEach(game -> {
+            if (game.timer + 120000 < System.currentTimeMillis()) {
+                game.getLocation().send(game.getTurn().getUser(game.getShard().getJDA()).getName() + " lost due to inactivity!").queue();
+                game.end();
+            }
+        }), 1);
+    }
+    
     private Tile[] board;
     private int turn;
-    private long lastPlay0;
-    private long lastPlay1;
+    private long timer;
     
     public TicTacToe(MessageChannel channel, UserData creator) {
-        super(new GameLocation(channel), new GameInfo(creator, true, true), new TicTacToeListener(), channel.getJDA(), 600000 + System.currentTimeMillis());
+        super(new GameLocation(channel), new GameInfo(creator, true, true), new TicTacToeListener(), channel.getJDA(), System.currentTimeMillis() + System.currentTimeMillis());
     }
     
     public Tile[] getBoard() {
@@ -59,6 +69,7 @@ public class TicTacToe extends AbstractGame<TicTacToeListener> {
             return;
         }
         tile.setPlayer(player);
+        timer = System.currentTimeMillis();
         turn = turn == 0 ? 1 : 0;
         getEventListener().onMove(new MoveEvent(this, tile));
         for (int[] combo : winCombos) {
@@ -91,6 +102,7 @@ public class TicTacToe extends AbstractGame<TicTacToeListener> {
             board[i] = new Tile();
         }
         this.turn = 0;
+        this.timer = System.currentTimeMillis();
         return true;
     }
     
