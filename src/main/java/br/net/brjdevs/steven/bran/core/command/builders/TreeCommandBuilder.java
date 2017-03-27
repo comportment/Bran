@@ -156,8 +156,8 @@ public class TreeCommandBuilder {
                 } else if (event.isPrivate() ? !event.getUserData().hasPermission(getRequiredPermission()) : !event.getGuildData(true).hasPermission(event.getAuthor(), getRequiredPermission())) {
                     switch (onMissingPermission) {
 						case SHOW_ERROR:
-							event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(subCommand.getRequiredPermission())) + "*").queue();
-							break;
+                            event.sendMessage("\u2757 I can't let you do that! You are missing the following permissions: " + String.join(", ", Permissions.toCollection(getRequiredPermission()))).queue();
+                            break;
 						case REDIRECT:
 							event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
 							break;

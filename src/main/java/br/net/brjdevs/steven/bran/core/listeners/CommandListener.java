@@ -44,8 +44,8 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 			event.getChannel().sendTyping().queue(success -> event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue());
             
         } else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getData().get().getUserData(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
-            event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission())) + "*").queue());
-			return;
+            event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("\u2757 I can't let you do that! You are missing the following permissions: " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission()))).queue());
+            return;
 		}
         CommandEvent e = new CommandEvent(event, cmd, event.getMessage().getRawContent(), prefix);
         Bran.getInstance().getSession().cmds++;
