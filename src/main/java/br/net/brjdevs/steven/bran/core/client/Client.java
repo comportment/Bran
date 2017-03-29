@@ -1,5 +1,6 @@
 package br.net.brjdevs.steven.bran.core.client;
 
+import br.net.brjdevs.steven.bran.core.managers.TaskManager;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.AccountType;
@@ -29,11 +30,11 @@ public class Client {
         this.lastReboot = 0;
         this.eventManager = new BranEventManager(this);
         restartJDA();
-        //TaskManager.startAsyncTask("Shard [" + shardId + "] Guard", (service) -> {
-        //if (Bran.getInstance().getLastEvents().get(shardId) + 10000 < System.currentTimeMillis()) {
-        //Bran.getInstance().reboot(this);
-        //}
-        //}, 1);
+        TaskManager.startAsyncTask("Shard " + shardId + " Guard", (service) -> {
+            if (Bran.getInstance().getLastEvents().get(shardId) + 15000 < System.currentTimeMillis()) {
+                Bran.getInstance().reboot(this);
+            }
+        }, 1);
     }
     
     public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {

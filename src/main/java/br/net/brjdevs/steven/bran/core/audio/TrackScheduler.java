@@ -216,8 +216,8 @@ public class TrackScheduler {
 	
 	private void onQueueStop() {
 		if (getPreviousTrack() != null && getPreviousTrack().getContext() != null && getPreviousTrack().getContext().canTalk()) {
-			getPreviousTrack().getContext().sendMessage("Finished playing queue, disconnecting... If you want to play more music use `!!music play [SONG]`.").queue();
-		}
+            getPreviousTrack().getContext().sendMessage("Finished playing queue, disconnecting... If you want to play more music use `!!play [SONG]`.").queue();
+        }
 		Bran.getInstance().getTaskManager().getMusicRegisterTimeout().addMusicPlayer(String.valueOf(getGuild().getId()), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(30));
 		getGuild().getAudioManager().closeAudioConnection();
 	}

@@ -137,7 +137,7 @@ public class MusicCommand {
                 .setAction((event) -> {
                     GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(event.getGuild());
                     if (musicManager.getTrackScheduler().getCurrentTrack() == null || musicManager.getPlayer().getPlayingTrack() == null) {
-                        event.sendMessage("I'm not playing anything, use `" + event.getPrefix() + "music play [SONG]` to play something!").queue();
+                        event.sendMessage("I'm not playing anything, use `" + event.getPrefix() + "play [SONG]` to play something!").queue();
                         return;
                     }
                     AudioTrackInfo info = musicManager.getPlayer().getPlayingTrack().getInfo();
@@ -193,7 +193,7 @@ public class MusicCommand {
                         return;
                     }
                     musicManager.getTrackScheduler().setPaused(!musicManager.getTrackScheduler().isPaused());
-                    event.sendMessage(musicManager.getTrackScheduler().isPaused() ? "The player is now paused. Use `" + event.getPrefix() + "m pause` again to resume." : "The player is no longer paused.").queue();
+                    event.sendMessage(musicManager.getTrackScheduler().isPaused() ? "The player is now paused. Use `" + event.getPrefix() + "pause` again to resume." : "The player is no longer paused.").queue();
                 })
                 .build();
     }
@@ -210,7 +210,7 @@ public class MusicCommand {
                     TrackScheduler scheduler = manager.getTrackScheduler();
                     VoiceChannel vchan = event.getGuild().getSelfMember().getVoiceState().getChannel();
                     if (vchan == null) {
-                        event.sendMessage(Quotes.FAIL, "I'm not connected to a Voice Channel and I failed to locate you. Are you even in a voice channel?").queue();
+                        event.sendMessage(Quotes.FAIL, "I'm not connected to any channel.").queue();
                         return;
                     }
                     if (!vchan.getMembers().contains(event.getMember())) {
@@ -279,7 +279,7 @@ public class MusicCommand {
     @Command
     private static ICommand queue() {
         return new TreeCommandBuilder(Category.MUSIC)
-                .setAliases("queue")
+                .setAliases("queue", "q")
                 .setDefault("list")
                 .onNotFound(CommandAction.REDIRECT)
                 .setName("Music Queue Command")
@@ -460,7 +460,7 @@ public class MusicCommand {
                         trackUrl = trackUrl.replaceFirst("soundcloud ", "scsearch:");
                     if (!trackUrl.matches(URL_REGEX) && !trackUrl.startsWith("ytsearch:") && !trackUrl.startsWith("scsearch:"))
                         trackUrl = "ytsearch:" + trackUrl;
-                    Bran.getInstance().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl, false);
+                    Bran.getInstance().getMusicManager().loadAndPlay(event.getAuthor(), event.getTextChannel(), trackUrl, true);
                 })
                 .build();
     }

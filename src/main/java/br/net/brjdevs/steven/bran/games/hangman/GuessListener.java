@@ -27,6 +27,8 @@ public class GuessListener extends EventListener<MessageReceivedEvent> {
         UserData user = Bran.getInstance().getDataManager().getData().get().getUserData(event.getAuthor());
         HangMan game = (HangMan) rawGame;
         String guess = event.getMessage().getRawContent();
+        if (guess.isEmpty())
+            return;
         if (guess.charAt(0) != '^') return;
         if (guess.matches("\\^(give ?up|end|stop)")) {
             if (game.getInfo().isMultiplayer()) {

@@ -14,6 +14,7 @@ import br.net.brjdevs.steven.bran.core.utils.TimeUtils;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
 import java.util.stream.Stream;
@@ -31,22 +32,17 @@ public class ShardCommand {
 						.setAliases("info", "information", "i")
 						.setDescription("Gives you information on a shard.")
 						.setName("ShardInfo Command")
-						.setArgs(new Argument("shard", String.class))
-						.setAction((event) -> {
-							String shard = ((String) event.getArgument("shard").get());
-							if (shard.charAt(0) == '*') {
-								Stream.of(Bran.getInstance().getShards()).forEach(s -> event.sendMessage(createShardInfo(s)).queue());
-							} else {
-								if (!MathUtils.isInteger(shard)) {
-									event.sendMessage("You have to tell me a Shard ID or use `*` to get info on all shards!").queue();
-									return;
-								}
-								int shardId = Integer.parseInt(shard);
-                                Client s = Bran.getInstance().getShards()[shardId];
-                                event.sendMessage(createShardInfo(s)).queue();
-							}
-						})
-						.build())
+                        .setArgs(new Argument("shard", Integer.class, true))
+                        .setAction((event) -> {
+                            if (!event.getArgument("shard").isPresent()) {
+                                event.sendMessage(createShardInfo()).queue();
+                                return;
+                            }
+                            int shardId = ((int) event.getArgument("shard").get());
+                            Client s = Bran.getInstance().getShards()[shardId];
+                            event.sendMessage(createShardInfo(s)).queue();
+                        })
+                        .build())
 				.addSubCommand(new CommandBuilder(Category.BOT_ADMINISTRATOR)
 						.setAliases("reboot", "restart", "r")
 						.setName("Shard Reboot Command")
@@ -93,4 +89,16 @@ public class ShardCommand {
         embedBuilder.setFooter("Ping: " + shard.getJDA().getPing() + "ms", "https://discordapp.com/assets/371886a66446c46e66e9435158468720.svg");
         return embedBuilder.build();
 	}
+    
+    private static String createShardInfo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("```diff\n");
+        for (Client client : Bran.getInstance().getShards()) {
+            sb.append(client.getJDA().getStatus() == Status.CONNECTED ? "+" : "-").append(" ");
+            sb.append("Shard ").append(client.getJDA().getShardInfo() != null ? client.getJDA().getShardInfo().getShardString() : "[0 / 1]").append(" - Last event: ")
+                    .append(TimeUtils.format(System.currentTimeMillis() - Bran.getInstance().getLastEvents().get(client.getId())))
+                    .append(" - WS Ping: ").append(client.getJDA().getPing()).append("ms\n");
+        }
+        return sb.append("```").toString();
+    }
 }

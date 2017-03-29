@@ -29,8 +29,8 @@ public class PokemonCommand {
 				.setAction((event) -> {
 					try {
 						String pokemon = (String) event.getArgument("id/name").get(), content;
-						pokemon = String.format("http://pokeapi.co/api/v2/pokemon/%s/", URLEncoder.encode(pokemon, "UTF-8"));
-						try {
+                        pokemon = String.format("http://pokeapi.co/api/v2/pokemon/%s/", URLEncoder.encode(pokemon.toLowerCase(), "UTF-8"));
+                        try {
 							content = HttpUtils.read(pokemon);
 						} catch (Exception e) {
 							event.sendMessage("Failed to connect! Please try again in a few minutes...").queue();
@@ -47,8 +47,8 @@ public class PokemonCommand {
 						try {
 							form = new JsonParser().parse(HttpUtils.read(item.get("forms").getAsJsonArray().get(0).getAsJsonObject().get("url").getAsString())).getAsJsonObject().get("sprites").getAsJsonObject().get("front_default").getAsString();
 						} catch (Exception e) {
-							form = "Could not gather Pokemon Sprite!";
-						}
+                            form = "Could not grab Pokemon Sprite!";
+                        }
 						JsonArray abilities = item.get("abilities").getAsJsonArray();
 						JsonArray stats = item.get("stats").getAsJsonArray();
 						EmbedBuilder embedBuilder = new EmbedBuilder();
