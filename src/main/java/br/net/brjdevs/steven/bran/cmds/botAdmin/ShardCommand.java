@@ -52,26 +52,18 @@ public class ShardCommand {
 							String shard = ((String) event.getArgument("shard").get());
 							if (shard.charAt(0) == '*') {
 								Stream.of(Bran.getInstance().getShards()).forEach(s -> {
-									try {
-										Bran.getInstance().reboot(s);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-									Utils.sleep(5_000L);
-								});
-							} else {
-								if (!MathUtils.isInteger(shard)) {
-									return;
-								}
-								int shardId = Integer.parseInt(shard);
+                                    Bran.getInstance().reboot(s);
+                                    Utils.sleep(5_000L);
+                                });
+                            } else {
+                                if (!MathUtils.isInteger(shard)) {
+                                    return;
+                                }
+                                int shardId = Integer.parseInt(shard);
                                 Client s = Bran.getInstance().getShards()[shardId];
-                                try {
-									Bran.getInstance().reboot(s);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							}
-						})
+                                Bran.getInstance().reboot(s);
+                            }
+                        })
 						.build())
 				.build();
 	}
