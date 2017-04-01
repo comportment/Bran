@@ -25,5 +25,9 @@ public class RateLimiter {
 	public boolean process(User user) {
 		return process(user.getId());
 	}
-	
+    
+    public List<String> getUsersRateLimited() {
+        return usersRateLimited;
+    }
+    
 }

@@ -6,8 +6,8 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.hooks.IEventManager;
 import org.reflections.Reflections;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -74,6 +74,6 @@ public class BranEventManager implements IEventManager {
 	
 	@Override
 	public List<Object> getRegisteredListeners() {
-		return Collections.unmodifiableList(listeners);
-	}
+        return new ArrayList<>(listeners);
+    }
 }

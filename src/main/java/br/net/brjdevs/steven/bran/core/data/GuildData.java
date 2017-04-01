@@ -36,8 +36,9 @@ public class GuildData {
     private long guildId;
 	private long announceChannelId;
 	private List<Long> publicRoles = new ArrayList<>();
-	
-	public GuildData(Guild guild) {
+    private Map<Long, List<String>> disabledCommands = new HashMap<>();
+    
+    public GuildData(Guild guild) {
 		this.guildId = Long.parseLong(guild.getId());
         this.prefixes.addAll(Bran.getInstance().getDataManager().getConfig().get().defaultPrefixes);
     }
@@ -118,5 +119,14 @@ public class GuildData {
     
     public void setModLogChannel(TextChannel modLogChannel) {
         this.modLogChannel = Long.parseLong(modLogChannel.getId());
+    }
+    
+    public Map<Long, List<String>> getDisabledCommands() {
+        if (disabledCommands == null) disabledCommands = new HashMap<>();
+        return disabledCommands;
+    }
+    
+    public List<String> getDisabledCommands(TextChannel channel) {
+        return getDisabledCommands().getOrDefault(Long.parseLong(channel.getId()), new ArrayList<>());
     }
 }

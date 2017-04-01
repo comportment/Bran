@@ -112,69 +112,70 @@ public class TreeCommandBuilder {
 			
 			@Override
 			public void execute(CommandEvent event) {
-				if (event.isPrivate() && !isPrivateAvailable()) {
-					event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
-					return;
-				}
-				if (event.getArgs(3)[1].matches("^(\\?|help)$")) {
-					event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
-					return;
-				}
-				String alias = event.getArgs(3)[1].trim();
-				boolean isDefault = false;
-				if (alias.isEmpty()) {
-					if (defaultCmd != null) {
-						alias = defaultCmd;
-						isDefault = true;
-					} else {
-						if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
-							event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
-						} else {
-							event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
-						}
-						return;
-					}
-				}
-				ICommand subCommand = Bran.getInstance().getCommandManager().getCommand(this, alias);
-				if (subCommand == null) {
-					switch (onNotFound) {
-						case SHOW_ERROR:
-							event.sendMessage("No such SubCommand `" + alias + "` in " + getName() + ".").queue();
-							break;
-						case REDIRECT:
-							event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
-							break;
-						case SHOW_HELP:
-							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
-								event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
-							} else {
-								event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
-							}
-							break;
-					}
-					return;
+                if (event.isPrivate() && !isPrivateAvailable()) {
+                    event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
+                    return;
+                } else if (!event.isPrivate() && event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(event.getCommand().getKey()))
+                    return;
+                else if (event.getArgs(3)[1].matches("^(\\?|help)$")) {
+                    event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
+                    return;
+                }
+                String alias = event.getArgs(3)[1].trim();
+                boolean isDefault = false;
+                if (alias.isEmpty()) {
+                    if (defaultCmd != null) {
+                        alias = defaultCmd;
+                        isDefault = true;
+                    } else {
+                        if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+                            event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
+                        } else {
+                            event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+                        }
+                        return;
+                    }
+                }
+                ICommand subCommand = Bran.getInstance().getCommandManager().getCommand(this, alias);
+                if (subCommand == null) {
+                    switch (onNotFound) {
+                        case SHOW_ERROR:
+                            event.sendMessage("No such SubCommand `" + alias + "` in " + getName() + ".").queue();
+                            break;
+                        case REDIRECT:
+                            event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
+                            break;
+                        case SHOW_HELP:
+                            if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+                                event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
+                            } else {
+                                event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+                            }
+                            break;
+                    }
+                    return;
                 } else if (event.isPrivate() ? !event.getUserData().hasPermission(getRequiredPermission()) : !event.getGuildData(true).hasPermission(event.getAuthor(), getRequiredPermission())) {
                     switch (onMissingPermission) {
-						case SHOW_ERROR:
+                        case SHOW_ERROR:
                             event.sendMessage("\u2757 I can't let you do that! You are missing the following permissions: " + String.join(", ", Permissions.toCollection(getRequiredPermission()))).queue();
                             break;
-						case REDIRECT:
-							event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
-							break;
-						case SHOW_HELP:
-							if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
-								event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
-							} else {
-								event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
-							}
-							break;
-					}
-					return;
-				}
-				event.createChild(subCommand, isDefault);
-			}
-			
-			@Override
+                        case REDIRECT:
+                            event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
+                            break;
+                        case SHOW_HELP:
+                            if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+                                event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
+                            } else {
+                                event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+                            }
+                            break;
+                    }
+                    return;
+                }
+                event.createChild(subCommand, isDefault);
+            }
+            
+            @Override
 			public String[] getAliases() {
 				return aliases;
 			}

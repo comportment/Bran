@@ -4,15 +4,20 @@ import br.net.brjdevs.steven.bran.core.audio.AudioLoader;
 import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.command.Argument;
 import br.net.brjdevs.steven.bran.core.command.Command;
+import br.net.brjdevs.steven.bran.core.command.CommandManager;
 import br.net.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.net.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.net.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import br.net.brjdevs.steven.bran.core.quote.Quotes;
+import br.net.brjdevs.steven.bran.core.utils.Emojis;
 import br.net.brjdevs.steven.bran.core.utils.MathUtils;
 import br.net.brjdevs.steven.bran.core.utils.TimeUtils;
+import net.dv8tion.jda.core.entities.TextChannel;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class ConfigCommand {
@@ -110,6 +115,103 @@ public class ConfigCommand {
                                         event.sendMessage("Done, now the FairQueue Level for this Guild is `" + argument.get() + "`.").queue();
                                         Bran.getInstance().getDataManager().getData().update();
                                     }
+                                })
+                                .build())
+                        .build())
+                .addSubCommand(new TreeCommandBuilder(Category.GUILD_ADMINISTRATOR)
+                        .setAliases("commands", "cmds")
+                        .setName("Commands Config")
+                        .setDescription("Enable/disable commands!")
+                        .addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
+                                .setName("Command Enable")
+                                .setAliases("enable")
+                                .setDescription("Enable commands.")
+                                .setArgs(new Argument("command", String.class), new Argument("channel", String.class))
+                                .setArgumentParser((input) -> {
+                                    if (!input.contains(" "))
+                                        return new String[] {input};
+                                    int index = input.lastIndexOf(" ");
+                                    return new String[] {input.substring(0, index), input.substring(index + 1)};
+                                })
+                                .setAction((event) -> {
+                                    if (event.getMessage().getMentionedChannels().isEmpty()) {
+                                        event.sendMessage("You have to mention a channel!").queue();
+                                        return;
+                                    }
+                                    String rawCmd = ((String) event.getArgument("command").get());
+                                    CommandManager m = Bran.getInstance().getCommandManager();
+                                    ICommand cmd = null;
+                                    do {
+                                        String[] split = rawCmd.split(" ");
+                                        try {
+                                            rawCmd = rawCmd.substring(split[0].length() + 1);
+                                        } catch (Exception ignored) {
+                                        }
+                                        if (cmd == null)
+                                            cmd = m.getCommand(split[0]);
+                                        else
+                                            cmd = m.getCommand((ITreeCommand) cmd, split[0]);
+                                        if (split.length == 1) {
+                                            cmd = m.getCommand(split[0]);
+                                            break;
+                                        }
+                                    } while (!rawCmd.isEmpty() && cmd instanceof ITreeCommand);
+                                    if (cmd == null) {
+                                        event.sendMessage("\\:x: No commands found matching the following criteria: " + event.getArgument("command").get()).queue();
+                                        return;
+                                    } else if (!event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(cmd.getKey())) {
+                                        event.sendMessage("This command isn't disabled!").queue();
+                                        return;
+                                    }
+                                    TextChannel channel = event.getMessage().getMentionedChannels().get(0);
+                                    event.getGuildData(false).getDisabledCommands(channel).remove(cmd.getKey());
+                                    event.sendMessage(Emojis.CHECK_MARK + " Command " + cmd.getName() + " was enabled in " + channel.getAsMention() + "!").queue();
+                                })
+                                .build())
+                        .addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
+                                .setAliases("disable")
+                                .setName("Command Disable")
+                                .setDescription("Enable commands.")
+                                .setArgs(new Argument("command", String.class), new Argument("channel", String.class))
+                                .setArgumentParser((input) -> {
+                                    if (!input.contains(" "))
+                                        return new String[] {input};
+                                    int index = input.lastIndexOf(" ");
+                                    return new String[] {input.substring(0, index), input.substring(index + 1)};
+                                })
+                                .setAction((event) -> {
+                                    if (event.getMessage().getMentionedChannels().isEmpty()) {
+                                        event.sendMessage("You have to mention a channel!").queue();
+                                        return;
+                                    }
+                                    String rawCmd = ((String) event.getArgument("command").get());
+                                    CommandManager m = Bran.getInstance().getCommandManager();
+                                    ICommand cmd = null;
+                                    do {
+                                        String[] split = rawCmd.split(" ");
+                                        try {
+                                            rawCmd = rawCmd.substring(split[0].length() + 1);
+                                        } catch (Exception ignored) {
+                                        }
+                                        if (cmd == null)
+                                            cmd = m.getCommand(split[0]);
+                                        else
+                                            cmd = m.getCommand((ITreeCommand) cmd, split[0]);
+                                        if (split.length == 1) {
+                                            cmd = m.getCommand(split[0]);
+                                            break;
+                                        }
+                                    } while (!rawCmd.isEmpty() && cmd instanceof ITreeCommand);
+                                    if (cmd == null) {
+                                        event.sendMessage("\\:x: No commands found matching the following criteria: " + event.getArgument("command").get()).queue();
+                                        return;
+                                    } else if (event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(cmd.getKey())) {
+                                        event.sendMessage("This command is already disabled!").queue();
+                                        return;
+                                    }
+                                    TextChannel channel = event.getMessage().getMentionedChannels().get(0);
+                                    event.getGuildData(false).getDisabledCommands().computeIfAbsent(Long.parseLong(channel.getId()), id -> new ArrayList<>()).add(cmd.getKey());
+                                    event.sendMessage(Emojis.CHECK_MARK + " Command " + cmd.getName() + " was disabled in " + channel.getAsMention() + "!").queue();
                                 })
                                 .build())
                         .build())

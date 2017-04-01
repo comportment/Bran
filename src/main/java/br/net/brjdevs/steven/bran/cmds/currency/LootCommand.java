@@ -10,8 +10,8 @@ import br.net.brjdevs.steven.bran.core.managers.RateLimiter;
 import br.net.brjdevs.steven.bran.core.utils.Emojis;
 
 public class LootCommand {
-	
-	private static final RateLimiter RATELIMITER = new RateLimiter(10000);
+    
+    public static final RateLimiter RATELIMITER = new RateLimiter(10000);
     
     @Command
     private static ICommand loot() {

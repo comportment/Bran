@@ -25,4 +25,8 @@ public interface ICommand {
 	Category getCategory();
 	
 	String getHelp();
+    
+    default String getKey() {
+        return "[" + getCategory() + "]=" + getName() + "." + getAliases()[0];
+    }
 }

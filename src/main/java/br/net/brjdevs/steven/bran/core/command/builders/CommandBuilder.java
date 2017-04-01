@@ -98,8 +98,9 @@ public class CommandBuilder {
                 } else if (event.isPrivate() ? !event.getUserData().hasPermission(getRequiredPermission()) : !event.getGuildData(true).hasPermission(event.getAuthor(), getRequiredPermission())) {
                     event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
 					return;
-				}
-				String[] split = event.getArgs(2);
+                } else if (!event.isPrivate() && event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(event.getCommand().getKey()))
+                    return;
+                String[] split = event.getArgs(2);
 				if (split[1].matches("^(\\?|help)$")) {
 					event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
 					return;

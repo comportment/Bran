@@ -255,9 +255,13 @@ public class Bran {
 	}
 	
 	public void shutdownAll(int exitCode) {
-		
-		playerManager.getMusicManagers().forEach((guildId, musicManager) -> {
-			try {
+        
+        Stream.of(shards).forEach(shard ->
+                shard.getEventManager().getRegisteredListeners().clear()
+        );
+        
+        new HashMap<>(playerManager.getMusicManagers()).forEach((guildId, musicManager) -> {
+            try {
 				if (musicManager.getTrackScheduler().getCurrentTrack() == null) return;
 				TextChannel channel = musicManager.getTrackScheduler().getCurrentTrack().getContext();
 				if (channel != null && channel.canTalk())
