@@ -40,8 +40,8 @@ public class Bran {
 	
 	public static Color COLOR = Color.decode("#388BDF");
 	private static Bran instance;
-	private static JedisPool jedisPool = new JedisPool("localhost", 6379);
-	private static SimpleLog LOG = SimpleLog.getLog("BotContainer");
+    private static BranJedisPool jedisPool = new BranJedisPool("localhost", 6379);
+    private static SimpleLog LOG = SimpleLog.getLog("BotContainer");
 	public File workingDir;
 	private TaskManager taskManager;
 	private CommandManager commandManager;
