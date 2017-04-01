@@ -175,15 +175,18 @@ public class Bran {
 			Map<Long, ImmutablePair<Long, GuildMusicManager>> shardPlayers = new HashMap<>();
 			Map<Long, GuildMusicManager> copy = new HashMap<>(playerManager.getMusicManagers());
 			copy.forEach((guildId, musicManager) -> {
-				Guild guild = shard.getJDA().getGuildById(String.valueOf(guildId));
-				if (guild != null) {
-					if (guild.getAudioManager().isConnected() || guild.getAudioManager().isAttemptingToConnect()) {
-						shardPlayers.put(guildId, new ImmutablePair<>(Long.parseLong(guild.getAudioManager().getConnectedChannel().getId()), musicManager));
-						musicManager.getTrackScheduler().setPaused(true);
-						playerManager.unregister(guildId);
-					}
-				}
-			});
+                try {
+                    Guild guild = shard.getJDA().getGuildById(String.valueOf(guildId));
+                    if (guild != null) {
+                        if (guild.getAudioManager().getConnectedChannel() != null) {
+                            shardPlayers.put(guildId, new ImmutablePair<>(Long.parseLong(guild.getAudioManager().getConnectedChannel().getId()), musicManager));
+                            musicManager.getTrackScheduler().setPaused(true);
+                            playerManager.unregister(guildId);
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            });
 			shard.getJDA().shutdown(false);
 			Utils.sleep(5000);
 			shard.restartJDA();
@@ -198,7 +201,6 @@ public class Bran {
 				
 			});
 		} catch (Exception e) {
-			e.printStackTrace();
 			return false;
 		}
 		return true;

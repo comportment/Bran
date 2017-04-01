@@ -143,21 +143,18 @@ public class ConfigCommand {
                                     ICommand cmd = null;
                                     do {
                                         String[] split = rawCmd.split(" ");
-                                        try {
-                                            rawCmd = rawCmd.substring(split[0].length() + 1);
-                                        } catch (Exception ignored) {
-                                        }
                                         if (cmd == null)
                                             cmd = m.getCommand(split[0]);
                                         else
                                             cmd = m.getCommand((ITreeCommand) cmd, split[0]);
-                                        if (split.length == 1) {
-                                            cmd = m.getCommand(split[0]);
-                                            break;
+                                        try {
+                                            rawCmd = rawCmd.substring(split[0].length() + 1);
+                                        } catch (Exception ignored) {
+                                            rawCmd = "";
                                         }
                                     } while (!rawCmd.isEmpty() && cmd instanceof ITreeCommand);
                                     if (cmd == null) {
-                                        event.sendMessage("\\:x: No commands found matching the following criteria: " + event.getArgument("command").get()).queue();
+                                        event.sendMessage(Emojis.X + " No commands found matching the following criteria: " + event.getArgument("command").get() + ". Make sure you didn't include prefixes in the command.").queue();
                                         return;
                                     } else if (!event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(cmd.getKey())) {
                                         event.sendMessage("This command isn't disabled!").queue();
@@ -189,21 +186,18 @@ public class ConfigCommand {
                                     ICommand cmd = null;
                                     do {
                                         String[] split = rawCmd.split(" ");
-                                        try {
-                                            rawCmd = rawCmd.substring(split[0].length() + 1);
-                                        } catch (Exception ignored) {
-                                        }
                                         if (cmd == null)
                                             cmd = m.getCommand(split[0]);
                                         else
                                             cmd = m.getCommand((ITreeCommand) cmd, split[0]);
-                                        if (split.length == 1) {
-                                            cmd = m.getCommand(split[0]);
-                                            break;
+                                        try {
+                                            rawCmd = rawCmd.substring(split[0].length() + 1);
+                                        } catch (Exception ignored) {
+                                            rawCmd = "";
                                         }
                                     } while (!rawCmd.isEmpty() && cmd instanceof ITreeCommand);
                                     if (cmd == null) {
-                                        event.sendMessage("\\:x: No commands found matching the following criteria: " + event.getArgument("command").get()).queue();
+                                        event.sendMessage(Emojis.X + " No commands found matching the following criteria: " + event.getArgument("command").get() + ". Make sure you didn't include prefixes in the command.").queue();
                                         return;
                                     } else if (event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(cmd.getKey())) {
                                         event.sendMessage("This command is already disabled!").queue();

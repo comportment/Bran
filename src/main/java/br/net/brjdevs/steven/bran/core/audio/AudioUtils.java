@@ -64,7 +64,6 @@ public class AudioUtils {
 			audioManager.setSelfMuted(false);
 		if (audioManager.isConnected()) return audioManager.getConnectedChannel();
 		try {
-			audioManager.setSelfDeafened(true);
 			audioManager.setConnectionListener(new ConnectionListenerImpl(vchan.getGuild()));
 			audioManager.openAudioConnection(vchan);
 		} catch (Exception e) {
