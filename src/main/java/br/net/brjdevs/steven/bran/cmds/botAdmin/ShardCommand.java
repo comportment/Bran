@@ -87,9 +87,9 @@ public class ShardCommand {
         sb.append("```diff\n");
         for (Client client : Bran.getInstance().getShards()) {
             sb.append(client.getJDA().getStatus() == Status.CONNECTED ? "+" : "-").append(" ");
-            sb.append("Shard ").append(client.getJDA().getShardInfo() != null ? client.getJDA().getShardInfo().getShardString() : "[0 / 1]").append(" - Last event: ")
+            sb.append("Shard ").append(client.getJDA().getShardInfo() != null ? client.getJDA().getShardInfo().getShardString() : "[0 / 1]").append(" L.E.: ")
                     .append(TimeUtils.format(System.currentTimeMillis() - Bran.getInstance().getLastEvents().get(client.getId())))
-                    .append(" - WS Ping: ").append(client.getJDA().getPing()).append("ms\n");
+                    .append(" L.R.: ").append(TimeUtils.format(System.currentTimeMillis() - client.getLastReboot())).append(" S: ").append(client.getJDA().getStatus()).append("\n");
         }
         return sb.append("```").toString();
     }
