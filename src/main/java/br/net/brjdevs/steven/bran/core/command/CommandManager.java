@@ -1,5 +1,6 @@
 package br.net.brjdevs.steven.bran.core.command;
 
+import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
@@ -45,6 +46,7 @@ public class CommandManager {
                             "guildid text, " +
                             "date bigint, " +
                             "successful int," +
+                            "sessionId bigint, " +
                             "PRIMARY KEY (id)" +
                             ");").execute();
                     conn.prepareStatement("ALTER TABLE CMDLOG AUTO_INCREMENT=1;").execute();
@@ -128,14 +130,15 @@ public class CommandManager {
             SQLDatabase.getInstance().run((conn) -> {
                 try {
                     PreparedStatement statement = conn.prepareStatement("INSERT INTO CMDLOG " +
-                            "(cmd, arguments, userid, channelid, guildid, date, successful) VALUES(" +
+                            "(cmd, arguments, userid, channelid, guildid, date, successful, sessionId) VALUES(" +
                             "?, " +
                             "?, " +
                             "?, " +
                             "?, " +
                             "?, " +
                             "?, " +
-                            "?" +
+                            "?," +
+                            "? " +
                             ");");
                     statement.setString(1, cmd.getName());
                     statement.setString(2, args);
@@ -144,6 +147,7 @@ public class CommandManager {
                     statement.setString(5, guild == null ? null : guild.getId());
                     statement.setLong(6, System.currentTimeMillis());
                     statement.setInt(7, successful ? 1 : 0);
+                    statement.setLong(8, Bran.getInstance().getSessionId());
                     
                     statement.executeUpdate();
                 } catch (SQLException exception) {

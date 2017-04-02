@@ -17,10 +17,10 @@ public class GuildListener extends EventListener<GenericGuildEvent> {
 	public void event(GenericGuildEvent event) {
 		if (event instanceof GuildJoinEvent) {
 			Bran.getInstance().getDiscordLog().logToDiscord((GuildJoinEvent) event);
-			GuildStatsManager.log(LoggedEvent.JOIN);
-		} else if (event instanceof GuildLeaveEvent) {
+            GuildStatsManager.log(LoggedEvent.JOIN, event.getGuild());
+        } else if (event instanceof GuildLeaveEvent) {
 			Bran.getInstance().getDiscordLog().logToDiscord((GuildLeaveEvent) event);
-			GuildStatsManager.log(LoggedEvent.LEAVE);
-		}
+            GuildStatsManager.log(LoggedEvent.LEAVE, event.getGuild());
+        }
 	}
 }

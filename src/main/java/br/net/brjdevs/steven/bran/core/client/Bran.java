@@ -7,9 +7,9 @@ import br.net.brjdevs.steven.bran.core.command.CommandManager;
 import br.net.brjdevs.steven.bran.core.currency.ProfileData;
 import br.net.brjdevs.steven.bran.core.data.BranDataManager;
 import br.net.brjdevs.steven.bran.core.data.Config;
-import br.net.brjdevs.steven.bran.core.managers.MessageCache;
 import br.net.brjdevs.steven.bran.core.managers.Messenger;
 import br.net.brjdevs.steven.bran.core.managers.TaskManager;
+import br.net.brjdevs.steven.bran.core.snowflakes.SnowflakeGenerator;
 import br.net.brjdevs.steven.bran.core.utils.Session;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
 import com.mashape.unirest.http.HttpResponse;
@@ -54,8 +54,9 @@ public class Bran {
 	private int ownerShardId;
 	private Session session;
 	private Messenger messenger;
-	
-	public Bran() throws LoginException, InterruptedException, RateLimitedException {
+    private long sessionId;
+    
+    public Bran() throws LoginException, InterruptedException, RateLimitedException {
 		instance = this;
         this.discordBotData = new BranDataManager();
 		this.ownerId = 0;
@@ -74,16 +75,20 @@ public class Bran {
 		this.session = new Session();
 		this.messenger = new Messenger();
 		this.taskManager = new TaskManager();
-        new MessageCache();
+        this.sessionId = new SnowflakeGenerator(3, 1).nextId();
     }
-	
-	public static JedisPool getJedisPool() {
-		return jedisPool;
+    
+    public static JedisPool getJedisPool() {
+        return jedisPool;
 	}
-	
-	public static Bran getInstance() {
+    
+    public static Bran getInstance() {
 		return instance;
 	}
+    
+    public long getSessionId() {
+        return sessionId;
+    }
     
     public Client[] getShards() {
         return shards;

@@ -1,6 +1,5 @@
 package br.net.brjdevs.steven.bran.core.command.builders;
 
-import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.command.Argument;
 import br.net.brjdevs.steven.bran.core.command.ArgumentParsingException;
 import br.net.brjdevs.steven.bran.core.command.CommandEvent;
@@ -129,7 +128,6 @@ public class CommandBuilder {
 					}
 				}
 				action.accept(event, args);
-                Bran.getInstance().getCommandManager().log(event.getCommand(), event.getMessage().getRawContent(), event.getAuthor(), event.getChannel(), event.isPrivate() ? null : event.getGuild(), true);
             }
 			
 			@Override

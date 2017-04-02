@@ -3,7 +3,6 @@ package br.net.brjdevs.steven.bran.core.listeners;
 import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import br.net.brjdevs.steven.bran.core.command.CommandEvent;
-import br.net.brjdevs.steven.bran.core.command.CommandStatsManager;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.currency.DroppedMoney;
 import br.net.brjdevs.steven.bran.core.data.GuildData;
@@ -49,12 +48,12 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 		}
         CommandEvent e = new CommandEvent(event, cmd, event.getMessage().getRawContent(), prefix);
         Bran.getInstance().getSession().cmds++;
-		CommandStatsManager.log(cmd);
 		Utils.async(cmd.getName() + ">" + Utils.getUser(event.getAuthor()),
 				() -> {
 					try {
 						cmd.execute(e);
-						if (!e.isPrivate())
+                        Bran.getInstance().getCommandManager().log(e.getCommand(), event.getMessage().getRawContent(), event.getAuthor(), event.getChannel(), e.isPrivate() ? null : event.getGuild(), true);
+                        if (!e.isPrivate())
 							DroppedMoney.of(event.getTextChannel()).dropWithChance(MathUtils.random(100), 5);
 					} catch (Exception ex) {
                         if (ex instanceof PermissionException) {

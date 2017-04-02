@@ -124,10 +124,10 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	
 	public MessageEmbed toEmbedCmds(JDA jda) {
 		return new EmbedBuilder().setTitle("Commands Stats", null).setColor(Bran.COLOR)
-                .addField("Now", CommandStatsManager.resume(CommandStatsManager.MINUTE_CMDS), false)
-                .addField("Hourly", CommandStatsManager.resume(CommandStatsManager.HOUR_CMDS), false)
-                .addField("Daily", CommandStatsManager.resume(CommandStatsManager.DAY_CMDS), false)
-                .addField("Total", CommandStatsManager.resume(CommandStatsManager.TOTAL_CMDS), false).build();
+                .addField("Now", CommandStatsManager.resume(CommandStatsManager.getIssuedCommands(TimePeriod.MINUTE)), false)
+                .addField("Hourly", CommandStatsManager.resume(CommandStatsManager.getIssuedCommands(TimePeriod.HOUR)), false)
+                .addField("Daily", CommandStatsManager.resume(CommandStatsManager.getIssuedCommands(TimePeriod.DAY)), false)
+                .addField("Total", CommandStatsManager.resume(CommandStatsManager.getIssuedCommands(TimePeriod.TOTAL)), false).build();
     }
 	
 	public MessageEmbed toEmbedGuilds(JDA jda) {

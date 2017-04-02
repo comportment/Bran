@@ -1,9 +1,15 @@
 package br.net.brjdevs.steven.bran.core.managers;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
+import br.net.brjdevs.steven.bran.core.sql.SQLAction;
+import br.net.brjdevs.steven.bran.core.sql.SQLDatabase;
 import br.net.brjdevs.steven.bran.core.utils.StringUtils;
-import net.dv8tion.jda.core.EmbedBuilder;
+import br.net.brjdevs.steven.bran.core.utils.TimePeriod;
+import net.dv8tion.jda.core.entities.Guild;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,44 +27,82 @@ public class GuildStatsManager {
 	private static final char EMPTY_BLOCK = '\u200b';
 	private static final ExpirationManager EXPIRATION = new ExpirationManager();
 	private static final int MINUTE = 60000, HOUR = 3600000, DAY = 86400000;
-	
-	public static String bar(int percent, int total) {
+    
+    static {
+        try {
+            SQLDatabase.getInstance().run((conn) -> {
+                try {
+                    conn.prepareStatement("CREATE TABLE IF NOT EXISTS GUILDLOG (" +
+                            "guildId varchar(18)," +
+                            "loggedEvent int," + // 0 = Join; 1 = Leave
+                            "date bigint," +
+                            "sessionId bigint" +
+                            ");").execute();
+                } catch (SQLException e) {
+                    SQLAction.LOGGER.log(e);
+                }
+            }).queue();
+        } catch (SQLException e) {
+            SQLAction.LOGGER.log(e);
+        }
+    }
+    
+    public static String bar(int percent, int total) {
 		int activeBlocks = (int) ((float) percent / 100f * total);
 		StringBuilder builder = new StringBuilder().append('`').append(EMPTY_BLOCK);
 		for (int i = 0; i < total; i++) builder.append(activeBlocks > i ? ACTIVE_BLOCK : ' ');
 		return builder.append(EMPTY_BLOCK).append('`').toString();
 	}
-	
-	public static EmbedBuilder fillEmbed(Map<LoggedEvent, AtomicInteger> events, EmbedBuilder builder) {
-		int total = events.values().stream().mapToInt(AtomicInteger::get).sum();
-		
-		if (total == 0) {
-			builder.addField("Nothing Here.", "Just dust.", false);
-			return builder;
-		}
-		
-		events.entrySet().stream()
-				.filter(entry -> entry.getValue().get() > 0)
-				.sorted(Comparator.comparingInt(entry -> total - entry.getValue().get()))
-				.limit(12)
-				.forEachOrdered(entry -> {
-					int percent = entry.getValue().get() * 100 / total;
-					builder.addField(entry.getKey().toString(), String.format("%s %d%% (%d)", bar(percent, 15), percent, entry.getValue().get()), true);
-				});
-		
-		return builder.setFooter("Guilds: " + Bran.getInstance().getGuilds().size(), null);
-	}
-	
-	public static void log(LoggedEvent loggedEvent) {
-		long millis = System.currentTimeMillis();
-		TOTAL_EVENTS.computeIfAbsent(loggedEvent, k -> new AtomicInteger(0)).incrementAndGet();
-		DAY_EVENTS.computeIfAbsent(loggedEvent, k -> new AtomicInteger(0)).incrementAndGet();
-		HOUR_EVENTS.computeIfAbsent(loggedEvent, k -> new AtomicInteger(0)).incrementAndGet();
-		MINUTE_EVENTS.computeIfAbsent(loggedEvent, k -> new AtomicInteger(0)).incrementAndGet();
-		EXPIRATION.letExpire(millis + MINUTE, () -> MINUTE_EVENTS.get(loggedEvent).decrementAndGet());
-		EXPIRATION.letExpire(millis + HOUR, () -> HOUR_EVENTS.get(loggedEvent).decrementAndGet());
-		EXPIRATION.letExpire(millis + DAY, () -> DAY_EVENTS.get(loggedEvent).decrementAndGet());
-	}
+    
+    public static Map<LoggedEvent, Integer> getLoggedEvents(TimePeriod period) {
+        Map<LoggedEvent, Integer> result = new HashMap<>();
+        try {
+            SQLDatabase.getInstance().run((conn) -> {
+                try {
+                    for (int i = 0; i < 2; i++) {
+                        long sessionId = Bran.getInstance().getSessionId();
+                        PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) " +
+                                "FROM GUILDLOG WHERE loggedEvent=? " +
+                                "AND date + " + period.getMillis() + " > " + System.currentTimeMillis() + " " +
+                                "AND sessionId = " + sessionId);
+                        statement.setInt(1, i);
+                        ResultSet set = statement.executeQuery();
+                        int times;
+                        if (set != null && set.next() && (times = set.getInt(1)) > 0)
+                            result.put(LoggedEvent.from(i), times);
+                    }
+                    
+                } catch (SQLException e) {
+                    SQLAction.LOGGER.log(e);
+                }
+            }).complete();
+        } catch (SQLException e) {
+            SQLAction.LOGGER.log(e);
+        }
+        return result;
+    }
+    
+    public static void log(LoggedEvent loggedEvent, Guild guild) {
+        try {
+            SQLDatabase.getInstance().run((conn) -> {
+                try {
+                    PreparedStatement statement = conn.prepareStatement("INSERT INTO GUILDLOG VALUES(" +
+                            "?, " +
+                            "?, " +
+                            System.currentTimeMillis() + ", " +
+                            Bran.getInstance().getSessionId() + "" +
+                            ");");
+                    statement.setString(1, guild.getId());
+                    statement.setInt(2, loggedEvent == LoggedEvent.JOIN ? 0 : 1);
+                    statement.executeUpdate();
+                } catch (SQLException e) {
+                    SQLAction.LOGGER.log(e);
+                }
+            }).complete();
+        } catch (SQLException e) {
+            SQLAction.LOGGER.log(e);
+        }
+    }
 	
 	public static String resume(Map<LoggedEvent, AtomicInteger> commands) {
 		int total = commands.values().stream().mapToInt(AtomicInteger::get).sum();
@@ -76,8 +120,12 @@ public class GuildStatsManager {
 	
 	public enum LoggedEvent {
 		JOIN, LEAVE;
-		
-		@Override
+        
+        public static LoggedEvent from(int i) {
+            return i == 0 ? JOIN : LEAVE;
+        }
+        
+        @Override
 		public String toString() {
 			return StringUtils.capitalize(name());
 		}
