@@ -16,10 +16,7 @@ public class BranDataManager {
 	private GsonDataRedisManager<Polls> pollPersistence;
 	
 	public BranDataManager() {
-        getData();
         getConfig();
-        getHangmanWords();
-        getPolls();
     }
     
     public GsonDataRedisManager<DataHolder> getData() {

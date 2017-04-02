@@ -9,7 +9,8 @@ public class Config {
 	public String jenkinsPass = "";
 	public String jenkinsToken = "";
 	public String jenkinsLatestBuild = "";
-	public String botToken = "";
+    public String redisPassword = null;
+    public String botToken = "";
 	public String ownerId = "";
 	public String discordBotsToken = "";
 	public String discordBotsOrgToken = "";

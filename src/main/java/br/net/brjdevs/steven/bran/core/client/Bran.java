@@ -24,7 +24,6 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import javax.security.auth.login.LoginException;
@@ -58,9 +57,6 @@ public class Bran {
 	
 	public Bran() throws LoginException, InterruptedException, RateLimitedException {
 		instance = this;
-        try (Jedis jedis = jedisPool.getResource()) {
-            jedis.auth("stup2016");
-        }
         this.discordBotData = new BranDataManager();
 		this.ownerId = 0;
 		this.ownerShardId = 0;

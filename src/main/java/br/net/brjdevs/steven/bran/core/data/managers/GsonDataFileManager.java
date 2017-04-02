@@ -34,7 +34,6 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 				this.data = GSON.fromJson(IOUtils.read(this.path), clazz);
 			}
         } catch (IOException e) {
-            e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
