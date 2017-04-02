@@ -59,6 +59,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 					} catch (Exception ex) {
                         if (ex instanceof PermissionException) {
                             e.sendMessage(ex.getMessage()).queue();
+                            Bran.getInstance().getCommandManager().log(e.getCommand(), event.getMessage().getRawContent(), event.getAuthor(), event.getChannel(), e.isPrivate() ? null : event.getGuild(), false);
                             return;
                         }
                         LOG.log(ex);

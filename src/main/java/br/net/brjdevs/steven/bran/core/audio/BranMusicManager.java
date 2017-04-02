@@ -1,6 +1,8 @@
 package br.net.brjdevs.steven.bran.core.audio;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
+import br.net.brjdevs.steven.bran.core.sql.SQLAction;
+import br.net.brjdevs.steven.bran.core.sql.SQLDatabase;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -9,6 +11,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,7 +26,22 @@ public class BranMusicManager {
 		this.playedSongs = new AtomicLong(0);
 		this.playerManager = new DefaultAudioPlayerManager();
 		AudioSourceManagers.registerRemoteSources(playerManager);
-	}
+        
+        try {
+            SQLDatabase.getInstance().run((conn) -> {
+                try {
+                    conn.prepareStatement("CREATE TABLE IF NOT EXISTS MUSIC (" +
+                            "id varchar(15)," +
+                            "played int, PRIMARY KEY(id) " +
+                            ");").executeUpdate();
+                } catch (SQLException e) {
+                    SQLAction.LOGGER.log(e);
+                }
+            }).queue();
+        } catch (SQLException e) {
+            SQLAction.LOGGER.log(e);
+        }
+    }
 	
 	public Map<Long, GuildMusicManager> getMusicManagers() {
 		return musicManagers;

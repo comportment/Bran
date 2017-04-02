@@ -39,8 +39,8 @@ public class WeatherCommand {
 						return;
 					}
 					try {
-						if (element.isJsonNull()) {
-							event.sendMessage("Nothing found by `" + query + "`.").queue();
+                        if (element == null || element.isJsonNull()) {
+                            event.sendMessage("Nothing found by `" + query + "`.").queue();
 							return;
 						}
 						JsonObject result = element.getAsJsonObject();

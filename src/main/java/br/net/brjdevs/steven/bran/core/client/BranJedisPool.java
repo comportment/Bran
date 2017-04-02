@@ -15,11 +15,11 @@ public class BranJedisPool extends JedisPool {
     public Jedis getResource() {
         Jedis jedis = super.getResource();
         jedis.setDataSource(this);
-        if (!Utils.isEmpty(Bran.getInstance().getConfig().redisPassword)) {
+        if (!Utils.isEmpty(Bran.getInstance().getConfig().dbPwd)) {
             try {
                 jedis.ping();
             } catch (JedisDataException e) {
-                jedis.auth(Bran.getInstance().getConfig().redisPassword);
+                jedis.auth(Bran.getInstance().getConfig().dbPwd);
             }
         }
         

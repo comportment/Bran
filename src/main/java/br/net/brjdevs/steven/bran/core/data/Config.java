@@ -9,7 +9,7 @@ public class Config {
 	public String jenkinsPass = "";
 	public String jenkinsToken = "";
 	public String jenkinsLatestBuild = "";
-    public String redisPassword = null;
+    public String dbPwd = null;
     public String botToken = "";
 	public String ownerId = "";
 	public String discordBotsToken = "";

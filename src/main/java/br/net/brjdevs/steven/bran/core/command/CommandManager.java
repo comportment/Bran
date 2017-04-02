@@ -3,7 +3,12 @@ package br.net.brjdevs.steven.bran.core.command;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
+import br.net.brjdevs.steven.bran.core.sql.SQLAction;
+import br.net.brjdevs.steven.bran.core.sql.SQLDatabase;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -14,6 +19,8 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
 import java.lang.reflect.Method;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +33,30 @@ public class CommandManager {
 	private final SimpleLog LOG = SimpleLog.getLog("Command Manager");
 	
 	public CommandManager() {
-		load();
+        try {
+            SQLDatabase.getInstance().run((conn) -> {
+                try {
+                    conn.prepareStatement("CREATE TABLE IF NOT EXISTS CMDLOG (" +
+                            "id int NOT NULL AUTO_INCREMENT, " +
+                            "cmd text, " +
+                            "arguments text, " +
+                            "userid text, " +
+                            "channelid text, " +
+                            "guildid text, " +
+                            "date bigint, " +
+                            "successful int," +
+                            "PRIMARY KEY (id)" +
+                            ");").execute();
+                    conn.prepareStatement("ALTER TABLE CMDLOG AUTO_INCREMENT=1;").execute();
+                    
+                } catch (SQLException exception) {
+                    SQLAction.LOGGER.log(exception);
+                }
+            }).queue();
+        } catch (SQLException e) {
+            SQLAction.LOGGER.log(e);
+        }
+        load();
 	}
 	
 	public void addCommand(ICommand command) {
@@ -92,4 +122,36 @@ public class CommandManager {
 	    });
 		LOG.info("Finished loading all Commands.");
 	}
+    
+    public void log(ICommand cmd, String args, User user, MessageChannel channel, Guild guild, boolean successful) {
+        try {
+            SQLDatabase.getInstance().run((conn) -> {
+                try {
+                    PreparedStatement statement = conn.prepareStatement("INSERT INTO CMDLOG " +
+                            "(cmd, arguments, userid, channelid, guildid, date, successful) VALUES(" +
+                            "?, " +
+                            "?, " +
+                            "?, " +
+                            "?, " +
+                            "?, " +
+                            "?, " +
+                            "?" +
+                            ");");
+                    statement.setString(1, cmd.getName());
+                    statement.setString(2, args);
+                    statement.setString(3, user.getId());
+                    statement.setString(4, channel.getId());
+                    statement.setString(5, guild == null ? null : guild.getId());
+                    statement.setLong(6, System.currentTimeMillis());
+                    statement.setInt(7, successful ? 1 : 0);
+                    
+                    statement.executeUpdate();
+                } catch (SQLException exception) {
+                    SQLAction.LOGGER.log(exception);
+                }
+            }).queue();
+        } catch (SQLException e) {
+            SQLAction.LOGGER.log(e);
+        }
+    }
 }
