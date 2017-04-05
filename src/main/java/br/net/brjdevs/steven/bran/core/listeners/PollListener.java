@@ -8,10 +8,7 @@ import br.net.brjdevs.steven.bran.core.utils.MathUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-import java.util.regex.Pattern;
-
 public class PollListener extends EventListener<GuildMessageReceivedEvent> {
-	private static final Pattern OPTION_INDEX = Pattern.compile("^([0-9]{1,2})$");
 	
 	public PollListener() {
 		super(GuildMessageReceivedEvent.class);
@@ -22,7 +19,6 @@ public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		String msg = event.getMessage().getRawContent();
 		if (!MathUtils.isInteger(msg)) return;
-		if (!OPTION_INDEX.matcher(msg).matches()) return;
         GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true);
         if (!guildData.hasPermission(event.getAuthor(), Permissions.POLL)) return;
 		Poll poll = Poll.getPoll(event.getChannel());
@@ -35,13 +31,8 @@ public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 				return;
 			}
 			event.getMessage().addReaction(added ? "\u2705" : "\u2796").queue();
-		} catch (NullPointerException ex) {
-			if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
-				Bran.getInstance().getMessenger().sendMessage(event.getChannel(), "\u274c").queue();
-				return;
-			}
-			event.getMessage().addReaction("\u274c").queue();
-		}
+        } catch (NullPointerException ignored) {
+        }
         Bran.getInstance().getDataManager().getPolls().update();
     }
 }
