@@ -7,7 +7,6 @@ import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.currency.DroppedMoney;
 import br.net.brjdevs.steven.bran.core.data.GuildData;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
-import br.net.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.net.brjdevs.steven.bran.core.quote.Quotes;
 import br.net.brjdevs.steven.bran.core.utils.Hastebin;
 import br.net.brjdevs.steven.bran.core.utils.MathUtils;
@@ -33,17 +32,21 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 		String msg = event.getMessage().getRawContent().toLowerCase();
 		String[] args = StringUtils.splitSimple(msg);
         GuildData guildData = !event.isFromType(ChannelType.TEXT) ? null : Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true);
-        String prefix = PrefixManager.getPrefix(args[0], guildData);
-		if (prefix == null) return;
-		String baseCmd = args[0].substring(prefix.length());
-		ICommand cmd = Bran.getInstance().getCommandManager().getCommand(baseCmd);
-		if (cmd == null)
-			return;
+        ICommand cmd = null;
+        String prefix = null;
+        for (String s : guildData == null ? Bran.getInstance().getConfig().defaultPrefixes : guildData.prefixes) {
+            if (args[0].length() + 1 > s.length() && args[0].startsWith(s) && (cmd = Bran.getInstance().getCommandManager().getCommand(args[0].substring(s.length()))) != null) {
+                prefix = s;
+                break;
+            }
+        }
+        ICommand fcmd = cmd;
+        if (prefix == null) return;
 		else if (!cmd.isPrivateAvailable() && event.isFromType(ChannelType.PRIVATE)) {
 			event.getChannel().sendTyping().queue(success -> event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue());
             
         } else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getData().get().getUserData(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
-            event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("\u2757 I can't let you do that! You are missing the following permissions: " + String.join(", ", Permissions.toCollection(cmd.getRequiredPermission()))).queue());
+            event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("\u2757 I can't let you do that! You are missing the following permissions: " + String.join(", ", Permissions.toCollection(fcmd.getRequiredPermission()))).queue());
             return;
 		}
         CommandEvent e = new CommandEvent(event, cmd, event.getMessage().getRawContent(), prefix);
@@ -51,7 +54,7 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
 		Utils.async(cmd.getName() + ">" + Utils.getUser(event.getAuthor()),
 				() -> {
 					try {
-						cmd.execute(e);
+                        fcmd.execute(e);
                         Bran.getInstance().getCommandManager().log(e.getCommand(), event.getMessage().getRawContent(), event.getAuthor(), event.getChannel(), e.isPrivate() ? null : event.getGuild(), true);
                         if (!e.isPrivate())
 							DroppedMoney.of(event.getTextChannel()).dropWithChance(MathUtils.random(100), 5);

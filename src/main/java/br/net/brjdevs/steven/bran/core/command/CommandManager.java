@@ -4,12 +4,12 @@ import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
+import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import br.net.brjdevs.steven.bran.core.sql.SQLAction;
 import br.net.brjdevs.steven.bran.core.sql.SQLDatabase;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -19,19 +19,19 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
+import java.awt.*;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CommandManager {
-	
-	private final List<ICommand> commands = new ArrayList<>();
-	private final SimpleLog LOG = SimpleLog.getLog("Command Manager");
+    
+    private static Map<ICommand, String> help = new HashMap<>();
+    private static List<ICommand> commands = new ArrayList<>();
+    private final SimpleLog LOG = SimpleLog.getLog("Command Manager");
 	
 	public CommandManager() {
         try {
@@ -58,12 +58,49 @@ public class CommandManager {
         } catch (SQLException e) {
             SQLAction.LOGGER.log(e);
         }
-        load();
-	}
-	
-	public void addCommand(ICommand command) {
-		if (command != null)
+        new Thread(this::load).start();
+    }
+    
+    public void addCommand(ICommand command) {
+        if (command != null) {
             commands.add(command);
+            generateHelp(command);
+        }
+    }
+    
+    public MessageEmbed getHelp(ICommand command, Member m) {
+        return new EmbedBuilder().setColor(m != null && m.getColor() != null ? m.getColor() : Color.decode("#D68A38")).setDescription(help.get(command)).build();
+    }
+    
+    public String generateHelp(ICommand command) {
+        try {
+            String desc = "";
+            desc += command.getCategory().getEmoji() + " **| " + command.getCategory().getKey() + "**\n**Command:** " + command.getName() + "\n";
+            desc += "**Description:** " + command.getDescription() + "\n";
+            if (command.getArguments() != null) {
+                desc += "**Arguments:** " + (command.getArguments().length != 0 ? (String.join(" ", Arrays.stream(command.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "No arguments required.") + '\n';
+                desc += "            *Please note: do **NOT** include <> or []*\n";
+            }
+            desc += "**Required Permission(s):** " + String.join(", ", Permissions.toCollection(command.getRequiredPermission())) + "\n";
+            if (command instanceof ITreeCommand) {
+                desc += "**Parameters**:\n";
+                Set<Category> categories = ((ITreeCommand) command).getSubCommands().stream().map(ICommand::getCategory).collect(Collectors.toSet());
+                for (Category category : categories) {
+                    List<ICommand> commands = ((ITreeCommand) command).getSubCommands().stream().filter(cmd -> cmd.getCategory() == category).collect(Collectors.toList());
+                    if (commands.isEmpty()) continue;
+                    desc += category.getEmoji() + " **| " + category.getKey() + "**\n";
+                    for (ICommand cmd : commands)
+                        desc += "          **" + cmd.getAliases()[0] + "** " + (cmd.getArguments() != null ? (String.join(" ", Arrays.stream(cmd.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "") + " - " + (cmd instanceof ITreeCommand ? "Use `" + cmd.getHelp() + "` to get help on this command!" : cmd.getDescription()) + "\n";
+                    desc += '\n';
+                }
+            }
+            if (command.getExample() != null)
+                desc += "**Example:** " + command.getExample();
+            help.put(command, desc);
+            return desc;
+        } catch (Exception e) {
+            return null;
+        }
     }
 	
 	public List<ICommand> getCommands() {
@@ -115,7 +152,6 @@ public class CommandManager {
 			    if (command.getCategory() == Category.UNKNOWN) {
 				    LOG.fatal("Registered ICommand with UNKNOWN Category. (" + clazz.getSimpleName() + ")");
 			    }
-			    HelpContainer.generateHelp(command);
 			    addCommand(command);
 		    } catch (Exception e) {
 	    		LOG.log(e);

@@ -13,20 +13,12 @@ import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class GuildStatsManager {
-	
-	public static final Map<LoggedEvent, AtomicInteger>
-			TOTAL_EVENTS = new HashMap<>(),
-			DAY_EVENTS = new HashMap<>(),
-			HOUR_EVENTS = new HashMap<>(),
-			MINUTE_EVENTS = new HashMap<>();
-	private static final char ACTIVE_BLOCK = '\u2588';
+    
+    private static final char ACTIVE_BLOCK = '\u2588';
 	private static final char EMPTY_BLOCK = '\u200b';
-	private static final ExpirationManager EXPIRATION = new ExpirationManager();
-	private static final int MINUTE = 60000, HOUR = 3600000, DAY = 86400000;
     
     static {
         try {
@@ -103,18 +95,18 @@ public class GuildStatsManager {
             SQLAction.LOGGER.log(e);
         }
     }
-	
-	public static String resume(Map<LoggedEvent, AtomicInteger> commands) {
-		int total = commands.values().stream().mapToInt(AtomicInteger::get).sum();
-		
-		return (total == 0) ? ("No Events Logged.") : ("Count: " + total + "\n" + commands.entrySet().stream()
-				.filter(entry -> entry.getValue().get() > 0)
-				.sorted(Comparator.comparingInt(entry -> total - entry.getValue().get()))
-				.limit(5)
+    
+    public static String resume(Map<LoggedEvent, Integer> commands) {
+        int total = commands.values().stream().mapToInt(Integer::intValue).sum();
+    
+        return (total == 0) ? ("No Events Logged.") : ("Count: " + total + "\n" + commands.entrySet().stream()
+                .filter(entry -> entry.getValue() > 0)
+                .sorted(Comparator.comparingInt(entry -> total - entry.getValue()))
+                .limit(5)
 				.map(entry -> {
-					int percent = entry.getValue().get() * 100 / total;
-					return String.format("%s %d%% **%s** (%d)", bar(percent, 15), percent, entry.getKey().toString(), entry.getValue().get());
-				})
+                    int percent = entry.getValue() * 100 / total;
+                    return String.format("%s %d%% **%s** (%d)", bar(percent, 15), percent, entry.getKey().toString(), entry.getValue());
+                })
 				.collect(Collectors.joining("\n")));
 	}
 	

@@ -4,7 +4,6 @@ import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.data.GuildData;
 import br.net.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
-import br.net.brjdevs.steven.bran.core.managers.PrefixManager;
 import br.net.brjdevs.steven.bran.core.utils.MathUtils;
 import br.net.brjdevs.steven.bran.core.utils.StringUtils;
 import net.dv8tion.jda.core.entities.Guild;
@@ -47,13 +46,16 @@ public class CustomCommandsListener extends EventListener<GuildMessageReceivedEv
         GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true);
         if (guildData.customCommands.isEmpty()) return;
 		String msg = event.getMessage().getRawContent().trim().toLowerCase().split("\\s+")[0];
-		String prefix = PrefixManager.getPrefix0(msg, guildData);
-		if (prefix == null) return;
-		if (!guildData.hasPermission(event.getAuthor(), Permissions.RUN_USRCMD))
-			return;
-		String baseCmd = msg.substring(prefix.length()).split("\\s+")[0];
-		CustomCommand command = guildData.customCommands.get(baseCmd);
-		if (command == null) return;
+        CustomCommand command = null;
+        for (String s : guildData.prefixes) {
+            if (msg.length() > s.length() && msg.startsWith(s) && (command = guildData.customCommands.get(msg.substring(s.length()))) != null) {
+                break;
+            }
+        }
+        if (command == null)
+            return;
+        else if (!guildData.hasPermission(event.getAuthor(), Permissions.RUN_USRCMD))
+            return;
 		String args = StringUtils.splitArgs(event.getMessage().getRawContent(), 2)[1];
 		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args);
 		Bran.getInstance().getMessenger().sendMessage(event.getChannel(), answer).queue();

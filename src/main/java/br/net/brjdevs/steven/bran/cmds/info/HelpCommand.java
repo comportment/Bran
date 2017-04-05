@@ -4,7 +4,6 @@ import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.command.Argument;
 import br.net.brjdevs.steven.bran.core.command.Command;
 import br.net.brjdevs.steven.bran.core.command.CommandManager;
-import br.net.brjdevs.steven.bran.core.command.HelpContainer;
 import br.net.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
@@ -50,7 +49,7 @@ public class HelpCommand {
                         if (cmd == null) {
                             event.sendMessage(Emojis.X + " No commands found matching the following criteria: " + event.getArgument("command").get() + ". Make sure you didn't include prefixes in the command.").queue();
                         } else {
-                            event.sendMessage(HelpContainer.getHelp(cmd, event.getMember())).queue();
+                            event.sendMessage(Bran.getInstance().getCommandManager().getHelp(cmd, event.getMember())).queue();
                         }
                         return;
                     }

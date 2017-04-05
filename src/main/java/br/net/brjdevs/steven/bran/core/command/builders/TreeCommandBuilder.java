@@ -3,7 +3,6 @@ package br.net.brjdevs.steven.bran.core.command.builders;
 import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.command.Argument;
 import br.net.brjdevs.steven.bran.core.command.CommandEvent;
-import br.net.brjdevs.steven.bran.core.command.HelpContainer;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.enums.CommandAction;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
@@ -15,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TreeCommandBuilder {
-	
-	private List<ICommand> subCommands = new ArrayList<>();
+    
+    private List<ICommand> subCommands = new ArrayList<>();
 	private String[] aliases;
 	private String name = null;
 	private String desc = null;
@@ -65,8 +64,8 @@ public class TreeCommandBuilder {
 	
 	public TreeCommandBuilder addSubCommand(ICommand subCommand) {
 		this.subCommands.add(subCommand);
-		HelpContainer.generateHelp(subCommand);
-		return this;
+        Bran.getInstance().getCommandManager().generateHelp(subCommand);
+        return this;
 	}
 	
 	public TreeCommandBuilder setDefault(String alias) {
@@ -118,7 +117,7 @@ public class TreeCommandBuilder {
                 } else if (!event.isPrivate() && event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(event.getCommand().getKey()))
                     return;
                 else if (event.getArgs(3)[1].matches("^(\\?|help)$")) {
-                    event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
+                    event.sendMessage(Bran.getInstance().getCommandManager().getHelp(this, event.getMember())).queue();
                     return;
                 }
                 String alias = event.getArgs(3)[1].trim();
@@ -131,7 +130,7 @@ public class TreeCommandBuilder {
                         if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
                             event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
                         } else {
-                            event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+                            event.sendMessage(Bran.getInstance().getCommandManager().getHelp(event.getCommand(), event.getSelfMember())).queue();
                         }
                         return;
                     }
@@ -149,7 +148,7 @@ public class TreeCommandBuilder {
                             if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
                                 event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
                             } else {
-                                event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+                                event.sendMessage(Bran.getInstance().getCommandManager().getHelp(event.getCommand(), event.getSelfMember())).queue();
                             }
                             break;
                     }
@@ -166,7 +165,7 @@ public class TreeCommandBuilder {
                             if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
                                 event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
                             } else {
-                                event.sendMessage(HelpContainer.getHelp(event.getCommand(), event.getSelfMember())).queue();
+                                event.sendMessage(Bran.getInstance().getCommandManager().getHelp(event.getCommand(), event.getSelfMember())).queue();
                             }
                             break;
                     }

@@ -132,11 +132,11 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 	
 	public MessageEmbed toEmbedGuilds(JDA jda) {
 		return new EmbedBuilder().setTitle("Guild Stats", null).setColor(Bran.COLOR)
-				.addField("Now", GuildStatsManager.resume(GuildStatsManager.MINUTE_EVENTS), false)
-				.addField("Hourly", GuildStatsManager.resume(GuildStatsManager.HOUR_EVENTS), false)
-				.addField("Daily", GuildStatsManager.resume(GuildStatsManager.DAY_EVENTS), false)
-				.addField("Total", GuildStatsManager.resume(GuildStatsManager.TOTAL_EVENTS), false)
-				.setFooter("Guilds: " + Bran.getInstance().getGuilds().size(), null).build();
+                .addField("Now", GuildStatsManager.resume(GuildStatsManager.getLoggedEvents(TimePeriod.MINUTE)), false)
+                .addField("Hourly", GuildStatsManager.resume(GuildStatsManager.getLoggedEvents(TimePeriod.HOUR)), false)
+                .addField("Daily", GuildStatsManager.resume(GuildStatsManager.getLoggedEvents(TimePeriod.DAY)), false)
+                .addField("Total", GuildStatsManager.resume(GuildStatsManager.getLoggedEvents(TimePeriod.TOTAL)), false)
+                .setFooter("Guilds: " + Bran.getInstance().getGuilds().size(), null).build();
 	}
 	
 	public String toString(JDA jda) {

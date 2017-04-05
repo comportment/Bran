@@ -1,9 +1,9 @@
 package br.net.brjdevs.steven.bran.core.command.builders;
 
+import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.command.Argument;
 import br.net.brjdevs.steven.bran.core.command.ArgumentParsingException;
 import br.net.brjdevs.steven.bran.core.command.CommandEvent;
-import br.net.brjdevs.steven.bran.core.command.HelpContainer;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
@@ -102,8 +102,8 @@ public class CommandBuilder {
                     return;
                 String[] split = event.getArgs(2);
 				if (split[1].matches("^(\\?|help)$")) {
-					event.sendMessage(HelpContainer.getHelp(this, event.getMember())).queue();
-					return;
+                    event.sendMessage(Bran.getInstance().getCommandManager().getHelp(this, event.getMember())).queue();
+                    return;
 				}
 				split[1] = split[1].trim();
 				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\' && split[1].matches("^(\\?|help)$"))
