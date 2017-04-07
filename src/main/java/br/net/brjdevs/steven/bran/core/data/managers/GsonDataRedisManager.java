@@ -14,30 +14,26 @@ public class GsonDataRedisManager<T> implements Supplier<T> {
 	private T data;
 	
 	public GsonDataRedisManager(Class<T> clazz, String key, Supplier<T> constructor) {
-		this.key = key;
-		try (Jedis jedis = Bran.getJedisPool().getResource()) {
-            synchronized (GSON) {
-                String s = jedis.get(key);
-                if (s == null) {
-                    jedis.set(key, s = GSON.toJson(constructor.get()));
-                }
-                data = GSON.fromJson(s, clazz);
+        this.key = key;
+        try (Jedis jedis = Bran.getJedisPool().getResource()) {
+            String s = jedis.get(key);
+            if (s == null) {
+                jedis.set(key, s = GSON.toJson(constructor.get()));
             }
+            data = GSON.fromJson(s, clazz);
         } catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	@Override
+            throw new RuntimeException(e);
+        }
+    }
+    
+    @Override
 	public T get() {
 		return data;
 	}
 	
 	public void update() {
         try (Jedis jedis = Bran.getJedisPool().getResource()) {
-            synchronized (GSON) {
-                jedis.set(key, GSON.toJson(data));
-            }
+            jedis.set(key, GSON.toJson(data));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
