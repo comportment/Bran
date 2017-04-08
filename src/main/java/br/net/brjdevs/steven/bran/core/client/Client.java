@@ -46,6 +46,7 @@ public class Client {
 		jdaBuilder.setAutoReconnect(true);
         jdaBuilder.setGame(Game.of("waking up..."));
         jdaBuilder.setStatus(OnlineStatus.IDLE);
+        jdaBuilder.setCorePoolSize(5);
         jda = jdaBuilder.buildBlocking();
 		if (startup == 0)
 			this.startup = System.currentTimeMillis();

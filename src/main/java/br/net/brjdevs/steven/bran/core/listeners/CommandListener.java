@@ -43,10 +43,10 @@ public class CommandListener extends EventListener<MessageReceivedEvent> {
         ICommand fcmd = cmd;
         if (prefix == null) return;
 		else if (!cmd.isPrivateAvailable() && event.isFromType(ChannelType.PRIVATE)) {
-			event.getChannel().sendTyping().queue(success -> event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue());
+            event.getChannel().sendMessage(Quotes.getQuote(Quotes.FAIL) + "You cannot execute this Commands in PMs!").queue();
             
         } else if (event.isFromType(ChannelType.PRIVATE) ? !Bran.getInstance().getDataManager().getData().get().getUserData(event.getAuthor()).hasPermission(cmd.getRequiredPermission()) : !Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true).hasPermission(event.getAuthor(), cmd.getRequiredPermission())) {
-            event.getChannel().sendTyping().queue(sent -> event.getChannel().sendMessage("\u2757 I can't let you do that! You are missing the following permissions: " + String.join(", ", Permissions.toCollection(fcmd.getRequiredPermission()))).queue());
+            event.getChannel().sendMessage("\u2757 I can't let you do that! You are missing the following permissions: " + String.join(", ", Permissions.toCollection(fcmd.getRequiredPermission()))).queue();
             return;
 		}
         CommandEvent e = new CommandEvent(event, cmd, event.getMessage().getRawContent(), prefix);
