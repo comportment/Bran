@@ -11,16 +11,12 @@ import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.currency.BankAccount;
 import br.net.brjdevs.steven.bran.core.currency.ProfileData;
 import br.net.brjdevs.steven.bran.core.currency.ProfileData.Rank;
-import br.net.brjdevs.steven.bran.core.managers.profile.Inventory;
 import br.net.brjdevs.steven.bran.core.utils.Emojis;
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
-import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ProfileCommand {
 	private static final Pattern pattern = Pattern.compile("^(reset|default|null|none)$");
@@ -67,25 +63,6 @@ public class ProfileCommand {
                             event.sendMessage("You ranked up from " + r + " to " + next + "!").queue();
                             Bran.getInstance().getDataManager().getData().update();
                         })
-						.build())
-				.addSubCommand(new CommandBuilder(Category.INFORMATIVE)
-						.setAliases("inventory")
-						.setName("Inventory Command")
-						.setDescription("Shows you your inventory.")
-						.setAction((event) -> {
-							Inventory inventory = Bran.getInstance().getProfile(event.getAuthor()).getInventory();
-							if (inventory.isEmpty()) {
-								event.sendMessage("Your inventory is empty!").queue();
-								return;
-							}
-							List<String> items = inventory.getItems().entrySet()
-									.stream().map(entry -> entry.getValue().toString()).collect(Collectors.toList());
-							EmbedBuilder embedBuilder = new EmbedBuilder();
-							embedBuilder.setColor(Bran.COLOR);
-							embedBuilder.setAuthor("Your inventory", null, event.getAuthor().getEffectiveAvatarUrl());
-							embedBuilder.setDescription(String.join("\n", items));
-							event.sendMessage(embedBuilder.build()).queue();
-						})
 						.build())
 				.addSubCommand(new TreeCommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("edit")

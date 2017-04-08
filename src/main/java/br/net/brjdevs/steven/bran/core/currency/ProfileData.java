@@ -1,7 +1,6 @@
 package br.net.brjdevs.steven.bran.core.currency;
 
 import br.net.brjdevs.steven.bran.core.managers.profile.IProfileListener;
-import br.net.brjdevs.steven.bran.core.managers.profile.Inventory;
 import br.net.brjdevs.steven.bran.core.utils.StringUtils;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
 import br.net.brjdevs.steven.bran.games.engine.GameReference;
@@ -24,7 +23,6 @@ public class ProfileData {
 	private HMStats HMStats;
 	private Rank rank;
 	private long level, experience;
-	private Inventory inv;
 	private transient List<IProfileListener> listeners;
 	private int stamina;
     private long lastDaily;
@@ -42,7 +40,6 @@ public class ProfileData {
         this.level = 0;
         this.experience = 0;
         this.customHex = null;
-        this.inv = new Inventory();
         this.listeners = new ArrayList<>();
         this.stamina = 100;
         this.lastDaily = 0;
@@ -123,11 +120,6 @@ public class ProfileData {
 		this.experience = experience;
 	}
 	
-	public Inventory getInventory() {
-		if (inv == null) inv = new Inventory();
-		return inv;
-	}
-	
 	public User getUser(JDA jda) {
 		return jda.getUserById(userId);
 	}
@@ -161,7 +153,6 @@ public class ProfileData {
 		this.rank = Rank.ROOKIE;
 		this.level = 0;
 		this.level = 0;
-		this.inv = new Inventory();
 	}
 	
 	public boolean setCustomColor(String hex) {
@@ -220,7 +211,6 @@ public class ProfileData {
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);
 		builder.addField("\u2b50 Experience to Next Level", String.valueOf(expForNextLevel(getLevel())), true);
 		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(getBankAccount().getCoins()), true);
-		builder.addField("\uD83D\uDCBC Inventory", String.valueOf(getInventory().size(false)), true);
 		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
         builder.addField("<:hangman:295383212207767553> Hang Man", "\u00AD", true);
         builder.addField("Victories", String.valueOf(getHMStats().getVictories()), true);
