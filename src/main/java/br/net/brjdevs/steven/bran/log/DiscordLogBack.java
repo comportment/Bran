@@ -8,6 +8,10 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import net.dv8tion.jda.core.entities.TextChannel;
 
+/**
+ * @author Kodehawa, AdrianTodt
+ */
+
 public class DiscordLogBack extends AppenderBase<ILoggingEvent> {
     private static boolean enabled = false;
 

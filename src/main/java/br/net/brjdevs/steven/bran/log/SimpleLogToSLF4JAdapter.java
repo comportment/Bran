@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+/**
+ * @author sedmelluq
+ */
+
 public class SimpleLogToSLF4JAdapter implements SimpleLog.LogListener {
     private static final Map<SimpleLog, Logger> LOGGERS = new WeakHashMap<>();
 
