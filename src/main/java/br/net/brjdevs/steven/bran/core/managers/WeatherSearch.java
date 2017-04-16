@@ -1,8 +1,8 @@
 package br.net.brjdevs.steven.bran.core.managers;
 
-import br.net.brjdevs.steven.bran.core.utils.HttpUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.mashape.unirest.http.Unirest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -18,7 +18,7 @@ public class WeatherSearch {
 			String url = URL.replace("{query}", URLEncoder.encode(query, "UTF-8"));
 			FutureTask<Object> task = new FutureTask<>(() -> {
 				try {
-					return HttpUtils.read(url);
+					return Unirest.get(url).asString().getBody();
 				} catch (Exception e) {
 					return e;
 				}

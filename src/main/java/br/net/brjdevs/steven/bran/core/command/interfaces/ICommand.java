@@ -4,6 +4,8 @@ import br.net.brjdevs.steven.bran.core.command.Argument;
 import br.net.brjdevs.steven.bran.core.command.CommandEvent;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 
+import java.util.function.Function;
+
 public interface ICommand {
 	
 	void execute(CommandEvent event);
@@ -24,7 +26,9 @@ public interface ICommand {
 	
 	Category getCategory();
 	
-	String getHelp();
+	String getHelpMessage();
+
+	Function<String, String[]> getArgumentParser();
     
     default String getKey() {
         return "[" + getCategory() + "]=" + getName() + "." + getAliases()[0];

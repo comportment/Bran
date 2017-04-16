@@ -15,8 +15,7 @@ public class Base64Command {
 	private static ICommand base64() {
 		return new TreeCommandBuilder(Category.MISCELLANEOUS)
 				.setName("Base64 Command")
-				.setHelp("base64 ?")
-				.setAliases("base64")
+								.setAliases("base64")
 				.setDescription("Let's speak in Base64!")
 				.addSubCommand(new CommandBuilder(Category.MISCELLANEOUS)
 						.setAliases("encode")

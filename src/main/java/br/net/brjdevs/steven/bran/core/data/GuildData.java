@@ -8,10 +8,7 @@ import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import br.net.brjdevs.steven.bran.core.operations.ResultType;
 import br.net.brjdevs.steven.bran.core.operations.ResultType.OperationResult;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,7 +45,8 @@ public class GuildData {
 	}
 	
 	public long getPermissionForUser(User user) {
-        return permissions.getOrDefault(Long.parseLong(user.getId()), user.getId().equals(Bran.getInstance().getDataManager().getConfig().get().ownerId) ? Permissions.BOT_OWNER : getGuild(user.getJDA()).getMember(user).isOwner() ? Permissions.GUILD_OWNER : Permissions.BASE_USR);
+    	Member member = getGuild(user.getJDA()).getMember(user);
+        return user.getId().equals(Bran.getInstance().getDataManager().getConfig().get().ownerId) ? Permissions.BOT_OWNER : member.isOwner() ? Permissions.GUILD_OWNER : permissions.getOrDefault(user.getIdLong(), Permissions.BASE_USR);
     }
 	
 	public OperationResult setPermission(CommandEvent event, long permsToAdd, long permsToTake, User user) {

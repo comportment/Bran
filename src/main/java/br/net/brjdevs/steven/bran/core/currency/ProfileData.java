@@ -50,7 +50,7 @@ public class ProfileData {
 	}
 	
 	public static long expForNextLevel(long level) {
-		double expCalculate = 9 + Math.pow(1.3d, level);
+		double expCalculate = 147 * (level + 1 ^ 3);
 		long expRequired = Math.round(expCalculate);
 		if (expCalculate - expRequired > 0) expRequired++;
 		return expRequired;
@@ -125,7 +125,7 @@ public class ProfileData {
 	}
 	
 	public void addExperience(long experience) {
-		if (getExperience() <= 0 && getLevel() <= 0 && experience < 0) {
+		if (getExperience() + experience < 0 || getLevel() <= 1 && experience < 0) {
 			return;
 		}
 		setExperience(this.experience + experience);
@@ -211,7 +211,7 @@ public class ProfileData {
 		builder.addField("\uD83C\uDF1F Experience", String.valueOf(getExperience()), true);
 		builder.addField("\u2b50 Experience to Next Level", String.valueOf(expForNextLevel(getLevel())), true);
 		builder.addField("\uD83D\uDCB8 Coins", String.valueOf(getBankAccount().getCoins()), true);
-		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
+		builder.addField("\uD83C\uDF96 Rank", getRank().toString(), true).addBlankField(true).addBlankField(true).addField("\uD83C\uDFAE Game Stats", EMPTY, true).addBlankField(true);
         builder.addField("<:hangman:295383212207767553> Hang Man", "\u00AD", true);
         builder.addField("Victories", String.valueOf(getHMStats().getVictories()), true);
         builder.addField("Defeats", String.valueOf(getHMStats().getDefeats()), true);

@@ -5,18 +5,19 @@ import br.net.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReadyListener extends EventListener<ReadyEvent> {
 	
-	private static final SimpleLog LOG = SimpleLog.getLog("Ready Listener");
+	private static final Logger LOG = LoggerFactory.getLogger("Ready Listener");
 	
 	public ReadyListener() {
 		super(ReadyEvent.class);
 	}
 	
 	@Override
-	public void event(ReadyEvent event) {
+	public void onEvent(ReadyEvent event) {
         if (event.getJDA().getShardInfo() != null)
             LOG.info("Got Ready Event on Shard " + event.getJDA().getShardInfo().getShardId());
         else

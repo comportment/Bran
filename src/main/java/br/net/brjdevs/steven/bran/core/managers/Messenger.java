@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.requests.RestAction;
 
 public class Messenger {
 	
-	public RestAction<Message> sendMessage(MessageChannel channel, String content) {
+	public static RestAction<Message> sendMessage(MessageChannel channel, String content) {
 		content = content.replaceAll("@everyone", "@\u00ADeveryone");
 		channel.sendTyping().complete();
 		if (content.length() > 2000)
@@ -18,7 +18,7 @@ public class Messenger {
 		return channel.sendMessage(content);
 	}
 	
-	public RestAction<Message> sendMessage(MessageChannel channel, Message message) {
+	public static RestAction<Message> sendMessage(MessageChannel channel, Message message) {
 		channel.sendTyping().complete();
 		
 		if (message.getRawContent().length() > 2000)
@@ -27,7 +27,7 @@ public class Messenger {
 		return channel.sendMessage(message);
 	}
 	
-	public RestAction<Message> sendMessage(MessageChannel channel, MessageEmbed embed) {
+	public static RestAction<Message> sendMessage(MessageChannel channel, MessageEmbed embed) {
 		channel.sendTyping().complete();
 		return channel.sendMessage(embed);
 	}

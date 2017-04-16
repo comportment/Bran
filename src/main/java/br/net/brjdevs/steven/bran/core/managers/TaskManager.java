@@ -3,9 +3,10 @@ package br.net.brjdevs.steven.bran.core.managers;
 import br.net.brjdevs.steven.bran.core.audio.timers.ChannelLeaveTimer;
 import br.net.brjdevs.steven.bran.core.audio.timers.MusicRegisterTimeout;
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.client.DiscordLog.Level;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.sun.management.OperatingSystemMXBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
@@ -51,17 +52,6 @@ public class TaskManager {
 			    ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
 		startAsyncTask("CPU Thread",
 				(service) -> Bran.getInstance().getSession().cpuUsage = Bran.getInstance().getSession().calculateCpuUsage(os), 5);
-		startAsyncTask("DiscordBots Thread", (service) -> Arrays.stream(Bran.getInstance().getShards()).forEach(shard -> {
-			try {
-				shard.updateStats();
-				shard.updateCurrentGuildCount();
-				Bran.getInstance().getDiscordLog().logToDiscord("Updated server_count in DiscordBots (Shard[" + shard.getId() + "])", "Successfully updated server_count at [Discord Bots/PW](https://bots.discord.pw/bots/" + shard.getJDA().getSelfUser().getId() + ") and [Discord Bots/ORG](https://discordbots.org/bot/" + shard.getJDA().getSelfUser().getId() + ")", Level.INFO);
-			} catch (UnirestException e) {
-				Bran.getInstance().getDiscordLog()
-						.logToDiscord(e.getMessage(),
-								"Unexpected exception occurred while updating Shard " + shard.getId() + " server count!", Level.WARN);
-			}
-		}), 3600);
 		startAsyncTask("Stamina Regenerator", (service) ->
                         Bran.getInstance().getDataManager().getData().get().users.values().stream().filter(userData -> userData.getProfileData().getStamina() < 100).forEach(userData -> userData.getProfileData().setStamina(userData.getProfileData().getStamina() + 5))
                 , 300);

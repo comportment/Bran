@@ -35,11 +35,11 @@ public class BranMusicManager {
                             "played int, PRIMARY KEY(id) " +
                             ");").executeUpdate();
                 } catch (SQLException e) {
-                    SQLAction.LOGGER.log(e);
+					SQLAction.LOGGER.error("Failed to execute SQLAction", e);
                 }
             }).queue();
         } catch (SQLException e) {
-            SQLAction.LOGGER.log(e);
+			SQLAction.LOGGER.error("Failed to execute SQLAction", e);
         }
     }
 	

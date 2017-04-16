@@ -6,12 +6,12 @@ import br.net.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.quote.Quotes;
-import br.net.brjdevs.steven.bran.core.utils.HttpUtils;
 import br.net.brjdevs.steven.bran.core.utils.StringUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mashape.unirest.http.Unirest;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.awt.*;
@@ -31,9 +31,9 @@ public class PokemonCommand {
 						String pokemon = (String) event.getArgument("id/name").get(), content;
                         pokemon = String.format("http://pokeapi.co/api/v2/pokemon/%s/", URLEncoder.encode(pokemon.toLowerCase(), "UTF-8"));
                         try {
-							content = HttpUtils.read(pokemon);
+							content = Unirest.get(pokemon).asString().getBody();
 						} catch (Exception e) {
-							event.sendMessage("Failed to connect! Please try again in a few minutes...").queue();
+							event.sendMessage("That's not a valid pokemon name!").queue();
 							return;
 						}
 						JsonObject item = new JsonParser().parse(content).getAsJsonObject();
@@ -45,7 +45,7 @@ public class PokemonCommand {
 						StringBuilder stringBuilder = new StringBuilder();
 						String form;
 						try {
-							form = new JsonParser().parse(HttpUtils.read(item.get("forms").getAsJsonArray().get(0).getAsJsonObject().get("url").getAsString())).getAsJsonObject().get("sprites").getAsJsonObject().get("front_default").getAsString();
+							form = new JsonParser().parse(Unirest.get(item.get("forms").getAsJsonArray().get(0).getAsJsonObject().get("url").getAsString()).asString().getBody()).getAsJsonObject().get("sprites").getAsJsonObject().get("front_default").getAsString();
 						} catch (Exception e) {
                             form = "Could not grab Pokemon Sprite!";
                         }

@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BranDataManager {
+public class DataManager {
 	
 	private GsonDataRedisManager<DataHolder> dataHolderManager;
 	private GsonDataFileManager<Config> configDataManager;
 	private GsonDataRedisManager<Map<String, List<String>>> hangmanWordsManager;
 	private GsonDataRedisManager<Polls> pollPersistence;
 	
-	public BranDataManager() {
+	public DataManager() {
         getConfig();
     }
     

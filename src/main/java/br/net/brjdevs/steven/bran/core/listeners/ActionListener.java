@@ -16,7 +16,7 @@ public class ActionListener extends EventListener<Event> {
 	}
 	
 	@Override
-	public void event(Event e) {
+	public void onEvent(Event e) {
 		ResponseWaiter responseWaiter = null;
 		String response = null;
 		Object obj = null;

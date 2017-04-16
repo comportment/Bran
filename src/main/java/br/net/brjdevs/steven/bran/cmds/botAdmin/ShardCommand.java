@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.cmds.botAdmin;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.client.Client;
+import br.net.brjdevs.steven.bran.core.client.Shard;
 import br.net.brjdevs.steven.bran.core.command.Argument;
 import br.net.brjdevs.steven.bran.core.command.Command;
 import br.net.brjdevs.steven.bran.core.command.builders.CommandBuilder;
@@ -39,7 +39,7 @@ public class ShardCommand {
                                 return;
                             }
                             int shardId = ((int) event.getArgument("shard").get());
-                            Client s = Bran.getInstance().getShards()[shardId];
+                            Shard s = Bran.getInstance().getShards()[shardId];
                             event.sendMessage(createShardInfo(s)).queue();
                         })
                         .build())
@@ -60,7 +60,7 @@ public class ShardCommand {
                                     return;
                                 }
                                 int shardId = Integer.parseInt(shard);
-                                Client s = Bran.getInstance().getShards()[shardId];
+                                Shard s = Bran.getInstance().getShards()[shardId];
                                 Bran.getInstance().reboot(s);
                             }
                         })
@@ -68,28 +68,26 @@ public class ShardCommand {
 				.build();
 	}
     
-    private static MessageEmbed createShardInfo(Client shard) {
+    private static MessageEmbed createShardInfo(Shard shard) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 		JDA jda = shard.getJDA();
 		embedBuilder.setTitle("Shard #" + shard.getId(), null);
 		embedBuilder.addField("Total Uptime", TimeUtils.format(System.currentTimeMillis() - shard.getStartup()), true);
 		embedBuilder.addField("Last Reboot", TimeUtils.format(System.currentTimeMillis() - shard.getLastReboot()), true);
         embedBuilder.addField("Last Event", TimeUtils.format(System.currentTimeMillis() - Bran.getInstance().getLastEvents().get(shard.getId())), true);
-        embedBuilder.addField("Event Manager Shutdown", String.valueOf(shard.getEventManager().executor.isShutdown()), true);
 		embedBuilder.addField("Status", jda.getStatus().name(), true);
 		embedBuilder.addField("General", "**Users:** " + jda.getUsers().size() + "\n**Guilds:** " + jda.getGuilds().size() + "\n**Audio Connections:** " + jda.getGuilds().stream().filter(guild -> guild.getAudioManager().isConnected()).count(), true);
-        embedBuilder.setFooter("Ping: " + shard.getJDA().getPing() + "ms", "https://discordapp.com/assets/371886a66446c46e66e9435158468720.svg");
         return embedBuilder.build();
 	}
     
     private static String createShardInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("```diff\n");
-        for (Client client : Bran.getInstance().getShards()) {
-            sb.append(client.getJDA().getStatus() == Status.CONNECTED ? "+" : "-").append(" ");
-            sb.append("Shard ").append(client.getJDA().getShardInfo() != null ? client.getJDA().getShardInfo().getShardString() : "[0 / 1]").append(" L.E.: ")
-                    .append(TimeUtils.format(System.currentTimeMillis() - Bran.getInstance().getLastEvents().get(client.getId())))
-                    .append(" L.R.: ").append(TimeUtils.format(System.currentTimeMillis() - client.getLastReboot())).append(" S: ").append(client.getJDA().getStatus()).append("\n");
+        for (Shard shard : Bran.getInstance().getShards()) {
+            sb.append(shard.getJDA().getStatus() == Status.CONNECTED ? "+" : "-").append(" ");
+            sb.append("Shard ").append(shard.getJDA().getShardInfo() != null ? shard.getJDA().getShardInfo().getShardString() : "[0 / 1]").append(" L.E.: ")
+                    .append(TimeUtils.format(System.currentTimeMillis() - Bran.getInstance().getLastEvents().get(shard.getId())))
+                    .append(" L.R.: ").append(TimeUtils.format(System.currentTimeMillis() - shard.getLastReboot())).append(" S: ").append(shard.getJDA().getStatus()).append("\n");
         }
         return sb.append("```").toString();
     }

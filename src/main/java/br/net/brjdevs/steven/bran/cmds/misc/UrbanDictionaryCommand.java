@@ -1,12 +1,13 @@
 package br.net.brjdevs.steven.bran.cmds.misc;
 
-import br.net.brjdevs.steven.bran.Main;
 import br.net.brjdevs.steven.bran.core.command.Argument;
 import br.net.brjdevs.steven.bran.core.command.Command;
 import br.net.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -21,7 +22,7 @@ import java.net.URLEncoder;
 import java.util.Scanner;
 
 public class UrbanDictionaryCommand {
-	
+	private static final Gson GSON = new GsonBuilder().serializeNulls().create();
 	@Command
 	private static ICommand urban() {
 		return new CommandBuilder(Category.INFORMATIVE)
@@ -46,7 +47,7 @@ public class UrbanDictionaryCommand {
 						}
 						scan.close();
 						in.close();
-						JsonObject json = Main.GSON.fromJson(jsonstring, JsonElement.class).getAsJsonObject();
+						JsonObject json = GSON.fromJson(jsonstring, JsonElement.class).getAsJsonObject();
 						if(json.get("result_type").getAsString().equals("no_results")){
 							event.sendMessage("There aren't any definitions for `" + params + "` yet.").queue();
 							return;

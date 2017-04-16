@@ -8,6 +8,9 @@ import br.net.brjdevs.steven.bran.core.command.builders.TreeCommandBuilder;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
+import br.net.brjdevs.steven.bran.core.utils.Hastebin;
+import br.net.brjdevs.steven.bran.core.utils.Utils;
+import net.dv8tion.jda.core.EmbedBuilder;
 import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -107,16 +110,19 @@ public class EvalCommand /*implements ICommand*/ {
 						.setArgs(new Argument("java code", String.class))
 						.setAction((event) -> {
 							Object x = null;
+							long runtime = 0, compile = 0;
 							try {
 								OutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
 								stream.write(getBodyWithLines((String) event.getArgument("java code").get()).getBytes());
 								stream.close();
 								try {
 									FutureTask<?> task = new FutureTask<>(() -> compile(Bran.getInstance()));
+									compile = System.currentTimeMillis();
 									task.run();
 									x = task.get(15, TimeUnit.SECONDS);
+                                    compile = System.currentTimeMillis() - compile;
 								} catch (TimeoutException e) {
-									event.sendMessage("Compiling timed out.").queue();
+                                    event.sendMessage("Compiling timed out.").queue();
 									return;
 								} catch (Exception e) {
 									event.sendMessage(e.getMessage()).queue();
@@ -129,23 +135,28 @@ public class EvalCommand /*implements ICommand*/ {
 									event.sendMessage("Something went wrong trying to load the compiled class.").queue();
 									return;
 								}
-								
 								Object o = clazz.getConstructors()[0].newInstance(event);
 								try {
 									Object finalO = o;
 									FutureTask<?> task = new FutureTask<>(() -> finalO.getClass().getMethod("run").invoke(finalO));
+									runtime = System.currentTimeMillis();
 									task.run();
 									o = task.get(2, TimeUnit.SECONDS);
+                                    runtime = System.currentTimeMillis() - runtime;
 								} catch (TimeoutException e) {
 									event.sendMessage("Method timed out.").queue();
 									return;
 								} catch (Exception e) {
-									o = ":anger: `" + e.getCause() + "`";
-								}
+									o = e.getClass().getSimpleName() + ": " + e.getMessage() + "\n" + Utils.getStackTrace(e);
+                                }
 								if (o == null || o.toString().isEmpty())
 									o = "Executed without error and no objects returned!";
 								o = o.toString().replaceAll(Bran.getInstance().getConfig().botToken, "<BOT TOKEN>");
-								event.sendMessage(o.toString()).queue();
+								o = "**Result:** " + o.toString();
+								EmbedBuilder embedBuilder = new EmbedBuilder();
+                                embedBuilder.setAuthor("Java Evaluator", null, "http://findicons.com/files/icons/1008/quiet/256/java.png").addField("Compile time", compile + "ms", true).addBlankField(true).addField("Executing time", runtime + "ms", true);
+                                embedBuilder.setDescription(o.toString());
+								event.sendMessage(embedBuilder.build()).queue();
 							} catch (Exception e) {
 								if (x == null) x = e;
 								event.sendMessage("Something went wrong trying to eval your query.\n" + x).queue();
@@ -208,7 +219,7 @@ public class EvalCommand /*implements ICommand*/ {
                         "\n\t{\n\t\t";
         String[] lines = code.split("\n");
         body += String.join("\n\t\t", (CharSequence[]) lines);
-        return body + (body.endsWith(";") ? "" : ";") + (!body.contains("return ") && !body.contains("throw ") ? ";return null;" : "") + "\n\t}"
+		body += (body.endsWith(";") ? "" : ";") + (!body.contains("return ") && !body.contains("throw ") ? ";return null;" : "") + "\n\t}"
                 + "\n\n\tpublic void print(Object o) { System.out.print(o.toString()); }\n" +
                 "\tpublic void println(Object o) { print(o.toString() + \"\\n\"); }\n" +
                 "\tpublic void printErr(Object o) { System.err.print(o.toString()); }\n" +
@@ -216,128 +227,6 @@ public class EvalCommand /*implements ICommand*/ {
                 "\tprivate CommandEvent event;\n\n" +
                 "\tpublic " + f.getName().replace(".java", "") + "(CommandEvent event)\n\t{\n" +
                 "\t\tthis.event = event;\n\t}\n}";
-    }
-	
-	/*@Override
-	public void execute(CommandEvent event) {
-		switch (((String) event.getArgument("lang").get())) {
-			case "js":
-			case "javascript":
-				eval.put("shard", event.getShard());
-				eval.put("container", Bran.getInstance());
-				eval.put("jda", event.getJDA());
-				eval.put("event", event);
-				eval.put("author", event.getAuthor());
-				eval.put("self", event.getJDA().getSelfUser());
-				String toEval = (String) event.getArgument("js code").get();
-				Object out;
-				try {
-					eval.eval("imports = new JavaImporter(java.util, java.io, java.net)\n");
-					out = eval.eval("(function() {with(imports) {" + toEval + "\n}})()");
-				} catch (Exception e) {
-					out = e;
-				}
-				if (out == null || out.toString().isEmpty())
-					out = "Executed without error and no objects returned.";
-				out = out.toString().replaceAll(event.getJDA().getToken(), "Bot ");
-				String currentArgs = "";
-				currentArgs += "Output: \n";
-				currentArgs += "```" + out.toString() + "```";
-				event.sendMessage(currentArgs).queue();
-				break;
-			default:
-				Object x = null;
-				try {
-					OutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
-					stream.write(getBodyWithLines((String) event.getArgument("java code").get()).getBytes());
-					stream.close();
-					try {
-						FutureTask<?> task = new FutureTask<>(() -> compile(Bran.getInstance()));
-						task.run();
-						x = task.get(15, TimeUnit.SECONDS);
-					} catch (TimeoutException e) {
-						event.sendMessage("Compiling timed out.").queue();
-						return;
-					} catch (Exception e) {
-						event.sendMessage(e.getMessage()).queue();
-						return;
-					}
-					this.out.deleteOnExit();
-					URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {folder.toURI().toURL()}, EvalCommand.class.getClassLoader());
-					Class clazz = urlClassLoader.loadClass(this.out.getName().replace(".class", ""));
-					if (clazz == null) {
-						event.sendMessage("Something went wrong trying to load the compiled class.").queue();
-						return;
-					}
-					
-					Object o = clazz.getConstructors()[0].newInstance(event);
-					try {
-						Object finalO = o;
-						FutureTask<?> task = new FutureTask<>(() -> finalO.getClass().getMethod("run").invoke(finalO));
-						task.run();
-						o = task.get(2, TimeUnit.SECONDS);
-					} catch (TimeoutException e) {
-						event.sendMessage("Method timed out.").queue();
-						return;
-					} catch (Exception e) {
-						o = ":anger: `" + e.getCause() + "`";
-					}
-					if (o == null || o.toString().isEmpty())
-						o = "Executed without error and no objects returned!";
-					o = o.toString().replaceAll(Bran.getInstance().getConfig().botToken, "<BOT TOKEN>");
-					event.sendMessage(o.toString()).queue();
-				} catch (Exception e) {
-					if (x == null) x = e;
-					event.sendMessage("Something went wrong trying to eval your query.\n" + x).queue();
-				}
-				if (f.exists() && !f.delete()) {
-					event.sendMessage("Could not delete DontUse.java").queue();
-				}
-				if (this.out.exists() && !this.out.delete()) {
-					event.sendMessage("Could not delete DontUse.class").queue();
-				}
-				break;
-		}
+		return body;
 	}
-	
-	@Override
-	public String[] getAliases() {
-		return new String[] {"eval"};
-	}
-	
-	@Override
-	public String getName() {
-		return "Eval Command";
-	}
-	
-	@Override
-	public String getDescription() {
-		return "Evaluates in java and javascript!";
-	}
-	
-	@Override
-	public Argument[] getArguments() {
-		return new Argument[] {new Argument("lang", String.class), new Argument("code", String.class)};
-	}
-	
-	@Override
-	public long getRequiredPermission() {
-		return Permissions.EVAL;
-	}
-	
-	@Override
-	public boolean isPrivateAvailable() {
-		return true;
-	}
-	
-	@Override
-	public String getExample(String prefix) {
-		return prefix + "eval js return \"This is JavaScript!\"\n" +
-				prefix + "eval java return \"This is Java!\"";
-	}
-	
-	@Override
-	public Category getCategory() {
-		return Category.BOT_ADMINISTRATOR;
-	}*/
 }

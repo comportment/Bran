@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.core.utils;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.command.CommandStatsManager;
+import br.net.brjdevs.steven.bran.core.command.CommandManager;
 import br.net.brjdevs.steven.bran.core.listeners.EventListener;
 import br.net.brjdevs.steven.bran.core.managers.GuildStatsManager;
 import br.net.brjdevs.steven.bran.core.poll.Poll;
@@ -122,12 +122,13 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
         return embedBuilder.setColor(Bran.COLOR).build();
 	}
 	
-	public MessageEmbed toEmbedCmds(JDA jda) {
+	public MessageEmbed toEmbedCmds() {
+		CommandManager manager = Bran.getInstance().getCommandManager();
 		return new EmbedBuilder().setTitle("Commands Stats", null).setColor(Bran.COLOR)
-                .addField("Now", CommandStatsManager.resume(CommandStatsManager.getIssuedCommands(TimePeriod.MINUTE)), false)
-                .addField("Hourly", CommandStatsManager.resume(CommandStatsManager.getIssuedCommands(TimePeriod.HOUR)), false)
-                .addField("Daily", CommandStatsManager.resume(CommandStatsManager.getIssuedCommands(TimePeriod.DAY)), false)
-                .addField("Total", CommandStatsManager.resume(CommandStatsManager.getIssuedCommands(TimePeriod.TOTAL)), false).build();
+                .addField("Now", manager.resume(manager.getIssuedCommands(TimePeriod.MINUTE)), false)
+                .addField("Hourly", manager.resume(manager.getIssuedCommands(TimePeriod.HOUR)), false)
+                .addField("Daily", manager.resume(manager.getIssuedCommands(TimePeriod.DAY)), false)
+                .addField("Total", manager.resume(manager.getIssuedCommands(TimePeriod.TOTAL)), false).build();
     }
 	
 	public MessageEmbed toEmbedGuilds(JDA jda) {
@@ -178,7 +179,7 @@ public class Session extends EventListener<GuildMessageReceivedEvent> {
 		return sb.toString();
 	}
 	
-	public void event(GuildMessageReceivedEvent event) {
+	public void onEvent(GuildMessageReceivedEvent event) {
 		Bran.getInstance().getSession().readMessage(event.getAuthor().getId().equals(event.getJDA().getSelfUser().getId()));
 	}
 }

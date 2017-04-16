@@ -1,6 +1,7 @@
 package br.net.brjdevs.steven.bran.core.sql;
 
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -9,7 +10,7 @@ import java.util.concurrent.Executors;
 
 public class SQLAction {
     
-    public static final SimpleLog LOGGER = SimpleLog.getLog("SQLAction");
+    public static final Logger LOGGER = LoggerFactory.getLogger("SQLAction");
     private static final ExecutorService SQL_SERVICE = Executors.newCachedThreadPool(r -> new Thread(r, "SQL Thread "));
     private Connection conn;
     private SQLTask task;
@@ -30,7 +31,7 @@ public class SQLAction {
             try {
                 complete();
             } catch (Exception e) {
-                LOGGER.log(e);
+                LOGGER.error("Error when queueing SQLAction", e);
             }
         });
     }

@@ -11,6 +11,6 @@ public interface ITreeCommand extends ICommand {
 	CommandAction onMissingPermission();
 	
 	CommandAction onNotFound();
-	
-	String getHelp();
+
+	String getDefaultCommand();
 }

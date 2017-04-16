@@ -2,11 +2,10 @@ package br.net.brjdevs.steven.bran.core.listeners;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.data.GuildData;
-import br.net.brjdevs.steven.bran.core.utils.RestActionSleep;
+import br.net.brjdevs.steven.bran.core.managers.Messenger;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.requests.RestAction;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +16,7 @@ public class WordFilterListener extends EventListener<GuildMessageReceivedEvent>
 	}
 	
 	@Override
-	public void event(GuildMessageReceivedEvent event) {
+	public void onEvent(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().equals(event.getJDA().getSelfUser()))
 			return;
 		if (!event.getChannel().getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_MANAGE))
@@ -33,7 +32,7 @@ public class WordFilterListener extends EventListener<GuildMessageReceivedEvent>
 		}
 		if (hasFilteredWord) {
 			event.getMessage().delete().queue();
-			Bran.getInstance().getMessenger().sendMessage(event.getChannel(), "**" + Utils.getUser(event.getAuthor()) + "** you can't say that!!").queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(TimeUnit.SECONDS.toMillis(1), RestAction::queue));
+			Messenger.sendMessage(event.getChannel(), "**" + Utils.getUser(event.getAuthor()) + "** you can't say that!!").queue(msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
 		}
 	}
 }

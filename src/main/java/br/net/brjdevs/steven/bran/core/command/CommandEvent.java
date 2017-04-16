@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.core.command;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.client.Client;
+import br.net.brjdevs.steven.bran.core.client.Shard;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.data.GuildData;
 import br.net.brjdevs.steven.bran.core.data.UserData;
@@ -13,7 +13,8 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.requests.RestAction;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,19 +40,15 @@ public class CommandEvent {
         this.args = args;
         this.prefix = prefix;
 	    this.argsMap = new HashMap<>();
-		this.arguments = CommandUtils.copy(command);
+		this.arguments = command.getArguments().clone();
 		Arrays.stream(arguments).forEach(arg -> argsMap.put(arg.getName(), arg));
 		if (!Utils.isPrivate(event)) {
 			this.member = event.getMember();
             this.guild = event.getGuild();
 		}
 	}
-	
-	public Messenger getMessenger() {
-		return Bran.getInstance().getMessenger();
-	}
     
-    public Client getShard() {
+    public Shard getShard() {
         return Bran.getInstance().getShards()[Bran.getInstance().getShardId(event.getJDA())];
 	}
 	
@@ -64,20 +61,20 @@ public class CommandEvent {
 	}
 	
 	public RestAction<Message> sendMessage(String msg) {
-		return getMessenger().sendMessage(getChannel(), msg);
+		return Messenger.sendMessage(getChannel(), msg);
 	}
     public RestAction<Message> sendMessage(Message message) {
-	    return getMessenger().sendMessage(getChannel(), message);
+	    return Messenger.sendMessage(getChannel(), message);
     }
     public RestAction<Message> sendMessage(MessageEmbed embed) {
-	    return getMessenger().sendMessage(getChannel(), embed);
+	    return Messenger.sendMessage(getChannel(), embed);
     }
     public RestAction<Message>  sendPrivate(String msg) {
-	    return getMessenger().sendMessage(getPrivateChannel(), msg);
+	    return Messenger.sendMessage(getPrivateChannel(), msg);
     }
 	
 	public RestAction<Message> sendPrivate(Message message) {
-		return getMessenger().sendMessage(getPrivateChannel(), message);
+		return Messenger.sendMessage(getPrivateChannel(), message);
 	}
 	
 	public PrivateChannel getPrivateChannel() {
@@ -142,7 +139,6 @@ public class CommandEvent {
 	}
 	
 	public Argument getArgument(String name) {
-		if (!argsMap.containsKey(name)) SimpleLog.getLog("Argument Getter").fatal("TYPO CARALHO");
 		return argsMap.get(name);
 	}
 	
@@ -150,7 +146,7 @@ public class CommandEvent {
         String newArgs = b ? args : args.replaceFirst(" ", "");
         CommandEvent event = new CommandEvent(this.event, command, newArgs, prefix);
         Thread.currentThread().setName(command.getName() + ">" + Utils.getUser(event.getAuthor()));
-		command.execute(event);
+        Bran.getInstance().getCommandManager().execute(event);
 		return event;
     }
 }

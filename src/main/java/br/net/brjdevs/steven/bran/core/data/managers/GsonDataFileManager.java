@@ -3,7 +3,8 @@ package br.net.brjdevs.steven.bran.core.data.managers;
 import br.net.brjdevs.steven.bran.core.utils.IOUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,7 +14,7 @@ import java.util.function.Supplier;
 public class GsonDataFileManager<T> implements Supplier<T> {
 	
 	private static final Gson GSON = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
-	private static final SimpleLog LOG = SimpleLog.getLog("GsonDataFileManager");
+	private static final Logger LOGGER = LoggerFactory.getLogger("GsonDataFileManager");
 	
 	private Path path;
 	private T data;
@@ -22,13 +23,13 @@ public class GsonDataFileManager<T> implements Supplier<T> {
 		this.path = Paths.get(path);
         try {
             if (!this.path.toFile().exists()) {
-				LOG.info("Could not find config file at " + this.path.toFile().getAbsolutePath() + ", creating a new one...");
+				LOGGER.info("Could not find config file at " + this.path.toFile().getAbsolutePath() + ", creating a new one...");
 				if (this.path.toFile().createNewFile()) {
-					LOG.info("Generated new config file at " + this.path.toFile().getAbsolutePath() + ".");
+					LOGGER.info("Generated new config file at " + this.path.toFile().getAbsolutePath() + ".");
 					IOUtils.write(this.path, GSON.toJson(constructor.get()));
-					LOG.info("Please, fill the file with valid properties.");
+					LOGGER.info("Please, fill the file with valid properties.");
 				} else {
-					LOG.warn("Could not create config file at " + path);
+					LOGGER.warn("Could not create config file at " + path);
 				}
 			} else {
 				this.data = GSON.fromJson(IOUtils.read(this.path), clazz);

@@ -1,20 +1,26 @@
 package br.net.brjdevs.steven.bran.core.client;
 
+import br.net.brjdevs.steven.bran.Version;
 import br.net.brjdevs.steven.bran.core.audio.AudioUtils;
 import br.net.brjdevs.steven.bran.core.audio.BranMusicManager;
 import br.net.brjdevs.steven.bran.core.audio.GuildMusicManager;
 import br.net.brjdevs.steven.bran.core.command.CommandManager;
 import br.net.brjdevs.steven.bran.core.currency.ProfileData;
-import br.net.brjdevs.steven.bran.core.data.BranDataManager;
+import br.net.brjdevs.steven.bran.core.data.DataManager;
 import br.net.brjdevs.steven.bran.core.data.Config;
 import br.net.brjdevs.steven.bran.core.managers.Messenger;
 import br.net.brjdevs.steven.bran.core.managers.TaskManager;
+import br.net.brjdevs.steven.bran.core.redis.RedisDatabase;
 import br.net.brjdevs.steven.bran.core.snowflakes.SnowflakeGenerator;
+import br.net.brjdevs.steven.bran.core.sql.SQLDatabase;
 import br.net.brjdevs.steven.bran.core.utils.Session;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
+import br.net.brjdevs.steven.bran.log.DiscordLogBack;
+import br.net.brjdevs.steven.bran.log.SimpleLogToSLF4JAdapter;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.entities.Guild;
@@ -22,9 +28,10 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.json.JSONObject;
+import org.slf4j.Logger;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import redis.clients.jedis.JedisPool;
+import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
@@ -39,26 +46,25 @@ public class Bran {
 	
 	public static Color COLOR = Color.decode("#388BDF");
 	private static Bran instance;
-    private static BranJedisPool jedisPool = new BranJedisPool("localhost", 6379);
-    private static SimpleLog LOG = SimpleLog.getLog("BotContainer");
+    private static Logger LOGGER = LoggerFactory.getLogger("Bran");
 	public File workingDir;
 	private TaskManager taskManager;
 	private CommandManager commandManager;
 	private BranMusicManager playerManager;
-	private BranDataManager discordBotData;
-    private Client[] shards;
-    private DiscordLog discordLog;
+	private DataManager discordBotData;
+    private Shard[] shards;
 	private int totalShards;
 	private AtomicLongArray lastEvents;
 	private long ownerId;
 	private int ownerShardId;
 	private Session session;
-	private Messenger messenger;
     private long sessionId;
+    private boolean isSetup;
     
-    public Bran() throws LoginException, InterruptedException, RateLimitedException {
-		instance = this;
-        this.discordBotData = new BranDataManager();
+    public void init() throws LoginException, InterruptedException, RateLimitedException {
+    	this.isSetup = false;
+        this.discordBotData = new DataManager();
+		SQLDatabase.start(getConfig().dbPwd);
 		this.ownerId = 0;
 		this.ownerShardId = 0;
 		this.workingDir = new File(System.getProperty("user.dir") + "/data/");
@@ -66,23 +72,21 @@ public class Bran {
 			throw new NullPointerException("Could not create config.json");
 		this.totalShards = getRecommendedShards();
 		this.lastEvents = new AtomicLongArray(totalShards);
-        this.shards = new Client[totalShards];
+        this.shards = new Shard[totalShards];
         initShards();
 		getOwner();
 		this.playerManager = new BranMusicManager();
 		this.commandManager = new CommandManager();
-		this.discordLog = new DiscordLog();
 		this.session = new Session();
-		this.messenger = new Messenger();
 		this.taskManager = new TaskManager();
         this.sessionId = new SnowflakeGenerator(3, 1).nextId();
+        this.isSetup = true;
     }
-    
-    public static JedisPool getJedisPool() {
-        return jedisPool;
+
+	public boolean isSetup() {
+		return isSetup;
 	}
-    
-    public static Bran getInstance() {
+	public static Bran getInstance() {
 		return instance;
 	}
     
@@ -90,11 +94,11 @@ public class Bran {
         return sessionId;
     }
     
-    public Client[] getShards() {
+    public Shard[] getShards() {
         return shards;
 	}
 	
-	public BranDataManager getDataManager() {
+	public DataManager getDataManager() {
 		return discordBotData;
 	}
 	
@@ -103,25 +107,25 @@ public class Bran {
 		return jda.getShardInfo().getShardId();
 	}
     
-    public Client getShard(JDA jda) {
+    public Shard getShard(JDA jda) {
         return getShards()[getShardId(jda)];
 	}
     
     public ProfileData getProfile(User user) {
         return discordBotData.getData().get().getUserData(user).getProfileData();
     }
+
+    public TextChannel getTextChannelById(String id) {
+		return Arrays.stream(shards).map(shard -> shard.getJDA().getTextChannelById(id)).filter(Objects::nonNull).findFirst().orElse(null);
+	}
 	
 	public int getTotalShards() {
 		return totalShards;
 	}
     
-    public Client[] getOnlineShards() {
-        return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(Client[]::new);
+    public Shard[] getOnlineShards() {
+        return Arrays.stream(shards).filter(s -> s.getJDA().getStatus() == Status.CONNECTED).toArray(Shard[]::new);
     }
-	
-	public DiscordLog getDiscordLog() {
-		return discordLog;
-	}
 	
 	public void setLastEvent(int shardId, long time) {
 		lastEvents.set(shardId, time);
@@ -129,10 +133,6 @@ public class Bran {
 	
 	public Session getSession() {
 		return session;
-	}
-	
-	public Messenger getMessenger() {
-		return messenger;
 	}
 	
 	public Config getConfig() {
@@ -171,7 +171,7 @@ public class Bran {
 		return taskManager;
 	}
     
-    public synchronized boolean reboot(Client shard) {
+    public synchronized boolean reboot(Shard shard) {
         try {
 			Map<Long, ImmutablePair<Long, GuildMusicManager>> shardPlayers = new HashMap<>();
 			Map<Long, GuildMusicManager> copy = new HashMap<>(playerManager.getMusicManagers());
@@ -190,7 +190,7 @@ public class Bran {
             });
 			shard.getJDA().shutdown(false);
 			Utils.sleep(5000);
-			shard.restartJDA();
+			shard.restartJDA(getConfig());
 			shardPlayers.forEach((id, pair) -> {
 				VoiceChannel channel = shard.getJDA().getVoiceChannelById(String.valueOf(pair.left));
 				GuildMusicManager musicManager = pair.right;
@@ -230,30 +230,32 @@ public class Bran {
 	
 	private void initShards() throws LoginException, InterruptedException, RateLimitedException {
 		for (int i = 0; i < shards.length; i++) {
-			LOG.info("Starting shard #" + i + " of " + shards.length);
-            shards[i] = new Client(i, totalShards);
-            LOG.info("Finished shard #" + i);
+			LOGGER.info("Starting shard #" + i + " of " + shards.length);
+            Shard s = new Shard(i, totalShards);
+            s.restartJDA(getConfig());
+            shards[i] = s;
+            LOGGER.info("Finished shard #" + i);
 			Thread.sleep(5_000L);
 		}
-        for (Client shard : shards) {
+        for (Shard shard : shards) {
             setLastEvent(shard.getId(), System.currentTimeMillis());
 		}
 	}
 	
 	public User getOwner() {
-		if (ownerId != 0) return getShards()[ownerShardId].getJDA().getUserById(String.valueOf(ownerId));
-        for (Client shard : shards) {
+		if (ownerId != 0) return getShards()[ownerShardId].getJDA().getUserById(ownerId);
+        for (Shard shard : shards) {
             User u = shard.getJDA().getUserById(getConfig().ownerId);
 			if (u != null) {
 				ownerId = Long.parseLong(u.getId());
 				break;
 			}
 		}
-		if (ownerId == 0) LOG.fatal("Could not find Owner.");
-		return getShards()[ownerShardId].getJDA().getUserById(String.valueOf(ownerId));
+		if (ownerId == 0) LOGGER.error("Could not find owner id " + ownerId);
+		return getShards()[ownerShardId].getJDA().getUserById(ownerId);
 	}
 	
-	public int calcShardId(long discordGuildId) {
+	public int getShardId(long discordGuildId) {
 		return (int) ((discordGuildId >> 22) % totalShards);
 	}
 	
@@ -278,8 +280,54 @@ public class Bran {
         getDataManager().getConfig().update();
         getDataManager().getHangmanWords().update();
         
-        Stream.of(shards).forEach(Client::shutdown);
+        Stream.of(shards).forEach(Shard::shutdown);
         
         System.exit(exitCode);
+	}
+
+	public static void main(String[] args) {
+    	try {
+			RedisDatabase.getDB();
+			SimpleLogToSLF4JAdapter.install();
+			instance = new Bran();
+			instance.init();
+			DiscordLogBack.enable();
+
+			/*TaskManager.startAsyncTask("DiscordBots Thread", (service) -> Arrays.stream(Bran.getInstance().getShards()).forEach(shard -> {
+				try {
+					JSONObject data = new JSONObject();
+					data.put("server_count", shard.getJDA().getGuilds().size());
+					if (instance.getTotalShards() > 1) {
+						data.put("shard_id", shard.getId());
+						data.put("shard_count", instance.getTotalShards());
+					}
+					try {
+						Unirest.post("https://bots.discord.pw/api/bots/" + shard.getJDA().getSelfUser().getId() + "/stats")
+								.header("Authorization", Bran.getInstance().getConfig().discordBotsToken)
+								.header("Content-Type", "application/json")
+								.body(data.toString())
+								.asJson();
+					} catch (Exception e) {
+						throw new UnirestException("Could not update server count at DiscordBots.pw");
+					}
+					try {
+						Unirest.post("https://discordbots.org/api/bots/" + shard.getJDA().getSelfUser().getId() + "/stats")
+								.header("Authorization", Bran.getInstance().getConfig().discordBotsOrgToken)
+								.header("Content-Type", "application/json")
+								.body(data.toString())
+								.asJson();
+					} catch (Exception e) {
+						throw new UnirestException("Could not update server cound at Discord Bots.org");
+					}
+					LOGGER.info("Successfully updated shard " + shard.getId() + " server_count!");
+				} catch (UnirestException e) {
+					LOGGER.error("Failed to update shard " + shard.getId() + " server_count!", e);
+				}
+			}), 3600);*/
+
+			LOGGER.info("Started Bran instance at version " + Version.VERSION);
+		} catch (Exception e) {
+    		LOGGER.error("Failed to start Bran instance!", e);
+		}
 	}
 }

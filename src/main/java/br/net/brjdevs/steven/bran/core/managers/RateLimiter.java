@@ -1,33 +1,32 @@
 package br.net.brjdevs.steven.bran.core.managers;
 
+import br.com.brjdevs.java.utils.threads.ScheduledTaskProcessor;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
 import net.dv8tion.jda.core.entities.User;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RateLimiter {
 	
-	private static final ExpirationManager EXPIRATION = new ExpirationManager();
+	private static final ScheduledTaskProcessor TASK_PROCESSOR = new ScheduledTaskProcessor("RateLimiter");
 	private final int timeout;
-	private final List<String> usersRateLimited = new ArrayList<>();
+	private final TLongList usersRateLimited = new TLongArrayList();
 	
 	public RateLimiter(int timeout) {
 		this.timeout = timeout;
 	}
 	
-	public boolean process(String userId) {
+	public boolean process(long userId) {
 		if (usersRateLimited.contains(userId)) return false;
 		usersRateLimited.add(userId);
-		EXPIRATION.letExpire(System.currentTimeMillis() + timeout, () -> usersRateLimited.remove(userId));
+		TASK_PROCESSOR.addTask(System.currentTimeMillis() + timeout, () -> usersRateLimited.remove(userId));
 		return true;
 	}
 	
 	public boolean process(User user) {
-		return process(user.getId());
+		return process(user.getIdLong());
 	}
     
-    public List<String> getUsersRateLimited() {
+    public TLongList getUsersRateLimited() {
         return usersRateLimited;
     }
-    
 }

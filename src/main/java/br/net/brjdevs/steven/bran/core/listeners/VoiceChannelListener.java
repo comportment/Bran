@@ -57,7 +57,7 @@ public class VoiceChannelListener extends EventListener<GenericGuildVoiceEvent> 
 	
 	
 	@Override
-	public void event(GenericGuildVoiceEvent event) {
+	public void onEvent(GenericGuildVoiceEvent event) {
 		if (event.getGuild() == null) return;
 		if (event instanceof GuildVoiceMoveEvent) {
 			VoiceChannel joined = ((GuildVoiceMoveEvent) event).getChannelJoined();

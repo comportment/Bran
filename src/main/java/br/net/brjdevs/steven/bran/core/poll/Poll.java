@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.core.poll;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.client.Client;
+import br.net.brjdevs.steven.bran.core.client.Shard;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -47,7 +47,7 @@ public class Poll {
 		this.shardId = shardId;
 	}
     
-    public Client getShard(Bran bran) {
+    public Shard getShard(Bran bran) {
         return bran.getShards()[shardId];
 	}
 	

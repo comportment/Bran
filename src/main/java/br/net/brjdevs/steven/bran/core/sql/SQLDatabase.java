@@ -8,19 +8,19 @@ import java.sql.SQLException;
 
 public class SQLDatabase {
     
-    private static final SQLDatabase sql;
-    
-    static {
-        sql = new SQLDatabase();
+    private static SQLDatabase sql;
+
+    public static void start(String dbPwd) {
+        sql = new SQLDatabase(dbPwd);
     }
     
     private MysqlDataSource dataSource;
     
-    public SQLDatabase() {
+    private SQLDatabase(String dbPwd) {
         dataSource = new MysqlDataSource();
         dataSource.setDatabaseName("botlogs");
         dataSource.setUser("root");
-        dataSource.setPassword(Bran.getInstance().getConfig().dbPwd);
+        dataSource.setPassword(dbPwd);
         dataSource.setServerName("localhost");
         dataSource.setURL(dataSource.getURL() + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&autoReconnect=true&useSSL=false");
     }

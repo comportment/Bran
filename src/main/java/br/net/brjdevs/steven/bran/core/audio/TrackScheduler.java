@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.core.audio;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.client.Client;
+import br.net.brjdevs.steven.bran.core.client.Shard;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
@@ -268,7 +268,7 @@ public class TrackScheduler {
 		getAudioPlayer().setPaused(paused);
 	}
     
-    public Client getShard() {
+    public Shard getShard() {
         return Bran.getInstance().getShards()[shard];
 	}
 	

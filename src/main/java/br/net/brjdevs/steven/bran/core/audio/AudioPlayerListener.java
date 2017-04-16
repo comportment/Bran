@@ -12,14 +12,15 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
 
 public class AudioPlayerListener extends AudioEventAdapter {
 	
 	private static final String announce = "\uD83D\uDD0A Now Playing in **%s**: `%s` (`%s`) added by %s.";
-	private static final SimpleLog LOG = SimpleLog.getLog("AudioPlayerListener");
+	private static final Logger LOG = LoggerFactory.getLogger("AudioPlayerListener");
 	private TrackScheduler scheduler;
 	private long messageId;
 	private long channelId;
@@ -57,7 +58,6 @@ public class AudioPlayerListener extends AudioEventAdapter {
 		Bran.getInstance().getMusicManager().playedSongs.incrementAndGet();
 		Bran.getInstance().getTaskManager().getMusicRegisterTimeout().removeMusicPlayer(scheduler.getGuild().getId());
 		if (scheduler.getCurrentTrack() == null) {
-			LOG.fatal("Got TrackStartEvent with null CachedAudioTrack!");
 			return;
 		}
 		if (scheduler.getCurrentTrack().getContext() != null && scheduler.getCurrentTrack().getContext().canTalk()) {

@@ -9,13 +9,13 @@ import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import br.net.brjdevs.steven.bran.core.quote.Quotes;
 import br.net.brjdevs.steven.bran.core.utils.MathUtils;
-import br.net.brjdevs.steven.bran.core.utils.RestActionSleep;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.requests.RestAction;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class PruneCommand {
@@ -25,8 +25,7 @@ public class PruneCommand {
 		return new TreeCommandBuilder(Category.GUILD_ADMINISTRATOR)
                 .setAliases("prune", "purge")
                 .setName("Prune Command")
-				.setHelp("prune ?")
-				.setPrivateAvailable(false)
+								.setPrivateAvailable(false)
 				.setDescription("Delete multiple messages instantly with this command!")
 				.setRequiredPermission(Permissions.PRUNE_CLEANUP)
 				.addSubCommand(new CommandBuilder(Category.GUILD_ADMINISTRATOR)
@@ -52,12 +51,11 @@ public class PruneCommand {
 									event.sendMessage("No bot messages found in the latest 100 messages.").queue();
 									return;
 								}
-								RestAction<Message> restAction = event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.");
 								if (filteredMessages.size() < 2) {
-									filteredMessages.get(0).delete().queue(success -> restAction.queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(30000, RestAction::queue)));
+									filteredMessages.get(0).delete().queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.").queue(msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS)));
 								} else {
 									try {
-										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(30000, RestAction::queue)));
+										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.").queue(msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS)));
 									} catch (IllegalArgumentException ex) {
 										event.sendMessage(ex.getMessage()).queue();
 									}
@@ -100,12 +98,11 @@ public class PruneCommand {
 									event.sendMessage("No messages from this user found in the latest 100 messages.").queue();
 									return;
 								}
-								RestAction<Message> restAction = event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.");
 								if (filteredMessages.size() < 2) {
-									filteredMessages.get(0).delete().queue(success -> restAction.queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(30000, RestAction::queue)));
+									filteredMessages.get(0).delete().queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.").queue(msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS)));
 								} else {
 									try {
-										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(30000, RestAction::queue)));
+										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.").queue(msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS)));
 									} catch (IllegalArgumentException ex) {
 										event.sendMessage(ex.getMessage()).queue();
 									}
@@ -137,12 +134,11 @@ public class PruneCommand {
 									event.sendMessage("No messages found matching the given content.").queue();
 									return;
 								}
-								RestAction<Message> restAction = event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.");
 								if (filteredMessages.size() < 2) {
-									filteredMessages.get(0).delete().queue(success -> restAction.queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(30000, RestAction::queue)));
+									filteredMessages.get(0).delete().queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.").queue(msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS)));
 								} else {
 									try {
-										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> restAction.queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(30000, RestAction::queue)));
+										event.getTextChannel().deleteMessages(filteredMessages).queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + filteredMessages.size() + " messages.").queue(msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS)));
 									} catch (IllegalArgumentException ex) {
 										event.sendMessage(ex.getMessage()).queue();
 									}
@@ -168,7 +164,7 @@ public class PruneCommand {
 							}
 							event.getTextChannel().getHistory().retrievePast(amount).queue(messages -> {
 								try {
-									event.getTextChannel().deleteMessages(messages).queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + messages.size() + " messages.").queue(msg -> new RestActionSleep(msg.delete()).sleepAndThen(30000, RestAction::queue)));
+									event.getTextChannel().deleteMessages(messages).queue(success -> event.sendMessage(Quotes.SUCCESS, "Deleted " + messages.size() + " messages.").queue(msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS)));
 								} catch (IllegalArgumentException ex) {
 									event.sendMessage(ex.getMessage()).queue();
 								}

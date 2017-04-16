@@ -5,9 +5,10 @@ import br.net.brjdevs.steven.bran.core.command.Command;
 import br.net.brjdevs.steven.bran.core.command.builders.CommandBuilder;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
-import br.net.brjdevs.steven.bran.core.utils.HttpUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 
@@ -37,9 +38,8 @@ public class LookupCommand {
 						String url = String.format(LOOKUP_URL, URLEncoder.encode((String) event.getArgument("site").get(), "UTF-8"));
 						JsonObject result;
 						try {
-							result = new JsonParser().parse(HttpUtils.read(url)).getAsJsonObject();
-						} catch (IOException e) {
-							e.printStackTrace();
+							result = new JsonParser().parse(Unirest.get(url).asString().getBody()).getAsJsonObject();
+						} catch (UnirestException e) {
 							event.sendMessage("Could not connect, please try again later.").queue();
 							return;
 						}

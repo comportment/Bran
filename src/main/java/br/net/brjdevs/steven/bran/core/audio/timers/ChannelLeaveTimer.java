@@ -88,7 +88,7 @@ public class ChannelLeaveTimer {
 			if (!timingOutUpdated) {
 				String id = closestEntry.getKey();
 				TIMING_OUT.remove(id);
-				JDA jda = Bran.getInstance().getShards()[Bran.getInstance().calcShardId(Long.parseLong(id))].getJDA();
+				JDA jda = Bran.getInstance().getShards()[Bran.getInstance().getShardId(Long.parseLong(id))].getJDA();
 				Guild guild = jda.getGuildById(id);
 				if (guild != null) {
 					GuildMusicManager musicManager = Bran.getInstance().getMusicManager().get(guild);

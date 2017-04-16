@@ -2,6 +2,7 @@ package br.net.brjdevs.steven.bran.core.listeners;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.data.GuildData;
+import br.net.brjdevs.steven.bran.core.managers.Messenger;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import br.net.brjdevs.steven.bran.core.poll.Poll;
 import br.net.brjdevs.steven.bran.core.utils.MathUtils;
@@ -15,7 +16,7 @@ public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 	}
 	
 	@Override
-	public void event(GuildMessageReceivedEvent event) {
+	public void onEvent(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
 		String msg = event.getMessage().getRawContent();
 		if (!MathUtils.isInteger(msg)) return;
@@ -27,7 +28,7 @@ public class PollListener extends EventListener<GuildMessageReceivedEvent> {
 		try {
 			boolean added = poll.vote(event.getAuthor().getId(), i);
 			if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
-				Bran.getInstance().getMessenger().sendMessage(event.getChannel(), added ? "\u2705" : "\u2796").queue();
+				Messenger.sendMessage(event.getChannel(), added ? "\u2705" : "\u2796").queue();
 				return;
 			}
 			event.getMessage().addReaction(added ? "\u2705" : "\u2796").queue();

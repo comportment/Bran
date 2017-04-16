@@ -31,11 +31,11 @@ public class GuildStatsManager {
                             "sessionId bigint" +
                             ");").execute();
                 } catch (SQLException e) {
-                    SQLAction.LOGGER.log(e);
+                    SQLAction.LOGGER.error("Failed to execute SQLAction", e);
                 }
             }).queue();
         } catch (SQLException e) {
-            SQLAction.LOGGER.log(e);
+            SQLAction.LOGGER.error("Failed to execute SQLAction", e);
         }
     }
     
@@ -65,11 +65,11 @@ public class GuildStatsManager {
                     }
                     
                 } catch (SQLException e) {
-                    SQLAction.LOGGER.log(e);
+                    SQLAction.LOGGER.error("Failed to execute SQLAction", e);
                 }
             }).complete();
         } catch (SQLException e) {
-            SQLAction.LOGGER.log(e);
+            SQLAction.LOGGER.error("Failed to execute SQLAction", e);
         }
         return result;
     }
@@ -88,11 +88,11 @@ public class GuildStatsManager {
                     statement.setInt(2, loggedEvent == LoggedEvent.JOIN ? 0 : 1);
                     statement.executeUpdate();
                 } catch (SQLException e) {
-                    SQLAction.LOGGER.log(e);
+                    SQLAction.LOGGER.error("Failed to execute SQLAction", e);
                 }
-            }).complete();
+            }).queue();
         } catch (SQLException e) {
-            SQLAction.LOGGER.log(e);
+            SQLAction.LOGGER.error("Failed to execute SQLAction", e);
         }
     }
     

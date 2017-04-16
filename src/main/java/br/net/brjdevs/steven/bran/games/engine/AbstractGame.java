@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.games.engine;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.client.Client;
+import br.net.brjdevs.steven.bran.core.client.Shard;
 import br.net.brjdevs.steven.bran.core.currency.ProfileData;
 import br.net.brjdevs.steven.bran.core.data.UserData;
 import br.net.brjdevs.steven.bran.core.managers.profile.IProfileListener;
@@ -110,7 +110,7 @@ public abstract class AbstractGame<T extends GameEventListener> {
         return eventListener;
     }
     
-    public Client getShard() {
+    public Shard getShard() {
         return Bran.getInstance().getShards()[shardId];
     }
     

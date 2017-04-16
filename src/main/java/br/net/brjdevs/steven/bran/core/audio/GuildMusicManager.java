@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.core.audio;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.client.Client;
+import br.net.brjdevs.steven.bran.core.client.Shard;
 import br.net.brjdevs.steven.bran.core.sql.SQLAction;
 import br.net.brjdevs.steven.bran.core.sql.SQLDatabase;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -14,7 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class GuildMusicManager {
-	
+
 	private final AudioPlayer player;
 	private final TrackScheduler scheduler;
 	private final int shard;
@@ -42,11 +42,11 @@ public class GuildMusicManager {
                             statement.setString(1, track.getInfo().identifier);
                             statement.executeUpdate();
                         } catch (SQLException e) {
-                            SQLAction.LOGGER.log(e);
+							SQLAction.LOGGER.error("Could not run SQLAction", e);
                         }
                     }).queue();
                 } catch (SQLException e) {
-                    SQLAction.LOGGER.log(e);
+					SQLAction.LOGGER.error("Could not run SQLAction", e);
                 }
             }
         });
@@ -55,7 +55,7 @@ public class GuildMusicManager {
 		return getShard().getJDA().getGuildById(String.valueOf(guildId));
 	}
     
-    public Client getShard() {
+    public Shard getShard() {
         return Bran.getInstance().getShards()[shard];
 	}
 	public TrackScheduler getTrackScheduler() {

@@ -16,7 +16,7 @@ public class MoveListener extends EventListener<MessageReceivedEvent> {
     }
     
     @Override
-    public void event(MessageReceivedEvent event) {
+    public void onEvent(MessageReceivedEvent event) {
         if (event.getAuthor().isBot() || event.getAuthor().isFake())
             return;
         String msg = event.getMessage().getContent();

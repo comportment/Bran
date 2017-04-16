@@ -1,5 +1,6 @@
 package br.net.brjdevs.steven.bran.core.client;
 
+import br.net.brjdevs.steven.bran.core.data.Config;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import net.dv8tion.jda.core.AccountType;
@@ -12,32 +13,25 @@ import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
 
-public class Client {
+public class Shard {
     
-    private final BranEventManager eventManager;
+    private final EventManager eventManager;
 	private int shardId;
 	private int totalShards;
 	private volatile JDA jda;
 	private long startup;
 	private long lastReboot;
-	private int currentGuildCount;
     
-    public Client(int shardId, int totalShards) throws LoginException, InterruptedException, RateLimitedException {
+    public Shard(int shardId, int totalShards) throws LoginException, InterruptedException, RateLimitedException {
         this.shardId = shardId;
         this.totalShards = totalShards;
         this.startup = 0;
         this.lastReboot = 0;
-        this.eventManager = new BranEventManager(this);
-        restartJDA();
-        //TaskManager.startAsyncTask("Shard " + shardId + " Guard", (service) -> {
-        //if (Bran.getInstance().getLastEvents().get(shardId) + 15000 < System.currentTimeMillis()) {
-        //Bran.getInstance().reboot(this);
-        //}
-        //}, 1);
+        this.eventManager = new EventManager(this);
     }
     
-    public void restartJDA() throws LoginException, InterruptedException, RateLimitedException {
-        JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(Bran.getInstance().getConfig().botToken);
+    public void restartJDA(Config config) throws LoginException, InterruptedException, RateLimitedException {
+		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT).setToken(config.botToken);
         if (totalShards > 1) {
 			jdaBuilder.useSharding(shardId, totalShards);
 		}
@@ -51,7 +45,6 @@ public class Client {
 		if (startup == 0)
 			this.startup = System.currentTimeMillis();
 		this.lastReboot = System.currentTimeMillis();
-		this.currentGuildCount = jda.getGuilds().size();
 	}
 	
 	public JDA getJDA() {
@@ -70,7 +63,7 @@ public class Client {
 		return startup;
 	}
 	
-	public BranEventManager getEventManager() {
+	public EventManager getEventManager() {
 		return eventManager;
 	}
 	
@@ -88,40 +81,5 @@ public class Client {
 				"+ Fun commands (eight ball, choose, custom commands, random comics, yoda speak)\n" +
 				"+ Currency system (BETA)" +
 				"```";
-	}
-	
-	public void updateCurrentGuildCount() {
-		currentGuildCount = jda.getGuilds().size();
-	}
-	
-	public int getCurrentGuildCount() {
-		return currentGuildCount;
-	}
-	
-	public void updateStats() throws UnirestException {
-		JSONObject data = new JSONObject();
-		data.put("server_count", jda.getGuilds().size());
-		if (totalShards > 1) {
-			data.put("shard_id", shardId);
-			data.put("shard_count", totalShards);
-		}
-		try {
-			Unirest.post("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
-                    .header("Authorization", Bran.getInstance().getConfig().discordBotsToken)
-                    .header("Content-Type", "application/json")
-					.body(data.toString())
-					.asJson();
-		} catch (Exception e) {
-			throw new UnirestException("Could not update server count at DiscordBots.pw");
-		}
-		try {
-			Unirest.post("https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats")
-                    .header("Authorization", Bran.getInstance().getConfig().discordBotsOrgToken)
-                    .header("Content-Type", "application/json")
-					.body(data.toString())
-					.asJson();
-		} catch (Exception e) {
-			throw new UnirestException("Could not update server cound at Discord Bots.org");
-		}
 	}
 }

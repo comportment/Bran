@@ -3,6 +3,7 @@ package br.net.brjdevs.steven.bran.core.listeners;
 import br.net.brjdevs.steven.bran.core.client.Bran;
 import br.net.brjdevs.steven.bran.core.data.GuildData;
 import br.net.brjdevs.steven.bran.core.managers.CustomCommand;
+import br.net.brjdevs.steven.bran.core.managers.Messenger;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import br.net.brjdevs.steven.bran.core.utils.MathUtils;
 import br.net.brjdevs.steven.bran.core.utils.StringUtils;
@@ -41,7 +42,7 @@ public class CustomCommandsListener extends EventListener<GuildMessageReceivedEv
 	}
 	
 	@Override
-	public void event(GuildMessageReceivedEvent event) {
+	public void onEvent(GuildMessageReceivedEvent event) {
 		if (event.getAuthor().isFake() || event.getAuthor().isBot()) return;
         GuildData guildData = Bran.getInstance().getDataManager().getData().get().getGuildData(event.getGuild(), true);
         if (guildData.customCommands.isEmpty()) return;
@@ -58,6 +59,6 @@ public class CustomCommandsListener extends EventListener<GuildMessageReceivedEv
             return;
 		String args = StringUtils.splitArgs(event.getMessage().getRawContent(), 2)[1];
 		String answer = parseTag(command.getAnswer(), event.getMember(), event.getChannel(), event.getGuild(), args);
-		Bran.getInstance().getMessenger().sendMessage(event.getChannel(), answer).queue();
+		Messenger.sendMessage(event.getChannel(), answer).queue();
 	}
 }

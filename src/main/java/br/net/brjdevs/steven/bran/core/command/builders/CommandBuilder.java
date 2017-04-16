@@ -6,13 +6,17 @@ import br.net.brjdevs.steven.bran.core.command.ArgumentParsingException;
 import br.net.brjdevs.steven.bran.core.command.CommandEvent;
 import br.net.brjdevs.steven.bran.core.command.enums.Category;
 import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
+import br.net.brjdevs.steven.bran.core.command.interfaces.ITreeCommand;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import br.net.brjdevs.steven.bran.core.utils.Utils;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CommandBuilder {
 	
@@ -25,7 +29,6 @@ public class CommandBuilder {
 	protected String example = null;
 	protected Long perm = Permissions.RUN_BASECMD;
 	protected Category category;
-	private String help;
     private Function<String, String[]> parser = (raw) -> args.length > 1 ? Arrays.stream(Argument.split(raw, args.length - 1)).filter(a -> !Utils.isEmpty(a)).toArray(String[]::new) : new String[] {raw};
     
     public CommandBuilder(Category category) {
@@ -82,52 +85,12 @@ public class CommandBuilder {
 		return this;
 	}
 	
-	public CommandBuilder setHelp(String help) {
-		this.help = help;
-		return this;
-	}
-	
 	public ICommand build() {
 		return new ICommand() {
 			
 			@Override
 			public void execute(CommandEvent event) {
-				if (event.isPrivate() && !isPrivateAvailable()) {
-					event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
-					return;
-                } else if (event.isPrivate() ? !event.getUserData().hasPermission(getRequiredPermission()) : !event.getGuildData(true).hasPermission(event.getAuthor(), getRequiredPermission())) {
-                    event.sendMessage("You don't have enough permissions to execute this Command!\n*Missing Permission(s): " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "*").queue();
-					return;
-                } else if (!event.isPrivate() && event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(event.getCommand().getKey()))
-                    return;
-                String[] split = event.getArgs(2);
-				if (split[1].matches("^(\\?|help)$")) {
-                    event.sendMessage(Bran.getInstance().getCommandManager().getHelp(this, event.getMember())).queue();
-                    return;
-				}
-				split[1] = split[1].trim();
-				if (split.length > 1 && !split[1].isEmpty() && split[1].charAt(0) == '\\' && split[1].matches("^(\\?|help)$"))
-					split[1] = split[1].substring(1);
-                String[] s = parser.apply(split[1]);
-                Argument[] args = event.getArguments();
-				if (args != null) {
-					for (int i = 0; i < args.length; i++) {
-						try {
-							if (s[i].trim().isEmpty() && !args[i].isOptional()) {
-								throw new ArgumentParsingException("Invalid or no were given.");
-							}
-							args[i].parse(s[i].trim());
-							if (!args[i].isPresent() && !args[i].isOptional())
-								throw new ArgumentParsingException("Invalid or no were given.");
-						} catch (ArgumentParsingException | ArrayIndexOutOfBoundsException ex) {
-							if (!args[i].isOptional()) {
-								event.sendMessage("**Bad Arguments:** " + ex.getMessage() + ".\nExpected arguments: " + (String.join(" ", Arrays.stream(getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new)))).queue();
-								return;
-							}
-						}
-					}
-				}
-				action.accept(event, args);
+				action.accept(event, event.getArguments());
             }
 			
 			@Override
@@ -171,8 +134,22 @@ public class CommandBuilder {
 			}
 			
 			@Override
-			public String getHelp() {
-				return help;
+			public String getHelpMessage() {
+				String desc = "";
+				desc += getCategory().getEmoji() + " **| " + getCategory().getKey() + "**\n**Command:** " + getName() + "\n";
+				desc += "**Description:** " + getDescription() + "\n";
+				if (getArguments() != null) {
+					desc += "**Arguments:** " + (getArguments().length != 0 ? (String.join(" ", Arrays.stream(getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "No arguments required.") + '\n';
+					desc += "            *Please note: do **NOT** include <> or []*\n";
+				}
+				desc += "**Required Permission(s):** " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "\n";
+				if (getExample() != null)
+					desc += "**Example:** " + getExample();
+				return desc;
+			}
+			@Override
+			public Function<String, String[]> getArgumentParser() {
+				return parser;
 			}
 		};
 	}

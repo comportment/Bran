@@ -11,7 +11,11 @@ import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import net.dv8tion.jda.core.Permission;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class TreeCommandBuilder {
     
@@ -20,11 +24,9 @@ public class TreeCommandBuilder {
 	private String name = null;
 	private String desc = null;
 	private boolean isPrivate = true;
-	private String example = null;
 	private Long perm = Permissions.RUN_BASECMD;
 	private Category category;
 	private String defaultCmd;
-	private String help;
 	private CommandAction onNotFound = CommandAction.SHOW_ERROR;
 	private CommandAction onMissingPermission = CommandAction.SHOW_ERROR;
 	
@@ -57,14 +59,8 @@ public class TreeCommandBuilder {
 		return this;
 	}
 	
-	public TreeCommandBuilder setExample(String example) {
-		this.example = example;
-		return this;
-	}
-	
 	public TreeCommandBuilder addSubCommand(ICommand subCommand) {
 		this.subCommands.add(subCommand);
-        Bran.getInstance().getCommandManager().generateHelp(subCommand);
         return this;
 	}
 	
@@ -78,11 +74,6 @@ public class TreeCommandBuilder {
 	}
 	public TreeCommandBuilder onMissingPermission(CommandAction action) {
 		this.onMissingPermission = action;
-		return this;
-	}
-	
-	public TreeCommandBuilder setHelp(String help) {
-		this.help = help;
 		return this;
 	}
 	
@@ -103,75 +94,37 @@ public class TreeCommandBuilder {
 			public CommandAction onNotFound() {
 				return onNotFound;
 			}
-			
-			@Override
-			public String getHelp() {
-				return help;
+            @Override
+            public String getDefaultCommand() {
+                return defaultCmd;
+            }
+
+            @Override
+			public String getHelpMessage() {
+				String desc = "";
+				desc += getCategory().getEmoji() + " **| " + getCategory().getKey() + "**\n**Command:** " + getName() + "\n";
+				desc += "**Description:** " + getDescription() + "\n";
+				desc += "**Required Permission(s):** " + String.join(", ", Permissions.toCollection(getRequiredPermission())) + "\n";
+				desc += "**Parameters**:\n";
+				Set<Category> categories = getSubCommands().stream().map(ICommand::getCategory).collect(Collectors.toSet());
+				for (Category category : categories) {
+					List<ICommand> commands = getSubCommands().stream().filter(cmd -> cmd.getCategory() == category).collect(Collectors.toList());
+					if (commands.isEmpty()) continue;
+					desc += category.getEmoji() + " **| " + category.getKey() + "**\n";
+					for (ICommand cmd : commands)
+						desc += "          **" + cmd.getAliases()[0] + "** " + (cmd.getArguments() != null ? (String.join(" ", Arrays.stream(cmd.getArguments()).map(arg -> (arg.isOptional() ? "<" : "[") + arg.getType().getSimpleName() + ": " + arg.getName() + (arg.isOptional() ? ">" : "]")).toArray(String[]::new))) : "") + " - " + (cmd instanceof ITreeCommand ? "Use the help command to get help!" : cmd.getDescription()) + "\n";
+					desc += '\n';
+				}
+				return desc;
 			}
-			
-			@Override
+            @Override
+            public Function<String, String[]> getArgumentParser() {
+                return null;
+            }
+
+            @Override
 			public void execute(CommandEvent event) {
-                if (event.isPrivate() && !isPrivateAvailable()) {
-                    event.sendMessage("This Command is not available in PMs, please use it in a Guild Text Channel.").queue();
-                    return;
-                } else if (!event.isPrivate() && event.getGuildData(true).getDisabledCommands(event.getTextChannel()).contains(event.getCommand().getKey()))
-                    return;
-                else if (event.getArgs(3)[1].matches("^(\\?|help)$")) {
-                    event.sendMessage(Bran.getInstance().getCommandManager().getHelp(this, event.getMember())).queue();
-                    return;
-                }
-                String alias = event.getArgs(3)[1].trim();
-                boolean isDefault = false;
-                if (alias.isEmpty()) {
-                    if (defaultCmd != null) {
-                        alias = defaultCmd;
-                        isDefault = true;
-                    } else {
-                        if (event.getGuild() != null && !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
-                            event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
-                        } else {
-                            event.sendMessage(Bran.getInstance().getCommandManager().getHelp(event.getCommand(), event.getSelfMember())).queue();
-                        }
-                        return;
-                    }
-                }
-                ICommand subCommand = Bran.getInstance().getCommandManager().getCommand(this, alias);
-                if (subCommand == null) {
-                    switch (onNotFound) {
-                        case SHOW_ERROR:
-                            event.sendMessage("No such SubCommand `" + alias + "` in " + getName() + ".").queue();
-                            break;
-                        case REDIRECT:
-                            event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
-                            break;
-                        case SHOW_HELP:
-                            if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
-                                event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
-                            } else {
-                                event.sendMessage(Bran.getInstance().getCommandManager().getHelp(event.getCommand(), event.getSelfMember())).queue();
-                            }
-                            break;
-                    }
-                    return;
-                } else if (event.isPrivate() ? !event.getUserData().hasPermission(getRequiredPermission()) : !event.getGuildData(true).hasPermission(event.getAuthor(), getRequiredPermission())) {
-                    switch (onMissingPermission) {
-                        case SHOW_ERROR:
-                            event.sendMessage("\u2757 I can't let you do that! You are missing the following permissions: " + String.join(", ", Permissions.toCollection(getRequiredPermission()))).queue();
-                            break;
-                        case REDIRECT:
-                            event.createChild(Bran.getInstance().getCommandManager().getCommand(this, defaultCmd), true);
-                            break;
-                        case SHOW_HELP:
-                            if (!event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
-                                event.sendMessage("I can't send you help without the MESSAGE_EMBED_LINKS permission!").queue();
-                            } else {
-                                event.sendMessage(Bran.getInstance().getCommandManager().getHelp(event.getCommand(), event.getSelfMember())).queue();
-                            }
-                            break;
-                    }
-                    return;
-                }
-                event.createChild(subCommand, isDefault);
+                Bran.getInstance().getCommandManager().execute(event);
             }
             
             @Override
@@ -206,7 +159,7 @@ public class TreeCommandBuilder {
 			
 			@Override
 			public String getExample() {
-				return example;
+				return null;
 			}
 			
 			@Override

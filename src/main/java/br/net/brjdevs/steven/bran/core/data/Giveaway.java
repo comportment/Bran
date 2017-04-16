@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.core.data;
 
 import br.net.brjdevs.steven.bran.core.client.Bran;
-import br.net.brjdevs.steven.bran.core.client.Client;
+import br.net.brjdevs.steven.bran.core.client.Shard;
 import br.net.brjdevs.steven.bran.core.managers.TaskManager;
 import br.net.brjdevs.steven.bran.core.utils.CollectionUtils;
 import br.net.brjdevs.steven.bran.core.utils.Hastebin;
@@ -135,7 +135,7 @@ public class Giveaway {
         return getGuild().getTextChannelById(id) == null ? getGuild().getPublicChannel() : getGuild().getTextChannelById(id);
     }
     
-    public Client getShard() {
-        return Bran.getInstance().getShards()[Bran.getInstance().calcShardId(guildId)];
+    public Shard getShard() {
+        return Bran.getInstance().getShards()[Bran.getInstance().getShardId(guildId)];
     }
 }

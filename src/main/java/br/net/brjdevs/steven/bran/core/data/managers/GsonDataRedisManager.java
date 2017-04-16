@@ -1,6 +1,6 @@
 package br.net.brjdevs.steven.bran.core.data.managers;
 
-import br.net.brjdevs.steven.bran.core.client.Bran;
+import br.net.brjdevs.steven.bran.core.redis.RedisDatabase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import redis.clients.jedis.Jedis;
@@ -15,7 +15,7 @@ public class GsonDataRedisManager<T> implements Supplier<T> {
 	
 	public GsonDataRedisManager(Class<T> clazz, String key, Supplier<T> constructor) {
         this.key = key;
-        try (Jedis jedis = Bran.getJedisPool().getResource()) {
+        try (Jedis jedis = RedisDatabase.getDB().getResource()) {
             String s = jedis.get(key);
             if (s == null) {
                 jedis.set(key, s = GSON.toJson(constructor.get()));
@@ -32,7 +32,7 @@ public class GsonDataRedisManager<T> implements Supplier<T> {
 	}
 	
 	public void update() {
-        try (Jedis jedis = Bran.getJedisPool().getResource()) {
+        try (Jedis jedis = RedisDatabase.getDB().getResource()) {
             jedis.set(key, GSON.toJson(data));
         } catch (Exception e) {
             throw new RuntimeException(e);
