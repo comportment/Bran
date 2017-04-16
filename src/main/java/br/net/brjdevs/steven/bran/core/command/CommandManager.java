@@ -39,6 +39,7 @@ public class CommandManager {
     private final Logger LOGGER = LoggerFactory.getLogger("Command Manager");
 	
 	public CommandManager() {
+
         try {
             SQLDatabase.getInstance().run((conn) -> {
                 try {
