@@ -1,0 +1,71 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'com.sedmelluq.jdaction' version '1.0.1'
+}
+
+mainClassName = "br.net.brjdevs.steven.bran.core.client.Bran"
+
+
+group 'br.net.brjdevs.steven.bran'
+def ver = new Version(major: 1, minor: 0, revision: 5)
+version ver.toString()
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile 'net.dv8tion:JDA:3.0.0_173'
+    compile 'com.sedmelluq:lavaplayer:1.2.34'
+    compile 'org.reflections:reflections:0.9.10'
+    compile 'redis.clients:jedis:2.9.0'
+    compile 'ch.qos.logback:logback-classic:0.9.26'
+    compile 'com.esotericsoftware:kryo:4.0.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'br.com.brjdevs:utils:1.0.0_4'
+    compile 'com.fathzer:javaluator:3.0.0'
+    compile 'mysql:mysql-connector-java:6.0.4'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2'
+}
+
+task prepareSource(type: Copy) {
+    from 'src/main/java'
+    into 'build/prepared-src'
+    filter(ReplaceTokens, tokens: [
+            version: ver.toString()
+    ])
+    dependsOn clean
+}
+prepareSource.dependsOn clean
+
+compileJava {
+    source = prepareSource.destinationDir
+    classpath = sourceSets.main.compileClasspath
+    options.encoding = 'UTF-8'
+    dependsOn prepareSource
+}
+
+
+
+class Version {
+    String major, minor, revision
+
+    static String getBuild() {
+        return new Date().format('ddMMyyyy')
+    }
+
+    String toString() {
+        "${major}.${minor}.${revision}_D$build"
+    }
+}
