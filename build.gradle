@@ -11,7 +11,7 @@ mainClassName = "br.net.brjdevs.steven.bran.core.client.Bran"
 
 
 group 'br.net.brjdevs.steven.bran'
-def ver = new Version(major: 1, minor: 0, revision: 5)
+def ver = new Version(major: 1, minor: 0, revision: 12)
 version ver.toString()
 
 sourceCompatibility = 1.8
@@ -23,12 +23,11 @@ repositories {
 }
 
 dependencies {
-    compile 'net.dv8tion:JDA:3.0.0_173'
+    compile 'net.dv8tion:JDA:3.0.0_176'
     compile 'com.sedmelluq:lavaplayer:1.2.34'
     compile 'org.reflections:reflections:0.9.10'
     compile 'redis.clients:jedis:2.9.0'
     compile 'ch.qos.logback:logback-classic:0.9.26'
-    compile 'com.esotericsoftware:kryo:4.0.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'br.com.brjdevs:utils:1.0.0_4'
     compile 'com.fathzer:javaluator:3.0.0'

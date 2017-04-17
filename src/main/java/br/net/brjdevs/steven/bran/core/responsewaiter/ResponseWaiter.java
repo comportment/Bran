@@ -25,9 +25,9 @@ public class ResponseWaiter {
 	private ExpectedResponseType expectedResponseType;
     
     public ResponseWaiter(User user, TextChannel textChannel, Shard shard, long expiresIn, String[] validInputs, ExpectedResponseType expectedResponseType, ResponseListener responseListener) {
-        this.userId = Long.parseLong(user.getId());
-		this.channelId = Long.parseLong(textChannel.getId());
-		this.guildId = Long.parseLong(textChannel.getGuild().getId());
+        this.userId = user.getIdLong();
+		this.channelId = textChannel.getIdLong();
+		this.guildId = textChannel.getGuild().getIdLong();
 		this.expiresIn = expiresIn;
 		this.validInputs = validInputs;
         this.shard = shard;

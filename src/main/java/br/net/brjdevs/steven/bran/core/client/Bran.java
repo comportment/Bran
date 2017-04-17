@@ -180,7 +180,7 @@ public class Bran {
                     Guild guild = shard.getJDA().getGuildById(String.valueOf(guildId));
                     if (guild != null) {
                         if (guild.getAudioManager().getConnectedChannel() != null) {
-                            shardPlayers.put(guildId, new ImmutablePair<>(Long.parseLong(guild.getAudioManager().getConnectedChannel().getId()), musicManager));
+                            shardPlayers.put(guildId, new ImmutablePair<>(guild.getAudioManager().getConnectedChannel().getIdLong(), musicManager));
                             musicManager.getTrackScheduler().setPaused(true);
                             playerManager.unregister(guildId);
                         }
@@ -247,7 +247,7 @@ public class Bran {
         for (Shard shard : shards) {
             User u = shard.getJDA().getUserById(getConfig().ownerId);
 			if (u != null) {
-				ownerId = Long.parseLong(u.getId());
+				ownerId = u.getIdLong();
 				break;
 			}
 		}

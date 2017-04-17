@@ -62,7 +62,7 @@ public class BranMusicManager {
 	}
 	
 	public synchronized GuildMusicManager get(Guild guild) {
-		long guildId = Long.parseLong(guild.getId());
+		long guildId = guild.getIdLong();
 		GuildMusicManager musicManager = musicManagers
 				.computeIfAbsent(guildId, k -> new GuildMusicManager(playerManager, guild));
 		

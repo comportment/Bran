@@ -1,7 +1,7 @@
 package br.net.brjdevs.steven.bran.core.data;
 
 import br.net.brjdevs.steven.bran.core.data.managers.GsonDataFileManager;
-import br.net.brjdevs.steven.bran.core.data.managers.GsonDataRedisManager;
+import br.net.brjdevs.steven.bran.core.data.managers.RedisDataManager;
 import br.net.brjdevs.steven.bran.core.poll.Polls;
 
 import java.util.HashMap;
@@ -10,18 +10,18 @@ import java.util.Map;
 
 public class DataManager {
 	
-	private GsonDataRedisManager<DataHolder> dataHolderManager;
+	private RedisDataManager<DataHolder> dataHolderManager;
 	private GsonDataFileManager<Config> configDataManager;
-	private GsonDataRedisManager<Map<String, List<String>>> hangmanWordsManager;
-	private GsonDataRedisManager<Polls> pollPersistence;
+	private RedisDataManager<Map<String, List<String>>> hangmanWordsManager;
+	private RedisDataManager<Polls> pollPersistence;
 	
 	public DataManager() {
         getConfig();
     }
     
-    public GsonDataRedisManager<DataHolder> getData() {
+    public RedisDataManager<DataHolder> getData() {
         if (dataHolderManager == null)
-			dataHolderManager = new GsonDataRedisManager<>(DataHolder.class, "dataholder.json", DataHolder::new);
+			dataHolderManager = new RedisDataManager<>(DataHolder.class, "dataholder.json", DataHolder::new);
 		return dataHolderManager;
 	}
     
@@ -31,15 +31,15 @@ public class DataManager {
 		return configDataManager;
 	}
     
-    public GsonDataRedisManager<Map<String, List<String>>> getHangmanWords() {
+    public RedisDataManager<Map<String, List<String>>> getHangmanWords() {
         if (hangmanWordsManager == null)
-			hangmanWordsManager = (GsonDataRedisManager<Map<String, List<String>>>) new GsonDataRedisManager(HashMap.class, "hangmanwords.json", HashMap::new);
+			hangmanWordsManager = (RedisDataManager<Map<String, List<String>>>) new RedisDataManager(HashMap.class, "hangmanwords.json", HashMap::new);
 		return hangmanWordsManager;
 	}
     
-    public GsonDataRedisManager<Polls> getPolls() {
+    public RedisDataManager<Polls> getPolls() {
         if (pollPersistence == null)
-			pollPersistence = new GsonDataRedisManager<>(Polls.class, "pollpersistence", Polls::new);
+			pollPersistence = new RedisDataManager<>(Polls.class, "pollpersistence", Polls::new);
 		return pollPersistence;
 	}
 }

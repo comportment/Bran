@@ -10,13 +10,17 @@ import br.net.brjdevs.steven.bran.core.command.interfaces.ICommand;
 import br.net.brjdevs.steven.bran.core.currency.BankAccount;
 import br.net.brjdevs.steven.bran.core.data.UserData;
 import br.net.brjdevs.steven.bran.core.utils.Emojis;
+import br.net.brjdevs.steven.bran.core.utils.Utils;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.User;
 
+import java.util.Arrays;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class BetCommand {
 
@@ -59,6 +63,7 @@ public class BetCommand {
                 .addSubCommand(new CommandBuilder(Category.CURRENCY)
                         .setAliases("join")
                         .setName("Bet Join Command")
+                        .setDescription("Bets an amount of coins.")
                         .setArgs(new Argument("amount", Integer.class))
                         .setAction((event) -> {
                             Bet bet = bets.get(event.getTextChannel().getIdLong());
@@ -69,17 +74,41 @@ public class BetCommand {
                             int amount = ((int) event.getArgument("amount").get());
                             if (amount < bet.getMinimum()) {
                                 event.sendMessage("You have to bet at least " + bet.getMinimum() + " coins!").queue();
+                            } else if (amount > 2500) {
+                                event.sendMessage(Emojis.X + " The maximum bet is 2500 coins!").queue();
                             } else if (!event.getUserData().getProfileData().getBankAccount().takeCoins(amount, BankAccount.MAIN_BANK)) {
                                 event.sendMessage("You don't have " + amount + " coins to bet!").queue();
                             } else {
                                 bet.getParticipating().put(event.getAuthor().getIdLong(), (long) amount);
-                                event.sendMessage(Emojis.CHECK_MARK + " You bet " + amount + " coins!").queue();
+                                event.sendMessage(Emojis.CHECK_MARK + " You bet " + amount + " coins! Accumulated amount: " + bet.getAccumulatedAmount()).queue();
                             }
+                        })
+                        .build())
+                .addSubCommand(new CommandBuilder(Category.CURRENCY)
+                        .setAliases("info")
+                        .setName("Bet Info Command")
+                        .setDescription("Shows you information on the current bet.")
+                        .setAction((event) -> {
+                            Bet bet = bets.get(event.getTextChannel().getIdLong());
+                            if (bet == null) {
+                                event.sendMessage("No bets running in this channel!").queue();
+                                return;
+                            }
+                            EmbedBuilder embedBuilder = new EmbedBuilder();
+                            embedBuilder.setTitle("Bet information", null);
+                            embedBuilder.setDescription("\u00ad");
+                            embedBuilder.addField("Creator", Utils.getUser(bet.getCreator()), true);
+                            embedBuilder.addField("User count", String.valueOf(bet.getParticipating().size()), true);
+                            embedBuilder.addField("Accumulated coins", String.valueOf(bet.getAccumulatedAmount()), true);
+                            embedBuilder.addField("Users", Arrays.stream(bet.getParticipating().keys()).mapToObj(l -> Utils.getUser(event.getJDA().getUserById(l)) + ": " + bet.getParticipating().get(l) + " coins").collect(Collectors.joining("\n")), false);
+
+                            event.sendMessage(embedBuilder.build()).queue();
                         })
                         .build())
                 .addSubCommand(new CommandBuilder(Category.CURRENCY)
                         .setAliases("end")
                         .setName("Bet End Command")
+                        .setDescription("Ends a bet and chooses a winner!")
                         .setAction((event) -> {
                             Bet bet = bets.get(event.getTextChannel().getIdLong());
                             if (bet == null) {

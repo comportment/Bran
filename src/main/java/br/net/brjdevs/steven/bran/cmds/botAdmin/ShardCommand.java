@@ -85,9 +85,8 @@ public class ShardCommand {
         sb.append("```diff\n");
         for (Shard shard : Bran.getInstance().getShards()) {
             sb.append(shard.getJDA().getStatus() == Status.CONNECTED ? "+" : "-").append(" ");
-            sb.append("Shard ").append(shard.getJDA().getShardInfo() != null ? shard.getJDA().getShardInfo().getShardString() : "[0 / 1]").append(" L.E.: ")
-                    .append(TimeUtils.format(System.currentTimeMillis() - Bran.getInstance().getLastEvents().get(shard.getId())))
-                    .append(" L.R.: ").append(TimeUtils.format(System.currentTimeMillis() - shard.getLastReboot())).append(" S: ").append(shard.getJDA().getStatus()).append("\n");
+            sb.append("Shard ").append(shard.getJDA().getShardInfo() != null ? shard.getJDA().getShardInfo().getShardString() : "[0 / 1] ").append(shard.getJDA().getStatus().name()).append(" - Last response: ")
+                    .append(TimeUtils.format(System.currentTimeMillis() - Bran.getInstance().getLastEvents().get(shard.getId()))).append(" - Guilds: ").append(shard.getJDA().getGuilds().size()).append("\n");
         }
         return sb.append("```").toString();
     }

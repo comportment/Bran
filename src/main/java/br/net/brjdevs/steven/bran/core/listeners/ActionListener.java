@@ -21,7 +21,7 @@ public class ActionListener extends EventListener<Event> {
 		String response = null;
 		Object obj = null;
 		if (e instanceof MessageReactionAddEvent) {
-			responseWaiter = ResponseWaiter.responseWaiters.get(Long.parseLong(((MessageReactionAddEvent) e).getUser().getId()));
+			responseWaiter = ResponseWaiter.responseWaiters.get(((MessageReactionAddEvent) e).getUser().getIdLong());
 			if (responseWaiter != null && responseWaiter.getExpectedResponseType() != ExpectedResponseType.REACTION)
 				return;
 			response = ((MessageReactionAddEvent) e).getReaction().getEmote().getName();
@@ -29,14 +29,14 @@ public class ActionListener extends EventListener<Event> {
 		} else if (e instanceof GuildMessageReceivedEvent) {
 			if (((GuildMessageReceivedEvent) e).getAuthor().isBot() || ((GuildMessageReceivedEvent) e).getAuthor().isFake())
 				return;
-			responseWaiter = ResponseWaiter.responseWaiters.get(Long.parseLong(((GuildMessageReceivedEvent) e).getAuthor().getId()));
+			responseWaiter = ResponseWaiter.responseWaiters.get(((GuildMessageReceivedEvent) e).getAuthor().getIdLong());
 			if (responseWaiter != null && responseWaiter.getExpectedResponseType() != ExpectedResponseType.MESSAGE)
 				return;
 			response = ((GuildMessageReceivedEvent) e).getMessage().getRawContent();
 			obj = ((GuildMessageReceivedEvent) e).getMessage();
 		}
 		if (responseWaiter != null) {
-			ResponseWaiter.responseWaiters.remove(Long.parseLong(responseWaiter.getUser().getId()));
+			ResponseWaiter.responseWaiters.remove(responseWaiter.getUser().getIdLong());
 			ResponseWaiter.EXPIRATION.removeResponseWaiter(responseWaiter);
 			if (ArrayUtils.contains(responseWaiter.getValidInputs(), response))
 				responseWaiter.getResponseListener().onEvent(new ValidResponseEvent(responseWaiter, obj));

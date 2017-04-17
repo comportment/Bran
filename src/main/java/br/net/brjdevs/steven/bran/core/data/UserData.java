@@ -2,6 +2,7 @@ package br.net.brjdevs.steven.bran.core.data;
 
 import br.net.brjdevs.steven.bran.core.currency.ProfileData;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
+import br.net.brjdevs.steven.bran.core.translator.Language;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
 
@@ -10,9 +11,10 @@ public class UserData {
 	public long userId;
     private ProfileData profileData;
     private long globalPermission = Permissions.BASE_USR;
-    
+    private Language language;
+
     public UserData(User user, ProfileData profileData) {
-        this.userId = Long.parseLong(user.getId());
+        this.userId = user.getIdLong();
         setProfileData(profileData);
     }
 	
@@ -42,4 +44,8 @@ public class UserData {
 			globalPermission = Permissions.BASE_USR;
 		return globalPermission;
 	}
+
+    public Language getLanguage() {
+        return language;
+    }
 }

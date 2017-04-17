@@ -66,19 +66,19 @@ public class Giveaway {
 	
 	public Giveaway(Member member, Guild guild, Role role, TextChannel channel, int maxUsers, long expiresIn) {
 		this.maxUsers = maxUsers;
-		this.creator = Long.parseLong(member.getUser().getId());
+		this.creator = member.getUser().getIdLong();
 		this.expiresIn = expiresIn + System.currentTimeMillis();
 		if (role != null && role != guild.getPublicRole())
-			this.roleId = Long.parseLong(role.getId());
+			this.roleId = role.getIdLong();
 		else
 			this.roleId = -1L;
-		this.guildId = Long.parseLong(guild.getId());
+		this.guildId = guild.getIdLong();
 		this.participating = new ArrayList<>();
-		this.channel = Long.parseLong(channel.getId());
+		this.channel = channel.getIdLong();
 	}
 	
 	public boolean participate(Member member) {
-		long l = Long.parseLong(member.getUser().getId());
+		long l = member.getUser().getIdLong();
 		if (participating.contains(l)) return false;
 		participating.add(l);
 		return true;
@@ -106,7 +106,7 @@ public class Giveaway {
 	
 	public boolean join(Member member) {
 		if (participating.size() > maxUsers) return false;
-		participating.add(Long.parseLong(member.getUser().getId()));
+		participating.add(member.getUser().getIdLong());
 		return true;
 	}
 	

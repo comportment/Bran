@@ -7,6 +7,7 @@ import br.net.brjdevs.steven.bran.core.managers.CustomCommand;
 import br.net.brjdevs.steven.bran.core.managers.Permissions;
 import br.net.brjdevs.steven.bran.core.operations.ResultType;
 import br.net.brjdevs.steven.bran.core.operations.ResultType.OperationResult;
+import br.net.brjdevs.steven.bran.core.translator.Language;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
@@ -34,9 +35,10 @@ public class GuildData {
 	private long announceChannelId;
 	private List<Long> publicRoles = new ArrayList<>();
     private Map<Long, List<String>> disabledCommands = new HashMap<>();
-    
+    private Language language;
+
     public GuildData(Guild guild) {
-		this.guildId = Long.parseLong(guild.getId());
+		this.guildId = guild.getIdLong();
         this.prefixes.addAll(Bran.getInstance().getDataManager().getConfig().get().defaultPrefixes);
     }
 	
@@ -58,7 +60,7 @@ public class GuildData {
 		if ((senderPerm & (permsToAdd | permsToTake)) != (permsToAdd | permsToTake))
 			return ResultType.FAILURE.setExtras("You don't have enough permission to do that.", (permsToAdd | permsToTake)); //Check if the Sender Perm have all the permissions
 		long oldPerms = getPermissionForUser(user);
-		permissions.put(Long.parseLong(user.getId()), targetPerm ^ (targetPerm & permsToTake) | permsToAdd);
+		permissions.put(user.getIdLong(), targetPerm ^ (targetPerm & permsToTake) | permsToAdd);
 		return ResultType.SUCCESS.setExtras("Successfully updated permissions!", oldPerms, getPermissionForUser(user));
 	}
 	
@@ -74,7 +76,7 @@ public class GuildData {
 		if (textChannel == null)
 			announceChannelId = 0;
 		else
-			this.announceChannelId = Long.parseLong(textChannel.getId());
+			this.announceChannelId = textChannel.getIdLong();
 	}
 	
 	public List<Long> getPublicRoles() {
@@ -90,7 +92,7 @@ public class GuildData {
 	
 	public boolean isPublic(Role role) {
 		if (publicRoles == null) publicRoles = new ArrayList<>();
-		return publicRoles.contains(Long.parseLong(role.getId()));
+		return publicRoles.contains(role.getIdLong());
 	}
 	
 	public void addPublicRole(Role role) {
@@ -112,19 +114,24 @@ public class GuildData {
     }
     
     public TextChannel getModLogChannel(JDA jda) {
-        return jda.getTextChannelById(String.valueOf(modLogChannel));
+        return jda.getTextChannelById(modLogChannel);
     }
     
     public void setModLogChannel(TextChannel modLogChannel) {
-        this.modLogChannel = Long.parseLong(modLogChannel.getId());
+        this.modLogChannel = modLogChannel.getIdLong();
     }
     
     public Map<Long, List<String>> getDisabledCommands() {
         if (disabledCommands == null) disabledCommands = new HashMap<>();
         return disabledCommands;
     }
-    
-    public List<String> getDisabledCommands(TextChannel channel) {
-        return getDisabledCommands().getOrDefault(Long.parseLong(channel.getId()), new ArrayList<>());
+
+	public Language getLanguage() {
+    	if (language == null)
+    		language = Language.en_US;
+		return language;
+	}
+	public List<String> getDisabledCommands(TextChannel channel) {
+        return getDisabledCommands().getOrDefault(channel.getIdLong(), new ArrayList<>());
     }
 }

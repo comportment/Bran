@@ -7,13 +7,13 @@ import redis.clients.jedis.Jedis;
 
 import java.util.function.Supplier;
 
-public class GsonDataRedisManager<T> implements Supplier<T> {
-    
+public class RedisDataManager<T> implements Supplier<T> {
+
     private final Gson GSON = new GsonBuilder().serializeNulls().create();
     private String key;
 	private T data;
 	
-	public GsonDataRedisManager(Class<T> clazz, String key, Supplier<T> constructor) {
+	public RedisDataManager(Class<T> clazz, String key, Supplier<T> constructor) {
         this.key = key;
         try (Jedis jedis = RedisDatabase.getDB().getResource()) {
             String s = jedis.get(key);

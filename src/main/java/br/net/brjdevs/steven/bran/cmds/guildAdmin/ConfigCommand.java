@@ -201,7 +201,7 @@ public class ConfigCommand {
                                         return;
                                     }
                                     TextChannel channel = event.getMessage().getMentionedChannels().get(0);
-                                    event.getGuildData(false).getDisabledCommands().computeIfAbsent(Long.parseLong(channel.getId()), id -> new ArrayList<>()).add(cmd.getKey());
+                                    event.getGuildData(false).getDisabledCommands().computeIfAbsent(channel.getIdLong(), id -> new ArrayList<>()).add(cmd.getKey());
                                     event.sendMessage(Emojis.CHECK_MARK + " Command " + cmd.getName() + " was disabled in " + channel.getAsMention() + "!").queue();
                                 })
                                 .build())

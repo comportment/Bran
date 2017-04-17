@@ -50,8 +50,8 @@ public class AudioPlayerListener extends AudioEventAdapter {
 	}
 	
 	private void setMessage(Message message) {
-		this.messageId = Long.parseLong(message.getId());
-		this.channelId = Long.parseLong(message.getChannel().getId());
+		this.messageId = message.getIdLong();
+		this.channelId = message.getChannel().getIdLong();
 	}
 	
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {

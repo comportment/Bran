@@ -18,11 +18,11 @@ public class GuildMusicManager {
 	private final AudioPlayer player;
 	private final TrackScheduler scheduler;
 	private final int shard;
-	private Long guildId;
+	private long guildId;
 	
 	public GuildMusicManager(AudioPlayerManager manager, Guild guild) {
 		player = manager.createPlayer();
-		this.guildId = Long.parseLong(guild.getId());
+		this.guildId = guild.getIdLong();
 		this.shard = Bran.getInstance().getShardId(guild.getJDA());
 		scheduler = new TrackScheduler(this, player, guildId, shard);
 		player.addListener(new AudioPlayerListener(getTrackScheduler()));

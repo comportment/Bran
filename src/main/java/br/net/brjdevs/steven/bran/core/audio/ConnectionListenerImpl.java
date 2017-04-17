@@ -16,7 +16,7 @@ public class ConnectionListenerImpl implements net.dv8tion.jda.core.audio.hooks.
 	
 	public ConnectionListenerImpl(Guild guild) {
 		this.attempts = -1;
-		this.guildId = Long.parseLong(guild.getId());
+		this.guildId = guild.getIdLong();
 		this.shard = Bran.getInstance().getShardId(guild.getJDA());
 	}
 	
