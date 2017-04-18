@@ -23,7 +23,7 @@ public class GuildListener extends EventListener<GenericGuildEvent> {
 			LOGGER.info("Joined guild '" + event.getGuild().getName() + "' (Members: " + event.getGuild().getMembers().size() + ")");
             GuildStatsManager.log(LoggedEvent.JOIN, event.getGuild());
         } else if (event instanceof GuildLeaveEvent) {
-			LOGGER.info("Joined guild '" + event.getGuild().getName() + "' (Members: " + event.getGuild().getMembers().size() + ")");
+			LOGGER.info("Left guild '" + event.getGuild().getName() + "' (Members: " + event.getGuild().getMembers().size() + ")");
             GuildStatsManager.log(LoggedEvent.LEAVE, event.getGuild());
         }
 	}
